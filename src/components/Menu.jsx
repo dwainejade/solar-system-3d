@@ -56,7 +56,20 @@ const Menu = () => {
         Menu
       </button>
       <div className='menu-content'>
-        {selectedPlanet ? (
+        <div className='menu-item'>
+          <label htmlFor='simSpeed'>Simulation Speed: </label>
+          <select id='simSpeed' onChange={handleSpeedChange}>
+            <option value='realtime'>Realtime</option>
+            <option value='1h'>1s equals 1 hour</option>
+            <option value='1d'>1s equals 1 day</option>
+            <option value='1w'>1s equals 1 week</option>
+            <option value='1m'>1s equals 1 month</option>
+            <option value='1y'>1s equals 1 year</option>
+            <option value='5y'>1s equals 5 years</option>
+            <option value='10y'>1s equals 10 years</option>
+          </select>
+        </div>
+        {selectedPlanet && (
           <div className='planet-details'>
             <h2>{selectedPlanet.name}</h2>
             <p>Mass: {formatNumber(selectedPlanet.mass)} kg</p>
@@ -69,20 +82,6 @@ const Menu = () => {
             <p>Rotation Period: {selectedPlanet.rotationPeriod} hours</p>
             <p>Surface Temperature: {selectedPlanet.surfaceTemp} °C</p>
             <p>Gravity: {selectedPlanet.gravity} m/s²</p>
-          </div>
-        ) : (
-          <div className='menu-item'>
-            <label htmlFor='simSpeed'>Simulation Speed: </label>
-            <select id='simSpeed' onChange={handleSpeedChange}>
-              <option value='realtime'>Realtime</option>
-              <option value='1h'>1s equals 1 hour</option>
-              <option value='1d'>1s equals 1 day</option>
-              <option value='1w'>1s equals 1 week</option>
-              <option value='1m'>1s equals 1 month</option>
-              <option value='1y'>1s equals 1 year</option>
-              <option value='5y'>1s equals 5 years</option>
-              <option value='10y'>1s equals 10 years</option>
-            </select>
           </div>
         )}
       </div>

@@ -79,7 +79,8 @@ body {
 
     .menu-content {
       display: flex;
-
+      flex-direction: column;
+      overflow-y: auto;
       .menu-item {
         display: flex;
         flex-direction: row;
@@ -90,6 +91,9 @@ body {
         input {
           width: 60px;
         }
+      }
+      .planet-details {
+        max-height: 100%;
       }
     }
 

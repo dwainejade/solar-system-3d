@@ -75,6 +75,8 @@ body {
 }
 .Main .menu-con .menu-content {
   display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 }
 .Main .menu-con .menu-content .menu-item {
   display: flex;
@@ -86,6 +88,9 @@ body {
 }
 .Main .menu-con .menu-content .menu-item input {
   width: 60px;
+}
+.Main .menu-con .menu-content .planet-details {
+  max-height: 100%;
 }
 .Main .menu-con .menu-toggle-btn {
   position: absolute;
