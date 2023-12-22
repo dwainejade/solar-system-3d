@@ -1,12 +1,10 @@
 import React, { useRef, useEffect, useState } from "react";
-import { Stars, CameraControls } from "@react-three/drei";
+import { Stars, CameraControls, useTexture } from "@react-three/drei";
 import useStore, { usePlanetStore } from "./store/store";
 import planetsData from "./data/planetsData";
 import Planet from "./components/Planet";
-import Moon from "./components/Moon";
+// import Moon from "./components/Moon";
 import Sun from "./components/Sun";
-// import { useThree } from "@react-three/fiber";
-// import CameraController from "./components/CameraControls";
 
 // scale down data for our model
 const distanceScaleFactor = 0.0000001;
@@ -14,7 +12,7 @@ const sizeScaleFactor = 0.00015;
 const rotationSpeedScaleFactor = 600000;
 
 const Scene = () => {
-  const { sunSettings } = useStore();
+  const { sunSettings, rotationCounts, simulationDate } = useStore();
   const { planetPositions, selectedPlanet } = usePlanetStore();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(5);
@@ -73,13 +71,6 @@ const Scene = () => {
   //   normal: "/assets/earth/2k_earth_normal_map.png",
   //   specular: "/assets/earth/2k_earth_specular_map.png",
   // });
-  // const jupiterTextures = useTexture({
-  //   map: "/assets/jupiter/jupiter.png",
-  // });
-  // const venusTextures = useTexture({
-  //   map: "/assets/venus/venus.png",
-  // });
-  // console.log(planetPositions);
 
   const cameraConfig = {
     maxDistance: 900,

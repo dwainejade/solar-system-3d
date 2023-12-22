@@ -1,6 +1,6 @@
 import React, { useRef, forwardRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import useStore, { usePlanetStore } from "../store/store";
+import useStore from "../store/store";
 import OrbitPath from "./OrbitPath";
 
 // scale down data for our model
@@ -10,7 +10,7 @@ const rotationSpeedScaleFactor = 600000;
 
 const Moon = forwardRef(({ bodyData, parentPosition }, ref) => {
   const { simSpeed } = useStore();
-  // console.log(planetAngles);
+
   const localRef = ref || useRef();
   const localAngleRef = useRef(0);
   // const pathRef = useRef();

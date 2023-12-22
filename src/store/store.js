@@ -17,9 +17,28 @@ const useStore = create((set, get) => ({
     setMoonOrbit: newSettings =>
         set(state => ({ moonSettings: { ...state.moonSettings, ...newSettings } })),
 
+    rotationCounts: {},  // Tracks the number of rotations for each planet
+    simulationDate: new Date('2024-01-01'),  // Starting date
+    // Update rotation count for a planet
+    // Function to update rotation count
+    updateRotationCount: (planetName, additionalCount) =>
+        set(state => {
+            const currentCount = state.rotationCounts[planetName] || 0;
+            return {
+                rotationCounts: {
+                    ...state.rotationCounts,
+                    [planetName]: currentCount + additionalCount
+                }
+            };
+        }),
+    // Increment the simulation date by one day
+    incrementDate: () =>
+        set((state) => ({
+            simulationDate: new Date(state.simulationDate.setDate(state.simulationDate.getDate() + 1)),
+        })),
+
 
     // cameraTarget: new THREE.Vector3(0, 0, 0),
-
     camera: new THREE.PerspectiveCamera(),
     orbitControls: null,
     previousCameraPosition: new THREE.Vector3(),

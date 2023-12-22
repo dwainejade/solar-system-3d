@@ -15,6 +15,10 @@ const sunData = {
     surfaceTemp: 5505, // in Celsius (average effective temperature)
     color: "#FFFF00", // Bright yellow color
     gravity: 274, // in m/s² (surface gravity)
+    textures: {
+        map: '/assets/sun/2k_sun.jpg', // Base texture
+        highResMap: '/assets/sun/2k_sun.jpg' // Higher resolution texture
+    },
 };
 
 const marsData = {
@@ -47,7 +51,11 @@ const earthData = {
     rotationPeriod: 23.93, // in hours
     surfaceTemp: 14, // in Celsius
     color: "dodgerblue",
-    gravity: 9.807 // in m/s²
+    gravity: 9.807, // in m/s²
+    textures: {
+        map: '/assets/earth/2k_earth_daymap.jpg', // Base texture
+        highResMap: '/assets/earth/2k_earth_daymap.jpg' // Higher resolution texture
+    },
 };
 
 const moonData = {
@@ -64,6 +72,10 @@ const moonData = {
     surfaceTemp: -53, // in Celsius (average)
     color: "silver",
     gravity: 1.62, // in m/s²
+    textures: {
+        map: '/assets/moon/2k_moon.jpg', // Base texture
+        highResMap: '/assets/moon/2k_moon.jpg' // Higher resolution texture
+    },
 };
 
 

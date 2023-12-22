@@ -1,11 +1,9 @@
 import React, { Suspense, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-// import { OrbitControls } from "@react-three/drei";
 // import { Perf } from "r3f-perf";
 import Scene from "./Scene";
 import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import Menu from "./components/Menu";
-// import CameraControls from "./components/CameraControls";
 
 const App = () => {
   return (

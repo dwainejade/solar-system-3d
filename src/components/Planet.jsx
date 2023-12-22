@@ -3,6 +3,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import OrbitPath from "./OrbitPath";
 import planetsData from "../data/planetsData";
 import useStore, { usePlanetStore } from "../store/store";
+import { MeshStandardMaterial } from "three";
 // import * as THREE from "three";
 
 // default values
@@ -32,7 +33,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     gravity,
   } = mergedData;
 
-  const { simSpeed, resetCamera } = useStore();
+  const { simSpeed, updateRotationCount, incrementDate } = useStore();
   const { updatePlanetAngle, planetAngles, planetPositions, updatePlanetPosition, selectedPlanet, setSelectedPlanet } = usePlanetStore();
 
   const localRef = ref || useRef();
@@ -54,52 +55,38 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   const [hoveredPlanet, setHoveredPlanet] = useState(null);
 
   useFrame((state, delta) => {
-    // Adjust delta based on simulation speed
+    // Adjust delta based on simulation speed (simSpeed)
     const adjustedDelta = delta * simSpeed;
 
-    // Calculate each planet's orbital speed (radians per second)
-    // Orbital period is in Earth days, so convert it to seconds
-    const planetOrbitalSpeed = (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60);
-
     // Update planet's orbital position
+    const planetOrbitalSpeed = (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60); // Assuming orbitalPeriod is in Earth days
     localAngleRef.current += planetOrbitalSpeed * adjustedDelta;
     const x = scaledOrbitalRadius * Math.cos(localAngleRef.current);
     const z = scaledOrbitalRadius * Math.sin(localAngleRef.current);
 
-    // Update the planet's position
     if (localRef.current) {
       localRef.current.position.set(x, 0, z);
       updatePlanetPosition(name, { x, y: 0, z });
 
-      // Increment the elapsed time by delta each frame
-      // setRotationElapsedTime(prev => prev + delta);
-
-      const currentRotation = localAngleRef.current * numberOfRotationsPerOrbit;
-      const completedRotations = Math.floor(currentRotation / (2 * Math.PI));
-      if (completedRotations > lastRotationRef.current) {
-        lastRotationRef.current = completedRotations;
-
-        // Compare simulation time with real rotation period
-        // const simulationRotationTimeSeconds = rotationElapsedTime;
-        // console.log(`Simulation time for ${name} rotation: ${simulationRotationTimeSeconds.toFixed(2)} seconds`);
-
-        // Reset rotation elapsed time for next rotation
-        // setRotationElapsedTime(0);
-      }
-
       // Planet rotation on its own axis
       if (rotationPeriod) {
-        let rotationSpeed = rotationPeriod ? (2 * Math.PI) / (rotationPeriod * 3600) : 0;
-        rotationSpeed *= rotationSpeedScaleFactor;
-        // Increment the rotation based on rotation speed
-        const rotationIncrement = rotationSpeed * delta;
-        localRef.current.rotation.y += rotationIncrement;
-      }
+        // Calculate rotation speed and increment
+        const rotationPeriodInSeconds = rotationPeriod * 3600; // Convert hours to seconds
+        const rotationSpeed = (2 * Math.PI) / rotationPeriodInSeconds; // radians per second
+        const rotationIncrement = rotationSpeed * adjustedDelta;
 
-      // Camera logic for selected planet
-      // if (isPlanetSelected) {
-      //   camera.lookAt(localRef.current.position);
-      // }
+        // Increment the rotation
+        localRef.current.rotation.y += rotationIncrement;
+
+        // Check for a complete rotation
+        if (localRef.current.rotation.y >= 2 * Math.PI) {
+          localRef.current.rotation.y %= 2 * Math.PI; // Reset rotation for next cycle
+          updateRotationCount(name, 1); // Update rotation count in store for the planet
+          if (name === "Earth") {
+            incrementDate(); // Increment the simulation date by one day
+          }
+        }
+      }
     }
   });
 
@@ -109,8 +96,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     if (selectedPlanet && selectedPlanet.name === name) {
       setSelectedPlanet(null);
     } else {
-      setSelectedPlanet(mergedData); // Assuming mergedData has the necessary planet info
-      // No need to manually call setCameraTarget here, as it's handled in CameraControls useEffect
+      setSelectedPlanet(mergedData);
     }
   };
 
@@ -126,28 +112,14 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     setHoveredPlanet(null);
   };
 
-  const LabelsOverlay = ({ hoveredPlanet }) => {
-    if (!hoveredPlanet) return null;
-
-    // Calculate position of the label based on the planet's position
-    // This is a simplified example. In practice, you might need to convert
-    // the planet's 3D position to the 2D canvas coordinate system.
-
-    return (
-      <div style={{ position: "absolute", left: "calculated x", top: "calculated y" }}>
-        <div className='planet-label'>{hoveredPlanet}</div>
-      </div>
-    );
-  };
+  const detailLevel = isPlanetSelected ? 64 : 32;
 
   return (
     <>
       <group ref={localRef}>
         <mesh onClick={handleClick} onPointerOver={handlePointerOver} onPointerOut={handlePointerOut}>
-          <sphereGeometry args={[scaledRadius, 32, 32]} />
+          <sphereGeometry args={[scaledRadius, detailLevel, detailLevel]} />
           {textures ? <meshStandardMaterial map={textures.map} /> : <meshStandardMaterial color={color} />}
-          {/* {isPlanetSelected &&
-          } */}
         </mesh>
       </group>
       <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} color={color} name={name} />
