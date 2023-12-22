@@ -65,8 +65,12 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     const z = scaledOrbitalRadius * Math.sin(localAngleRef.current);
 
     if (localRef.current) {
-      localRef.current.position.set(x, 0, z);
-      updatePlanetPosition(name, { x, y: 0, z });
+      // Calculate the orbital inclination effect
+      const inclination = orbitalInclination * (Math.PI / 180); // Convert to radians if it's in degrees
+      const y = Math.sin(inclination) * scaledOrbitalRadius * Math.sin(localAngleRef.current);
+
+      localRef.current.position.set(x, y, z); // Now includes the y position adjusted by inclination
+      updatePlanetPosition(name, { x, y, z });
 
       // Planet rotation on its own axis
       if (rotationPeriod) {
@@ -122,7 +126,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
           {textures ? <meshStandardMaterial map={textures.map} /> : <meshStandardMaterial color={color} />}
         </mesh>
       </group>
-      <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} color={color} name={name} />
+      <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />
     </>
   );
 });

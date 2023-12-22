@@ -2,21 +2,24 @@ import React, { forwardRef, useMemo } from "react";
 import { Line } from "@react-three/drei";
 import * as THREE from "three";
 
-const OrbitPath = forwardRef(({ origin = new THREE.Vector3(0, 0, 0), radius = 2, color = "white", name = "orbit-path" }, ref) => {
-  // if (name === "Moon") {
-  //   console.log(name, origin);
-  // }
+const OrbitPath = forwardRef(
+  ({ origin = new THREE.Vector3(0, 0, 0), radius = 2, color = "white", name = "orbit-path", orbitalInclination }, ref) => {
+    // Convert inclination to radians
+    const inclination = orbitalInclination * (Math.PI / 180);
 
-  const points = useMemo(() => {
-    const orbitPoints = [];
-    for (let i = 0; i <= 360; i += 1) {
-      const radians = (i * Math.PI) / 180;
-      orbitPoints.push(new THREE.Vector3(origin.x + radius * Math.cos(radians), origin.y, origin.z + radius * Math.sin(radians)));
-    }
-    return orbitPoints;
-  }, [origin, radius]);
+    const points = useMemo(() => {
+      const pathPoints = [];
+      for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 64) {
+        const x = radius * Math.cos(angle);
+        const y = Math.sin(inclination) * radius * Math.sin(angle); // Adjusted for inclination
+        const z = radius * Math.sin(angle);
+        pathPoints.push(new THREE.Vector3(x, y, z));
+      }
+      return pathPoints;
+    }, [origin, radius]);
 
-  return <Line ref={ref} points={points} color={color} lineWidth={0.5} />;
-});
+    return <Line ref={ref} points={points} color={color} lineWidth={0.3} />;
+  }
+);
 
 export default OrbitPath;
