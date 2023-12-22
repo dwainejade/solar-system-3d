@@ -3,8 +3,8 @@ import { useFrame, useThree } from "@react-three/fiber";
 import OrbitPath from "./OrbitPath";
 import planetsData from "../data/planetsData";
 import useStore, { usePlanetStore } from "../store/store";
-import { Line } from "@react-three/drei"; // or use plain three.js objects
-// import * as THREE from "three";
+import { Line, Torus } from "@react-three/drei"; // or use plain three.js objects
+import * as THREE from "three";
 
 // default values
 const defaultBodyData = planetsData.Earth;
@@ -136,6 +136,13 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
           <sphereGeometry args={[scaledRadius, detailLevel, detailLevel]} />
           {textures ? <meshStandardMaterial map={textures.map} /> : <meshStandardMaterial color={color} />}
         </mesh>
+        {name === "Saturn" && (
+          <Torus args={[scaledRadius * 1.5, scaledRadius * 0.3, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+            {/* Adjust args based on the scale and appearance you want for the rings */}
+            <meshBasicMaterial color={"#F4E1C1"} side={THREE.DoubleSide} transparent opacity={0.6} />
+            {/* Replace "#F4E1C1" with whatever color you choose for the rings */}
+          </Torus>
+        )}
         <Line
           points={axialTiltLinePoints} // Points the line goes through
           color={color} // Or any color you like
