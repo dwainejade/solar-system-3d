@@ -3,7 +3,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import OrbitPath from "./OrbitPath";
 import planetsData from "../data/planetsData";
 import useStore, { usePlanetStore } from "../store/store";
-import { MeshStandardMaterial } from "three";
+import { Line } from "@react-three/drei"; // or use plain three.js objects
 // import * as THREE from "three";
 
 // default values
@@ -65,6 +65,10 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     const z = scaledOrbitalRadius * Math.sin(localAngleRef.current);
 
     if (localRef.current) {
+      // Apply Axial Tilt
+      const axialTiltInRadians = axialTilt * (Math.PI / 180); // Convert axial tilt to radians
+      localRef.current.rotation.z = axialTiltInRadians; // Apply tilt to the rotation.z (assuming z is the axis of rotation)
+
       // Calculate the orbital inclination effect
       const inclination = orbitalInclination * (Math.PI / 180); // Convert to radians if it's in degrees
       const y = Math.sin(inclination) * scaledOrbitalRadius * Math.sin(localAngleRef.current);
@@ -118,6 +122,13 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
 
   const detailLevel = isPlanetSelected ? 64 : 32;
 
+  // Calculate points for the axial tilt line
+  const lineLength = scaledRadius * 2; // Make the line extend out of the planet
+  const axialTiltLinePoints = [
+    [0, -lineLength / 1.8, 0], // Starting point of the line
+    [0, lineLength / 1.8, 0], // Ending point of the line
+  ];
+
   return (
     <>
       <group ref={localRef}>
@@ -125,6 +136,11 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
           <sphereGeometry args={[scaledRadius, detailLevel, detailLevel]} />
           {textures ? <meshStandardMaterial map={textures.map} /> : <meshStandardMaterial color={color} />}
         </mesh>
+        <Line
+          points={axialTiltLinePoints} // Points the line goes through
+          color={color} // Or any color you like
+          rotation={[0, 0, (axialTilt * Math.PI) / 180]} // Align with the axial tilt
+        />
       </group>
       <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />
     </>
