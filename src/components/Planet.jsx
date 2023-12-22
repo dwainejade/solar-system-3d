@@ -3,7 +3,8 @@ import { useFrame, useThree } from "@react-three/fiber";
 import OrbitPath from "./OrbitPath";
 import planetsData from "../data/planetsData";
 import useStore, { usePlanetStore } from "../store/store";
-import * as THREE from "three";
+// import * as THREE from "three";
+
 // default values
 const defaultBodyData = planetsData.Earth;
 
@@ -30,6 +31,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     color,
     gravity,
   } = mergedData;
+
   const { simSpeed, resetCamera } = useStore();
   const { updatePlanetAngle, planetAngles, planetPositions, updatePlanetPosition, selectedPlanet, setSelectedPlanet } = usePlanetStore();
 
@@ -46,11 +48,10 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
 
   const isPlanetSelected = selectedPlanet && selectedPlanet.name === name; // clicked planet
 
-  const { camera } = useThree();
-  const cameraOffset = new THREE.Vector3(0, 5, -10); // Adjust as needed
   // const [rotationCount, setRotationCount] = useState(0);
   const lastRotationRef = useRef(0);
   // const [rotationElapsedTime, setRotationElapsedTime] = useState(0);
+  const [hoveredPlanet, setHoveredPlanet] = useState(null);
 
   useFrame((state, delta) => {
     // Adjust delta based on simulation speed
@@ -96,11 +97,9 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
       }
 
       // Camera logic for selected planet
-      if (isPlanetSelected) {
-        const targetPosition = localRef.current.position.clone().add(cameraOffset);
-        camera.position.lerp(targetPosition, 0.1);
-        camera.lookAt(localRef.current.position);
-      }
+      // if (isPlanetSelected) {
+      //   camera.lookAt(localRef.current.position);
+      // }
     }
   });
 
@@ -109,17 +108,42 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
 
     if (selectedPlanet && selectedPlanet.name === name) {
       setSelectedPlanet(null);
-      resetCamera();
     } else {
       setSelectedPlanet(mergedData); // Assuming mergedData has the necessary planet info
       // No need to manually call setCameraTarget here, as it's handled in CameraControls useEffect
     }
   };
 
+  const handlePointerOver = e => {
+    e.stopPropagation();
+    document.body.style.cursor = "pointer";
+    setHoveredPlanet(name);
+  };
+
+  const handlePointerOut = e => {
+    e.stopPropagation();
+    document.body.style.cursor = "auto";
+    setHoveredPlanet(null);
+  };
+
+  const LabelsOverlay = ({ hoveredPlanet }) => {
+    if (!hoveredPlanet) return null;
+
+    // Calculate position of the label based on the planet's position
+    // This is a simplified example. In practice, you might need to convert
+    // the planet's 3D position to the 2D canvas coordinate system.
+
+    return (
+      <div style={{ position: "absolute", left: "calculated x", top: "calculated y" }}>
+        <div className='planet-label'>{hoveredPlanet}</div>
+      </div>
+    );
+  };
+
   return (
     <>
-      <group ref={localRef} onClick={handleClick}>
-        <mesh>
+      <group ref={localRef}>
+        <mesh onClick={handleClick} onPointerOver={handlePointerOver} onPointerOut={handlePointerOut}>
           <sphereGeometry args={[scaledRadius, 32, 32]} />
           {textures ? <meshStandardMaterial map={textures.map} /> : <meshStandardMaterial color={color} />}
           {/* {isPlanetSelected &&

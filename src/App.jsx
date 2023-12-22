@@ -5,15 +5,12 @@ import { Canvas } from "@react-three/fiber";
 import Scene from "./Scene";
 import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import Menu from "./components/Menu";
-import CameraControls from "./components/CameraControls";
+// import CameraControls from "./components/CameraControls";
 
 const App = () => {
   return (
     <div className='Main'>
-      <Canvas id='Canvas' dpr={[1, 2]} camera={{ fov: 45, position: [30, 22, 30], near: 0.1, far: 2000 }}>
-        {/* <Perf deepAnalyze /> */}
-        <CameraControls />
-        {/* <OrbitControls minDistance={5} maxDistance={980} zoomSpeed={0.2} dampingFactor={1.2} /> */}
+      <Canvas id='Canvas' dpr={[1, 2]} camera={{ fov: 45, position: [40, 40, 40], near: 0.1, far: 2000 }}>
         <Suspense fallback={<div>Loading...</div>}>
           <Scene />
         </Suspense>

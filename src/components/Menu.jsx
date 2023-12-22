@@ -3,11 +3,11 @@ import useStore, { usePlanetStore } from "../store/store";
 
 const Menu = () => {
   const { simSpeed, setSimSpeed } = useStore();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isMenuOpen, setMenuOpen] = useState(false);
   const { selectedPlanet } = usePlanetStore();
 
   const toggleMenu = () => {
-    setIsOpen(!isOpen);
+    setMenuOpen(!isMenuOpen);
   };
 
   const formatNumber = number => {
@@ -51,7 +51,7 @@ const Menu = () => {
   };
 
   return (
-    <div className={`menu-con ${isOpen ? "open" : "close"}`}>
+    <div className={`menu-con ${isMenuOpen ? "open" : "close"}`}>
       <button onClick={toggleMenu} className='menu-toggle-btn'>
         Menu
       </button>
