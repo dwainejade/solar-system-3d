@@ -37,11 +37,6 @@ body {
   flex-direction: row;
   overflow: hidden;
 }
-@media (max-width: 600px) {
-  .Main {
-    flex-direction: column;
-  }
-}
 .Main #Canvas {
   background-color: black;
 }
@@ -56,12 +51,6 @@ body {
 }
 .Main .menu-con.open {
   width: 300px;
-}
-@media (max-width: 600px) {
-  .Main .menu-con.open {
-    width: 100%;
-    height: 300px;
-  }
 }
 .Main .menu-con.close {
   width: 0;
