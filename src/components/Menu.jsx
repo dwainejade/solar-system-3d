@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import useStore, { usePlanetStore } from "../store/store";
+import planetsData from "../data/planetsData";
 
 const Menu = () => {
   const { simSpeed, setSimSpeed } = useStore();
+  const { selectedPlanet, setSelectedPlanet } = usePlanetStore();
   const [isMenuOpen, setMenuOpen] = useState(false);
-  const { selectedPlanet } = usePlanetStore();
 
   const toggleMenu = () => {
     setMenuOpen(!isMenuOpen);
@@ -22,25 +23,28 @@ const Menu = () => {
       case "realtime":
         newSpeed = 1;
         break;
-      case "1h":
+      case "1min":
+        newSpeed = 60;
+        break;
+      case "1hr":
         newSpeed = 3600; // 1 hour = 3600 seconds
         break;
-      case "1d":
+      case "1day":
         newSpeed = 86400; // 1 day = 86400 seconds
         break;
-      case "1w":
+      case "1wk":
         newSpeed = 604800; // 1 week = 7 * 86400 seconds
         break;
-      case "1m":
+      case "1mon":
         newSpeed = 2629800; // Approx 1 month = 30.44 * 86400 seconds
         break;
-      case "1y":
+      case "1yr":
         newSpeed = 31557600; // 1 year = 365.25 * 86400 seconds (accounting for leap years)
         break;
-      case "5y":
+      case "5yr":
         newSpeed = 157788000; // 5 years
         break;
-      case "10y":
+      case "10yr":
         newSpeed = 315576000; // 10 years
         break;
       default:
@@ -48,6 +52,14 @@ const Menu = () => {
     }
 
     setSimSpeed(newSpeed);
+  };
+
+  // Handle planet selection change
+  const handlePlanetChange = e => {
+    // Update selected planet based on user selection
+    const newSelectedPlanetName = e.target.value;
+    const newSelectedPlanet = planetsData[newSelectedPlanetName];
+    setSelectedPlanet(newSelectedPlanet); // Update the selected planet in the store
   };
 
   return (
@@ -60,13 +72,25 @@ const Menu = () => {
           <label htmlFor='simSpeed'>Simulation Speed: </label>
           <select id='simSpeed' onChange={handleSpeedChange}>
             <option value='realtime'>Realtime</option>
-            <option value='1h'>1s equals 1 hour</option>
-            <option value='1d'>1s equals 1 day</option>
-            <option value='1w'>1s equals 1 week</option>
-            <option value='1m'>1s equals 1 month</option>
-            <option value='1y'>1s equals 1 year</option>
-            <option value='5y'>1s equals 5 years</option>
-            <option value='10y'>1s equals 10 years</option>
+            <option value='1min'>1s equals 1 minute</option>
+            <option value='1hr'>1s equals 1 hour</option>
+            <option value='1day'>1s equals 1 day</option>
+            <option value='1wk'>1s equals 1 week</option>
+            <option value='1mon'>1s equals 1 month</option>
+            <option value='1yr'>1s equals 1 year</option>
+            <option value='5yr'>1s equals 5 years</option>
+            <option value='10yr'>1s equals 10 years</option>
+          </select>
+        </div>
+        {/* Dropdown for selecting planets */}
+        <div className='menu-item'>
+          <label htmlFor='planetSelection'>Select a Planet:</label>
+          <select id='planetSelection' onChange={handlePlanetChange} value={selectedPlanet?.name || ""}>
+            {Object.keys(planetsData).map(planetName => (
+              <option key={planetName} value={planetName} defaultValue={planetName}>
+                {planetName}
+              </option>
+            ))}
           </select>
         </div>
         {selectedPlanet && (
