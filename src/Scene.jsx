@@ -5,11 +5,7 @@ import planetsData from "./data/planetsData";
 import Planet from "./components/Planet";
 // import Moon from "./components/Moon";
 import Sun from "./components/Sun";
-
-// scale down data for our model
-const distanceScaleFactor = 0.0000001;
-const sizeScaleFactor = 0.00015;
-const rotationSpeedScaleFactor = 600000;
+import { sizeScaleFactor } from "./data/planetsData";
 
 const Scene = () => {
   const { sunSettings, rotationCounts, simulationDate } = useStore();
@@ -73,11 +69,11 @@ const Scene = () => {
   // });
 
   const cameraConfig = {
-    maxDistance: 900,
-    smoothTime: 0.5,
+    maxDistance: 10000,
+    smoothTime: 0.6,
     truckSpeed: 2.0,
     rotateSpeed: 1.0,
-    zoomSpeed: 1.0,
+    zoomSpeed: 0.5,
   };
 
   return (
@@ -94,10 +90,10 @@ const Scene = () => {
       <Planet bodyData={planetsData.Saturn} />
       <Planet bodyData={planetsData.Uranus} />
       <Planet bodyData={planetsData.Neptune} />
-      {/* <Planet bodyData={planetsData.Pluto} /> */}
+      <Planet bodyData={planetsData.Pluto} />
       <Sun position={sunSettings.position} resetCamera={resetCamera} />
       {/* <Ground /> */}
-      <Stars radius={500} count={5000} factor={20} saturation={0} fade speed={0.5} />
+      <Stars radius={7000} count={10000} factor={100} saturation={0} fade speed={0.5} />
     </>
   );
 };

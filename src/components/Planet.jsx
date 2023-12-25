@@ -3,17 +3,12 @@ import { useFrame, useThree } from "@react-three/fiber";
 import OrbitPath from "./OrbitPath";
 import planetsData from "../data/planetsData";
 import useStore, { usePlanetStore } from "../store/store";
-import { Line, Torus } from "@react-three/drei"; // or use plain three.js objects
+import { Line, Torus, Trail } from "@react-three/drei"; // or use plain three.js objects
 import * as THREE from "three";
+import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 
 // default values
 const defaultBodyData = planetsData.Earth;
-
-// scale down data for our model
-const distanceScaleFactor = 0.0000001;
-const sizeScaleFactor = 0.00015;
-const rotationSpeedScaleFactor = 600000;
-// const speedScaleFactor = 0.01;
 
 const Planet = forwardRef(({ bodyData, textures }, ref) => {
   const mergedData = { ...defaultBodyData, ...bodyData };
@@ -40,10 +35,10 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   const localAngleRef = useRef(planetAngles[name] || 0); // Initialize with saved angle or 0
 
   // calculating scaled values
-  const numberOfRotationsPerOrbit = rotationPeriod ? (orbitalPeriod * 24) / rotationPeriod : 0;
+  // const numberOfRotationsPerOrbit = rotationPeriod ? (orbitalPeriod * 24) / rotationPeriod : 0;
   const scaledOrbitalRadius = orbitalRadius * distanceScaleFactor;
   const scaledRadius = radius * sizeScaleFactor;
-  const scaledOrbitalSpeed = orbitalSpeed * simSpeed;
+  // const scaledOrbitalSpeed = orbitalSpeed * simSpeed;
   let rotationSpeed = rotationPeriod ? (2 * Math.PI) / (rotationPeriod * 3600) : 0;
   rotationSpeed *= rotationSpeedScaleFactor;
 
@@ -53,6 +48,9 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   const lastRotationRef = useRef(0);
   // const [rotationElapsedTime, setRotationElapsedTime] = useState(0);
   const [hoveredPlanet, setHoveredPlanet] = useState(null);
+  // Define state and refs to track dragging
+  const [isDragging, setIsDragging] = useState(false);
+  const initialClickPosition = useRef({ x: 0, y: 0 });
 
   useFrame((state, delta) => {
     // Adjust delta based on simulation speed (simSpeed)
@@ -97,15 +95,41 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
       }
     }
   });
-
+  // Modify the handleClick to account for dragging
   const handleClick = e => {
-    e.stopPropagation();
-
-    if (selectedPlanet && selectedPlanet.name === name) {
-      setSelectedPlanet(null);
-    } else {
-      setSelectedPlanet(mergedData);
+    if (!isDragging) {
+      // Your original click handling logic
+      // This now only triggers if the mesh wasn't dragged
+      if (selectedPlanet && selectedPlanet.name === name) {
+        setSelectedPlanet(null);
+      } else {
+        setSelectedPlanet(mergedData);
+      }
     }
+  };
+
+  // New handler for pointer down
+  const handlePointerDown = e => {
+    e.stopPropagation();
+    setIsDragging(false); // Reset dragging state
+    initialClickPosition.current = { x: e.clientX, y: e.clientY }; // Record initial click position
+  };
+
+  // New handler for pointer move
+  const handlePointerMove = e => {
+    // Calculate the distance moved
+    const distanceMoved = Math.sqrt(
+      Math.pow(e.clientX - initialClickPosition.current.x, 2) + Math.pow(e.clientY - initialClickPosition.current.y, 2)
+    );
+    if (distanceMoved > 5) {
+      // Threshold to consider as a drag, adjust as needed
+      setIsDragging(true);
+    }
+  };
+
+  // New handler for pointer up
+  const handlePointerUp = e => {
+    setIsDragging(false); // Reset dragging state
   };
 
   const handlePointerOver = e => {
@@ -132,14 +156,21 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   return (
     <>
       <group ref={localRef}>
-        <mesh onClick={handleClick} onPointerOver={handlePointerOver} onPointerOut={handlePointerOut}>
+        <mesh
+          onClick={handleClick}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerOver={handlePointerOver}
+          onPointerOut={handlePointerOut}
+        >
           <sphereGeometry args={[scaledRadius, detailLevel, detailLevel]} />
           {textures ? <meshStandardMaterial map={textures.map} /> : <meshStandardMaterial color={color} />}
         </mesh>
         {name === "Saturn" && (
           <Torus args={[scaledRadius * 1.5, scaledRadius * 0.3, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
             {/* Adjust args based on the scale and appearance you want for the rings */}
-            <meshBasicMaterial color={"#F4E1C1"} side={THREE.DoubleSide} transparent opacity={0.6} />
+            <meshBasicMaterial color={"#F4E1C1"} side={THREE.DoubleSide} />
             {/* Replace "#F4E1C1" with whatever color you choose for the rings */}
           </Torus>
         )}
