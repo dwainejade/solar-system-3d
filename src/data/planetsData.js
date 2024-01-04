@@ -78,7 +78,7 @@ const marsData = {
     axialTilt: 25.19, // in degrees
     rotationPeriod: 24.6635, // in hours
     surfaceTemp: -63, // in Celsius
-    color: "#B7410E",
+    color: "salmon",
     gravity: 3.72076, // in m/s²
 };
 
@@ -112,7 +112,7 @@ const venusData = {
     axialTilt: 177.4, // in degrees (rotates in opposite direction)
     rotationPeriod: 5832.5, // in hours (retrograde rotation)
     surfaceTemp: 464, // in Celsius
-    color: "white",
+    color: "#ff9e43",
     gravity: 8.87 // in m/s²
 };
 
@@ -207,7 +207,7 @@ const planetsData = {
     Mercury: mercuryData,
     Venus: venusData,
     Earth: earthData,
-    Moon: moonData,
+    // Moon: moonData,
     Mars: marsData,
     Jupiter: jupiterData,
     Saturn: saturnData,
@@ -219,5 +219,5 @@ export default planetsData;
 
 
 export const distanceScaleFactor = 0.000001;
-export const sizeScaleFactor = 0.00015;
+export const sizeScaleFactor = 0.0003;
 export const rotationSpeedScaleFactor = 600000;
