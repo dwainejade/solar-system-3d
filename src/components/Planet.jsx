@@ -97,6 +97,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   });
   // Modify the handleClick to account for dragging
   const handleClick = e => {
+    e.stopPropagation();
     if (!isDragging) {
       // Your original click handling logic
       // This now only triggers if the mesh wasn't dragged
@@ -153,6 +154,8 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     [0, lineLength / 1.8, 0], // Ending point of the line
   ];
 
+  // console.log(name, textures && isPlanetSelected);
+
   return (
     <>
       <group ref={localRef}>
@@ -163,22 +166,26 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
           onPointerUp={handlePointerUp}
           onPointerOver={handlePointerOver}
           onPointerOut={handlePointerOut}
+          castShadow
         >
           <sphereGeometry args={[scaledRadius, detailLevel, detailLevel]} />
-          {textures ? <meshStandardMaterial map={textures.map} /> : <meshStandardMaterial color={color} />}
+          {textures && isPlanetSelected ? (
+            <meshPhysicalMaterial metalness={0.9} roughness={0.65} map={textures.map} />
+          ) : (
+            <meshStandardMaterial castShadow color={color} />
+          )}
         </mesh>
         {name === "Saturn" && (
-          <Torus args={[scaledRadius * 1.5, scaledRadius * 0.3, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
-            {/* Adjust args based on the scale and appearance you want for the rings */}
-            <meshBasicMaterial color={"#F4E1C1"} side={THREE.DoubleSide} />
-            {/* Replace "#F4E1C1" with whatever color you choose for the rings */}
-          </Torus>
+          <group>
+            <Torus args={[scaledRadius * 2, scaledRadius * 0.15, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
+              <meshBasicMaterial color={"#Ffffff"} />
+            </Torus>
+            <Torus args={[scaledRadius * 1.5, scaledRadius * 0.3, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
+              <meshBasicMaterial color={"#F4E1C1"} />
+            </Torus>
+          </group>
         )}
-        <Line
-          points={axialTiltLinePoints} // Points the line goes through
-          color={color} // Or any color you like
-          rotation={[0, 0, (axialTilt * Math.PI) / 180]} // Align with the axial tilt
-        />
+        <Line points={axialTiltLinePoints} color={color} />
       </group>
       <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />
     </>
