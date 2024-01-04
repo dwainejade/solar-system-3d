@@ -86,13 +86,17 @@ const Menu = () => {
         <div className='menu-item'>
           <label htmlFor='planetSelection'>Select a Planet:</label>
           <select id='planetSelection' onChange={handlePlanetChange} value={selectedPlanet?.name || ""}>
+            <option value='' disabled selected>
+              Select a Planet
+            </option>
             {Object.keys(planetsData).map(planetName => (
-              <option key={planetName} value={planetName} defaultValue={planetName}>
+              <option key={planetName} value={planetName}>
                 {planetName}
               </option>
             ))}
           </select>
         </div>
+
         {selectedPlanet && (
           <div className='planet-details'>
             <h2>{selectedPlanet.name}</h2>
