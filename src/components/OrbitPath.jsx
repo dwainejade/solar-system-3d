@@ -18,7 +18,7 @@ const OrbitPath = forwardRef(
       return pathPoints;
     }, [origin, radius]);
 
-    return <Line ref={ref} points={points} color={color} lineWidth={0.3} />;
+    return <Line ref={ref} points={points} color={color} lineWidth={0.5} />;
   }
 );
 
