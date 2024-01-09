@@ -15,7 +15,7 @@ const App = () => {
     <div className='Main'>
       <Canvas id='Canvas' dpr={[1, 2]} camera={{ fov: 50, position: [5000, 5000, 5000], near: 0.1, far: 100000 }}>
         {/* <Suspense fallback={<div>Loading...</div>}> */}
-        <Perf />
+        {/* <Perf /> */}
         <Scene />
         <CameraEffects />
         {/* </Suspense> */}
