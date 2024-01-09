@@ -6,7 +6,6 @@ import Planet from "./components/Planet";
 // import Moon from "./components/Moon";
 import Sun from "./components/Sun";
 import { sizeScaleFactor } from "./data/planetsData";
-import PlanetsDataUpdater from "./components/PlanetsDataUpdater";
 
 const Scene = () => {
   const { sunSettings, rotationCounts, simulationDate } = useStore();
@@ -106,9 +105,8 @@ const Scene = () => {
   return (
     <>
       <CameraControls ref={cameraControlsRef} makeDefault {...cameraConfig} minDistance={minDistance} />
-      <ambientLight intensity={0.25} />
-      <pointLight color='#f6f3ea' intensity={1} position={[0, 0, 0]} castShadow />
-      <PlanetsDataUpdater />
+      <ambientLight intensity={0.3} />
+      <pointLight color='#f6f3ea' intensity={1} position={[0, 0, 0]} />
       <Planet
         key={selectedPlanet ? selectedPlanet.name === "Earth-textured" : "Earth-plain"}
         bodyData={planetsData.Earth}
