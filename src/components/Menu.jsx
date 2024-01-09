@@ -85,8 +85,8 @@ const Menu = () => {
         {/* Dropdown for selecting planets */}
         <div className='menu-item'>
           <label htmlFor='planetSelection'>Select a Planet:</label>
-          <select id='planetSelection' onChange={handlePlanetChange} value={selectedPlanet?.name || ""}>
-            <option value='' disabled selected>
+          <select id='planetSelection' onChange={handlePlanetChange} value={selectedPlanet?.name || "Select a Planet"}>
+            <option value='Select a Planet' disabled>
               Select a Planet
             </option>
             {Object.keys(planetsData).map(planetName => (
@@ -100,13 +100,9 @@ const Menu = () => {
         {selectedPlanet && (
           <div className='planet-details'>
             <h2>{selectedPlanet.name}</h2>
-            <p>Mass: {formatNumber(selectedPlanet.mass)} kg</p>
+            <p>Mass: {selectedPlanet.mass.toString().replace("e+", "e")} kg</p>
             <p>Radius: {selectedPlanet.radius} km</p>
-            <p>Orbital Radius: {formatNumber(selectedPlanet.orbitalRadius)} km</p>
-            <p>Orbital Speed: {selectedPlanet.orbitalSpeed} km/s</p>
             <p>Orbital Period: {selectedPlanet.orbitalPeriod} days</p>
-            <p>Orbital Inclination: {selectedPlanet.orbitalInclination} degrees</p>
-            <p>Axial Tilt: {selectedPlanet.axialTilt} degrees</p>
             <p>Rotation Period: {selectedPlanet.rotationPeriod} hours</p>
             <p>Surface Temperature: {selectedPlanet.surfaceTemp} °C</p>
             <p>Gravity: {selectedPlanet.gravity} m/s²</p>
