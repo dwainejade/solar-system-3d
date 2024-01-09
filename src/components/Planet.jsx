@@ -3,8 +3,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import OrbitPath from "./OrbitPath";
 import planetsData from "../data/planetsData";
 import useStore, { usePlanetStore } from "../store/store";
-import { Line, Torus, Trail } from "@react-three/drei"; // or use plain three.js objects
-import * as THREE from "three";
+import { Line, Torus } from "@react-three/drei";
 import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 
 // default values
@@ -166,21 +165,20 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
           onPointerUp={handlePointerUp}
           onPointerOver={handlePointerOver}
           onPointerOut={handlePointerOut}
-          castShadow
         >
           <sphereGeometry args={[scaledRadius, detailLevel, detailLevel]} />
           {textures && isPlanetSelected ? (
             <meshPhysicalMaterial metalness={0.9} roughness={0.65} map={textures.map} />
           ) : (
-            <meshStandardMaterial castShadow color={color} />
+            <meshStandardMaterial color={color} />
           )}
         </mesh>
         {name === "Saturn" && (
           <group>
-            <Torus args={[scaledRadius * 2, scaledRadius * 0.15, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
+            <Torus args={[scaledRadius * 2, scaledRadius * 0.15, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
               <meshBasicMaterial color={"#Ffffff"} />
             </Torus>
-            <Torus args={[scaledRadius * 1.5, scaledRadius * 0.3, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
+            <Torus args={[scaledRadius * 1.5, scaledRadius * 0.3, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
               <meshBasicMaterial color={"#F4E1C1"} />
             </Torus>
           </group>
