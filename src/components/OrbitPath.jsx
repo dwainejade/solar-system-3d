@@ -11,7 +11,7 @@ const OrbitPath = forwardRef(
       const pathPoints = [];
       for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 128) {
         const x = radius * Math.cos(angle);
-        const y = Math.sin(inclination) * radius * Math.sin(angle); // Adjusted for inclination
+        const y = Math.sin(inclination) * radius * Math.sin(angle);
         const z = radius * Math.sin(angle);
         pathPoints.push(new THREE.Vector3(x, y, z));
       }
