@@ -41,9 +41,9 @@ body {
   flex-direction: row;
   overflow: hidden;
 
-  @media (max-width: 600px) {
-    flex-direction: column;
-  }
+  // @media (max-width: 600px) {
+  //   flex-direction: column;
+  // }
 
   #Canvas {
     background-color: black;
@@ -60,10 +60,10 @@ body {
     color: white;
     &.open {
       width: 300px;
-      @media (max-width: 600px) {
-        width: 100%;
-        height: 300px;
-      }
+      // @media (max-width: 600px) {
+      //   width: 100%;
+      //   height: 300px;
+      // }
     }
     &.close {
       width: 0;
@@ -79,7 +79,8 @@ body {
 
     .menu-content {
       display: flex;
-
+      flex-direction: column;
+      overflow-y: auto;
       .menu-item {
         display: flex;
         flex-direction: row;
@@ -90,6 +91,9 @@ body {
         input {
           width: 60px;
         }
+      }
+      .planet-details {
+        max-height: 100%;
       }
     }
 

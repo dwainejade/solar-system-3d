@@ -37,11 +37,6 @@ body {
   flex-direction: row;
   overflow: hidden;
 }
-@media (max-width: 600px) {
-  .Main {
-    flex-direction: column;
-  }
-}
 .Main #Canvas {
   background-color: black;
 }
@@ -57,12 +52,6 @@ body {
 .Main .menu-con.open {
   width: 300px;
 }
-@media (max-width: 600px) {
-  .Main .menu-con.open {
-    width: 100%;
-    height: 300px;
-  }
-}
 .Main .menu-con.close {
   width: 0;
   height: 0;
@@ -75,6 +64,8 @@ body {
 }
 .Main .menu-con .menu-content {
   display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 }
 .Main .menu-con .menu-content .menu-item {
   display: flex;
@@ -86,6 +77,9 @@ body {
 }
 .Main .menu-con .menu-content .menu-item input {
   width: 60px;
+}
+.Main .menu-con .menu-content .planet-details {
+  max-height: 100%;
 }
 .Main .menu-con .menu-toggle-btn {
   position: absolute;

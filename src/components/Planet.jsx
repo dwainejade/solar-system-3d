@@ -3,16 +3,11 @@ import { useFrame, useThree } from "@react-three/fiber";
 import OrbitPath from "./OrbitPath";
 import planetsData from "../data/planetsData";
 import useStore, { usePlanetStore } from "../store/store";
-// import * as THREE from "three";
+import { Line, Torus } from "@react-three/drei";
+import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 
 // default values
 const defaultBodyData = planetsData.Earth;
-
-// scale down data for our model
-const distanceScaleFactor = 0.0000001;
-const sizeScaleFactor = 0.00015;
-const rotationSpeedScaleFactor = 600000;
-// const speedScaleFactor = 0.01;
 
 const Planet = forwardRef(({ bodyData, textures }, ref) => {
   const mergedData = { ...defaultBodyData, ...bodyData };
@@ -32,17 +27,17 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     gravity,
   } = mergedData;
 
-  const { simSpeed, resetCamera } = useStore();
+  const { simSpeed, updateRotationCount, incrementDate } = useStore();
   const { updatePlanetAngle, planetAngles, planetPositions, updatePlanetPosition, selectedPlanet, setSelectedPlanet } = usePlanetStore();
 
   const localRef = ref || useRef();
   const localAngleRef = useRef(planetAngles[name] || 0); // Initialize with saved angle or 0
 
   // calculating scaled values
-  const numberOfRotationsPerOrbit = rotationPeriod ? (orbitalPeriod * 24) / rotationPeriod : 0;
+  // const numberOfRotationsPerOrbit = rotationPeriod ? (orbitalPeriod * 24) / rotationPeriod : 0;
   const scaledOrbitalRadius = orbitalRadius * distanceScaleFactor;
   const scaledRadius = radius * sizeScaleFactor;
-  const scaledOrbitalSpeed = orbitalSpeed * simSpeed;
+  // const scaledOrbitalSpeed = orbitalSpeed * simSpeed;
   let rotationSpeed = rotationPeriod ? (2 * Math.PI) / (rotationPeriod * 3600) : 0;
   rotationSpeed *= rotationSpeedScaleFactor;
 
@@ -52,66 +47,89 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   const lastRotationRef = useRef(0);
   // const [rotationElapsedTime, setRotationElapsedTime] = useState(0);
   const [hoveredPlanet, setHoveredPlanet] = useState(null);
+  // Define state and refs to track dragging
+  const [isDragging, setIsDragging] = useState(false);
+  const initialClickPosition = useRef({ x: 0, y: 0 });
 
   useFrame((state, delta) => {
-    // Adjust delta based on simulation speed
+    // Adjust delta based on simulation speed (simSpeed)
     const adjustedDelta = delta * simSpeed;
 
-    // Calculate each planet's orbital speed (radians per second)
-    // Orbital period is in Earth days, so convert it to seconds
-    const planetOrbitalSpeed = (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60);
-
     // Update planet's orbital position
+    const planetOrbitalSpeed = (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60); // Assuming orbitalPeriod is in Earth days
     localAngleRef.current += planetOrbitalSpeed * adjustedDelta;
     const x = scaledOrbitalRadius * Math.cos(localAngleRef.current);
     const z = scaledOrbitalRadius * Math.sin(localAngleRef.current);
 
-    // Update the planet's position
     if (localRef.current) {
-      localRef.current.position.set(x, 0, z);
-      updatePlanetPosition(name, { x, y: 0, z });
+      // Apply Axial Tilt
+      const axialTiltInRadians = axialTilt * (Math.PI / 180); // Convert axial tilt to radians
+      localRef.current.rotation.z = axialTiltInRadians; // Apply tilt to the rotation.z (assuming z is the axis of rotation)
 
-      // Increment the elapsed time by delta each frame
-      // setRotationElapsedTime(prev => prev + delta);
+      // Calculate the orbital inclination effect
+      const inclination = orbitalInclination * (Math.PI / 180); // Convert to radians if it's in degrees
+      const y = Math.sin(inclination) * scaledOrbitalRadius * Math.sin(localAngleRef.current);
 
-      const currentRotation = localAngleRef.current * numberOfRotationsPerOrbit;
-      const completedRotations = Math.floor(currentRotation / (2 * Math.PI));
-      if (completedRotations > lastRotationRef.current) {
-        lastRotationRef.current = completedRotations;
-
-        // Compare simulation time with real rotation period
-        // const simulationRotationTimeSeconds = rotationElapsedTime;
-        // console.log(`Simulation time for ${name} rotation: ${simulationRotationTimeSeconds.toFixed(2)} seconds`);
-
-        // Reset rotation elapsed time for next rotation
-        // setRotationElapsedTime(0);
-      }
+      localRef.current.position.set(x, y, z); // Now includes the y position adjusted by inclination
+      updatePlanetPosition(name, { x, y, z });
 
       // Planet rotation on its own axis
       if (rotationPeriod) {
-        let rotationSpeed = rotationPeriod ? (2 * Math.PI) / (rotationPeriod * 3600) : 0;
-        rotationSpeed *= rotationSpeedScaleFactor;
-        // Increment the rotation based on rotation speed
-        const rotationIncrement = rotationSpeed * delta;
-        localRef.current.rotation.y += rotationIncrement;
-      }
+        // Calculate rotation speed and increment
+        const rotationPeriodInSeconds = rotationPeriod * 3600; // Convert hours to seconds
+        const rotationSpeed = (2 * Math.PI) / rotationPeriodInSeconds; // radians per second
+        const rotationIncrement = rotationSpeed * adjustedDelta;
 
-      // Camera logic for selected planet
-      // if (isPlanetSelected) {
-      //   camera.lookAt(localRef.current.position);
-      // }
+        // Increment the rotation
+        localRef.current.rotation.y += rotationIncrement;
+
+        // Check for a complete rotation
+        if (localRef.current.rotation.y >= 2 * Math.PI) {
+          localRef.current.rotation.y %= 2 * Math.PI; // Reset rotation for next cycle
+          updateRotationCount(name, 1); // Update rotation count in store for the planet
+          if (name === "Earth") {
+            incrementDate(); // Increment the simulation date by one day
+          }
+        }
+      }
     }
   });
-
+  // Modify the handleClick to account for dragging
   const handleClick = e => {
     e.stopPropagation();
-
-    if (selectedPlanet && selectedPlanet.name === name) {
-      setSelectedPlanet(null);
-    } else {
-      setSelectedPlanet(mergedData); // Assuming mergedData has the necessary planet info
-      // No need to manually call setCameraTarget here, as it's handled in CameraControls useEffect
+    if (!isDragging) {
+      // Your original click handling logic
+      // This now only triggers if the mesh wasn't dragged
+      if (selectedPlanet && selectedPlanet.name === name) {
+        setSelectedPlanet(null);
+      } else {
+        setSelectedPlanet(mergedData);
+      }
     }
+  };
+
+  // New handler for pointer down
+  const handlePointerDown = e => {
+    e.stopPropagation();
+    setIsDragging(false); // Reset dragging state
+    initialClickPosition.current = { x: e.clientX, y: e.clientY }; // Record initial click position
+  };
+
+  // New handler for pointer move
+  const handlePointerMove = e => {
+    // Calculate the distance moved
+    const distanceMoved = Math.sqrt(
+      Math.pow(e.clientX - initialClickPosition.current.x, 2) + Math.pow(e.clientY - initialClickPosition.current.y, 2)
+    );
+    if (distanceMoved > 5) {
+      // Threshold to consider as a drag, adjust as needed
+      setIsDragging(true);
+    }
+  };
+
+  // New handler for pointer up
+  const handlePointerUp = e => {
+    setIsDragging(false); // Reset dragging state
   };
 
   const handlePointerOver = e => {
@@ -126,31 +144,48 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     setHoveredPlanet(null);
   };
 
-  const LabelsOverlay = ({ hoveredPlanet }) => {
-    if (!hoveredPlanet) return null;
+  const detailLevel = isPlanetSelected ? 64 : 32;
 
-    // Calculate position of the label based on the planet's position
-    // This is a simplified example. In practice, you might need to convert
-    // the planet's 3D position to the 2D canvas coordinate system.
+  // Calculate points for the axial tilt line
+  const lineLength = scaledRadius * 2; // Make the line extend out of the planet
+  const axialTiltLinePoints = [
+    [0, -lineLength / 1.8, 0], // Starting point of the line
+    [0, lineLength / 1.8, 0], // Ending point of the line
+  ];
 
-    return (
-      <div style={{ position: "absolute", left: "calculated x", top: "calculated y" }}>
-        <div className='planet-label'>{hoveredPlanet}</div>
-      </div>
-    );
-  };
+  // console.log(name, textures && isPlanetSelected);
 
   return (
     <>
       <group ref={localRef}>
-        <mesh onClick={handleClick} onPointerOver={handlePointerOver} onPointerOut={handlePointerOut}>
-          <sphereGeometry args={[scaledRadius, 32, 32]} />
-          {textures ? <meshStandardMaterial map={textures.map} /> : <meshStandardMaterial color={color} />}
-          {/* {isPlanetSelected &&
-          } */}
+        <mesh
+          onClick={handleClick}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerOver={handlePointerOver}
+          onPointerOut={handlePointerOut}
+        >
+          <sphereGeometry args={[scaledRadius, detailLevel, detailLevel]} />
+          {textures && isPlanetSelected ? (
+            <meshPhysicalMaterial metalness={0.9} roughness={0.65} map={textures.map} />
+          ) : (
+            <meshStandardMaterial color={color} />
+          )}
         </mesh>
+        {name === "Saturn" && (
+          <group>
+            <Torus args={[scaledRadius * 2, scaledRadius * 0.15, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+              <meshBasicMaterial color={"#Ffffff"} />
+            </Torus>
+            <Torus args={[scaledRadius * 1.5, scaledRadius * 0.3, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+              <meshBasicMaterial color={"#F4E1C1"} />
+            </Torus>
+          </group>
+        )}
+        <Line points={axialTiltLinePoints} color={color} />
       </group>
-      <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} color={color} name={name} />
+      <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />
     </>
   );
 });
