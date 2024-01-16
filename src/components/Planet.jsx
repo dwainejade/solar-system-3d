@@ -62,10 +62,6 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     const z = scaledOrbitalRadius * Math.sin(localAngleRef.current);
 
     if (localRef.current) {
-      // Apply Axial Tilt
-      const axialTiltInRadians = axialTilt * (Math.PI / 180); // Convert axial tilt to radians
-      localRef.current.rotation.z = axialTiltInRadians; // Apply tilt to the rotation.z (assuming z is the axis of rotation)
-
       // Calculate the orbital inclination effect
       const inclination = orbitalInclination * (Math.PI / 180); // Convert to radians if it's in degrees
       const y = Math.sin(inclination) * scaledOrbitalRadius * Math.sin(localAngleRef.current);
@@ -154,7 +150,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   ];
 
   // console.log(name, textures && isPlanetSelected);
-
+  console.log({ selectedPlanet });
   return (
     <>
       <group ref={localRef}>
@@ -183,9 +179,11 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
             </Torus>
           </group>
         )}
-        <Line points={axialTiltLinePoints} color={color} />
+        {/* <Line points={axialTiltLinePoints} color={color} /> */}
       </group>
-      <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />
+      {!selectedPlanet && (
+        <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />
+      )}
     </>
   );
 });
