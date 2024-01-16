@@ -1,10 +1,9 @@
 import React, { useRef, forwardRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import OrbitPath from "./OrbitPath";
-import planetsData from "../data/planetsData";
+import { Torus } from "@react-three/drei";
 import useStore, { usePlanetStore } from "../store/store";
-import { Line, Torus } from "@react-three/drei";
-import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
+import planetsData, { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 
 // default values
 const defaultBodyData = planetsData.Earth;
@@ -29,7 +28,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   } = mergedData;
 
   const { simSpeed, updateRotationCount, incrementDate, orbitPaths } = useStore();
-  const { updatePlanetAngle, planetAngles, planetPositions, updatePlanetPosition, selectedPlanet, setSelectedPlanet } = usePlanetStore();
+  const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet } = usePlanetStore();
 
   const localRef = ref || useRef();
   const localAngleRef = useRef(planetAngles[name] || 0); // Initialize with saved angle or 0
@@ -45,7 +44,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   const isPlanetSelected = selectedPlanet && selectedPlanet.name === name; // clicked planet
 
   // const [rotationCount, setRotationCount] = useState(0);
-  const lastRotationRef = useRef(0);
+  // const lastRotationRef = useRef(0);
   // const [rotationElapsedTime, setRotationElapsedTime] = useState(0);
   const [hoveredPlanet, setHoveredPlanet] = useState(null);
   // Define state and refs to track dragging
@@ -61,9 +60,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     // localAngleRef.current += planetOrbitalSpeed * adjustedDelta;
     // Initialize the angle if it's the first frame
     if (localAngleRef.current === 0) {
-      console.log(name, localAngleRef.current);
       localAngleRef.current = initialOrbitalAngle * (Math.PI / 180); // Convert to radians if initialOrbitalAngle is in degrees
-      console.log(name, localAngleRef.current);
     } else {
       localAngleRef.current += planetOrbitalSpeed * adjustedDelta;
     }
@@ -99,6 +96,17 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
       }
     }
   });
+
+  const [showTextures, setShowTextures] = useState(false);
+  const textureDisplayDistance = 4000; // Set the distance threshold for showing textures
+  const { camera } = useThree();
+  useFrame(() => {
+    if (localRef.current) {
+      const distance = camera.position.distanceTo(localRef.current.position);
+      setShowTextures(distance < textureDisplayDistance);
+    }
+  });
+
   // Modify the handleClick to account for dragging
   const handleClick = e => {
     e.stopPropagation();
@@ -170,7 +178,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
           onPointerOut={handlePointerOut}
         >
           <sphereGeometry args={[scaledRadius, detailLevel, detailLevel]} />
-          {textures && isPlanetSelected ? (
+          {textures && (showTextures || isPlanetSelected) ? (
             <meshPhysicalMaterial metalness={0.9} roughness={0.65} map={textures.map} />
           ) : (
             <meshStandardMaterial color={color} />
