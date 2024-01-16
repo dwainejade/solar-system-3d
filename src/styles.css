@@ -37,6 +37,10 @@ body {
   flex-direction: row;
   overflow: hidden;
 }
+.Main.fullscreen {
+  max-width: 100vw;
+  max-height: 100dvh;
+}
 .Main #Canvas {
   background-color: black;
 }
@@ -89,4 +93,23 @@ body {
   cursor: pointer;
   padding: 5px 10px;
   border-radius: 5px;
+}
+.Main .fullscreen-btn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid white;
+  background-color: #333;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.Main .fullscreen-btn.fullscreen {
+  background-image: url("/assets/icons/fullscreen-exit.svg");
+}
+.Main .fullscreen-btn.minimized {
+  background-image: url("/assets/icons/fullscreen-enter.svg");
 }

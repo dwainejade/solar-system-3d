@@ -2,13 +2,29 @@ import React, { useState } from "react";
 import useStore, { usePlanetStore } from "../store/store";
 import planetsData from "../data/planetsData";
 
-const Menu = () => {
-  const { simSpeed, setSimSpeed } = useStore();
+const Menu = ({ fullscreen, setFullscreen }) => {
+  const { simSpeed, setSimSpeed, constellations, toggleConstellations, FPMode, toggleFPMode } = useStore();
   const { selectedPlanet, setSelectedPlanet } = usePlanetStore();
   const [isMenuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => {
     setMenuOpen(!isMenuOpen);
+  };
+
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(e => {
+        console.error("Failed to enter full-screen mode:", e);
+      });
+      setFullscreen(true);
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(e => {
+          console.error("Failed to exit full-screen mode:", e);
+        });
+        setFullscreen(false);
+      }
+    }
   };
 
   const formatNumber = number => {
@@ -82,6 +98,14 @@ const Menu = () => {
             <option value='10yr'>1s equals 10 years</option>
           </select>
         </div>
+        <div className='menu-item'>
+          <p>{constellations ? "ON" : "OFF"}</p>
+          <button onClick={() => toggleConstellations()}>Toggle constellations</button>
+        </div>
+        {/* <div className='menu-item'>
+          <p>{FPMode ? "ON" : "OFF"}</p>
+          <button onClick={() => toggleFPMode()}>Toggle FP Mode</button>
+        </div> */}
         {/* Dropdown for selecting planets */}
         <div className='menu-item'>
           <label htmlFor='planetSelection'>Select a Planet:</label>
@@ -96,6 +120,8 @@ const Menu = () => {
             ))}
           </select>
         </div>
+
+        <button className={`fullscreen-btn ${fullscreen ? "fullscreen" : "minimized"}`} onClick={toggleFullScreen} />
 
         {selectedPlanet && (
           <div className='planet-details'>
