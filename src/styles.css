@@ -50,6 +50,7 @@ body {
   right: 0;
   width: 300px;
   height: 100%;
+  /* Full height of its parent */
   background-color: #333;
   color: white;
 }
@@ -63,17 +64,25 @@ body {
 .Main .menu-con.close .menu-content {
   opacity: 0;
 }
-.Main .menu-con .menu-content {
-  padding-top: 40px;
+.Main .menu-con .btn {
+  border: 0;
+  border-radius: 5px;
 }
 .Main .menu-con .menu-content {
   display: flex;
   flex-direction: column;
+  gap: 4px;
+  margin-top: 40px;
+  padding: 0 2%;
+  max-height: 100%;
+  /* Set max height to 100% of parent */
   overflow-y: auto;
+  /* Enables scrolling */
 }
 .Main .menu-con .menu-content .menu-item {
   display: flex;
   flex-direction: row;
+  align-items: center;
   gap: 10px;
 }
 .Main .menu-con .menu-content .menu-item label {
@@ -84,6 +93,8 @@ body {
 }
 .Main .menu-con .menu-content .planet-details {
   max-height: 100%;
+  overflow-y: auto;
+  /* Enables scrolling */
 }
 .Main .menu-con .menu-toggle-btn {
   position: absolute;
