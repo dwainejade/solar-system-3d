@@ -3,7 +3,8 @@ import useStore, { usePlanetStore } from "../store/store";
 import planetsData from "../data/planetsData";
 
 const Menu = () => {
-  const { simSpeed, setSimSpeed, constellations, toggleConstellations, fullscreen, toggleFullscreen, toggleOrbitPaths } = useStore();
+  const { simSpeed, setSimSpeed, constellations, toggleConstellations, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths } =
+    useStore();
   const { selectedPlanet, setSelectedPlanet } = usePlanetStore();
   const [isMenuOpen, setMenuOpen] = useState(false);
 
@@ -107,15 +108,15 @@ const Menu = () => {
 
         <div className='menu-item'>
           <label htmlFor='fullscreenToggle'>Toggle Fullscreen:</label>
-          <button
-            id='fullscreenToggle'
-            className={`fullscreen-btn ${fullscreen ? "fullscreen" : "minimized"}`}
-            onClick={toggleFullscreen}
-          />
+          <button id='fullscreenToggle' onClick={toggleFullscreen} className='btn'>
+            {fullscreen ? "ON" : "OFF"}
+          </button>
         </div>
         <div className='menu-item'>
           <label htmlFor='orbitPathToggle'>Toggle Orbit Paths:</label>
-          <button id='orbitPathToggle' className={`orbitpaths-btn ${fullscreen ? "fullscreen" : "minimized"}`} onClick={toggleOrbitPaths} />
+          <button id='orbitPathToggle' className='btn' onClick={toggleOrbitPaths}>
+            {orbitPaths ? "ON" : "OFF"}
+          </button>
         </div>
 
         {selectedPlanet && (
