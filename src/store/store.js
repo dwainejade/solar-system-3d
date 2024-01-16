@@ -5,6 +5,32 @@ const useStore = create((set, get) => ({
     simSpeed: 1, // 1 is realtime speed
     setSimSpeed: (newSpeed) => set({ simSpeed: newSpeed }),
 
+    fullscreen: false,
+    toggleFullscreen: () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch((e) => {
+                console.error("Failed to enter full-screen mode:", e);
+            });
+            set({ fullscreen: true });
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen().catch((e) => {
+                    console.error("Failed to exit full-screen mode:", e);
+                });
+                set({ fullscreen: false });
+            }
+        }
+    },
+
+    orbitPaths: true,
+    toggleOrbitPaths: () => set(state => ({ orbitPaths: !state.orbitPaths })),
+
+    // constellations: false,
+    // toggleConstellations: () => set(state => ({ constellations: !state.constellations })),
+
+    // FPMode: false, 
+    // toggleFPMode: () => set(state => ({ FPMode: !state.FPMode })),
+
     sunSettings: {
         position: new THREE.Vector3(0, 0, 0),
     },

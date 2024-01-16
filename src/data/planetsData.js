@@ -10,7 +10,7 @@ const sunData = {
     orbitalRadius: 0, // Sun doesn't orbit around anything in the solar system
     orbitalSpeed: 0, // No orbital speed
     orbitalPeriod: 0, // No orbital period
-    orbitalAngle: 0,
+    initialOrbitalAngle: 0, // The sun can be ZERO since it does not move
     axialTilt: 7.25, // in degrees to the ecliptic plane
     rotationPeriod: 609.12, // in hours (varies by latitude)
     surfaceTemp: 5505, // in Celsius (average effective temperature)
@@ -31,7 +31,7 @@ const earthData = {
     orbitalRadius: 149.6e6, // in kilometers
     orbitalSpeed: 29.78, // in kilometers per second
     orbitalPeriod: 365.25, // in Earth days
-    orbitalAngle: 1,
+    initialOrbitalAngle: 1, // DONT SET TO ZERO
     orbitalInclination: 0.00005, // in degrees
     axialTilt: 23.44, // in degrees
     rotationPeriod: 23.93, // in hours
@@ -52,7 +52,7 @@ const moonData = {
     orbitalRadius: 3.84e5, // in kilometers (average distance to Earth)
     orbitalSpeed: 1.022, // in kilometers per second
     orbitalPeriod: 27.3, // in Earth days (sidereal period)
-    orbitalAngle: 0,
+    initialOrbitalAngle: Math.random() * 360, // DONT SET TO ZERO
     orbitalInclination: 5.14, // in degrees (to the ecliptic)
     axialTilt: 1.54, // in degrees
     rotationPeriod: 655.7, // in hours (same as its orbital period, hence the same side always faces Earth)
@@ -73,7 +73,7 @@ const marsData = {
     orbitalRadius: 227.9e6, // in kilometers
     orbitalSpeed: 24.077, // in kilometers per second
     orbitalPeriod: 687, // in Earth days
-    orbitalAngle: 2,
+    initialOrbitalAngle: Math.random() * 360, // DONT SET TO ZERO
     orbitalInclination: 1.85, // in degrees
     axialTilt: 25.19, // in degrees
     rotationPeriod: 24.6635, // in hours
@@ -90,7 +90,7 @@ const mercuryData = {
     orbitalRadius: 57.9e6, // in kilometers
     orbitalSpeed: 47.87, // in kilometers per second
     orbitalPeriod: 88, // in Earth days
-    orbitalAngle: 0,
+    initialOrbitalAngle: Math.random() * 360, // DONT SET TO ZERO
     orbitalInclination: 7, // in degrees
     axialTilt: 0.034, // in degrees (very small)
     rotationPeriod: 1407.6, // in hours
@@ -107,7 +107,7 @@ const venusData = {
     orbitalRadius: 108.2e6, // in kilometers
     orbitalSpeed: 35.02, // in kilometers per second
     orbitalPeriod: 225, // in Earth days
-    orbitalAngle: 0,
+    initialOrbitalAngle: Math.random() * 360, // DONT SET TO ZERO
     orbitalInclination: 3.39, // in degrees
     axialTilt: 177.4, // in degrees (rotates in opposite direction)
     rotationPeriod: 5832.5, // in hours (retrograde rotation)
@@ -124,7 +124,7 @@ const jupiterData = {
     orbitalRadius: 778.5e6, // in kilometers
     orbitalSpeed: 13.07, // in kilometers per second
     orbitalPeriod: 4333, // in Earth days
-    orbitalAngle: 0,
+    initialOrbitalAngle: Math.random() * 360, // DONT SET TO ZERO
     orbitalInclination: 1.31, // in degrees
     axialTilt: 3.13, // in degrees
     rotationPeriod: 9.93, // in hours
@@ -141,7 +141,7 @@ const saturnData = {
     orbitalRadius: 1.434e9, // in kilometers
     orbitalSpeed: 9.68, // in kilometers per second
     orbitalPeriod: 10759, // in Earth days
-    orbitalAngle: 0,
+    initialOrbitalAngle: Math.random() * 360, // DONT SET TO ZERO
     orbitalInclination: 2.49, // in degrees
     axialTilt: 26.73, // in degrees
     rotationPeriod: 10.8, // in hours
@@ -158,7 +158,7 @@ const neptuneData = {
     orbitalRadius: 4.495e9, // in kilometers
     orbitalSpeed: 5.43, // in kilometers per second
     orbitalPeriod: 60182, // in Earth days
-    orbitalAngle: 0,
+    initialOrbitalAngle: Math.random() * 360, // DONT SET TO ZERO
     orbitalInclination: 1.77, // in degrees
     axialTilt: 28.32, // in degrees
     rotationPeriod: 16, // in hours
@@ -175,7 +175,7 @@ const uranusData = {
     orbitalRadius: 2.871e9, // in kilometers
     orbitalSpeed: 6.81, // in kilometers per second
     orbitalPeriod: 30660, // in Earth days
-    orbitalAngle: 0,
+    initialOrbitalAngle: Math.random() * 360, // DONT SET TO ZERO
     orbitalInclination: 0.77, // in degrees
     axialTilt: 97.77, // in degrees (unique side-rolling rotation)
     rotationPeriod: 17.2, // in hours
@@ -192,7 +192,7 @@ const plutoData = {
     orbitalRadius: 5.906e9, // in kilometers
     orbitalSpeed: 4.74, // in kilometers per second
     orbitalPeriod: 90560, // in Earth days
-    orbitalAngle: 0,
+    initialOrbitalAngle: Math.random() * 360, // DONT SET TO ZERO
     orbitalInclination: 17.16, // in degrees
     axialTilt: 122.53, // in degrees
     rotationPeriod: 153.3, // in hours
@@ -211,13 +211,13 @@ const planetsData = {
     Mars: marsData,
     Jupiter: jupiterData,
     Saturn: saturnData,
-    Neptune: neptuneData,
     Uranus: uranusData,
-    Pluto: plutoData,
+    Neptune: neptuneData,
+    // Pluto: plutoData,
 };
 export default planetsData;
 
 
-export const distanceScaleFactor = 0.000001;
-export const sizeScaleFactor = 0.0003;
+export const distanceScaleFactor = 0.00001;
+export const sizeScaleFactor = 0.0008;
 export const rotationSpeedScaleFactor = 600000;

@@ -1,10 +1,9 @@
 import React, { useRef, forwardRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import OrbitPath from "./OrbitPath";
-import planetsData from "../data/planetsData";
+import { Torus } from "@react-three/drei";
 import useStore, { usePlanetStore } from "../store/store";
-import { Line, Torus } from "@react-three/drei";
-import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
+import planetsData, { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 
 // default values
 const defaultBodyData = planetsData.Earth;
@@ -25,10 +24,11 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     surfaceTemp,
     color,
     gravity,
+    initialOrbitalAngle,
   } = mergedData;
 
-  const { simSpeed, updateRotationCount, incrementDate } = useStore();
-  const { updatePlanetAngle, planetAngles, planetPositions, updatePlanetPosition, selectedPlanet, setSelectedPlanet } = usePlanetStore();
+  const { simSpeed, updateRotationCount, incrementDate, orbitPaths } = useStore();
+  const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet } = usePlanetStore();
 
   const localRef = ref || useRef();
   const localAngleRef = useRef(planetAngles[name] || 0); // Initialize with saved angle or 0
@@ -44,7 +44,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   const isPlanetSelected = selectedPlanet && selectedPlanet.name === name; // clicked planet
 
   // const [rotationCount, setRotationCount] = useState(0);
-  const lastRotationRef = useRef(0);
+  // const lastRotationRef = useRef(0);
   // const [rotationElapsedTime, setRotationElapsedTime] = useState(0);
   const [hoveredPlanet, setHoveredPlanet] = useState(null);
   // Define state and refs to track dragging
@@ -57,15 +57,17 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
 
     // Update planet's orbital position
     const planetOrbitalSpeed = (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60); // Assuming orbitalPeriod is in Earth days
-    localAngleRef.current += planetOrbitalSpeed * adjustedDelta;
+    // localAngleRef.current += planetOrbitalSpeed * adjustedDelta;
+    // Initialize the angle if it's the first frame
+    if (localAngleRef.current === 0) {
+      localAngleRef.current = initialOrbitalAngle * (Math.PI / 180); // Convert to radians if initialOrbitalAngle is in degrees
+    } else {
+      localAngleRef.current += planetOrbitalSpeed * adjustedDelta;
+    }
     const x = scaledOrbitalRadius * Math.cos(localAngleRef.current);
     const z = scaledOrbitalRadius * Math.sin(localAngleRef.current);
 
     if (localRef.current) {
-      // Apply Axial Tilt
-      const axialTiltInRadians = axialTilt * (Math.PI / 180); // Convert axial tilt to radians
-      localRef.current.rotation.z = axialTiltInRadians; // Apply tilt to the rotation.z (assuming z is the axis of rotation)
-
       // Calculate the orbital inclination effect
       const inclination = orbitalInclination * (Math.PI / 180); // Convert to radians if it's in degrees
       const y = Math.sin(inclination) * scaledOrbitalRadius * Math.sin(localAngleRef.current);
@@ -94,6 +96,17 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
       }
     }
   });
+
+  const [showTextures, setShowTextures] = useState(false);
+  const textureDisplayDistance = 4000; // Set the distance threshold for showing textures
+  const { camera } = useThree();
+  useFrame(() => {
+    if (localRef.current) {
+      const distance = camera.position.distanceTo(localRef.current.position);
+      setShowTextures(distance < textureDisplayDistance);
+    }
+  });
+
   // Modify the handleClick to account for dragging
   const handleClick = e => {
     e.stopPropagation();
@@ -153,8 +166,6 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     [0, lineLength / 1.8, 0], // Ending point of the line
   ];
 
-  // console.log(name, textures && isPlanetSelected);
-
   return (
     <>
       <group ref={localRef}>
@@ -167,7 +178,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
           onPointerOut={handlePointerOut}
         >
           <sphereGeometry args={[scaledRadius, detailLevel, detailLevel]} />
-          {textures && isPlanetSelected ? (
+          {textures && (showTextures || isPlanetSelected) ? (
             <meshPhysicalMaterial metalness={0.9} roughness={0.65} map={textures.map} />
           ) : (
             <meshStandardMaterial color={color} />
@@ -183,9 +194,11 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
             </Torus>
           </group>
         )}
-        <Line points={axialTiltLinePoints} color={color} />
+        {/* <Line points={axialTiltLinePoints} color={color} /> */}
       </group>
-      <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />
+      {orbitPaths && (
+        <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />
+      )}
     </>
   );
 });

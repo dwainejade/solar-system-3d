@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import { Stars, CameraControls, useTexture } from "@react-three/drei";
+import { Stars, CameraControls, useTexture, Environment } from "@react-three/drei";
 import useStore, { usePlanetStore } from "./store/store";
 import planetsData from "./data/planetsData";
 import Planet from "./components/Planet";
@@ -95,18 +95,18 @@ const Scene = () => {
   });
 
   const cameraConfig = {
-    maxDistance: 10000,
-    smoothTime: 0.6,
+    maxDistance: 100000,
+    smoothTime: 1,
     truckSpeed: 2.0,
-    rotateSpeed: 1.0,
-    zoomSpeed: 0.5,
+    rotateSpeed: 0.5,
+    zoomSpeed: 2,
   };
 
   return (
     <>
       <CameraControls ref={cameraControlsRef} makeDefault {...cameraConfig} minDistance={minDistance} />
-      <ambientLight intensity={0.3} />
-      <pointLight color='#f6f3ea' intensity={1} position={[0, 0, 0]} />
+      <ambientLight intensity={0.1} />
+      <pointLight color='#f6f3ea' intensity={1.2} position={[0, 0, 0]} />
       <Planet
         key={selectedPlanet ? selectedPlanet.name === "Earth-textured" : "Earth-plain"}
         bodyData={planetsData.Earth}
@@ -150,8 +150,15 @@ const Scene = () => {
       />
       {/* <Planet bodyData={planetsData.Pluto} /> */}
       <Sun key={"Sun-plain"} position={sunSettings.position} resetCamera={resetCamera} />
-      {/* <Ground /> */}
-      <Stars radius={7000} count={1000} factor={100} saturation={0} fade speed={0.5} />
+
+      {/* <Stars radius={7000} count={1000} factor={100} saturation={0} fade speed={0.5} /> */}
+      <Environment
+        background
+        files={["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"]}
+        path={`/assets/stars/stars-cube-map/`}
+        near={100}
+        far={2000}
+      />
     </>
   );
 };

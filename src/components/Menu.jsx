@@ -3,7 +3,8 @@ import useStore, { usePlanetStore } from "../store/store";
 import planetsData from "../data/planetsData";
 
 const Menu = () => {
-  const { simSpeed, setSimSpeed } = useStore();
+  const { simSpeed, setSimSpeed, constellations, toggleConstellations, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths } =
+    useStore();
   const { selectedPlanet, setSelectedPlanet } = usePlanetStore();
   const [isMenuOpen, setMenuOpen] = useState(false);
 
@@ -82,6 +83,14 @@ const Menu = () => {
             <option value='10yr'>1s equals 10 years</option>
           </select>
         </div>
+        {/* <div className='menu-item'>
+          <p>{constellations ? "ON" : "OFF"}</p>
+          <button onClick={() => toggleConstellations()}>Toggle constellations</button>
+        </div> */}
+        {/* <div className='menu-item'>
+          <p>{FPMode ? "ON" : "OFF"}</p>
+          <button onClick={() => toggleFPMode()}>Toggle FP Mode</button>
+        </div> */}
         {/* Dropdown for selecting planets */}
         <div className='menu-item'>
           <label htmlFor='planetSelection'>Select a Planet:</label>
@@ -95,6 +104,19 @@ const Menu = () => {
               </option>
             ))}
           </select>
+        </div>
+
+        <div className='menu-item'>
+          <label htmlFor='fullscreenToggle'>Toggle Fullscreen:</label>
+          <button id='fullscreenToggle' onClick={toggleFullscreen} className='btn'>
+            {fullscreen ? "ON" : "OFF"}
+          </button>
+        </div>
+        <div className='menu-item'>
+          <label htmlFor='orbitPathToggle'>Toggle Orbit Paths:</label>
+          <button id='orbitPathToggle' className='btn' onClick={toggleOrbitPaths}>
+            {orbitPaths ? "ON" : "OFF"}
+          </button>
         </div>
 
         {selectedPlanet && (
