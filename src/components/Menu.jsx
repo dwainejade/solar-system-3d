@@ -2,29 +2,13 @@ import React, { useState } from "react";
 import useStore, { usePlanetStore } from "../store/store";
 import planetsData from "../data/planetsData";
 
-const Menu = ({ fullscreen, setFullscreen }) => {
-  const { simSpeed, setSimSpeed, constellations, toggleConstellations, FPMode, toggleFPMode } = useStore();
+const Menu = () => {
+  const { simSpeed, setSimSpeed, constellations, toggleConstellations, fullscreen, toggleFullscreen } = useStore();
   const { selectedPlanet, setSelectedPlanet } = usePlanetStore();
   const [isMenuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => {
     setMenuOpen(!isMenuOpen);
-  };
-
-  const toggleFullScreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(e => {
-        console.error("Failed to enter full-screen mode:", e);
-      });
-      setFullscreen(true);
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen().catch(e => {
-          console.error("Failed to exit full-screen mode:", e);
-        });
-        setFullscreen(false);
-      }
-    }
   };
 
   const formatNumber = number => {
@@ -121,7 +105,7 @@ const Menu = ({ fullscreen, setFullscreen }) => {
           </select>
         </div>
 
-        <button className={`fullscreen-btn ${fullscreen ? "fullscreen" : "minimized"}`} onClick={toggleFullScreen} />
+        <button className={`fullscreen-btn ${fullscreen ? "fullscreen" : "minimized"}`} onClick={toggleFullscreen} />
 
         {selectedPlanet && (
           <div className='planet-details'>
