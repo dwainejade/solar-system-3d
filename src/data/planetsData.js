@@ -218,6 +218,6 @@ const planetsData = {
 export default planetsData;
 
 
-export const distanceScaleFactor = 0.000001;
-export const sizeScaleFactor = 0.0003;
+export const distanceScaleFactor = 0.00001;
+export const sizeScaleFactor = 0.0008;
 export const rotationSpeedScaleFactor = 600000;
