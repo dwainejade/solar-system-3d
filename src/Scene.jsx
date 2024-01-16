@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import { Stars, CameraControls, useTexture } from "@react-three/drei";
+import { Stars, CameraControls, useTexture, Environment } from "@react-three/drei";
 import useStore, { usePlanetStore } from "./store/store";
 import planetsData from "./data/planetsData";
 import Planet from "./components/Planet";
@@ -151,7 +151,14 @@ const Scene = () => {
       {/* <Planet bodyData={planetsData.Pluto} /> */}
       <Sun key={"Sun-plain"} position={sunSettings.position} resetCamera={resetCamera} />
       {/* <Ground /> */}
-      <Stars radius={7000} count={1000} factor={100} saturation={0} fade speed={0.5} />
+      {/* <Stars radius={7000} count={1000} factor={100} saturation={0} fade speed={0.5} /> */}
+      <Environment
+        background
+        files={["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"]}
+        path={`/assets/stars/stars-cube-map/`}
+        near={100}
+        far={2000}
+      />
     </>
   );
 };
