@@ -25,6 +25,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     surfaceTemp,
     color,
     gravity,
+    initialOrbitalAngle,
   } = mergedData;
 
   const { simSpeed, updateRotationCount, incrementDate, orbitPaths } = useStore();
@@ -57,7 +58,15 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
 
     // Update planet's orbital position
     const planetOrbitalSpeed = (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60); // Assuming orbitalPeriod is in Earth days
-    localAngleRef.current += planetOrbitalSpeed * adjustedDelta;
+    // localAngleRef.current += planetOrbitalSpeed * adjustedDelta;
+    // Initialize the angle if it's the first frame
+    if (localAngleRef.current === 0) {
+      console.log(name, localAngleRef.current);
+      localAngleRef.current = initialOrbitalAngle * (Math.PI / 180); // Convert to radians if initialOrbitalAngle is in degrees
+      console.log(name, localAngleRef.current);
+    } else {
+      localAngleRef.current += planetOrbitalSpeed * adjustedDelta;
+    }
     const x = scaledOrbitalRadius * Math.cos(localAngleRef.current);
     const z = scaledOrbitalRadius * Math.sin(localAngleRef.current);
 
