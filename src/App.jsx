@@ -14,7 +14,7 @@ const App = () => {
 
   return (
     <div className={`Main ${fullscreen ? "fullscreen" : "minimized"}`}>
-      <Canvas id='Canvas' dpr={[1, 2]} camera={{ fov: 50, position: [5000, 5000, 5000], near: 0.1, far: 100000 }}>
+      <Canvas id='Canvas' dpr={[1, 2]} camera={{ fov: 50, position: [5000, 5000, 5000], near: 0.1, far: 200000 }}>
         <Suspense fallback={null}>
           {/* <Perf /> */}
           <Stats />
