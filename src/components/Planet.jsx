@@ -27,7 +27,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     gravity,
   } = mergedData;
 
-  const { simSpeed, updateRotationCount, incrementDate } = useStore();
+  const { simSpeed, updateRotationCount, incrementDate, orbitPaths } = useStore();
   const { updatePlanetAngle, planetAngles, planetPositions, updatePlanetPosition, selectedPlanet, setSelectedPlanet } = usePlanetStore();
 
   const localRef = ref || useRef();
@@ -149,8 +149,6 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     [0, lineLength / 1.8, 0], // Ending point of the line
   ];
 
-  // console.log(name, textures && isPlanetSelected);
-  console.log({ selectedPlanet });
   return (
     <>
       <group ref={localRef}>
@@ -181,7 +179,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
         )}
         {/* <Line points={axialTiltLinePoints} color={color} /> */}
       </group>
-      {!selectedPlanet && (
+      {orbitPaths && (
         <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />
       )}
     </>

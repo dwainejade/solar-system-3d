@@ -22,6 +22,9 @@ const useStore = create((set, get) => ({
         }
     },
 
+    orbitPaths: true,
+    toggleOrbitPaths: () => set(state => ({ orbitPaths: !state.orbitPaths })),
+
     // constellations: false,
     // toggleConstellations: () => set(state => ({ constellations: !state.constellations })),
 
