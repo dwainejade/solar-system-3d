@@ -211,9 +211,9 @@ const planetsData = {
     Mars: marsData,
     Jupiter: jupiterData,
     Saturn: saturnData,
-    Neptune: neptuneData,
     Uranus: uranusData,
-    Pluto: plutoData,
+    Neptune: neptuneData,
+    // Pluto: plutoData,
 };
 export default planetsData;
 
