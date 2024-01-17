@@ -28,7 +28,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   } = mergedData;
 
   const { simSpeed, updateRotationCount, incrementDate, orbitPaths } = useStore();
-  const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet } = usePlanetStore();
+  const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels } = usePlanetStore();
 
   const localRef = ref || useRef();
   const localAngleRef = useRef(planetAngles[name] || 0); // Initialize with saved angle or 0
@@ -99,11 +99,15 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
 
   const [showTextures, setShowTextures] = useState(false);
   const textureDisplayDistance = 4000; // Set the distance threshold for showing textures
-  const { camera } = useThree();
-  useFrame(() => {
+  const [htmlPosition, setHtmlPosition] = useState([0, 0, 0]);
+
+  useFrame(({ camera }) => {
     if (localRef.current) {
       const distance = camera.position.distanceTo(localRef.current.position);
       setShowTextures(distance < textureDisplayDistance);
+
+      const labelPositionY = scaledRadius + 2; // Adjust this value to control the height above the planet
+      setHtmlPosition([0, labelPositionY, 0]);
     }
   });
 
@@ -195,13 +199,24 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
           </group>
         )}
         {/* <Line points={axialTiltLinePoints} color={color} /> */}
-        {/* {!isPlanetSelected && ( */}
-        <Html position={[-1, 5, 0]} occlude>
-          <div className='planet-label' style={{ color }} onClick={handleClick} onPointerOver={handlePointerOver}>
-            {name}
-          </div>
-        </Html>
-        {/* )} */}
+
+        {/* Display planet names */}
+        {displayLabels && (
+          <Html position={htmlPosition} occlude>
+            <div
+              className='planet-label'
+              style={{ color }}
+              onClick={handleClick}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerOver={handlePointerOver}
+              onPointerOut={handlePointerOut}
+            >
+              {name}
+            </div>
+          </Html>
+        )}
       </group>
       {orbitPaths && (
         <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />

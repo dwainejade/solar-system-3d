@@ -92,6 +92,9 @@ export default useStore;
 
 
 const usePlanetStore = create((set) => ({
+    displayLabels: true, // render planet names in scene
+    toggleDisplayLabels: () => set((state) => ({ displayLabels: !state.displayLabels })),
+
     planetPositions: {},
     updatePlanetPosition: (name, position) =>
         set((state) => ({

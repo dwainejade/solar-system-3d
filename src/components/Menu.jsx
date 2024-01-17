@@ -5,7 +5,7 @@ import planetsData from "../data/planetsData";
 const Menu = () => {
   const { simSpeed, setSimSpeed, constellations, toggleConstellations, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths } =
     useStore();
-  const { selectedPlanet, setSelectedPlanet } = usePlanetStore();
+  const { selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels } = usePlanetStore();
   const [isMenuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -116,6 +116,12 @@ const Menu = () => {
           <label htmlFor='orbitPathToggle'>Toggle Orbit Paths:</label>
           <button id='orbitPathToggle' className='btn' onClick={toggleOrbitPaths}>
             {orbitPaths ? "ON" : "OFF"}
+          </button>
+        </div>
+        <div className='menu-item'>
+          <label htmlFor='labelToggle'>Toggle Labels:</label>
+          <button id='labelToggle' className='btn' onClick={toggleDisplayLabels}>
+            {displayLabels ? "ON" : "OFF"}
           </button>
         </div>
 
