@@ -1,7 +1,7 @@
 import React, { useRef, forwardRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import OrbitPath from "./OrbitPath";
-import { Torus } from "@react-three/drei";
+import { Html, Torus } from "@react-three/drei";
 import useStore, { usePlanetStore } from "../store/store";
 import planetsData, { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 
@@ -195,6 +195,13 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
           </group>
         )}
         {/* <Line points={axialTiltLinePoints} color={color} /> */}
+        {/* {!isPlanetSelected && ( */}
+        <Html position={[-1, 5, 0]} occlude>
+          <div className='planet-label' style={{ color }} onClick={handleClick} onPointerOver={handlePointerOver}>
+            {name}
+          </div>
+        </Html>
+        {/* )} */}
       </group>
       {orbitPaths && (
         <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />
