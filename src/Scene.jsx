@@ -94,11 +94,12 @@ const Scene = () => {
     map: "/assets/neptune/2k_neptune.jpg",
   });
 
+  // camera settings
   const cameraConfig = {
     maxDistance: 100000,
     smoothTime: 1,
-    truckSpeed: 2.0,
-    rotateSpeed: 0.5,
+    truckSpeed: 1,
+    rotateSpeed: 1,
     zoomSpeed: 2,
   };
 
@@ -106,7 +107,7 @@ const Scene = () => {
     <>
       <CameraControls ref={cameraControlsRef} makeDefault {...cameraConfig} minDistance={minDistance} />
       <ambientLight intensity={0.1} />
-      <pointLight color='#f6f3ea' intensity={1.2} position={[0, 0, 0]} />
+      <pointLight color='#f6f3ea' intensity={1} position={[0, 0, 0]} />
       <Planet
         key={selectedPlanet ? selectedPlanet.name === "Earth-textured" : "Earth-plain"}
         bodyData={planetsData.Earth}
