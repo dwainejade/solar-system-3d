@@ -21,9 +21,9 @@ const Scene = () => {
 
     // Define an isometric position for the camera
     const isometricPosition = {
-      x: sunSettings.position.x + -100,
-      y: sunSettings.position.y + 300,
-      z: sunSettings.position.z + 300,
+      x: sunSettings.position.x + -2000,
+      y: sunSettings.position.y + 1000,
+      z: sunSettings.position.z + 1000,
     };
     cameraControlsRef.current.setPosition(isometricPosition.x, isometricPosition.y, isometricPosition.z, true);
   };
