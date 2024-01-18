@@ -27,7 +27,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     initialOrbitalAngle,
   } = mergedData;
 
-  const { simSpeed, updateRotationCount, incrementDate, orbitPaths } = useStore();
+  const { simSpeed, updateRotationCount, incrementDate, simulationDate, orbitPaths } = useStore();
   const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels } = usePlanetStore();
 
   const localRef = ref || useRef();
@@ -98,16 +98,11 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   });
 
   const [showTextures, setShowTextures] = useState(false);
-  const textureDisplayDistance = 4000; // Set the distance threshold for showing textures
-  const [htmlPosition, setHtmlPosition] = useState([0, 0, 0]);
-
+  const textureDisplayDistance = 8000; // Set the distance threshold for showing textures
   useFrame(({ camera }) => {
     if (localRef.current) {
       const distance = camera.position.distanceTo(localRef.current.position);
       setShowTextures(distance < textureDisplayDistance);
-
-      const labelPositionY = scaledRadius + 2; // Adjust this value to control the height above the planet
-      setHtmlPosition([0, labelPositionY, 0]);
     }
   });
 
@@ -115,7 +110,6 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   const handleClick = e => {
     e.stopPropagation();
     if (!isDragging) {
-      // Your original click handling logic
       // This now only triggers if the mesh wasn't dragged
       if (selectedPlanet && selectedPlanet.name === name) {
         setSelectedPlanet(null);
@@ -198,11 +192,12 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
             </Torus>
           </group>
         )}
+
         {/* <Line points={axialTiltLinePoints} color={color} /> */}
 
         {/* Display planet names */}
-        {displayLabels && (
-          <Html position={htmlPosition} occlude>
+        {displayLabels ? (
+          <Html center occlude position-y={scaledRadius + scaledRadius * 0.25}>
             <div
               className='planet-label'
               style={{ color }}
@@ -215,6 +210,19 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
             >
               {name}
             </div>
+          </Html>
+        ) : (
+          <Html center>
+            <div
+              className='planet-point'
+              style={{ backgroundColor: color }}
+              onClick={handleClick}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerOver={handlePointerOver}
+              onPointerOut={handlePointerOut}
+            />
           </Html>
         )}
       </group>

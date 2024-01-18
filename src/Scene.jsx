@@ -11,11 +11,11 @@ const Scene = () => {
   const { sunSettings, rotationCounts, simulationDate } = useStore();
   const { planetPositions, selectedPlanet } = usePlanetStore();
   const cameraControlsRef = useRef();
-  const [minDistance, setMinDistance] = useState(5);
+  const [minDistance, setMinDistance] = useState(200);
 
   const resetCamera = () => {
     if (!cameraControlsRef.current) return;
-
+    setMinDistance(200);
     // Set the target to the sun's position
     cameraControlsRef.current.setTarget(sunSettings.position.x, sunSettings.position.y, sunSettings.position.z, true);
 
@@ -41,9 +41,9 @@ const Scene = () => {
         cameraControlsRef.current.dollyTo(optimalDistance, true);
       }
       if (selectedPlanet.name === "Sun") {
-        setMinDistance(4);
+        setMinDistance(200);
         cameraControlsRef.current.setTarget(0, 0, 0, true);
-        cameraControlsRef.current.dollyTo(8, true);
+        cameraControlsRef.current.dollyTo(200, true);
       }
     }
   }, [selectedPlanet, planetPositions]);
@@ -97,7 +97,7 @@ const Scene = () => {
   // camera settings
   const cameraConfig = {
     maxDistance: 100000,
-    smoothTime: 1,
+    smoothTime: 1.5,
     truckSpeed: 1,
     rotateSpeed: 1,
     zoomSpeed: 2,
@@ -108,47 +108,15 @@ const Scene = () => {
       <CameraControls ref={cameraControlsRef} makeDefault {...cameraConfig} minDistance={minDistance} />
       <ambientLight intensity={0.1} />
       <pointLight color='#f6f3ea' intensity={1} position={[0, 0, 0]} />
-      <Planet
-        key={selectedPlanet ? selectedPlanet.name === "Earth-textured" : "Earth-plain"}
-        bodyData={planetsData.Earth}
-        textures={earthTextures}
-      />
+      <Planet bodyData={planetsData.Earth} textures={earthTextures} />
       {/* <Moon bodyData={planetsData.Moon} parentPosition={planetPositions.Earth} /> */}
-      <Planet
-        key={selectedPlanet?.name === "Mars-textured" ? selectedPlanet.name : "Mars-plain"}
-        bodyData={planetsData.Mars}
-        textures={marsTextures}
-      />
-      <Planet
-        key={selectedPlanet?.name === "Venus-textured" ? selectedPlanet.name : "Venus-plain"}
-        bodyData={planetsData.Venus}
-        textures={venusTextures}
-      />
-      <Planet
-        key={selectedPlanet?.name === "Mercury-textured" ? selectedPlanet.name : "Mercury-plain"}
-        bodyData={planetsData.Mercury}
-        textures={mercuryTextures}
-      />
-      <Planet
-        key={selectedPlanet?.name === "Jupiter-textured" ? selectedPlanet.name : "Jupiter-plain"}
-        bodyData={planetsData.Jupiter}
-        textures={jupiterTextures}
-      />
-      <Planet
-        key={selectedPlanet?.name === "Saturn-textured" ? selectedPlanet.name : "Saturn-plain"}
-        bodyData={planetsData.Saturn}
-        textures={saturnTextures}
-      />
-      <Planet
-        key={selectedPlanet?.name === "Uranus-textured" ? selectedPlanet.name : "Uranus-plain"}
-        bodyData={planetsData.Uranus}
-        textures={uranusTextures}
-      />
-      <Planet
-        key={selectedPlanet?.name === "Neptune-textured" ? selectedPlanet.name : "Neptune-plain"}
-        bodyData={planetsData.Neptune}
-        textures={neptuneTextures}
-      />
+      <Planet bodyData={planetsData.Mars} textures={marsTextures} />
+      <Planet bodyData={planetsData.Venus} textures={venusTextures} />
+      <Planet bodyData={planetsData.Mercury} textures={mercuryTextures} />
+      <Planet bodyData={planetsData.Jupiter} textures={jupiterTextures} />
+      <Planet bodyData={planetsData.Saturn} textures={saturnTextures} />
+      <Planet bodyData={planetsData.Uranus} textures={uranusTextures} />
+      <Planet bodyData={planetsData.Neptune} textures={neptuneTextures} />
       {/* <Planet bodyData={planetsData.Pluto} /> */}
       <Sun key={"Sun-plain"} position={sunSettings.position} resetCamera={resetCamera} />
 

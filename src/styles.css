@@ -124,3 +124,15 @@ body {
 .Main .fullscreen-btn.minimized {
   background-image: url("/assets/icons/fullscreen-enter.svg");
 }
+.Main .planet-label {
+  text-transform: uppercase;
+  font-weight: 600;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 0.8rem;
+}
+.Main .planet-point {
+  width: 10px;
+  height: 10px;
+  border-radius: 10px;
+  opacity: 0.6;
+}

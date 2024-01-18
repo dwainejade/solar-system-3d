@@ -44,7 +44,7 @@ const useStore = create((set, get) => ({
         set(state => ({ moonSettings: { ...state.moonSettings, ...newSettings } })),
 
     rotationCounts: {},  // Tracks the number of rotations for each planet
-    simulationDate: new Date('2024-01-01'),  // Starting date
+    simulationDate: new Date('2024-01-18'),  // Starting date
     // Update rotation count for a planet
     // Function to update rotation count
     updateRotationCount: (planetName, additionalCount) =>

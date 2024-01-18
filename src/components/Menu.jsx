@@ -121,7 +121,7 @@ const Menu = () => {
         <div className='menu-item'>
           <label htmlFor='labelToggle'>Toggle Labels:</label>
           <button id='labelToggle' className='btn' onClick={toggleDisplayLabels}>
-            {displayLabels ? "ON" : "OFF"}
+            {displayLabels ? "NAMES" : "POINTS"}
           </button>
         </div>
 
