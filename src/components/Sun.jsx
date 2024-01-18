@@ -72,35 +72,36 @@ const Sun = ({ position, resetCamera }) => {
         <meshBasicMaterial color={[10, 3, 0]} toneMapped={false} />
       </mesh>
       {/* Display planet names */}
-      {/* {displayLabels ? (
+      {displayLabels ? (
         <Html center position-y={0}>
           <div
             className='planet-label'
-            style={{ color: "#ffdf00" }}
+            style={{ color: "rgb(255, 255, 0)" }}
             onClick={handleClick}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerOver={handlePointerOver}
             onPointerOut={handlePointerOut}
+            transform={[200, 200, 0]}
           >
             sun
           </div>
         </Html>
       ) : (
-      )} */}
-      <Html center>
-        <div
-          className='planet-point'
-          style={{ backgroundColor: "rgb(255, 255, 0)" }}
-          onClick={handleClick}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerOver={handlePointerOver}
-          onPointerOut={handlePointerOut}
-        />
-      </Html>
+        <Html center>
+          <div
+            className='planet-point'
+            style={{ backgroundColor: "rgb(255, 255, 0)" }}
+            onClick={handleClick}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerOver={handlePointerOver}
+            onPointerOut={handlePointerOut}
+          />
+        </Html>
+      )}
     </group>
   );
 };
