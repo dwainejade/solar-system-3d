@@ -28,9 +28,6 @@ const useStore = create((set, get) => ({
     showConstellations: false,
     toggleConstellations: () => set(state => ({ showConstellations: !state.showConstellations })),
 
-    // FPMode: false, 
-    // toggleFPMode: () => set(state => ({ FPMode: !state.FPMode })),
-
     sunSettings: {
         position: new THREE.Vector3(0, 0, 0),
     },
