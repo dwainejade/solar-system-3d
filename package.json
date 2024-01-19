@@ -3,16 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "description": "Solar System Interactive",
-  "keywords": [
-    "r3f",
-    "react",
-    "three",
-    "vite",
-    "starter",
-    "react three fiber",
-    "sandbox",
-    "codesandbox"
-  ],
   "author": "StrongMind",
   "repository": "github:strongmind/solar-system-interactive",
   "license": "0BSD",
@@ -33,7 +23,6 @@
   },
   "scripts": {
     "dev": "vite --host",
-    "sandbox": "APP_ENV=sandbox vite",
     "build": "vite build",
     "preview": "vite preview"
   },

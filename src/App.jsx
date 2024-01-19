@@ -1,12 +1,10 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-// import { Perf } from "r3f-perf";
 import Scene from "./Scene";
 import { Stats } from "@react-three/drei";
 import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import Menu from "./components/Menu";
 import useStore from "./store/store";
-// import { sizeScaleFactor } from "./data/planetsData";
 import CameraEffects from "./components/CameraEffects";
 
 const App = () => {
@@ -16,7 +14,6 @@ const App = () => {
     <div className={`Main ${fullscreen ? "fullscreen" : "minimized"}`}>
       <Canvas id='Canvas' dpr={[1, 2]} camera={{ fov: 50, position: [5000, 5000, 5000], near: 0.1, far: 200000 }}>
         <Suspense fallback={null}>
-          {/* <Perf /> */}
           <Stats />
           <Scene />
         </Suspense>
