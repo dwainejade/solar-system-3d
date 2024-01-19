@@ -116,6 +116,7 @@ body {
       cursor: pointer;
       padding: 5px 10px;
       border-radius: 5px;
+      z-index: 999;
     }
   }
 
@@ -139,17 +140,23 @@ body {
       background-image: url("/assets/icons/fullscreen-enter.svg");
     }
   }
-
+  .label-wrap {
+    border: solid 1px white;
+    width: 2px;
+    height: 2px;
+  }
   .planet-label {
     text-transform: uppercase;
     font-weight: 600;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 0.8rem;
+    width: 2px;
+    height: 2px;
   }
   .planet-point {
     width: 10px;
     height: 10px;
     border-radius: 10px;
-    opacity: 0.6;
+    opacity: 1;
   }
 }
