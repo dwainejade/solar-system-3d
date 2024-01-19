@@ -1,11 +1,21 @@
 import React, { useState } from "react";
-import useStore, { usePlanetStore } from "../store/store";
+import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import planetsData from "../data/planetsData";
 
 const Menu = () => {
-  const { simSpeed, setSimSpeed, constellations, toggleConstellations, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths } =
-    useStore();
+  const {
+    simSpeed,
+    setSimSpeed,
+    constellations,
+    showConstellations,
+    toggleConstellations,
+    fullscreen,
+    toggleFullscreen,
+    orbitPaths,
+    toggleOrbitPaths,
+  } = useStore();
   const { selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels } = usePlanetStore();
+  const { surfacePoint, isSurfaceCameraActive, toggleSurfaceCamera } = useCameraStore();
   const [isMenuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -87,10 +97,6 @@ const Menu = () => {
           <p>{constellations ? "ON" : "OFF"}</p>
           <button onClick={() => toggleConstellations()}>Toggle constellations</button>
         </div> */}
-        {/* <div className='menu-item'>
-          <p>{FPMode ? "ON" : "OFF"}</p>
-          <button onClick={() => toggleFPMode()}>Toggle FP Mode</button>
-        </div> */}
         {/* Dropdown for selecting planets */}
         <div className='menu-item'>
           <label htmlFor='planetSelection'>Select a Planet:</label>
@@ -124,6 +130,18 @@ const Menu = () => {
             {displayLabels ? "NAMES" : "POINTS"}
           </button>
         </div>
+        <div className='menu-item'>
+          <label htmlFor='constellationsToggle'>Toggle Constellations:</label>
+          <button id='constellationsToggle' className='btn' onClick={toggleConstellations}>
+            {showConstellations ? "ON" : "OFF"}
+          </button>
+        </div>
+        {/* <div className='menu-item'>
+          <label htmlFor='cameraToggle'>Toggle Camera:</label>
+          <button id='cameraToggle' className='btn' onClick={toggleSurfaceCamera}>
+            {isSurfaceCameraActive ? "FPV" : "DEFAULT"}
+          </button>
+        </div> */}
 
         {selectedPlanet && (
           <div className='planet-details'>

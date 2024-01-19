@@ -25,8 +25,8 @@ const useStore = create((set, get) => ({
     orbitPaths: true,
     toggleOrbitPaths: () => set(state => ({ orbitPaths: !state.orbitPaths })),
 
-    // constellations: false,
-    // toggleConstellations: () => set(state => ({ constellations: !state.constellations })),
+    showConstellations: false,
+    toggleConstellations: () => set(state => ({ showConstellations: !state.showConstellations })),
 
     // FPMode: false, 
     // toggleFPMode: () => set(state => ({ FPMode: !state.FPMode })),
@@ -92,7 +92,7 @@ export default useStore;
 
 
 const usePlanetStore = create((set) => ({
-    displayLabels: true, // render planet names in scene
+    displayLabels: false, // render planet names in scene
     toggleDisplayLabels: () => set((state) => ({ displayLabels: !state.displayLabels })),
 
     planetPositions: {},
@@ -116,4 +116,12 @@ const usePlanetStore = create((set) => ({
 
 }));
 
-export { usePlanetStore }
+const useCameraStore = create((set) => ({
+    surfacePoint: null,
+    setSurfacePoint: (point) => set({ surfacePoint: point }),
+
+    isSurfaceCameraActive: false,
+    toggleSurfaceCamera: () => set((state) => ({ isSurfaceCameraActive: !state.isSurfaceCameraActive })),
+}));
+
+export { usePlanetStore, useCameraStore }
