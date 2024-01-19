@@ -73,7 +73,7 @@ const Sun = ({ position, resetCamera }) => {
       </mesh>
       {/* Display planet names */}
       {displayLabels ? (
-        <Html center position-y={0}>
+        <Html as='div' center occlude position-y={60} zIndexRange={[100, 0]}>
           <div
             className='planet-label'
             style={{ color: "rgb(255, 255, 0)" }}
@@ -83,13 +83,12 @@ const Sun = ({ position, resetCamera }) => {
             onPointerUp={handlePointerUp}
             onPointerOver={handlePointerOver}
             onPointerOut={handlePointerOut}
-            transform={[200, 200, 0]}
           >
-            sun
+            Sun
           </div>
         </Html>
       ) : (
-        <Html center>
+        <Html center zIndexRange={[100, 0]}>
           <div
             className='planet-point'
             style={{ backgroundColor: "rgb(255, 255, 0)" }}
