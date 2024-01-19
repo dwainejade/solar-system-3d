@@ -1,15 +1,20 @@
 import React, { useRef, useEffect, useState } from "react";
-import { Stars, CameraControls, useTexture, Environment } from "@react-three/drei";
-import useStore, { usePlanetStore } from "./store/store";
+import { CameraControls, useTexture, Environment, PerspectiveCamera } from "@react-three/drei";
+import useStore, { useCameraStore, usePlanetStore } from "./store/store";
 import planetsData from "./data/planetsData";
 import Planet from "./components/Planet";
 // import Moon from "./components/Moon";
 import Sun from "./components/Sun";
 import { sizeScaleFactor } from "./data/planetsData";
+import { Vector3 } from "three";
+import { useFrame } from "@react-three/fiber";
+import Stars from "./components/Stars";
 
 const Scene = () => {
   const { sunSettings, rotationCounts, simulationDate } = useStore();
   const { planetPositions, selectedPlanet } = usePlanetStore();
+  const { surfacePoint, isSurfaceCameraActive } = useCameraStore();
+  const surfaceCameraRef = useRef();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
 
@@ -55,6 +60,30 @@ const Scene = () => {
     }
   }, [selectedPlanet, sunSettings.position]);
 
+  const heightAboveSurface = 0.1;
+
+  useFrame(() => {
+    if (isSurfaceCameraActive && surfacePoint && selectedPlanet) {
+      const planetPosition = planetPositions[selectedPlanet.name];
+      if (planetPosition) {
+        // Create a Vector3 instance from the planet's position
+        const planetPositionVector = new Vector3(planetPosition.x, planetPosition.y, planetPosition.z);
+
+        // Calculate the initial offset if it's not already set
+        const initialOffset = new Vector3(surfacePoint.x, surfacePoint.y, surfacePoint.z).sub(planetPositionVector);
+
+        // Calculate the new camera position
+        const newCameraPosition = planetPositionVector.add(initialOffset);
+
+        // Update the camera's position
+        surfaceCameraRef.current.position.set(newCameraPosition.x, newCameraPosition.y, newCameraPosition.z);
+
+        // Orient the camera - adjust as needed
+        surfaceCameraRef.current.lookAt(planetPositionVector);
+      }
+    }
+  });
+
   // A simplistic approach to calculate optimal distance
   function calculateOptimalDistance(planetRadius) {
     // This is a simple heuristic. You might need a more complex calculation based on FOV and viewport size.
@@ -97,15 +126,27 @@ const Scene = () => {
   // camera settings
   const cameraConfig = {
     maxDistance: 100000,
-    smoothTime: 1.5,
+    smoothTime: 0.8, // 1.5 is default
     truckSpeed: 1,
     rotateSpeed: 1,
     zoomSpeed: 2,
   };
-
   return (
     <>
-      <CameraControls ref={cameraControlsRef} makeDefault {...cameraConfig} minDistance={minDistance} />
+      {!isSurfaceCameraActive && <CameraControls ref={cameraControlsRef} makeDefault {...cameraConfig} minDistance={minDistance} />}
+
+      {/* First Person Camera */}
+      {surfacePoint && isSurfaceCameraActive && (
+        <PerspectiveCamera
+          ref={surfaceCameraRef}
+          makeDefault
+          position={[surfacePoint.x, surfacePoint.y + heightAboveSurface, surfacePoint.z]}
+          fov={70}
+          near={0.00001}
+          far={1000}
+          // You may also want to set the lookAt property
+        />
+      )}
       <ambientLight intensity={0.1} />
       <pointLight color='#f6f3ea' intensity={1} position={[0, 0, 0]} />
       <Planet bodyData={planetsData.Earth} textures={earthTextures} />
@@ -121,13 +162,14 @@ const Scene = () => {
       <Sun key={"Sun-plain"} position={sunSettings.position} resetCamera={resetCamera} />
 
       {/* <Stars radius={7000} count={1000} factor={100} saturation={0} fade speed={0.5} /> */}
-      <Environment
+      {/* <Environment
         background
         files={["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"]}
         path={`/assets/stars/stars-cube-map/`}
         near={100}
         far={2000}
-      />
+      /> */}
+      <Stars />
     </>
   );
 };
