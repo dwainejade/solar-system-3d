@@ -2,7 +2,7 @@ import React, { useRef, forwardRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import OrbitPath from "./OrbitPath";
 import { Html, Torus } from "@react-three/drei";
-import useStore, { usePlanetStore } from "../store/store";
+import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import planetsData, { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 
 // default values
@@ -28,7 +28,8 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   } = mergedData;
 
   const { simSpeed, updateRotationCount, incrementDate, simulationDate, orbitPaths } = useStore();
-  const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels } = usePlanetStore();
+  const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels, planetPositions } = usePlanetStore();
+  const { setSurfacePoint } = useCameraStore();
 
   const localRef = ref || useRef();
   const localAngleRef = useRef(planetAngles[name] || 0); // Initialize with saved angle or 0
@@ -50,6 +51,9 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   // Define state and refs to track dragging
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
+
+  const { raycaster, mouse, camera } = useThree();
+  const meshRef = useRef();
 
   useFrame((state, delta) => {
     // Adjust delta based on simulation speed (simSpeed)
@@ -117,6 +121,16 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
         setSelectedPlanet(mergedData);
       }
     }
+
+    // Update the raycaster with the current mouse and camera positions
+    raycaster.setFromCamera(mouse, camera);
+
+    // Calculate the intersection with the mesh
+    const intersects = raycaster.intersectObject(meshRef.current, true);
+    if (intersects.length > 0) {
+      const intersectionPoint = intersects[0].point;
+      setSurfacePoint(intersectionPoint);
+    }
   };
 
   // New handler for pointer down
@@ -168,6 +182,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     <>
       <group ref={localRef}>
         <mesh
+          ref={meshRef}
           onClick={handleClick}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -197,8 +212,15 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
 
         {/* Display planet names */}
         {displayLabels ? (
-          <Html center occlude position-y={scaledRadius + scaledRadius * 0.25}>
-            <div
+          <Html
+            as='span'
+            wrapperClass='label-wrapper'
+            center
+            occlude
+            position-y={scaledRadius + scaledRadius * 0.25}
+            zIndexRange={[100, 0]}
+          >
+            <span
               className='planet-label'
               style={{ color }}
               onClick={handleClick}
@@ -209,10 +231,10 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
               onPointerOut={handlePointerOut}
             >
               {name}
-            </div>
+            </span>
           </Html>
         ) : (
-          <Html center>
+          <Html as='div' center zIndexRange={[100, 0]} calculateDpr={Dpr => console.log(Dpr)}>
             <div
               className='planet-point'
               style={{ backgroundColor: color }}
