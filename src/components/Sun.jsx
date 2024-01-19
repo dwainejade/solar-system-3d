@@ -1,11 +1,12 @@
 import React, { useState, useRef } from "react";
 import { usePlanetStore } from "../store/store";
 import planetsData from "../data/planetsData";
+import { Html } from "@react-three/drei";
 
 const Sun = ({ position, resetCamera }) => {
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
-  const { selectedPlanet, setSelectedPlanet } = usePlanetStore();
+  const { selectedPlanet, setSelectedPlanet, displayLabels } = usePlanetStore();
 
   // Modify the handleClick to account for dragging
   const handleClick = e => {
@@ -57,18 +58,51 @@ const Sun = ({ position, resetCamera }) => {
   };
 
   return (
-    <mesh
-      position={position}
-      onClick={handleClick}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerOver={handlePointerOver}
-      onPointerOut={handlePointerOut}
-    >
-      <sphereGeometry args={[2, 64, 64]} />
-      <meshBasicMaterial color={[10, 3, 0]} toneMapped={false} />
-    </mesh>
+    <group>
+      <mesh
+        position={position}
+        onClick={handleClick}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerOver={handlePointerOver}
+        onPointerOut={handlePointerOut}
+      >
+        <sphereGeometry args={[50, 64, 64]} />
+        <meshBasicMaterial color={[10, 3, 0]} toneMapped={false} />
+      </mesh>
+      {/* Display planet names */}
+      {displayLabels ? (
+        <Html center position-y={0}>
+          <div
+            className='planet-label'
+            style={{ color: "rgb(255, 255, 0)" }}
+            onClick={handleClick}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerOver={handlePointerOver}
+            onPointerOut={handlePointerOut}
+            transform={[200, 200, 0]}
+          >
+            sun
+          </div>
+        </Html>
+      ) : (
+        <Html center>
+          <div
+            className='planet-point'
+            style={{ backgroundColor: "rgb(255, 255, 0)" }}
+            onClick={handleClick}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerOver={handlePointerOver}
+            onPointerOut={handlePointerOut}
+          />
+        </Html>
+      )}
+    </group>
   );
 };
 

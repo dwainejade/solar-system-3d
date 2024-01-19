@@ -1,7 +1,7 @@
 import React, { useRef, forwardRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import OrbitPath from "./OrbitPath";
-import { Torus } from "@react-three/drei";
+import { Html, Torus } from "@react-three/drei";
 import useStore, { usePlanetStore } from "../store/store";
 import planetsData, { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 
@@ -27,8 +27,8 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     initialOrbitalAngle,
   } = mergedData;
 
-  const { simSpeed, updateRotationCount, incrementDate, orbitPaths } = useStore();
-  const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet } = usePlanetStore();
+  const { simSpeed, updateRotationCount, incrementDate, simulationDate, orbitPaths } = useStore();
+  const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels } = usePlanetStore();
 
   const localRef = ref || useRef();
   const localAngleRef = useRef(planetAngles[name] || 0); // Initialize with saved angle or 0
@@ -98,9 +98,8 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   });
 
   const [showTextures, setShowTextures] = useState(false);
-  const textureDisplayDistance = 4000; // Set the distance threshold for showing textures
-  const { camera } = useThree();
-  useFrame(() => {
+  const textureDisplayDistance = 8000; // Set the distance threshold for showing textures
+  useFrame(({ camera }) => {
     if (localRef.current) {
       const distance = camera.position.distanceTo(localRef.current.position);
       setShowTextures(distance < textureDisplayDistance);
@@ -111,7 +110,6 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   const handleClick = e => {
     e.stopPropagation();
     if (!isDragging) {
-      // Your original click handling logic
       // This now only triggers if the mesh wasn't dragged
       if (selectedPlanet && selectedPlanet.name === name) {
         setSelectedPlanet(null);
@@ -194,7 +192,39 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
             </Torus>
           </group>
         )}
+
         {/* <Line points={axialTiltLinePoints} color={color} /> */}
+
+        {/* Display planet names */}
+        {displayLabels ? (
+          <Html center occlude position-y={scaledRadius + scaledRadius * 0.25}>
+            <div
+              className='planet-label'
+              style={{ color }}
+              onClick={handleClick}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerOver={handlePointerOver}
+              onPointerOut={handlePointerOut}
+            >
+              {name}
+            </div>
+          </Html>
+        ) : (
+          <Html center>
+            <div
+              className='planet-point'
+              style={{ backgroundColor: color }}
+              onClick={handleClick}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerOver={handlePointerOver}
+              onPointerOut={handlePointerOut}
+            />
+          </Html>
+        )}
       </group>
       {orbitPaths && (
         <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />

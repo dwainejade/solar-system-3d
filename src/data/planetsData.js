@@ -31,7 +31,7 @@ const earthData = {
     orbitalRadius: 149.6e6, // in kilometers
     orbitalSpeed: 29.78, // in kilometers per second
     orbitalPeriod: 365.25, // in Earth days
-    initialOrbitalAngle: 1, // DONT SET TO ZERO
+    initialOrbitalAngle: Math.random() * 360, // DONT SET TO ZERO
     orbitalInclination: 0.00005, // in degrees
     axialTilt: 23.44, // in degrees
     rotationPeriod: 23.93, // in hours
@@ -219,5 +219,5 @@ export default planetsData;
 
 
 export const distanceScaleFactor = 0.00001;
-export const sizeScaleFactor = 0.0008;
+export const sizeScaleFactor = 0.002;
 export const rotationSpeedScaleFactor = 600000;

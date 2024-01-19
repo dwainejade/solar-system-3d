@@ -25,8 +25,8 @@ const useStore = create((set, get) => ({
     orbitPaths: true,
     toggleOrbitPaths: () => set(state => ({ orbitPaths: !state.orbitPaths })),
 
-    // constellations: false,
-    // toggleConstellations: () => set(state => ({ constellations: !state.constellations })),
+    showConstellations: false,
+    toggleConstellations: () => set(state => ({ showConstellations: !state.showConstellations })),
 
     // FPMode: false, 
     // toggleFPMode: () => set(state => ({ FPMode: !state.FPMode })),
@@ -44,7 +44,7 @@ const useStore = create((set, get) => ({
         set(state => ({ moonSettings: { ...state.moonSettings, ...newSettings } })),
 
     rotationCounts: {},  // Tracks the number of rotations for each planet
-    simulationDate: new Date('2024-01-01'),  // Starting date
+    simulationDate: new Date('2024-01-18'),  // Starting date
     // Update rotation count for a planet
     // Function to update rotation count
     updateRotationCount: (planetName, additionalCount) =>
@@ -92,6 +92,9 @@ export default useStore;
 
 
 const usePlanetStore = create((set) => ({
+    displayLabels: false, // render planet names in scene
+    toggleDisplayLabels: () => set((state) => ({ displayLabels: !state.displayLabels })),
+
     planetPositions: {},
     updatePlanetPosition: (name, position) =>
         set((state) => ({
@@ -113,4 +116,12 @@ const usePlanetStore = create((set) => ({
 
 }));
 
-export { usePlanetStore }
+const useCameraStore = create((set) => ({
+    surfacePoint: null,
+    setSurfacePoint: (point) => set({ surfacePoint: point }),
+
+    isSurfaceCameraActive: false,
+    toggleSurfaceCamera: () => set((state) => ({ isSurfaceCameraActive: !state.isSurfaceCameraActive })),
+}));
+
+export { usePlanetStore, useCameraStore }
