@@ -141,6 +141,13 @@ body {
 .Main .planet-point {
   width: 10px;
   height: 10px;
-  border-radius: 10px;
-  opacity: 0.8;
+  border-radius: 50%;
+  opacity: 1;
+}
+.Main .moon-point {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  opacity: 1;
+  position: relative;
 }
