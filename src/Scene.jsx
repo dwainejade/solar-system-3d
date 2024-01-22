@@ -55,10 +55,8 @@ const Scene = () => {
     }
   }, [selectedPlanet, planetPositions]);
   useEffect(() => {
-    console.log({ selectedMoon });
     if (selectedMoon && cameraControlsRef.current) {
       const moonPosition = selectedMoon.position;
-      console.log(moonPosition, cameraControlsRef.current.camera.position);
       if (moonPosition) {
         // Calculate the optimal distance to view the moon
         const scaledRadius = selectedMoon.bodyData.radius * moonSizeScaleFactor;
