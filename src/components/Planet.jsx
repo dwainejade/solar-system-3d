@@ -254,7 +254,7 @@ const Planet = forwardRef(({ bodyData, textures, moonsData }, ref) => {
         {localRef.current &&
           Array.isArray(moonsData) &&
           moonsData.map((moon, i) => (
-            <Moon key={i} bodyData={moon} parentPosition={localRef.current.position} parentRotation={planetRotation} />
+            <Moon key={i} bodyData={moon} parentPosition={localRef.current.position} parentRotation={planetRotation} parentName={name} />
           ))}
       </group>
       {orbitPaths && (

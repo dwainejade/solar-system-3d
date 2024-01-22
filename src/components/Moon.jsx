@@ -5,9 +5,9 @@ import useStore, { usePlanetStore } from "../store/store";
 import { moonSizeScaleFactor, moonDistanceScaleFactor } from "../data/planetsData";
 import OrbitPath from "./OrbitPath";
 
-const Moon = forwardRef(({ bodyData, parentPosition, parentRotation }, ref) => {
+const Moon = forwardRef(({ bodyData, parentPosition, parentRotation, parentName }, ref) => {
   const { simSpeed, orbitPaths } = useStore();
-  const { displayNames } = usePlanetStore();
+  const { displayNames, selectedPlanet } = usePlanetStore();
 
   const localRef = ref || useRef();
   const localAngleRef = useRef(0);
@@ -59,32 +59,33 @@ const Moon = forwardRef(({ bodyData, parentPosition, parentRotation }, ref) => {
     console.log(`${name} AUX click`);
   };
   return (
-    <group>
-      <mesh ref={localRef} onClick={handleClick}>
-        <sphereGeometry args={[scaledRadius, 32, 32]} />
-        <meshBasicMaterial color={color} />
-      </mesh>
-      {displayNames ? (
-        <Html as='span' wrapperClass='label-wrapper' center occlude position-y={scaledRadius + scaledRadius * 0.25} zIndexRange={[100, 0]}>
-          <span className='planet-label' style={{ color }} onClick={handleClick}>
-            {name}
-          </span>
-        </Html>
-      ) : (
+    (selectedPlanet?.name === parentName || name === "Moon") && (
+      <group>
+        <mesh ref={localRef} onClick={handleClick}>
+          <sphereGeometry args={[scaledRadius, 32, 32]} />
+          <meshBasicMaterial color={color} />
+        </mesh>
         <Html
           position={[moonPosition?.x, moonPosition?.y, moonPosition?.z]}
           as='div'
+          wrapperClass='moon-wrapper'
           center
           zIndexRange={[100, 0]}
           onClick={() => console.log(`${name} clicked point`)}
         >
-          <div className='planet-point' style={{ backgroundColor: color }} onClick={handleClick} onAuxClick={handleRightClick} />
+          <div className='moon-point' style={{ backgroundColor: color }} onClick={handleClick} />
         </Html>
-      )}
-      {orbitPaths && localAngleRef.current && (
-        <OrbitPath origin={parentPosition} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />
-      )}
-    </group>
+        {orbitPaths && (
+          <OrbitPath
+            origin={parentPosition}
+            radius={scaledOrbitalRadius}
+            orbitalInclination={orbitalInclination}
+            color={color}
+            name={name}
+          />
+        )}
+      </group>
+    )
   );
 });
 
