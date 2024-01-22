@@ -1,38 +1,52 @@
-import React, { useRef, forwardRef, useMemo } from "react";
+import React, { useRef, forwardRef, useState, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
-import useStore from "../store/store";
+import useStore, { usePlanetStore } from "../store/store";
 import { moonSizeScaleFactor, moonDistanceScaleFactor } from "../data/planetsData";
 import OrbitPath from "./OrbitPath";
 
-const Moon = forwardRef(({ bodyData, parentPosition }, ref) => {
+const Moon = forwardRef(({ bodyData, parentPosition, parentRotation }, ref) => {
   const { simSpeed, orbitPaths } = useStore();
+  const { displayNames } = usePlanetStore();
 
   const localRef = ref || useRef();
   const localAngleRef = useRef(0);
+  const [moonPosition, setMoonPosition] = useState({ x: 0, y: 0, z: 0 });
 
-  const { name, orbitalRadius, radius, color, orbitalPeriod } = bodyData;
+  const { name, orbitalRadius, radius, color, orbitalPeriod, orbitalInclination } = bodyData;
 
   // Apply moon-specific scaling factors
   const scaledRadius = radius * moonSizeScaleFactor;
   const scaledOrbitalRadius = orbitalRadius * moonDistanceScaleFactor;
 
-  // Use useMemo to calculate and store the orbital speed
+  // Calculate the moon's orbital speed
   const orbitalSpeed = useMemo(() => {
-    const out = (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60);
-    console.log({ name, out });
-    return out;
+    return (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60); // Orbital period in Earth days
   }, [orbitalPeriod]);
 
   useFrame(() => {
     localAngleRef.current += orbitalSpeed * simSpeed;
 
-    const moonX = scaledOrbitalRadius;
-    const moonY = 0;
-    const moonZ = scaledOrbitalRadius;
+    // Calculate moon's position
+    const angle = localAngleRef.current;
+    const moonX = Math.cos(angle) * scaledOrbitalRadius;
+    const moonZ = Math.sin(angle) * scaledOrbitalRadius;
+    const inclination = orbitalInclination * (Math.PI / 180);
+    const moonY = Math.sin(angle) * Math.sin(inclination) * scaledOrbitalRadius;
 
     if (localRef.current) {
       localRef.current.position.set(moonX, moonY, moonZ);
+      setMoonPosition({ x: moonX, y: moonY, z: moonZ });
+    }
+    if (orbitPaths && localRef.current) {
+      // Apply inverse rotation to the orbit path to keep it stationary
+      localRef.current.children.forEach(child => {
+        if (child instanceof OrbitPath) {
+          child.rotation.x = -parentRotation.x;
+          child.rotation.y = -parentRotation.y;
+          child.rotation.z = -parentRotation.z;
+        }
+      });
     }
   });
 
@@ -41,23 +55,34 @@ const Moon = forwardRef(({ bodyData, parentPosition }, ref) => {
     console.log(`${name} clicked`);
   };
 
+  const handleRightClick = e => {
+    console.log(`${name} AUX click`);
+  };
   return (
     <group>
       <mesh ref={localRef} onClick={handleClick}>
         <sphereGeometry args={[scaledRadius, 32, 32]} />
         <meshBasicMaterial color={color} />
       </mesh>
-      {/* <Html as='div' center zIndexRange={[100, 0]} onClick={() => console.log(`${name} clicked point`)}>
-        <div className='planet-point' style={{ backgroundColor: "red" }} />
-      </Html> */}
-      {localRef.current && orbitPaths && (
-        <OrbitPath
-          origin={parentPosition}
-          radius={scaledOrbitalRadius}
-          // orbitalInclination={orbitalInclination}
-          color={color}
-          name={name}
-        />
+      {displayNames ? (
+        <Html as='span' wrapperClass='label-wrapper' center occlude position-y={scaledRadius + scaledRadius * 0.25} zIndexRange={[100, 0]}>
+          <span className='planet-label' style={{ color }} onClick={handleClick}>
+            {name}
+          </span>
+        </Html>
+      ) : (
+        <Html
+          position={[moonPosition?.x, moonPosition?.y, moonPosition?.z]}
+          as='div'
+          center
+          zIndexRange={[100, 0]}
+          onClick={() => console.log(`${name} clicked point`)}
+        >
+          <div className='planet-point' style={{ backgroundColor: color }} onClick={handleClick} onAuxClick={handleRightClick} />
+        </Html>
+      )}
+      {orbitPaths && localAngleRef.current && (
+        <OrbitPath origin={parentPosition} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />
       )}
     </group>
   );

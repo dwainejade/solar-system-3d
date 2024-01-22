@@ -49,6 +49,7 @@ const Planet = forwardRef(({ bodyData, textures, moonsData }, ref) => {
   // const lastRotationRef = useRef(0);
   // const [rotationElapsedTime, setRotationElapsedTime] = useState(0);
   const [hoveredPlanet, setHoveredPlanet] = useState(null);
+  const [planetRotation, setPlanetRotation] = useState({ x: 0, y: 0, z: 0 });
   // Define state and refs to track dragging
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
@@ -89,7 +90,11 @@ const Planet = forwardRef(({ bodyData, textures, moonsData }, ref) => {
 
         // Increment the rotation
         localRef.current.rotation.y += rotationIncrement;
-
+        setPlanetRotation({
+          x: localRef.current.rotation.x,
+          y: localRef.current.rotation.y,
+          z: localRef.current.rotation.z,
+        });
         // Check for a complete rotation
         if (localRef.current.rotation.y >= 2 * Math.PI) {
           localRef.current.rotation.y %= 2 * Math.PI; // Reset rotation for next cycle
@@ -248,7 +253,9 @@ const Planet = forwardRef(({ bodyData, textures, moonsData }, ref) => {
         )}
         {localRef.current &&
           Array.isArray(moonsData) &&
-          moonsData.map((moon, i) => <Moon key={i} bodyData={moon} parentPosition={localRef.current.position} />)}
+          moonsData.map((moon, i) => (
+            <Moon key={i} bodyData={moon} parentPosition={localRef.current.position} parentRotation={planetRotation} />
+          ))}
       </group>
       {orbitPaths && (
         <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />
