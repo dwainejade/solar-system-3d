@@ -4,7 +4,6 @@ import OrbitPath from "./OrbitPath";
 import { Html, Torus } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import planetsData, { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
-import Moon from "./Moon";
 
 // default values
 const defaultBodyData = planetsData.Earth;
@@ -251,11 +250,18 @@ const Planet = forwardRef(({ bodyData, textures, moonsData }, ref) => {
             />
           </Html>
         )}
-        {localRef.current &&
+        {/* {localRef.current &&
           Array.isArray(moonsData) &&
           moonsData.map((moon, i) => (
-            <Moon key={i} bodyData={moon} parentPosition={localRef.current.position} parentRotation={planetRotation} parentName={name} />
-          ))}
+            <Moon
+              key={i}
+              bodyData={moon}
+              parentPosition={localRef.current.position}
+              parentRotation={planetRotation}
+              parentName={name}
+              parentData={mergedData}
+            />
+          ))} */}
       </group>
       {orbitPaths && (
         <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />

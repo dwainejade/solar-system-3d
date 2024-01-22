@@ -112,7 +112,10 @@ const usePlanetStore = create((set) => ({
         })),
 
     selectedMoon: null,
-    setSelectedMoon: (moon) => set({ selectedMoon: moon }),
+    setSelectedMoon: (moonData) =>
+        set(() => ({
+            selectedMoon: moonData,
+        })),
 
 }));
 
