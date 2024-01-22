@@ -146,7 +146,7 @@ const Menu = () => {
         {selectedPlanet && (
           <div className='planet-details'>
             <h2>{selectedPlanet.name}</h2>
-            <p>Mass: {selectedPlanet.mass.toString().replace("e+", "e")} kg</p>
+            <p>Mass: {selectedPlanet.mass?.toString().replace("e+", "e")} kg</p>
             <p>Radius: {selectedPlanet.radius} km</p>
             <p>Orbital Period: {selectedPlanet.orbitalPeriod} days</p>
             <p>Rotation Period: {selectedPlanet.rotationPeriod} hours</p>
