@@ -9,8 +9,6 @@ import { sizeScaleFactor } from "./data/planetsData";
 import { Vector3 } from "three";
 import { useFrame } from "@react-three/fiber";
 import Stars from "./components/Stars";
-import DebrisField from "./components/Debris";
-import SaturnRings from "./components/SaturnRings";
 
 const Scene = () => {
   const { sunSettings, rotationCounts, simulationDate } = useStore();
