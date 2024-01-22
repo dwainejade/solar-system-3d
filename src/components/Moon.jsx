@@ -7,7 +7,7 @@ import OrbitPath from "./OrbitPath";
 
 const Moon = forwardRef(({ bodyData, parentPosition, parentRotation, parentName }, ref) => {
   const { simSpeed, orbitPaths } = useStore();
-  const { displayNames, selectedPlanet } = usePlanetStore();
+  const { displayNames, selectedPlanet, selectedMoon, setSelectedMoon } = usePlanetStore();
 
   const localRef = ref || useRef();
   const localAngleRef = useRef(0);
@@ -52,12 +52,10 @@ const Moon = forwardRef(({ bodyData, parentPosition, parentRotation, parentName 
 
   const handleClick = e => {
     e.stopPropagation();
+    setSelectedMoon({ name, position: moonPosition });
     console.log(`${name} clicked`);
   };
 
-  const handleRightClick = e => {
-    console.log(`${name} AUX click`);
-  };
   return (
     (selectedPlanet?.name === parentName || name === "Moon") && (
       <group>

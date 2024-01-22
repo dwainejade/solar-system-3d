@@ -111,6 +111,9 @@ const usePlanetStore = create((set) => ({
             selectedPlanet: planetData,
         })),
 
+    selectedMoon: null,
+    setSelectedMoon: (moon) => set({ selectedMoon: moon }),
+
 }));
 
 const useCameraStore = create((set) => ({
