@@ -1,48 +1,65 @@
-import React, { useRef, forwardRef } from "react";
+import React, { useRef, forwardRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
+import { Html } from "@react-three/drei";
 import useStore from "../store/store";
-// import OrbitPath from "./OrbitPath";
-import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
+import { moonSizeScaleFactor, moonDistanceScaleFactor } from "../data/planetsData";
+import OrbitPath from "./OrbitPath";
 
 const Moon = forwardRef(({ bodyData, parentPosition }, ref) => {
-  const { simSpeed } = useStore();
+  const { simSpeed, orbitPaths } = useStore();
 
   const localRef = ref || useRef();
   const localAngleRef = useRef(0);
-  // const pathRef = useRef();
 
-  const { name, orbitalRadius, radius, color, orbitalSpeed } = bodyData;
+  const { name, orbitalRadius, radius, color, orbitalPeriod } = bodyData;
 
-  // Apply scaling factors
-  const scaledOrbitalRadius = orbitalRadius * distanceScaleFactor;
-  const scaledRadius = radius * sizeScaleFactor;
-  const scaledOrbitalSpeed = orbitalSpeed * simSpeed;
+  // Apply moon-specific scaling factors
+  const scaledRadius = radius * moonSizeScaleFactor;
+  const scaledOrbitalRadius = orbitalRadius * moonDistanceScaleFactor;
 
-  useFrame((state, delta) => {
-    localAngleRef.current += (delta * scaledOrbitalSpeed) / scaledOrbitalRadius;
+  // Use useMemo to calculate and store the orbital speed
+  const orbitalSpeed = useMemo(() => {
+    const out = (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60);
+    console.log({ name, out });
+    return out;
+  }, [orbitalPeriod]);
 
-    // Calculate Moon's position relative to Earth
-    const moonX = parentPosition.x + scaledOrbitalRadius * Math.cos(localAngleRef.current);
-    const moonZ = parentPosition.z + scaledOrbitalRadius * Math.sin(localAngleRef.current);
+  useFrame(() => {
+    localAngleRef.current += orbitalSpeed * simSpeed;
+
+    const moonX = scaledOrbitalRadius;
+    const moonY = 0;
+    const moonZ = scaledOrbitalRadius;
 
     if (localRef.current) {
-      localRef.current.position.set(moonX, 0, moonZ);
+      localRef.current.position.set(moonX, moonY, moonZ);
     }
-
-    // Set the OrbitPath's position to the Earth's position
-    // if (pathRef.current) {
-    //   pathRef.current.position.set(parentPosition.x, 0, parentPosition.z);
-    // }
   });
 
+  const handleClick = e => {
+    e.stopPropagation();
+    console.log(`${name} clicked`);
+  };
+
   return (
-    <>
-      <mesh ref={localRef}>
+    <group>
+      <mesh ref={localRef} onClick={handleClick}>
         <sphereGeometry args={[scaledRadius, 32, 32]} />
-        <meshStandardMaterial color={color} />
+        <meshBasicMaterial color={color} />
       </mesh>
-      {/* <OrbitPath ref={pathRef} origin={parentPosition} radius={scaledOrbitalRadius} color={color} name={name} /> */}
-    </>
+      {/* <Html as='div' center zIndexRange={[100, 0]} onClick={() => console.log(`${name} clicked point`)}>
+        <div className='planet-point' style={{ backgroundColor: "red" }} />
+      </Html> */}
+      {localRef.current && orbitPaths && (
+        <OrbitPath
+          origin={parentPosition}
+          radius={scaledOrbitalRadius}
+          // orbitalInclination={orbitalInclination}
+          color={color}
+          name={name}
+        />
+      )}
+    </group>
   );
 });
 
