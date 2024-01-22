@@ -7,17 +7,17 @@ const Stars = () => {
   const starsTexture = useLoader(TextureLoader, "./assets/stars/starmap_8k.png");
   const constellationTexture = useLoader(TextureLoader, "./assets/stars/constellations.png");
   const { showConstellations } = useStore();
-
+  const size = 90000;
   return (
     <>
       <mesh>
-        <sphereGeometry args={[90001, 60, 40]} />
+        <sphereGeometry args={[size + 1, 128]} />
         <meshBasicMaterial map={starsTexture} side={BackSide} />
       </mesh>
 
       {showConstellations && (
         <mesh>
-          <sphereGeometry args={[90000, 60, 40]} />
+          <sphereGeometry args={[size, 128]} />
           <meshBasicMaterial map={constellationTexture} transparent={true} opacity={0.1} side={BackSide} />
         </mesh>
       )}
