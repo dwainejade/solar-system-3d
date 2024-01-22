@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { CameraControls, useTexture, Environment, PerspectiveCamera } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "./store/store";
-import planetsData from "./data/planetsData";
+import planetsData, { moonsData } from "./data/planetsData";
 import Planet from "./components/Planet";
 // import Moon from "./components/Moon";
 import Sun from "./components/Sun";
@@ -9,6 +9,8 @@ import { sizeScaleFactor } from "./data/planetsData";
 import { Vector3 } from "three";
 import { useFrame } from "@react-three/fiber";
 import Stars from "./components/Stars";
+import DebrisField from "./components/Debris";
+import SaturnRings from "./components/SaturnRings";
 
 const Scene = () => {
   const { sunSettings, rotationCounts, simulationDate } = useStore();
@@ -147,17 +149,18 @@ const Scene = () => {
           // You may also want to set the lookAt property
         />
       )}
+      <Stars />
       <ambientLight intensity={0.1} />
       <pointLight color='#f6f3ea' intensity={1} position={[0, 0, 0]} />
-      <Planet bodyData={planetsData.Earth} textures={earthTextures} />
+      <Planet bodyData={planetsData.Earth} textures={earthTextures} moonsData={moonsData.Earth} />
       {/* <Moon bodyData={planetsData.Moon} parentPosition={planetPositions.Earth} /> */}
-      <Planet bodyData={planetsData.Mars} textures={marsTextures} />
-      <Planet bodyData={planetsData.Venus} textures={venusTextures} />
-      <Planet bodyData={planetsData.Mercury} textures={mercuryTextures} />
-      <Planet bodyData={planetsData.Jupiter} textures={jupiterTextures} />
-      <Planet bodyData={planetsData.Saturn} textures={saturnTextures} />
-      <Planet bodyData={planetsData.Uranus} textures={uranusTextures} />
-      <Planet bodyData={planetsData.Neptune} textures={neptuneTextures} />
+      <Planet bodyData={planetsData.Mars} textures={marsTextures} moonsData={moonsData.Mars} />
+      <Planet bodyData={planetsData.Venus} textures={venusTextures} moonsData={moonsData.Venus} />
+      <Planet bodyData={planetsData.Mercury} textures={mercuryTextures} moonsData={moonsData.Mercury} />
+      <Planet bodyData={planetsData.Jupiter} textures={jupiterTextures} moonsData={moonsData.Jupiter} />
+      <Planet bodyData={planetsData.Saturn} textures={saturnTextures} moonsData={moonsData.Saturn} />
+      <Planet bodyData={planetsData.Uranus} textures={uranusTextures} moonsData={moonsData.Uranus} />
+      <Planet bodyData={planetsData.Neptune} textures={neptuneTextures} moonsData={moonsData.Neptune} />
       {/* <Planet bodyData={planetsData.Pluto} /> */}
       <Sun key={"Sun-plain"} position={sunSettings.position} resetCamera={resetCamera} />
 
@@ -169,7 +172,6 @@ const Scene = () => {
         near={100}
         far={2000}
       /> */}
-      <Stars />
     </>
   );
 };

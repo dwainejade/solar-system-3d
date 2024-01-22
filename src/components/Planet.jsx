@@ -4,11 +4,12 @@ import OrbitPath from "./OrbitPath";
 import { Html, Torus } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import planetsData, { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
+import Moon from "./Moon";
 
 // default values
 const defaultBodyData = planetsData.Earth;
 
-const Planet = forwardRef(({ bodyData, textures }, ref) => {
+const Planet = forwardRef(({ bodyData, textures, moonsData }, ref) => {
   const mergedData = { ...defaultBodyData, ...bodyData };
   const {
     name,
@@ -197,7 +198,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
             <meshStandardMaterial color={color} />
           )}
         </mesh>
-        {name === "Saturn" && (
+        {/* {name === "Saturn" && (
           <group>
             <Torus args={[scaledRadius * 2, scaledRadius * 0.15, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
               <meshBasicMaterial color={"#Ffffff"} />
@@ -206,10 +207,8 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
               <meshBasicMaterial color={"#F4E1C1"} />
             </Torus>
           </group>
-        )}
-
+        )} */}
         {/* <Line points={axialTiltLinePoints} color={color} /> */}
-
         {/* Display planet names */}
         {displayLabels ? (
           <Html
@@ -234,7 +233,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
             </span>
           </Html>
         ) : (
-          <Html as='div' center zIndexRange={[100, 0]} calculateDpr={Dpr => console.log(Dpr)}>
+          <Html as='div' center zIndexRange={[100, 0]}>
             <div
               className='planet-point'
               style={{ backgroundColor: color }}
@@ -247,6 +246,9 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
             />
           </Html>
         )}
+        {localRef.current &&
+          Array.isArray(moonsData) &&
+          moonsData.map((moon, i) => <Moon key={i} bodyData={moon} parentPosition={localRef.current.position} />)}
       </group>
       {orbitPaths && (
         <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />
