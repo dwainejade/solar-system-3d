@@ -159,7 +159,6 @@ const Menu = () => {
             <p>Mass: {selectedMoon.bodyData.mass?.toString().replace("e+", "e")} kg</p>
             <p>Radius: {selectedMoon.bodyData.radius} km</p>
             <p>Orbital Period: {selectedMoon.bodyData.orbitalPeriod} days</p>
-            <p>Rotation Period: {selectedMoon.bodyData.rotationPeriod} hours</p>
           </div>
         )}
       </div>
