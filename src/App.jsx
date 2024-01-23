@@ -21,14 +21,19 @@ const App = () => {
   const Loader = () => {
     return (
       <Html as='div' fullscreen className='loading-screen'>
-        <p>Loading: {progressPercentage.toFixed(0)}%</p>
+        <div>
+          <p>Loading: {progressPercentage.toFixed(0)}%</p>
+          <div className='loading-bar-container'>
+            <div className='loading-bar' style={{ width: `${progressPercentage}%` }}></div>
+          </div>
+        </div>
       </Html>
     );
   };
 
   return (
     <div className={`Main ${fullscreen ? "fullscreen" : "minimized"}`}>
-      <Canvas id='Canvas' dpr={[1, 2]} camera={{ fov: 50, position: [5000, 5000, 5000], near: 0.1, far: 200000 }}>
+      <Canvas id='Canvas' dpr={[1, 2]} camera={{ fov: 50, position: [5000, 5000, 5000], near: 0.01, far: 300000 }}>
         <Suspense fallback={<Loader />}>
           <Stats />
           <Scene />
