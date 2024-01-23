@@ -14,7 +14,7 @@ const Menu = () => {
     orbitPaths,
     toggleOrbitPaths,
   } = useStore();
-  const { selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels } = usePlanetStore();
+  const { selectedPlanet, setSelectedPlanet, selectedMoon, displayLabels, toggleDisplayLabels } = usePlanetStore();
   const { surfacePoint, isSurfaceCameraActive, toggleSurfaceCamera } = useCameraStore();
   const [isMenuOpen, setMenuOpen] = useState(false);
 
@@ -64,7 +64,6 @@ const Menu = () => {
 
     setSimSpeed(newSpeed);
   };
-
   // Handle planet selection change
   const handlePlanetChange = e => {
     // Update selected planet based on user selection
@@ -143,7 +142,7 @@ const Menu = () => {
           </button>
         </div> */}
 
-        {selectedPlanet && (
+        {selectedPlanet && !selectedMoon && (
           <div className='planet-details'>
             <h2>{selectedPlanet.name}</h2>
             <p>Mass: {selectedPlanet.mass?.toString().replace("e+", "e")} kg</p>
@@ -152,6 +151,15 @@ const Menu = () => {
             <p>Rotation Period: {selectedPlanet.rotationPeriod} hours</p>
             <p>Surface Temperature: {selectedPlanet.surfaceTemp} °C</p>
             <p>Gravity: {selectedPlanet.gravity} m/s²</p>
+          </div>
+        )}
+        {selectedMoon && (
+          <div className='planet-details'>
+            <h2>{selectedMoon.bodyData.name}</h2>
+            <p>Mass: {selectedMoon.bodyData.mass?.toString().replace("e+", "e")} kg</p>
+            <p>Radius: {selectedMoon.bodyData.radius} km</p>
+            <p>Orbital Period: {selectedMoon.bodyData.orbitalPeriod} days</p>
+            <p>Rotation Period: {selectedMoon.bodyData.rotationPeriod} hours</p>
           </div>
         )}
       </div>
