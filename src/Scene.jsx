@@ -151,26 +151,12 @@ const Scene = () => {
     zoomSpeed: 2,
   };
 
-  const renderPlanetWithMoons = (planetName, planetData) => {
+  const renderMoons = (planetName, planetData) => {
     // Ensure planetMoons is always an array. If moonsData[planetName] is undefined, use an empty array
     const planetMoons = moonsData[planetName] || [];
-
-    return (
-      <React.Fragment key={planetName}>
-        <Planet
-          bodyData={planetData}
-          // textures={/* appropriate textures for the planet */}
-        />
-        {planetMoons.map((moonData, index) => (
-          <Moon
-            key={`${planetName}-moon-${index}`}
-            bodyData={moonData}
-            parentPosition={planetPositions[planetName]}
-            parentName={planetName}
-          />
-        ))}
-      </React.Fragment>
-    );
+    return planetMoons.map((moonData, index) => (
+      <Moon key={`${planetName}-moon-${index}`} bodyData={moonData} parentPosition={planetPositions[planetName]} parentName={planetName} />
+    ));
   };
 
   return (
@@ -189,9 +175,12 @@ const Scene = () => {
           // You may also want to set the lookAt property
         />
       )}
+
       <Stars />
+
       <ambientLight intensity={0.1} />
       <pointLight color='#f6f3ea' intensity={1} position={[0, 0, 0]} />
+
       <Planet bodyData={planetsData.Earth} textures={earthTextures} moonsData={moonsData.Earth} />
       <Planet bodyData={planetsData.Mars} textures={marsTextures} moonsData={moonsData.Mars} />
       <Planet bodyData={planetsData.Venus} textures={venusTextures} moonsData={moonsData.Venus} />
@@ -201,8 +190,8 @@ const Scene = () => {
       <Planet bodyData={planetsData.Uranus} textures={uranusTextures} moonsData={moonsData.Uranus} />
       <Planet bodyData={planetsData.Neptune} textures={neptuneTextures} moonsData={moonsData.Neptune} />
 
-      {/* Render planets and their moons */}
-      {Object.entries(moonsData).map(([planetName, planetData]) => renderPlanetWithMoons(planetName, planetData))}
+      {/* Render moons */}
+      {Object.entries(moonsData).map(([planetName, planetData]) => renderMoons(planetName, planetData))}
 
       {/* <Planet bodyData={planetsData.Pluto} /> */}
       <Sun key={"Sun-plain"} position={sunSettings.position} resetCamera={resetCamera} />
