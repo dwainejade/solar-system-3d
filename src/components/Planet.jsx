@@ -204,12 +204,21 @@ const Planet = forwardRef(({ bodyData, textures, moonsData }, ref) => {
         >
           <sphereGeometry args={[scaledRadius, detailLevel, detailLevel]} />
           {textures && (showTextures || isPlanetSelected) ? (
-            <meshPhysicalMaterial metalness={0.9} roughness={0.65} map={textures.map} />
+            <meshPhysicalMaterial metalness={0.9} roughness={0.65} map={textures.map} zIndexRange={[100 - 1]} />
           ) : (
             <meshStandardMaterial color={color} />
           )}
         </mesh>
-        {name === "Saturn" && scaledRadius && <SaturnRings scaledRadius={scaledRadius} saturnRef={localRef} />}
+        {name === "Saturn" && (
+          <group>
+            <Torus args={[scaledRadius * 2, scaledRadius * 0.15, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+              <meshBasicMaterial color={"#Ffffff"} transparent opacity={0.6} />
+            </Torus>
+            <Torus args={[scaledRadius * 1.5, scaledRadius * 0.3, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+              <meshBasicMaterial color={"#F4E1C1"} transparent opacity={0.6} />
+            </Torus>
+          </group>
+        )}
         {/* <Line points={axialTiltLinePoints} color={color} /> */}
         {/* Display planet names */}
         {displayLabels ? (

@@ -151,7 +151,7 @@ const Scene = () => {
 
   // camera settings
   const cameraConfig = {
-    maxDistance: 120000,
+    maxDistance: 90000,
     smoothTime: 0.8, // 1.5 is default
     truckSpeed: 1,
     rotateSpeed: 1,
@@ -169,7 +169,7 @@ const Scene = () => {
   return (
     <>
       {!isSurfaceCameraActive && (
-        <CameraControls ref={cameraControlsRef} makeDefault {...cameraConfig} minDistance={Math.max(0.12, minDistance)} />
+        <CameraControls ref={cameraControlsRef} makeDefault {...cameraConfig} minDistance={Math.max(0.01, minDistance)} />
       )}
 
       {/* First Person Camera */}
