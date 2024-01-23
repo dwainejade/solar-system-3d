@@ -184,7 +184,7 @@ const Scene = () => {
           makeDefault
           position={[surfacePoint.x, surfacePoint.y + heightAboveSurface, surfacePoint.z]}
           fov={70}
-          near={0.00001}
+          near={0.0001}
           far={1000}
           // You may also want to set the lookAt property
         />

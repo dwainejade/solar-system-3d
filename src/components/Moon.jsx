@@ -1,4 +1,4 @@
-import React, { useRef, forwardRef, useState, useMemo } from "react";
+import React, { useRef, forwardRef, useState, useMemo, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import useStore, { usePlanetStore } from "../store/store";
@@ -24,6 +24,10 @@ const Moon = forwardRef(({ bodyData, parentPosition, parentName }, ref) => {
   const orbitalSpeed = useMemo(() => {
     return (2 * Math.PI) / (bodyData.orbitalPeriod * 24 * 60 * 60); // Orbital period in Earth days
   }, [orbitalPeriod]);
+
+  useEffect(() => {
+    localAngleRef.current = Math.random() * 2 * Math.PI; // Random angle between 0 and 2π
+  }, []);
 
   useFrame((state, delta) => {
     // Calculate the moon's orbital speed based on its orbital period
@@ -69,7 +73,7 @@ const Moon = forwardRef(({ bodyData, parentPosition, parentName }, ref) => {
     const moonData = { bodyData, position: moonPosition };
     if (selectedMoon && selectedMoon.name === name) {
       setSelectedMoon(null);
-      setSelectedPlanet(parentData);
+      setSelectedPlanet(null);
     } else {
       setSelectedPlanet(moonData);
       setSelectedMoon(moonData);
@@ -83,16 +87,19 @@ const Moon = forwardRef(({ bodyData, parentPosition, parentName }, ref) => {
         <sphereGeometry args={[scaledRadius, 32, 32]} />
         <meshStandardMaterial color={color} />
       </mesh>
-      <Html
-        position={[moonPosition?.x, moonPosition?.y, moonPosition?.z]}
-        as='div'
-        wrapperClass='moon-wrapper'
-        center
-        zIndexRange={[100, 0]}
-        onClick={() => console.log(`${name} clicked point`)}
-      >
-        <div className='moon-point' style={{ backgroundColor: color }} onClick={handleClick} />
-      </Html>
+
+      {parentName === selectedPlanet?.name && (
+        <Html
+          position={[moonPosition?.x, moonPosition?.y, moonPosition?.z]}
+          as='div'
+          wrapperClass='moon-wrapper'
+          center
+          zIndexRange={[100, 0]}
+          onClick={handleClick}
+        >
+          <div className='moon-point' style={{ backgroundColor: color }} onClick={handleClick} />
+        </Html>
+      )}
       {orbitPaths && parentPosition && (
         <group position={[parentPosition.x, parentPosition.y, parentPosition.z]}>
           <OrbitPath
