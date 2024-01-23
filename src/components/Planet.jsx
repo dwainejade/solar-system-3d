@@ -202,7 +202,7 @@ const Planet = forwardRef(({ bodyData, textures, moonsData }, ref) => {
             <meshStandardMaterial color={color} />
           )}
         </mesh>
-        {/* {name === "Saturn" && (
+        {name === "Saturn" && (
           <group>
             <Torus args={[scaledRadius * 2, scaledRadius * 0.15, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
               <meshBasicMaterial color={"#Ffffff"} />
@@ -211,7 +211,7 @@ const Planet = forwardRef(({ bodyData, textures, moonsData }, ref) => {
               <meshBasicMaterial color={"#F4E1C1"} />
             </Torus>
           </group>
-        )} */}
+        )}
         {/* <Line points={axialTiltLinePoints} color={color} /> */}
         {/* Display planet names */}
         {displayLabels ? (
