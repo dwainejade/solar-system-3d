@@ -7,7 +7,7 @@ const Stars = () => {
   const starsTexture = useLoader(TextureLoader, "./assets/stars/starmap_8k.png");
   const constellationTexture = useLoader(TextureLoader, "./assets/stars/constellations.png");
   const { showConstellations } = useStore();
-  const size = 90000;
+  const size = 200000;
   return (
     <>
       <mesh>
