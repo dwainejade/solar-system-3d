@@ -7,10 +7,11 @@ import { moonsData, moonSizeScaleFactor } from "./data/moonsData";
 import Planet from "./components/Planet";
 // import Moon from "./components/Moon";
 import Sun from "./components/Sun";
-import { Vector3 } from "three";
-import { useFrame } from "@react-three/fiber";
+import { Mesh, MeshStandardMaterial, PlaneGeometry, Vector3 } from "three";
+import { useFrame, useThree } from "@react-three/fiber";
 import Stars from "./components/Stars";
 import Moon from "./components/Moon";
+import SurfacePlane from "./components/SurfacePlane";
 
 const Scene = () => {
   const { sunSettings, rotationCounts, simulationDate } = useStore();
@@ -19,6 +20,7 @@ const Scene = () => {
   const surfaceCameraRef = useRef();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
+  const { scene } = useThree();
 
   const resetCamera = () => {
     if (!cameraControlsRef.current) return;
@@ -79,26 +81,31 @@ const Scene = () => {
     }
   }, [selectedPlanet, sunSettings.position]);
 
-  const heightAboveSurface = 0.1;
-
+  const heightAboveSurface = 10;
   useFrame(() => {
     if (isSurfaceCameraActive && surfacePoint && selectedPlanet) {
       const planetPosition = planetPositions[selectedPlanet.name];
       if (planetPosition) {
-        // Create a Vector3 instance from the planet's position
-        const planetPositionVector = new Vector3(planetPosition.x, planetPosition.y, planetPosition.z);
+        // Assuming planetPosition is the center of the planet
+        const centerOfPlanet = new Vector3(planetPosition.x, planetPosition.y, planetPosition.z);
 
-        // Calculate the initial offset if it's not already set
-        const initialOffset = new Vector3(surfacePoint.x, surfacePoint.y, surfacePoint.z).sub(planetPositionVector);
+        // Calculate the normal as the vector from the planet's center to the surface point
+        const surfaceNormal = new Vector3(surfacePoint.x, surfacePoint.y, surfacePoint.z).sub(centerOfPlanet).normalize();
 
-        // Calculate the new camera position
-        const newCameraPosition = planetPositionVector.add(initialOffset);
+        // Position the camera slightly above the surface point
+        const cameraHeightAboveSurface = 0.1; // Adjust as needed
+        const cameraPosition = new Vector3(surfacePoint.x, surfacePoint.y, surfacePoint.z).add(
+          surfaceNormal.multiplyScalar(cameraHeightAboveSurface)
+        );
 
-        // Update the camera's position
-        surfaceCameraRef.current.position.set(newCameraPosition.x, newCameraPosition.y, newCameraPosition.z);
+        surfaceCameraRef.current.position.copy(cameraPosition);
 
-        // Orient the camera - adjust as needed
-        surfaceCameraRef.current.lookAt(planetPositionVector);
+        // Set the camera to look at a point directly 'up' from the surface
+        const lookAtPoint = cameraPosition.clone().add(surfaceNormal);
+        surfaceCameraRef.current.lookAt(lookAtPoint);
+
+        // Align the camera's up vector with the surface normal
+        surfaceCameraRef.current.up.copy(surfaceNormal);
       }
     }
   });
@@ -144,11 +151,11 @@ const Scene = () => {
 
   // camera settings
   const cameraConfig = {
-    maxDistance: 100000,
+    maxDistance: 120000,
     smoothTime: 0.8, // 1.5 is default
     truckSpeed: 1,
     rotateSpeed: 1,
-    zoomSpeed: 2,
+    zoomSpeed: 0.1,
   };
 
   const renderMoons = (planetName, planetData) => {
@@ -161,7 +168,9 @@ const Scene = () => {
 
   return (
     <>
-      {!isSurfaceCameraActive && <CameraControls ref={cameraControlsRef} makeDefault {...cameraConfig} minDistance={minDistance} />}
+      {!isSurfaceCameraActive && (
+        <CameraControls ref={cameraControlsRef} makeDefault {...cameraConfig} minDistance={Math.max(0.12, minDistance)} />
+      )}
 
       {/* First Person Camera */}
       {surfacePoint && isSurfaceCameraActive && (
@@ -170,8 +179,8 @@ const Scene = () => {
           makeDefault
           position={[surfacePoint.x, surfacePoint.y + heightAboveSurface, surfacePoint.z]}
           fov={70}
-          near={0.0001}
-          far={1000}
+          near={0.01}
+          far={1000000}
           // You may also want to set the lookAt property
         />
       )}
@@ -196,13 +205,13 @@ const Scene = () => {
       {/* <Planet bodyData={planetsData.Pluto} /> */}
       <Sun key={"Sun-plain"} position={sunSettings.position} resetCamera={resetCamera} />
 
+      {/* <SurfacePlane /> */}
+
       {/* <Stars radius={7000} count={1000} factor={100} saturation={0} fade speed={0.5} /> */}
       {/* <Environment
         background
         files={["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"]}
         path={`/assets/stars/stars-cube-map/`}
-        near={100}
-        far={2000}
       /> */}
     </>
   );

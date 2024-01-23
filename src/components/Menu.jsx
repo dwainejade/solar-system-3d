@@ -135,12 +135,12 @@ const Menu = () => {
             {showConstellations ? "ON" : "OFF"}
           </button>
         </div>
-        {/* <div className='menu-item'>
+        <div className='menu-item'>
           <label htmlFor='cameraToggle'>Toggle Camera:</label>
           <button id='cameraToggle' className='btn' onClick={toggleSurfaceCamera}>
             {isSurfaceCameraActive ? "FPV" : "DEFAULT"}
           </button>
-        </div> */}
+        </div>
 
         {selectedPlanet && !selectedMoon && (
           <div className='planet-details'>
@@ -153,7 +153,7 @@ const Menu = () => {
             <p>Gravity: {selectedPlanet.gravity} m/s²</p>
           </div>
         )}
-        {selectedMoon && (
+        {selectedMoon && selectedPlanet && (
           <div className='planet-details'>
             <h2>{selectedMoon.bodyData.name}</h2>
             <p>Mass: {selectedMoon.bodyData.mass?.toString().replace("e+", "e")} kg</p>
