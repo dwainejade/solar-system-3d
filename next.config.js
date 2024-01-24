@@ -13,6 +13,8 @@ const withPWA = require('@ducanh2912/next-pwa').default({
 })
 
 const nextConfig = {
+  basePath: '/solar-system-interactive',
+  assetPrefix: '/solar-system-interactive',
   // uncomment the following snippet if using styled components
   // compiler: {
   //   styledComponents: true,
