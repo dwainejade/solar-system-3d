@@ -1,21 +1,12 @@
+"use client";
 import React, { useState } from "react";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import planetsData from "../data/planetsData";
 
 const Menu = () => {
-  const {
-    simSpeed,
-    setSimSpeed,
-    constellations,
-    showConstellations,
-    toggleConstellations,
-    fullscreen,
-    toggleFullscreen,
-    orbitPaths,
-    toggleOrbitPaths,
-  } = useStore();
+  const { setSimSpeed, showConstellations, toggleConstellations, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths } = useStore();
   const { selectedPlanet, setSelectedPlanet, selectedMoon, displayLabels, toggleDisplayLabels } = usePlanetStore();
-  const { surfacePoint, isSurfaceCameraActive, toggleSurfaceCamera } = useCameraStore();
+  const { isSurfaceCameraActive, toggleSurfaceCamera } = useCameraStore();
   const [isMenuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -92,10 +83,7 @@ const Menu = () => {
             <option value='10yr'>1s equals 10 years</option>
           </select>
         </div>
-        {/* <div className='menu-item'>
-          <p>{constellations ? "ON" : "OFF"}</p>
-          <button onClick={() => toggleConstellations()}>Toggle constellations</button>
-        </div> */}
+
         {/* Dropdown for selecting planets */}
         <div className='menu-item'>
           <label htmlFor='planetSelection'>Select a Planet:</label>

@@ -6,7 +6,7 @@ import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import planetsData, { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 import { Vector3 } from "three";
 import SurfacePlane from "./SurfacePlane";
-import SaturnRings from "./SaturnRings";
+// import SaturnRings from "./SaturnRings";
 
 // default values
 const defaultBodyData = planetsData.Earth;

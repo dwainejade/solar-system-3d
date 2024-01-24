@@ -7,7 +7,7 @@ import planetsData, { sizeScaleFactor } from "@/data/planetsData";
 import { moonsData, moonSizeScaleFactor } from "@/data/moonsData";
 
 import { Vector3 } from "three";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import Moon from "@/components/Moon";
 import Sun from "@/components/Sun";
 import Planet from "@/components/Planet";
@@ -19,7 +19,6 @@ const SceneOne = () => {
   const surfaceCameraRef = useRef();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
-  const { scene } = useThree();
 
   const resetCamera = () => {
     if (!cameraControlsRef.current) return;

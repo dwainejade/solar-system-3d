@@ -34,12 +34,7 @@ const App = () => {
 
   return (
     <div className={`Main ${fullscreen ? "fullscreen" : "minimized"}`}>
-      <Canvas
-        id='Canvas'
-        dpr={[1, 2]}
-        camera={{ fov: 50, position: [5000, 5000, 5000], near: 0.01, far: 200000 }}
-        // onCreated={state => (state.gl.toneMapping = THREE.AgXToneMapping)}
-      >
+      <Canvas id='Canvas' dpr={[1, 2]} camera={{ fov: 50, position: [5000, 5000, 5000], near: 0.01, far: 200000 }}>
         <Suspense fallback={<Loader />}>
           <Stats />
           <Scene />

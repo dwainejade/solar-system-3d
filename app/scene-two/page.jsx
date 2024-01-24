@@ -1,7 +1,7 @@
 import SharedCanvas from "@/components/canvas/SharedCanvas";
 import SceneTwo from "./SceneTwo";
 
-const SceneOnePage = () => {
+const SceneTwoPage = () => {
   return (
     <SharedCanvas>
       <SceneTwo />
@@ -9,4 +9,4 @@ const SceneOnePage = () => {
   );
 };
 
-export default SceneOnePage;
+export default SceneTwoPage;

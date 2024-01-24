@@ -3,7 +3,7 @@ import { usePlanetStore } from "../store/store";
 import planetsData from "../data/planetsData";
 import { Html } from "@react-three/drei";
 
-const Sun = ({ position, resetCamera }) => {
+const Sun = ({ position, resetCamera, textures }) => {
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
   const { selectedPlanet, setSelectedPlanet, displayLabels } = usePlanetStore();
@@ -69,7 +69,11 @@ const Sun = ({ position, resetCamera }) => {
         onPointerOut={handlePointerOut}
       >
         <sphereGeometry args={[50, 64, 64]} />
-        <meshBasicMaterial color={[10, 3, 0]} toneMapped={false} />
+        {textures ? (
+          <meshPhysicalMaterial map={textures.map} color={[10, 3, 0]} toneMapped={false} zIndexRange={[100 - 1]} />
+        ) : (
+          <meshBasicMaterial color={[10, 3, 0]} toneMapped={false} />
+        )}
       </mesh>
       {/* Display planet names */}
       {displayLabels ? (

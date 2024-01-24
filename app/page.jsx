@@ -1,22 +1,17 @@
 "use client";
-
 import Link from "next/link";
 
-const MainPage = () => {
+const Home = () => {
   return (
-    <div className='main-page'>
+    <div className='home-page'>
       <h1>Scene Selector</h1>
       <nav>
         <ul>
           <li>
-            <Link href='/scene-one'>
-              <a>Scene One</a>
-            </Link>
+            <Link href='/scene-one'>Scene 1</Link>
           </li>
           <li>
-            <Link href='/scene-two'>
-              <a>Scene Two</a>
-            </Link>
+            <Link href='/scene-two'>Scene 2</Link>
           </li>
         </ul>
       </nav>
@@ -24,4 +19,4 @@ const MainPage = () => {
   );
 };
 
-export default MainPage;
+export default Home;

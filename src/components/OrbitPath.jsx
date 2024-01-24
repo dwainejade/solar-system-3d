@@ -9,7 +9,7 @@ const OrbitPath = forwardRef(
 
     const points = useMemo(() => {
       const pathPoints = [];
-      for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 128) {
+      for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 150) {
         const x = radius * Math.cos(angle);
         const y = Math.sin(inclination) * radius * Math.sin(angle);
         const z = radius * Math.sin(angle);

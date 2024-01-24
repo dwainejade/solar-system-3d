@@ -18,7 +18,7 @@ const Stars = () => {
       {showConstellations && (
         <mesh>
           <sphereGeometry args={[size, 128]} />
-          <meshBasicMaterial map={constellationTexture} transparent={true} opacity={0.1} side={BackSide} />
+          <meshBasicMaterial map={constellationTexture} transparent={true} opacity={0.2} side={BackSide} />
         </mesh>
       )}
     </>
