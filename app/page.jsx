@@ -1,9 +1,13 @@
 "use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const Home = () => {
+  const router = useRouter();
+
   return (
-    <div className='home-page'>
+    <div className='main-page'>
       <h1>Scene Selector</h1>
       <nav>
         <ul>
@@ -11,7 +15,7 @@ const Home = () => {
             <Link href='/scene-one'>Scene 1</Link>
           </li>
           <li>
-            <Link href='/scene-two'>Scene 2</Link>
+            <p onClick={() => router.push("/scene-two")}>Scene 2</p>
           </li>
         </ul>
       </nav>
