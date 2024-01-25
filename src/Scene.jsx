@@ -7,11 +7,11 @@ import { moonsData, moonSizeScaleFactor } from "./data/moonsData";
 import Planet from "./components/Planet";
 // import Moon from "./components/Moon";
 import Sun from "./components/Sun";
-import { Mesh, MeshStandardMaterial, PlaneGeometry, Vector3 } from "three";
+import { Vector3 } from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 import Stars from "./components/Stars";
 import Moon from "./components/Moon";
-import SurfacePlane from "./components/SurfacePlane";
+// import SurfacePlane from "./components/SurfacePlane";
 
 const Scene = () => {
   const { sunSettings, rotationCounts, simulationDate } = useStore();
@@ -118,7 +118,7 @@ const Scene = () => {
   }
 
   const earthTextures = useTexture({
-    map: "./assets/earth/2k_earth_daymap.jpg",
+    map: "/assets/earth/2k_earth_daymap.jpg",
     // normal: "/assets/earth/2k_earth_normal_map.png",
     // specular: "/assets/earth/2k_earth_specular_map.png",
   });
@@ -126,27 +126,27 @@ const Scene = () => {
   //   map: "/assets/sun/2k_sun.jpg",
   // });
   const venusTextures = useTexture({
-    map: "./assets/venus/2k_venus_surface.jpg",
-    surface: "./assets/venus/2k_venus_atmosphere.jpg",
+    map: "/assets/venus/2k_venus_surface.jpg",
+    surface: "/assets/venus/2k_venus_atmosphere.jpg",
   });
   const mercuryTextures = useTexture({
-    map: "./assets/mercury/2k_mercury.jpg",
+    map: "/assets/mercury/2k_mercury.jpg",
   });
   const marsTextures = useTexture({
-    map: "./assets/mars/2k_mars.jpg",
+    map: "/assets/mars/2k_mars.jpg",
   });
   const jupiterTextures = useTexture({
-    map: "./assets/jupiter/2k_jupiter.jpg",
+    map: "/assets/jupiter/2k_jupiter.jpg",
   });
   const saturnTextures = useTexture({
-    map: "./assets/saturn/2k_saturn.jpg",
-    ring: "./assets/saturn/2k_saturn_ring_alpha.png",
+    map: "/assets/saturn/2k_saturn.jpg",
+    ring: "/assets/saturn/2k_saturn_ring_alpha.png",
   });
   const uranusTextures = useTexture({
-    map: "./assets/uranus/2k_uranus.jpg",
+    map: "/assets/uranus/2k_uranus.jpg",
   });
   const neptuneTextures = useTexture({
-    map: "./assets/neptune/2k_neptune.jpg",
+    map: "/assets/neptune/2k_neptune.jpg",
   });
 
   // camera settings

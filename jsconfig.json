@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "/",
     "paths": {
       "@/*": ["app/*", "src/*"],
+      "@assets/*": [ "/solar-system-interactive/assets/*"],
     },
   },
 }

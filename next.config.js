@@ -19,7 +19,7 @@ const nextConfig = {
   // compiler: {
   //   styledComponents: true,
   // },
-  output: 'export',
+  // output: 'export',
   // Optional: Change links `/me` -> `/me/` and emit `/me.html` -> `/me/index.html`
   // trailingSlash: true,
   // Optional: Prevent automatic `/me` -> `/me/`, instead preserve `href`
@@ -63,7 +63,7 @@ const nextConfig = {
   },
 }
 
-const KEYS_TO_OMIT = ['webpackDevMiddleware', 'configOrigin', 'target', 'analyticsId', 'webpack5', 'amp', 'assetPrefix']
+const KEYS_TO_OMIT = ['webpackDevMiddleware', 'configOrigin', 'target', 'analyticsId', 'webpack5', 'amp']
 
 module.exports = (_phase, { defaultConfig }) => {
   const plugins = [[withPWA], [withBundleAnalyzer, {}]]

@@ -116,12 +116,12 @@ const SceneOne = () => {
   }
 
   const earthTextures = useTexture({
-    map: "/assets/earth/2k_earth_daymap.jpg",
-    normal: "/assets/earth/2k_earth_normal_map.png",
-    specular: "/assets/earth/2k_earth_specular_map.png",
+    map: "/solar-system-interactive/assets/earth/2k_earth_daymap.jpg",
+    normal: "/solar-system-interactive/assets/earth/2k_earth_normal_map.png",
+    specular: "/solar-system-interactive/assets/earth/2k_earth_specular_map.png",
   });
   const sunTextures = useTexture({
-    map: "/assets/sun/2k_sun.jpg",
+    map: "/solar-system-interactive/assets/sun/2k_sun.jpg",
   });
 
   // camera settings

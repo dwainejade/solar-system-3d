@@ -17,8 +17,8 @@ const sunData = {
     color: "#FFFF00", // Bright yellow color
     gravity: 274, // in m/s² (surface gravity)
     textures: {
-        map: '/assets/sun/2k_sun.jpg', // Base texture
-        highResMap: '/assets/sun/2k_sun.jpg' // Higher resolution texture
+        map: '@assets/sun/2k_sun.jpg', // Base texture
+        highResMap: '@assets/sun/2k_sun.jpg' // Higher resolution texture
     },
 };
 
@@ -39,8 +39,8 @@ const earthData = {
     color: "dodgerblue",
     gravity: 9.807, // in m/s²
     textures: {
-        map: '/assets/earth/2k_earth_daymap.jpg', // Base texture
-        highResMap: '/assets/earth/2k_earth_daymap.jpg' // Higher resolution texture
+        map: '@assets/earth/2k_earth_daymap.jpg', // Base texture
+        highResMap: '@assets/earth/2k_earth_daymap.jpg' // Higher resolution texture
     },
 };
 
@@ -60,8 +60,8 @@ const moonData = {
     color: "silver",
     gravity: 1.62, // in m/s²
     textures: {
-        map: '/assets/moon/2k_moon.jpg', // Base texture
-        highResMap: '/assets/moon/2k_moon.jpg' // Higher resolution texture
+        map: '@assets/moon/2k_moon.jpg', // Base texture
+        highResMap: '@assets/moon/2k_moon.jpg' // Higher resolution texture
     },
 };
 
