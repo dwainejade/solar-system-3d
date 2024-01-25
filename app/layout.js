@@ -1,9 +1,7 @@
-"use client"
-
-// export const metadata = {
-//   title: 'Solar System',
-//   description: 'Solar System Simulator',
-// }
+export const metadata = {
+  title: 'Solar System',
+  description: 'Solar System Simulator',
+}
 
 export default function RootLayout({ children }) {
   return (
