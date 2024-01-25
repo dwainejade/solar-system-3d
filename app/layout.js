@@ -1,3 +1,5 @@
+"use client"
+
 export const metadata = {
   title: 'Solar System',
   description: 'Solar System Simulator',

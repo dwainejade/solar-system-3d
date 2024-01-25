@@ -1,3 +1,4 @@
+"use client";
 import SharedCanvas from "@/components/canvas/SharedCanvas";
 import SceneOne from "./SceneOne";
 
