@@ -17,6 +17,7 @@ const nextConfig = {
   output: process.env.NODE_ENV === "development" ? undefined : "export",
   distDir: 'dist',
   reactStrictMode: true, // Recommended for the `pages` directory, default in `app`.
+  trailingSlash: true,
   images: {},
   webpack(config, { isServer }) {
     if (!isServer) {
@@ -53,7 +54,7 @@ const nextConfig = {
   },
 }
 
-const KEYS_TO_OMIT = ['webpackDevMiddleware', 'configOrigin', 'target', 'analyticsId', 'webpack5', 'amp']
+const KEYS_TO_OMIT = ['webpackDevMiddleware', 'configOrigin', 'target', 'analyticsId', 'webpack5', 'amp', 'assetPrefix']
 
 module.exports = (_phase, { defaultConfig }) => {
   const plugins = [[withPWA], [withBundleAnalyzer, {}]]
