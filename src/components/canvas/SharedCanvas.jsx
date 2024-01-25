@@ -4,11 +4,10 @@ import { Suspense, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import Stars from "../Stars";
 import { Html, Preload, Stats, useProgress } from "@react-three/drei";
-import "../../styles.css";
 import useStore from "../../store/store";
 import Menu from "../Menu";
-import * as THREE from "three";
 import { Bloom, EffectComposer } from "@react-three/postprocessing";
+import "../../styles.css";
 
 const SharedCanvas = ({ children }) => {
   const { fullscreen } = useStore();
@@ -25,8 +24,8 @@ const SharedCanvas = ({ children }) => {
   const Loader = () => {
     return (
       <Html as='div' fullscreen className='loading-screen'>
-        <div>
-          <p>Loading: {progressPercentage.toFixed(0)}%</p>
+        <div className='loading-con'>
+          <p>Loading...</p>
           <div className='loading-bar-container'>
             <div className='loading-bar' style={{ width: `${progressPercentage}%` }}></div>
           </div>

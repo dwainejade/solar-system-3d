@@ -12,6 +12,9 @@ const Home = () => {
           <li>
             <Link href='/scene-two'>Scene 2</Link>
           </li>
+          <li>
+            <Link href='/about'>About Page</Link>
+          </li>
         </ul>
       </nav>
     </div>
