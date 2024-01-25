@@ -15,16 +15,7 @@ const withPWA = require('@ducanh2912/next-pwa').default({
 const nextConfig = {
   basePath: '/solar-system-interactive',
   assetPrefix: '/solar-system-interactive',
-  // uncomment the following snippet if using styled components
-  // compiler: {
-  //   styledComponents: true,
-  // },
-  output: 'export', // enable in prod only
-  // Optional: Change links `/me` -> `/me/` and emit `/me.html` -> `/me/index.html`
-  // trailingSlash: true,
-  // Optional: Prevent automatic `/me` -> `/me/`, instead preserve `href`
-  // skipTrailingSlashRedirect: true,
-  // Optional: Change the output directory `out` -> `dist`
+  output: process.env.NODE_ENV === "development" ? undefined : "export",
   distDir: 'dist',
   reactStrictMode: true, // Recommended for the `pages` directory, default in `app`.
   images: {},

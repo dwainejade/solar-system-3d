@@ -13,7 +13,7 @@ import Sun from "@/components/Sun";
 import Planet from "@/components/Planet";
 
 const SceneOne = () => {
-  const { sunSettings, rotationCounts, simulationDate } = useStore();
+  const { sunSettings } = useStore();
   const { planetPositions, selectedPlanet, selectedMoon } = usePlanetStore();
   const { surfacePoint, isSurfaceCameraActive } = useCameraStore();
   const surfaceCameraRef = useRef();
@@ -133,7 +133,7 @@ const SceneOne = () => {
     zoomSpeed: 0.1,
   };
 
-  const renderMoons = (planetName, planetData) => {
+  const renderMoons = planetName => {
     // Ensure planetMoons is always an array. If moonsData[planetName] is undefined, use an empty array
     const planetMoons = moonsData[planetName] || [];
     return planetMoons.map((moonData, index) => (
@@ -160,7 +160,7 @@ const SceneOne = () => {
         />
       )}
 
-      <Planet bodyData={planetsData.Earth} textures={earthTextures} moonsData={moonsData.Earth} />
+      <Planet bodyData={planetsData.Earth} textures={earthTextures} />
 
       {/* Render moons */}
       {Object.entries(moonsData).map(([planetName, planetData]) => renderMoons(planetName, planetData))}

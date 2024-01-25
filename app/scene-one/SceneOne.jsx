@@ -183,14 +183,14 @@ const SceneOne = () => {
         />
       )}
 
-      <Planet bodyData={planetsData.Earth} textures={earthTextures} moonsData={moonsData.Earth} />
-      <Planet bodyData={planetsData.Mars} textures={marsTextures} moonsData={moonsData.Mars} />
-      <Planet bodyData={planetsData.Venus} textures={venusTextures} moonsData={moonsData.Venus} />
-      <Planet bodyData={planetsData.Mercury} textures={mercuryTextures} moonsData={moonsData.Mercury} />
-      <Planet bodyData={planetsData.Jupiter} textures={jupiterTextures} moonsData={moonsData.Jupiter} />
-      <Planet bodyData={planetsData.Saturn} textures={saturnTextures} moonsData={moonsData.Saturn} />
-      <Planet bodyData={planetsData.Uranus} textures={uranusTextures} moonsData={moonsData.Uranus} />
-      <Planet bodyData={planetsData.Neptune} textures={neptuneTextures} moonsData={moonsData.Neptune} />
+      <Planet bodyData={planetsData.Earth} textures={earthTextures} />
+      <Planet bodyData={planetsData.Mars} textures={marsTextures} />
+      <Planet bodyData={planetsData.Venus} textures={venusTextures} />
+      <Planet bodyData={planetsData.Mercury} textures={mercuryTextures} />
+      <Planet bodyData={planetsData.Jupiter} textures={jupiterTextures} />
+      <Planet bodyData={planetsData.Saturn} textures={saturnTextures} />
+      <Planet bodyData={planetsData.Uranus} textures={uranusTextures} />
+      <Planet bodyData={planetsData.Neptune} textures={neptuneTextures} />
 
       {/* Render moons */}
       {Object.entries(moonsData).map(([planetName, planetData]) => renderMoons(planetName, planetData))}

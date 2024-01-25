@@ -11,7 +11,7 @@ import SurfacePlane from "./SurfacePlane";
 // default values
 const defaultBodyData = planetsData.Earth;
 
-const Planet = forwardRef(({ bodyData, textures, moonsData }, ref) => {
+const Planet = forwardRef(({ bodyData, textures }, ref) => {
   const mergedData = { ...defaultBodyData, ...bodyData };
   const {
     name,
@@ -257,18 +257,6 @@ const Planet = forwardRef(({ bodyData, textures, moonsData }, ref) => {
             />
           </Html>
         )}
-        {/* {localRef.current &&
-          Array.isArray(moonsData) &&
-          moonsData.map((moon, i) => (
-            <Moon
-              key={i}
-              bodyData={moon}
-              parentPosition={localRef.current.position}
-              parentRotation={planetRotation}
-              parentName={name}
-              parentData={mergedData}
-            />
-          ))} */}
       </group>
       {orbitPaths && (
         <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />
