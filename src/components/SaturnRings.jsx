@@ -4,7 +4,7 @@ import * as THREE from "three";
 import { TextureLoader } from "three";
 
 const SaturnRings = ({ saturnRef, scaledRadius }) => {
-  const texture = useLoader(TextureLoader, "./assets/saturn/saturn-rings-top.png");
+  const texture = useLoader(TextureLoader, "../assets/saturn/saturn-rings-top.png");
   const innerRadius = scaledRadius * 1.2;
   const outerRadius = scaledRadius * 1.4;
 

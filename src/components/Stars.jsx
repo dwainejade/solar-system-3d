@@ -4,8 +4,8 @@ import { BackSide } from "three";
 import useStore from "../store/store";
 
 const Stars = () => {
-  const starsTexture = useLoader(TextureLoader, "./assets/stars/starmap_8k.png");
-  const constellationTexture = useLoader(TextureLoader, "./assets/stars/constellations.png");
+  const starsTexture = useLoader(TextureLoader, "../assets/stars/starmap_8k.png");
+  const constellationTexture = useLoader(TextureLoader, "../assets/stars/constellations.png");
   const { showConstellations } = useStore();
   const size = 100000;
   return (
