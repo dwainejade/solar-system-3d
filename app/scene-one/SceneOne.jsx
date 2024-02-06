@@ -11,6 +11,7 @@ import { useFrame } from "@react-three/fiber";
 import Moon from "@/components/Moon";
 import Sun from "@/components/Sun";
 import Planet from "@/components/Planet";
+import Stars from "@/components/Stars"
 
 const SceneOne = () => {
   const { sunSettings, rotationCounts, simulationDate } = useStore();
@@ -179,9 +180,10 @@ const SceneOne = () => {
           fov={70}
           near={0.01}
           far={1000000}
-          // You may also want to set the lookAt property
         />
       )}
+
+      <Stars />
 
       <Planet bodyData={planetsData.Earth} textures={earthTextures} />
       <Planet bodyData={planetsData.Mars} textures={marsTextures} />
@@ -196,9 +198,7 @@ const SceneOne = () => {
       {Object.entries(moonsData).map(([planetName, planetData]) => renderMoons(planetName, planetData))}
 
       {/* <Planet bodyData={planetsData.Pluto} /> */}
-      <Sun key={"Sun-plain"} position={sunSettings.position} resetCamera={resetCamera} />
-
-      {/* <SurfacePlane /> */}
+      {/* <Sun key={"Sun-plain"} position={sunSettings.position} resetCamera={resetCamera} /> */}
     </>
   );
 };
