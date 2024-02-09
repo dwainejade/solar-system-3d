@@ -65,16 +65,16 @@ const useStore = create((set, get) => ({
     camera: new THREE.PerspectiveCamera(),
     orbitControls: null,
     previousCameraPosition: new THREE.Vector3(),
-    previousCameraTarget: new THREE.Vector3(),
+    // previousCameraTarget: new THREE.Vector3(),
     setOrbitControls: (controls) => set({ orbitControls: controls }),
 
-    setCameraTarget: (position) => {
-        const { orbitControls } = get();
-        if (orbitControls) {
-            orbitControls.target.copy(position);
-            orbitControls.update();
-        }
-    },
+    // setCameraTarget: (position) => {
+    //     const { orbitControls } = get();
+    //     if (orbitControls) {
+    //         orbitControls.target.copy(position);
+    //         orbitControls.update();
+    //     }
+    // },
 
     resetCamera: () => {
         const { orbitControls } = get();
@@ -116,15 +116,22 @@ const usePlanetStore = create((set) => ({
         set(() => ({
             selectedMoon: moonData,
         })),
-
 }));
 
 const useCameraStore = create((set) => ({
     surfacePoint: null,
-    setSurfacePoint: (point) => set({ surfacePoint: point }),
+    setSurfacePoint: (surfacePoint) => set({ surfacePoint }),
+
+    surfaceNormal: [0, 1, 0],
+    setSurfaceNormal: (surfaceNormal) => set({ surfaceNormal }),
 
     isSurfaceCameraActive: false,
     toggleSurfaceCamera: () => set((state) => ({ isSurfaceCameraActive: !state.isSurfaceCameraActive })),
+
+    cameraTarget: new THREE.Vector3(),
+    setCameraTarget: (target) => set({ cameraTarget: target }),
 }));
+
+
 
 export { usePlanetStore, useCameraStore }

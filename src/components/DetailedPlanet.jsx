@@ -30,12 +30,15 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     initialOrbitalAngle,
   } = mergedData;
 
+  const { map, normal, specular } = textures
+
   const { simSpeed, updateRotationCount, incrementDate, simulationDate, orbitPaths } = useStore();
-  const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels, planetPositions } = usePlanetStore();
-  const { setSurfacePoint, surfacePoint } = useCameraStore();
+  const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels, setSelectedMoon } = usePlanetStore();
+  const { setSurfacePoint, surfacePoint, setSurfaceNormal, surfaceNormal } = useCameraStore();
 
   const localRef = ref || useRef();
   const localAngleRef = useRef(planetAngles[name] || 0); // Initialize with saved angle or 0
+  const groupRef = useRef();
 
   // calculating scaled values
   // const numberOfRotationsPerOrbit = rotationPeriod ? (orbitalPeriod * 24) / rotationPeriod : 0;
@@ -55,7 +58,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   // Define state and refs to track dragging
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
-  const [surfaceNormal, setSurfaceNormal] = useState(null); // or a default normal vector
+
 
   const { raycaster, mouse, camera } = useThree();
   const meshRef = useRef();
@@ -110,6 +113,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     }
   });
 
+
   const [showTextures, setShowTextures] = useState(false);
   const textureDisplayDistance = 8000; // Set the distance threshold for showing textures
   useFrame(({ camera }) => {
@@ -127,6 +131,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     // if (selectedPlanet && selectedPlanet.name === name) {
     //   setSelectedPlanet(null);
     // } else {
+    setSelectedMoon(null);
     setSelectedPlanet(mergedData);
     // }
 
@@ -137,12 +142,14 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     const intersects = raycaster.intersectObject(meshRef.current, true);
     if (intersects.length > 0) {
       const intersectionPoint = intersects[0].point;
-      console.log({ intersectionPoint });
+      // console.log({ intersectionPoint });
       setSurfacePoint(intersectionPoint);
       const normal = new Vector3().subVectors(intersectionPoint, new Vector3(...localRef.current?.position)).normalize();
       setSurfaceNormal([normal.x, normal.y, normal.z]);
     }
-    console.log("Surface Point:", surfacePoint, "Surface Normal:", surfaceNormal);
+    // console.log("Surface Point:", surfacePoint, "Surface Normal:", surfaceNormal);
+    // console.log("planet", localRef?.current?.position)
+
   };
 
   // New handler for pointer down
@@ -190,6 +197,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     [0, lineLength / 1.8, 0], // Ending point of the line
   ];
 
+
   return (
     <>
       <group ref={localRef}>
@@ -203,11 +211,14 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
           onPointerOut={handlePointerOut}
         >
           <sphereGeometry args={[scaledRadius, detailLevel, detailLevel]} />
-          {textures ? (
-            <meshStandardMaterial metalness={0.3} roughness={0.65} map={textures.map} />
-          ) : (
-            <meshStandardMaterial color={color} />
-          )}
+          <meshStandardMaterial
+            metalness={.3}
+            roughness={.65}
+            bumpMap={textures.normal}
+            map={textures.map}
+            normalMap={textures.normal}
+            roughnessMap={textures.specular}
+          />
         </mesh>
         {name === "Saturn" && (
           <group>
@@ -257,8 +268,12 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
             />
           </Html>
         )}
+        {/* Plane for surface view */}
+        {surfacePoint && surfaceNormal && isPlanetSelected && (
+          <SurfacePlane position={surfacePoint} normal={surfaceNormal} planetRef={localRef} surfaceColor={color} />
+        )}
       </group>
-      {surfacePoint && surfaceNormal && isPlanetSelected && <SurfacePlane position={surfacePoint} normal={surfaceNormal} planetRef={localRef} surfaceColor={color} />}
+
       {orbitPaths && (
         <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />
       )}

@@ -117,34 +117,34 @@ const SceneOne = () => {
   });
 
 
-  // const heightAboveSurface = 10;
-  // useFrame(() => {
-  //   if (isSurfaceCameraActive && surfacePoint && selectedPlanet) {
-  //     const planetPosition = planetPositions[selectedPlanet.name];
-  //     if (planetPosition) {
-  //       // Assuming planetPosition is the center of the planet
-  //       const centerOfPlanet = new Vector3(planetPosition.x, planetPosition.y, planetPosition.z);
+  const heightAboveSurface = 10;
+  useFrame(() => {
+    if (isSurfaceCameraActive && surfacePoint && selectedPlanet) {
+      const planetPosition = planetPositions[selectedPlanet.name];
+      if (planetPosition) {
+        // Assuming planetPosition is the center of the planet
+        const centerOfPlanet = new Vector3(planetPosition.x, planetPosition.y, planetPosition.z);
 
-  //       // Calculate the normal as the vector from the planet's center to the surface point
-  //       const surfaceNormal = new Vector3(surfacePoint.x, surfacePoint.y, surfacePoint.z).sub(centerOfPlanet).normalize();
+        // Calculate the normal as the vector from the planet's center to the surface point
+        const surfaceNormal = new Vector3(surfacePoint.x, surfacePoint.y, surfacePoint.z).sub(centerOfPlanet).normalize();
 
-  //       // Position the camera slightly above the surface point
-  //       const cameraHeightAboveSurface = 0.1; // Adjust as needed
-  //       const cameraPosition = new Vector3(surfacePoint.x, surfacePoint.y, surfacePoint.z).add(
-  //         surfaceNormal.multiplyScalar(cameraHeightAboveSurface)
-  //       );
+        // Position the camera slightly above the surface point
+        const cameraHeightAboveSurface = 0.1; // Adjust as needed
+        const cameraPosition = new Vector3(surfacePoint.x, surfacePoint.y, surfacePoint.z).add(
+          surfaceNormal.multiplyScalar(cameraHeightAboveSurface)
+        );
 
-  //       surfaceCameraRef.current.position.copy(cameraPosition);
+        surfaceCameraRef.current.position.copy(cameraPosition);
 
-  //       // Set the camera to look at a point directly 'up' from the surface
-  //       const lookAtPoint = cameraPosition.clone().add(surfaceNormal);
-  //       surfaceCameraRef.current.lookAt(lookAtPoint);
+        // Set the camera to look at a point directly 'up' from the surface
+        const lookAtPoint = cameraPosition.clone().add(surfaceNormal);
+        surfaceCameraRef.current.lookAt(lookAtPoint);
 
-  //       // Align the camera's up vector with the surface normal
-  //       surfaceCameraRef.current.up.copy(surfaceNormal);
-  //     }
-  //   }
-  // });
+        // Align the camera's up vector with the surface normal
+        surfaceCameraRef.current.up.copy(surfaceNormal);
+      }
+    }
+  });
 
   // A simplistic approach to calculate optimal distance
   function calculateOptimalDistance(planetRadius) {
@@ -177,7 +177,7 @@ const SceneOne = () => {
         <CameraControls ref={cameraControlsRef} makeDefault {...cameraConfig} minDistance={Math.max(0.02, minDistance)} />
       )}
 
-      {/* <Stars /> */}
+      <Stars />
       {/* <StarField /> */}
 
       {/* First Person Camera */}
@@ -204,8 +204,6 @@ const SceneOne = () => {
       />
 
       <Sun key={"Sun-plain"} position={sunSettings.position} resetCamera={resetCamera} />
-
-      {/* <SurfacePlane /> */}
 
     </>
   );

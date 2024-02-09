@@ -198,7 +198,7 @@ const SceneOne = () => {
       {Object.entries(moonsData).map(([planetName, planetData]) => renderMoons(planetName, planetData))}
 
       {/* <Planet bodyData={planetsData.Pluto} /> */}
-      {/* <Sun key={"Sun-plain"} position={sunSettings.position} resetCamera={resetCamera} /> */}
+      <Sun key={"Sun-plain"} position={sunSettings.position} resetCamera={resetCamera} />
     </>
   );
 };

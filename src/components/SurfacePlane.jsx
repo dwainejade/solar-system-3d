@@ -1,30 +1,33 @@
-import React, { useRef, forwardRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import React, { useRef, useEffect } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
-const SurfacePlane = forwardRef(({ position, normal = [0, 1, 0] }, planetRef) => {
+const SurfacePlane = ({ position, normal, surfaceColor, planetRef }) => {
+  const { scene } = useThree();
   const planeRef = useRef();
 
+  useEffect(() => {
+    scene.add(planeRef.current);
+    return () => scene.remove(planeRef.current);
+  }, [scene]);
+
   useFrame(() => {
-    if (planetRef?.current && planeRef?.current && position && normal) {
+    if (planeRef.current && position && normal) {
       const normalVector = new THREE.Vector3(...normal).normalize();
       const positionVector = new THREE.Vector3(...position);
-
-      const adjustedPosition = positionVector.add(planetRef.current.position);
-      const adjustedNormal = normalVector.applyQuaternion(planetRef.current.quaternion);
-
-      planeRef.current.position.copy(adjustedPosition);
-      const target = adjustedNormal.clone().multiplyScalar(10).add(adjustedPosition);
+      // Calculate target point for the plane to face towards, based on the normal
+      const target = normalVector.clone().multiplyScalar(1).add(positionVector);
+      planeRef.current.position.copy(positionVector);
       planeRef.current.lookAt(target);
     }
   });
 
   return (
     <mesh ref={planeRef}>
-      <planeGeometry args={[5, 5, 1, 1]} />
-      <meshStandardMaterial color='tan' side={THREE.DoubleSide} />
+      <planeGeometry args={[2, 2]} />
+      <meshMatcapMaterial side={THREE.DoubleSide} color={surfaceColor} />
     </mesh>
   );
-});
+};
 
 export default SurfacePlane;
