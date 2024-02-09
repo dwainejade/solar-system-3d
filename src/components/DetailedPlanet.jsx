@@ -127,30 +127,22 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   const handleClick = e => {
     e.stopPropagation();
     if (isDragging) return;
-    // This now only triggers if the mesh wasn't dragged
-    // if (selectedPlanet && selectedPlanet.name === name) {
-    //   setSelectedPlanet(null);
-    // } else {
     setSelectedMoon(null);
     setSelectedPlanet(mergedData);
-    // }
 
-    // Update the raycaster with the current mouse and camera positions
+    // code to position surfaceplane
     raycaster.setFromCamera(mouse, camera);
-
-    // Calculate the intersection with the mesh
     const intersects = raycaster.intersectObject(meshRef.current, true);
     if (intersects.length > 0) {
-      const intersectionPoint = intersects[0].point;
-      // console.log({ intersectionPoint });
-      setSurfacePoint(intersectionPoint);
-      const normal = new Vector3().subVectors(intersectionPoint, new Vector3(...localRef.current?.position)).normalize();
+      let intersectionPoint = intersects[0].point; // This is in world space
+      // Convert from world to local space relative to the planet
+      intersectionPoint = localRef.current.worldToLocal(intersectionPoint.clone());
+      setSurfacePoint([intersectionPoint.x, intersectionPoint.y, intersectionPoint.z]);
+      const normal = new Vector3().subVectors(intersectionPoint, new Vector3()).normalize();
       setSurfaceNormal([normal.x, normal.y, normal.z]);
     }
-    // console.log("Surface Point:", surfacePoint, "Surface Normal:", surfaceNormal);
-    // console.log("planet", localRef?.current?.position)
-
   };
+
 
   // New handler for pointer down
   const handlePointerDown = e => {
@@ -269,7 +261,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
           </Html>
         )}
         {/* Plane for surface view */}
-        {surfacePoint && surfaceNormal && isPlanetSelected && (
+        {surfacePoint && surfaceNormal && (
           <SurfacePlane position={surfacePoint} normal={surfaceNormal} planetRef={localRef} surfaceColor={color} />
         )}
       </group>

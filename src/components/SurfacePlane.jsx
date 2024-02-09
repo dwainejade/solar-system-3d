@@ -1,31 +1,29 @@
 import React, { useRef, useEffect } from "react";
-import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
-const SurfacePlane = ({ position, normal, surfaceColor, planetRef }) => {
-  const { scene } = useThree();
+const SurfacePlane = ({ position, normal, surfaceColor }) => {
   const planeRef = useRef();
 
   useEffect(() => {
-    scene.add(planeRef.current);
-    return () => scene.remove(planeRef.current);
-  }, [scene]);
+    if (planeRef.current && normal) {
+      // normals
+      const targetNormal = new THREE.Vector3(...normal).normalize();
+      const planeNormal = new THREE.Vector3(0, 0, 1);
 
-  useFrame(() => {
-    if (planeRef.current && position && normal) {
-      const normalVector = new THREE.Vector3(...normal).normalize();
-      const positionVector = new THREE.Vector3(...position);
-      // Calculate target point for the plane to face towards, based on the normal
-      const target = normalVector.clone().multiplyScalar(1).add(positionVector);
-      planeRef.current.position.copy(positionVector);
-      planeRef.current.lookAt(target);
+      // add rotation
+      const quaternion = new THREE.Quaternion().setFromUnitVectors(planeNormal, targetNormal);
+      planeRef.current.quaternion.copy(quaternion);
+      //  add offset to avoid z-fighting
+      const offsetDistance = 0.001;
+      const offsetPosition = new THREE.Vector3(...position).add(targetNormal.multiplyScalar(offsetDistance));
+      planeRef.current.position.copy(offsetPosition);
     }
-  });
+  }, [position, normal]);
 
   return (
-    <mesh ref={planeRef}>
-      <planeGeometry args={[2, 2]} />
-      <meshMatcapMaterial side={THREE.DoubleSide} color={surfaceColor} />
+    <mesh ref={planeRef} position={position}>
+      <planeGeometry args={[1, 1]} />
+      <meshBasicMaterial side={THREE.DoubleSide} color={surfaceColor} />
     </mesh>
   );
 };
