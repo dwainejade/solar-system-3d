@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import { PerspectiveCamera, useHelper, Html } from "@react-three/drei";
+import { PerspectiveCamera, useHelper, OrbitControls } from "@react-three/drei";
 import { useCameraStore } from "@/store/store";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
@@ -23,25 +23,28 @@ const SurfacePlane = ({ position, normal, surfaceColor }) => {
   });
 
   useEffect(() => {
-    if (planeRef.current && normal) {
-      // normals
-      const targetNormal = new THREE.Vector3(...normal).normalize();
+    if (planeRef.current && normal && surfaceCameraRef.current) {
+      // Calculate the plane's orientation based on the provided normal
+      const targetNormal = new THREE.Vector3(...normal);
       const planeNormal = new THREE.Vector3(0, 0, 1);
-
-      // add rotation
       const quaternion = new THREE.Quaternion().setFromUnitVectors(planeNormal, targetNormal);
       planeRef.current.quaternion.copy(quaternion);
-      //  add offset to avoid z-fighting
-      const offsetDistance = 0;
-      const offsetPosition = new THREE.Vector3(...position).add(targetNormal.multiplyScalar(offsetDistance));
-      planeRef.current.position.copy(offsetPosition);
-      surfaceCameraRef.current.rotation.set(-Math.PI / 2, 0, 0);
-      console.log(targetNormal)
+
+      const cameraOffset = 0.001; // Distance above the surface o avoid clipping
+      const offsetPosition = new THREE.Vector3(...position).add(targetNormal.multiplyScalar(cameraOffset));
+      surfaceCameraRef.current.position.copy(offsetPosition);
+
+      // Align the camera to face the same direction as the plane's +Y axis
+      surfaceCameraRef.current.quaternion.copy(planeRef.current.quaternion);
+
+      // to align the camera's -Z with the plane's +Y
+      const additionalRotation = new THREE.Euler(Math.PI / 2, 0, 0, 'XYZ');
+      const totalQuaternion = new THREE.Quaternion().setFromEuler(additionalRotation);
+      surfaceCameraRef.current.quaternion.multiply(totalQuaternion);
     }
   }, [position, normal, isSurfaceCameraActive]);
 
 
-  // Mouse event handlers
   const onMouseDown = (event) => {
     event.stopPropagation()
     if (!isSurfaceCameraActive) return
@@ -53,12 +56,11 @@ const SurfacePlane = ({ position, normal, surfaceColor }) => {
     if (isDragging) {
       const deltaX = event.clientX - lastMousePosition.x;
       const deltaY = event.clientY - lastMousePosition.y;
-
+      console.log(event.clientX, event.clientY)
       // Update the last mouse position
       setLastMousePosition({ x: event.clientX, y: event.clientY });
 
-      // Convert deltas to radians and adjust camera rotation
-      const rotationSpeed = 0.005; // Adjust rotation speed as needed
+      const rotationSpeed = 0.002; // Adjust rotation speed as needed
       controlledCameraRef.current.rotation.y -= deltaX * rotationSpeed;
       controlledCameraRef.current.rotation.x -= deltaY * rotationSpeed;
 
@@ -93,15 +95,15 @@ const SurfacePlane = ({ position, normal, surfaceColor }) => {
       <PerspectiveCamera
         ref={surfaceCameraRef}
         name="surface-cam"
-        fov={24}
-        near={0.01}
-        far={10000}
+        fov={34}
+        near={0.001}
+        far={100000}
         position={position}
         makeDefault={isSurfaceCameraActive}
       />
       <group>
         <mesh ref={planeRef} position={position}>
-          <planeGeometry args={[1, 1]} />
+          <planeGeometry args={isSurfaceCameraActive ? [0, 0] : [.01, .01]} />
           <meshBasicMaterial color={surfaceColor} side={THREE.DoubleSide} />
         </mesh>
       </group>

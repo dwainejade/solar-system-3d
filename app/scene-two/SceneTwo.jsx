@@ -139,7 +139,7 @@ const SceneOne = () => {
     rotateSpeed: 0.1,
     zoomSpeed: 0.8,
   };
-  // console.log(cameraSurfacePoint)
+
   return (
     <>
       {!isSurfaceCameraActive && (
@@ -147,7 +147,6 @@ const SceneOne = () => {
       )}
 
       <Stars />
-      {/* <StarField /> */}
 
       <Planet bodyData={planetsData.Earth} textures={earthTextures} />
 

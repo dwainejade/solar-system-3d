@@ -34,7 +34,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
 
   const { simSpeed, updateRotationCount, incrementDate, simulationDate, orbitPaths } = useStore();
   const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels, setSelectedMoon } = usePlanetStore();
-  const { setSurfacePoint, surfacePoint, setSurfaceNormal, surfaceNormal, setCameraSurfacePoint, setCameraSurfaceNormal } = useCameraStore();
+  const { setSurfacePoint, surfacePoint, setSurfaceNormal, surfaceNormal, setCameraSurfacePoint, isSurfaceCameraActive } = useCameraStore();
 
   const localRef = ref || useRef();
   const localAngleRef = useRef(planetAngles[name] || 0); // Initialize with saved angle or 0
@@ -126,7 +126,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   // Modify the handleClick to account for dragging
   const handleClick = e => {
     e.stopPropagation();
-    if (isDragging) return;
+    if (isDragging || isSurfaceCameraActive) return;
     setSelectedMoon(null);
     setSelectedPlanet(mergedData);
 
@@ -182,14 +182,14 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     setHoveredPlanet(null);
   };
 
-  const detailLevel = isPlanetSelected ? 64 : 32;
+  const detailLevel = isSurfaceCameraActive ? 128 : 32;
 
   // Calculate points for the axial tilt line
-  const lineLength = scaledRadius * 2; // Make the line extend out of the planet
-  const axialTiltLinePoints = [
-    [0, -lineLength / 1.8, 0], // Starting point of the line
-    [0, lineLength / 1.8, 0], // Ending point of the line
-  ];
+  // const lineLength = scaledRadius * 2; // Make the line extend out of the planet
+  // const axialTiltLinePoints = [
+  //   [0, -lineLength / 1.8, 0], // Starting point of the line
+  //   [0, lineLength / 1.8, 0], // Ending point of the line
+  // ];
 
 
   return (
@@ -208,10 +208,10 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
           <meshStandardMaterial
             metalness={.3}
             roughness={.65}
-            bumpMap={textures.normal}
+            // bumpMap={textures.normal}
             map={textures.map}
-            normalMap={textures.normal}
-            roughnessMap={textures.specular}
+          // normalMap={textures.normal}
+          // roughnessMap={textures.specular}
           />
         </mesh>
         {name === "Saturn" && (
@@ -268,7 +268,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
         )}
       </group>
 
-      {orbitPaths && (
+      {orbitPaths && !isSurfaceCameraActive && (
         <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />
       )}
     </>

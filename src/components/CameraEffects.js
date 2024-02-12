@@ -31,7 +31,7 @@ const CameraEffects = () => {
     // Placeholder function for calculating FOV or other properties
     const calculateFOV = (planet) => {
         // Implement logic based on the planet's size, distance, or other characteristics
-        return 45; // Placeholder value
+        return 50; // Placeholder value
     };
 
     return null; // This component does not render anything
