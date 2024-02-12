@@ -4,11 +4,10 @@ import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import planetsData from "../data/planetsData";
 
 const Menu = () => {
-  const { setSimSpeed, showConstellations, toggleConstellations, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths } = useStore();
+  const { simSpeed, setSimSpeed, showConstellations, toggleConstellations, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths } = useStore();
   const { selectedPlanet, setSelectedPlanet, selectedMoon, displayLabels, toggleDisplayLabels } = usePlanetStore();
   const { isSurfaceCameraActive, toggleSurfaceCamera, surfacePoint } = useCameraStore();
   const [isMenuOpen, setMenuOpen] = useState(false);
-
   const toggleMenu = () => {
     setMenuOpen(!isMenuOpen);
   };
@@ -17,44 +16,32 @@ const Menu = () => {
     return new Intl.NumberFormat("en-US", { maximumSignificantDigits: 3 }).format(number);
   };
 
-  const handleSpeedChange = e => {
-    const speedOption = e.target.value;
-    let newSpeed;
-
-    switch (speedOption) {
-      case "realtime":
-        newSpeed = 1;
-        break;
-      case "1min":
-        newSpeed = 60;
-        break;
-      case "1hr":
-        newSpeed = 3600; // 1 hour = 3600 seconds
-        break;
-      case "1day":
-        newSpeed = 86400; // 1 day = 86400 seconds
-        break;
-      case "1wk":
-        newSpeed = 604800; // 1 week = 7 * 86400 seconds
-        break;
-      case "1mon":
-        newSpeed = 2629800; // Approx 1 month = 30.44 * 86400 seconds
-        break;
-      case "1yr":
-        newSpeed = 31557600; // 1 year = 365.25 * 86400 seconds (accounting for leap years)
-        break;
-      case "5yr":
-        newSpeed = 157788000; // 5 years
-        break;
-      case "10yr":
-        newSpeed = 315576000; // 10 years
-        break;
-      default:
-        newSpeed = 1;
+  const [currentSpeedIndex, setCurrentSpeedIndex] = useState(7);
+  const speedOptions = [
+    { label: "-5yr", value: -157788000 },
+    { label: "-1yr", value: -31557600 },
+    { label: "-1mon", value: -2629800 },
+    { label: "-1wk", value: -604800 },
+    { label: "-1day", value: -86400 },
+    { label: "-1hr", value: -3600 },
+    { label: "-1min", value: -60 },
+    { label: "Realtime", value: 1 },
+    { label: "1min", value: 60 },
+    { label: "1hr", value: 3600 },
+    { label: "1day", value: 86400 },
+    { label: "1wk", value: 604800 },
+    { label: "1mon", value: 2629800 },
+    { label: "1yr", value: 31557600 },
+    { label: "5yr", value: 157788000 },
+  ];
+  const adjustSpeed = (direction) => {
+    const newIndex = currentSpeedIndex + direction;
+    if (newIndex >= 0 && newIndex < speedOptions.length) {
+      setCurrentSpeedIndex(newIndex);
+      setSimSpeed(speedOptions[newIndex].value);
     }
-
-    setSimSpeed(newSpeed);
   };
+
   // Handle planet selection change
   const handlePlanetChange = e => {
     // Update selected planet based on user selection
@@ -70,7 +57,7 @@ const Menu = () => {
           Menu
         </button>
         <div className='menu-content'>
-          <div className='menu-item'>
+          {/* <div className='menu-item'>
             <label htmlFor='simSpeed'>Simulation Speed: </label>
             <select id='simSpeed' onChange={handleSpeedChange}>
               <option value='realtime'>Realtime</option>
@@ -83,6 +70,12 @@ const Menu = () => {
               <option value='5yr'>1s equals 5 years</option>
               <option value='10yr'>1s equals 10 years</option>
             </select>
+          </div> */}
+          <div className='menu-item'>
+            <label>Simulation Speed: </label>
+            <button onClick={() => adjustSpeed(-1)}>-</button>
+            {speedOptions[currentSpeedIndex].label}
+            <button onClick={() => adjustSpeed(1)}>+</button>
           </div>
 
           {/* Dropdown for selecting planets */}

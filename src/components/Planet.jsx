@@ -63,13 +63,13 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   useFrame((state, delta) => {
     // Adjust delta based on simulation speed (simSpeed)
     const adjustedDelta = delta * simSpeed;
-    console.log(simSpeed)
+
     // Update planet's orbital position
-    const planetOrbitalSpeed = (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60); // Assuming orbitalPeriod is in Earth days
-    // localAngleRef.current += planetOrbitalSpeed * adjustedDelta;
+    const planetOrbitalSpeed = (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60); // in Earth days
+
     // Initialize the angle if it's the first frame
     if (localAngleRef.current === 0) {
-      localAngleRef.current = initialOrbitalAngle * (Math.PI / 180); // Convert to radians if initialOrbitalAngle is in degrees
+      localAngleRef.current = initialOrbitalAngle * (Math.PI / 180); // Convert to radians 
     } else {
       localAngleRef.current -= planetOrbitalSpeed * adjustedDelta;
     }
@@ -78,7 +78,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
 
     if (localRef.current) {
       // Calculate the orbital inclination effect
-      const inclination = orbitalInclination * (Math.PI / 180); // Convert to radians if it's in degrees
+      const inclination = orbitalInclination * (Math.PI / 180); // Convert to radians 
       const y = Math.sin(inclination) * scaledOrbitalRadius * Math.sin(localAngleRef.current);
 
       localRef.current.position.set(x, y, z); // Now includes the y position adjusted by inclination
