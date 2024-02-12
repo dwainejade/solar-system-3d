@@ -91,8 +91,11 @@ body {
 .Main #Canvas {
   background-color: black;
 }
-.Main .menu-con {
+.Main .menu-wrapper {
   position: relative;
+}
+.Main .menu-con {
+  position: absolute;
   top: 0;
   right: 0;
   width: 300px;
@@ -100,9 +103,7 @@ body {
   /* Full height of its parent */
   background-color: #333;
   color: white;
-}
-.Main .menu-con.open {
-  width: 300px;
+  transition: width ease-in-out 0.2s, height ease-in-out 0.2s;
 }
 .Main .menu-con.close {
   width: 0;
@@ -110,6 +111,9 @@ body {
 }
 .Main .menu-con.close .menu-content {
   opacity: 0;
+}
+.Main .menu-con.open {
+  width: 300px;
 }
 .Main .menu-con .btn {
   border: 0;

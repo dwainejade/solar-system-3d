@@ -110,25 +110,32 @@ body {
     background-color: black;
   }
 
+  .menu-wrapper {
+    position: relative;
+  }
+
   // MENU
   .menu-con {
-    position: relative;
+    position: absolute;
     top: 0;
     right: 0;
     width: 300px;
     height: 100%; /* Full height of its parent */
     background-color: #333;
     color: white;
+    transition:
+      width ease-in-out 0.2s,
+      height ease-in-out 0.2s;
 
-    &.open {
-      width: 300px;
-    }
     &.close {
       width: 0;
       height: 0;
       .menu-content {
         opacity: 0;
       }
+    }
+    &.open {
+      width: 300px;
     }
 
     .btn {

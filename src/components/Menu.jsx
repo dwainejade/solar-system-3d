@@ -6,7 +6,7 @@ import planetsData from "../data/planetsData";
 const Menu = () => {
   const { setSimSpeed, showConstellations, toggleConstellations, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths } = useStore();
   const { selectedPlanet, setSelectedPlanet, selectedMoon, displayLabels, toggleDisplayLabels } = usePlanetStore();
-  const { isSurfaceCameraActive, toggleSurfaceCamera } = useCameraStore();
+  const { isSurfaceCameraActive, toggleSurfaceCamera, surfacePoint } = useCameraStore();
   const [isMenuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -64,91 +64,95 @@ const Menu = () => {
   };
 
   return (
-    <div className={`menu-con ${isMenuOpen ? "open" : "close"}`}>
-      <button onClick={toggleMenu} className='menu-toggle-btn'>
-        Menu
-      </button>
-      <div className='menu-content'>
-        <div className='menu-item'>
-          <label htmlFor='simSpeed'>Simulation Speed: </label>
-          <select id='simSpeed' onChange={handleSpeedChange}>
-            <option value='realtime'>Realtime</option>
-            <option value='1min'>1s equals 1 minute</option>
-            <option value='1hr'>1s equals 1 hour</option>
-            <option value='1day'>1s equals 1 day</option>
-            <option value='1wk'>1s equals 1 week</option>
-            <option value='1mon'>1s equals 1 month</option>
-            <option value='1yr'>1s equals 1 year</option>
-            <option value='5yr'>1s equals 5 years</option>
-            <option value='10yr'>1s equals 10 years</option>
-          </select>
-        </div>
+    <div className="menu-wrapper">
+      <div className={`menu-con ${isMenuOpen ? "open" : "close"}`}>
+        <button onClick={toggleMenu} className='menu-toggle-btn'>
+          Menu
+        </button>
+        <div className='menu-content'>
+          <div className='menu-item'>
+            <label htmlFor='simSpeed'>Simulation Speed: </label>
+            <select id='simSpeed' onChange={handleSpeedChange}>
+              <option value='realtime'>Realtime</option>
+              <option value='1min'>1s equals 1 minute</option>
+              <option value='1hr'>1s equals 1 hour</option>
+              <option value='1day'>1s equals 1 day</option>
+              <option value='1wk'>1s equals 1 week</option>
+              <option value='1mon'>1s equals 1 month</option>
+              <option value='1yr'>1s equals 1 year</option>
+              <option value='5yr'>1s equals 5 years</option>
+              <option value='10yr'>1s equals 10 years</option>
+            </select>
+          </div>
 
-        {/* Dropdown for selecting planets */}
-        <div className='menu-item'>
-          <label htmlFor='planetSelection'>Select a Planet:</label>
-          <select id='planetSelection' onChange={handlePlanetChange} value={selectedPlanet?.name || "Select a Planet"}>
-            <option value='Select a Planet' disabled>
-              Select a Planet
-            </option>
-            {Object.keys(planetsData).map(planetName => (
-              <option key={planetName} value={planetName}>
-                {planetName}
+          {/* Dropdown for selecting planets */}
+          <div className='menu-item'>
+            <label htmlFor='planetSelection'>Select a Planet:</label>
+            <select id='planetSelection' onChange={handlePlanetChange} value={selectedPlanet?.name || "Select a Planet"}>
+              <option value='Select a Planet' disabled>
+                Select a Planet
               </option>
-            ))}
-          </select>
-        </div>
-
-        <div className='menu-item'>
-          <label htmlFor='fullscreenToggle'>Toggle Fullscreen:</label>
-          <button id='fullscreenToggle' onClick={toggleFullscreen} className='btn'>
-            {fullscreen ? "ON" : "OFF"}
-          </button>
-        </div>
-        <div className='menu-item'>
-          <label htmlFor='orbitPathToggle'>Toggle Orbit Paths:</label>
-          <button id='orbitPathToggle' className='btn' onClick={toggleOrbitPaths}>
-            {orbitPaths ? "ON" : "OFF"}
-          </button>
-        </div>
-        <div className='menu-item'>
-          <label htmlFor='labelToggle'>Toggle Labels:</label>
-          <button id='labelToggle' className='btn' onClick={toggleDisplayLabels}>
-            {displayLabels ? "NAMES" : "POINTS"}
-          </button>
-        </div>
-        <div className='menu-item'>
-          <label htmlFor='constellationsToggle'>Toggle Constellations:</label>
-          <button id='constellationsToggle' className='btn' onClick={toggleConstellations}>
-            {showConstellations ? "ON" : "OFF"}
-          </button>
-        </div>
-        <div className='menu-item'>
-          <label htmlFor='cameraToggle'>Toggle Camera:</label>
-          <button id='cameraToggle' className='btn' onClick={toggleSurfaceCamera}>
-            {isSurfaceCameraActive ? "FPV" : "DEFAULT"}
-          </button>
-        </div>
-
-        {selectedPlanet && !selectedMoon && (
-          <div className='planet-details'>
-            <h2>{selectedPlanet.name}</h2>
-            <p>Mass: {selectedPlanet.mass?.toString().replace("e+", "e")} kg</p>
-            <p>Radius: {selectedPlanet.radius} km</p>
-            <p>Orbital Period: {selectedPlanet.orbitalPeriod} days</p>
-            <p>Rotation Period: {selectedPlanet.rotationPeriod} hours</p>
-            <p>Surface Temperature: {selectedPlanet.surfaceTemp} °C</p>
-            <p>Gravity: {selectedPlanet.gravity} m/s²</p>
+              {Object.keys(planetsData).map(planetName => (
+                <option key={planetName} value={planetName}>
+                  {planetName}
+                </option>
+              ))}
+            </select>
           </div>
-        )}
-        {selectedMoon && selectedPlanet && (
-          <div className='planet-details'>
-            <h2>{selectedMoon.bodyData.name}</h2>
-            <p>Mass: {selectedMoon.bodyData.mass?.toString().replace("e+", "e")} kg</p>
-            <p>Radius: {selectedMoon.bodyData.radius} km</p>
-            <p>Orbital Period: {selectedMoon.bodyData.orbitalPeriod} days</p>
+
+          <div className='menu-item'>
+            <label htmlFor='fullscreenToggle'>Toggle Fullscreen:</label>
+            <button id='fullscreenToggle' onClick={toggleFullscreen} className='btn'>
+              {fullscreen ? "ON" : "OFF"}
+            </button>
           </div>
-        )}
+          <div className='menu-item'>
+            <label htmlFor='orbitPathToggle'>Toggle Orbit Paths:</label>
+            <button id='orbitPathToggle' className='btn' onClick={toggleOrbitPaths}>
+              {orbitPaths ? "ON" : "OFF"}
+            </button>
+          </div>
+          <div className='menu-item'>
+            <label htmlFor='labelToggle'>Toggle Labels:</label>
+            <button id='labelToggle' className='btn' onClick={toggleDisplayLabels}>
+              {displayLabels ? "NAMES" : "POINTS"}
+            </button>
+          </div>
+          <div className='menu-item'>
+            <label htmlFor='constellationsToggle'>Toggle Constellations:</label>
+            <button id='constellationsToggle' className='btn' onClick={toggleConstellations}>
+              {showConstellations ? "ON" : "OFF"}
+            </button>
+          </div>
+          <div className='menu-item'>
+            <label htmlFor='cameraToggle'>Toggle Camera:</label>
+            {surfacePoint &&
+              <button id='cameraToggle' className='btn' onClick={toggleSurfaceCamera}>
+                {isSurfaceCameraActive ? "SURFACE" : "DEFAULT"}
+              </button>
+            }
+          </div>
+
+          {selectedPlanet && !selectedMoon && (
+            <div className='planet-details'>
+              <h2>{selectedPlanet.name}</h2>
+              <p>Mass: {selectedPlanet.mass?.toString().replace("e+", "e")} kg</p>
+              <p>Radius: {selectedPlanet.radius} km</p>
+              <p>Orbital Period: {selectedPlanet.orbitalPeriod} days</p>
+              <p>Rotation Period: {selectedPlanet.rotationPeriod} hours</p>
+              <p>Surface Temperature: {selectedPlanet.surfaceTemp} °C</p>
+              <p>Gravity: {selectedPlanet.gravity} m/s²</p>
+            </div>
+          )}
+          {selectedMoon && selectedPlanet && (
+            <div className='planet-details'>
+              <h2>{selectedMoon.bodyData.name}</h2>
+              <p>Mass: {selectedMoon.bodyData.mass?.toString().replace("e+", "e")} kg</p>
+              <p>Radius: {selectedMoon.bodyData.radius} km</p>
+              <p>Orbital Period: {selectedMoon.bodyData.orbitalPeriod} days</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
