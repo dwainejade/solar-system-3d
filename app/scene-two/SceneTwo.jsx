@@ -42,7 +42,7 @@ const SceneOne = () => {
       if (planetPosition) {
         setCameraTarget(new Vector3(planetPosition.x, planetPosition.y, planetPosition.z));
         // Assuming planet's position and other data are ready
-        const scaledRadius = planetsData[selectedPlanet.name].radius * sizeScaleFactor;
+        const scaledRadius = planetsData[selectedPlanet.name].radius * .001;
         const optimalDistance = calculateOptimalDistance(scaledRadius);
         setCameraOffset(optimalDistance)
         setMinDistance(optimalDistance);

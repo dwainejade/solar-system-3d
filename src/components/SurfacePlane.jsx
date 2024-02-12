@@ -95,16 +95,22 @@ const SurfacePlane = ({ position, normal, surfaceColor }) => {
       <PerspectiveCamera
         ref={surfaceCameraRef}
         name="surface-cam"
-        fov={34}
-        near={0.001}
+        fov={50}
+        near={0.0001}
         far={100000}
         position={position}
         makeDefault={isSurfaceCameraActive}
+        setFocalLength={200}
       />
       <group>
         <mesh ref={planeRef} position={position}>
-          <planeGeometry args={isSurfaceCameraActive ? [0, 0] : [.01, .01]} />
-          <meshBasicMaterial color={surfaceColor} side={THREE.DoubleSide} />
+          <planeGeometry args={isSurfaceCameraActive ? [200, 200] : [.01, .01]} />
+          <meshPhysicalMaterial
+            color={surfaceColor}
+            side={THREE.DoubleSide}
+            metalness={0}
+            roughness={1}
+          />
         </mesh>
       </group>
 

@@ -39,7 +39,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
 
   // calculating scaled values
   // const numberOfRotationsPerOrbit = rotationPeriod ? (orbitalPeriod * 24) / rotationPeriod : 0;
-  const scaledOrbitalRadius = orbitalRadius * distanceScaleFactor;
+  const scaledOrbitalRadius = orbitalRadius * (isSurfaceCameraActive ? .0001 : distanceScaleFactor);
   const scaledRadius = radius * sizeScaleFactor;
   // const scaledOrbitalSpeed = orbitalSpeed * simSpeed;
   let rotationSpeed = rotationPeriod ? (2 * Math.PI) / (rotationPeriod * 3600) : 0;

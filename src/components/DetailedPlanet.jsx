@@ -42,8 +42,8 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
 
   // calculating scaled values
   // const numberOfRotationsPerOrbit = rotationPeriod ? (orbitalPeriod * 24) / rotationPeriod : 0;
-  const scaledOrbitalRadius = orbitalRadius * distanceScaleFactor;
-  const scaledRadius = radius * sizeScaleFactor;
+  const scaledOrbitalRadius = orbitalRadius * .0001;
+  const scaledRadius = radius * .001;
   // const scaledOrbitalSpeed = orbitalSpeed * simSpeed;
   let rotationSpeed = rotationPeriod ? (2 * Math.PI) / (rotationPeriod * 3600) : 0;
   rotationSpeed *= rotationSpeedScaleFactor;
@@ -252,7 +252,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
           <Html as='div' center zIndexRange={[100, 0]}>
             <div
               className='planet-point'
-              style={{ backgroundColor: color }}
+              style={{ backgroundColor: color, opacity: isPlanetSelected ? .2 : .8 }}
               onClick={handleClick}
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
