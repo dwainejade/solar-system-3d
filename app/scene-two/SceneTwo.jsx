@@ -1,30 +1,25 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
-import { CameraControls, useTexture, PerspectiveCamera, Html } from "@react-three/drei";
+import { CameraControls, useTexture, PerspectiveCamera, useHelper } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "@/store/store";
 import planetsData, { sizeScaleFactor } from "@/data/planetsData";
 import { moonsData, moonSizeScaleFactor } from "@/data/moonsData";
-
 import { Vector3 } from "three";
 import { useFrame } from "@react-three/fiber";
 import Moon from "@/components/Moon";
 import Sun from "@/components/Sun";
 import Planet from "@/components/DetailedPlanet";
-import SurfacePlane from "@/components/SurfacePlane"
-import StarField from "./StarField";
 import Stars from "@/components/Stars"
 
 const SceneOne = () => {
   const { sunSettings } = useStore();
   const { planetPositions, selectedPlanet, selectedMoon } = usePlanetStore();
-  const { surfacePoint, isSurfaceCameraActive, cameraTarget, setCameraTarget } = useCameraStore();
-  const surfaceCameraRef = useRef();
+  const { surfacePoint, isSurfaceCameraActive, cameraTarget, setCameraTarget, surfaceNormal, cameraSurfacePoint, cameraSurfaceNormal } = useCameraStore();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
   const [cameraOffset, setCameraOffset] = useState(0); // Initial offset distance
   const [target, setTarget] = useState(null)
-
   // console.log(cameraTarget)
 
   const resetCamera = () => {
@@ -117,34 +112,8 @@ const SceneOne = () => {
   });
 
 
-  const heightAboveSurface = 10;
-  useFrame(() => {
-    if (isSurfaceCameraActive && surfacePoint && selectedPlanet) {
-      const planetPosition = planetPositions[selectedPlanet.name];
-      if (planetPosition) {
-        // Assuming planetPosition is the center of the planet
-        const centerOfPlanet = new Vector3(planetPosition.x, planetPosition.y, planetPosition.z);
 
-        // Calculate the normal as the vector from the planet's center to the surface point
-        const surfaceNormal = new Vector3(surfacePoint.x, surfacePoint.y, surfacePoint.z).sub(centerOfPlanet).normalize();
 
-        // Position the camera slightly above the surface point
-        const cameraHeightAboveSurface = 0.1; // Adjust as needed
-        const cameraPosition = new Vector3(surfacePoint.x, surfacePoint.y, surfacePoint.z).add(
-          surfaceNormal.multiplyScalar(cameraHeightAboveSurface)
-        );
-
-        surfaceCameraRef.current.position.copy(cameraPosition);
-
-        // Set the camera to look at a point directly 'up' from the surface
-        const lookAtPoint = cameraPosition.clone().add(surfaceNormal);
-        surfaceCameraRef.current.lookAt(lookAtPoint);
-
-        // Align the camera's up vector with the surface normal
-        surfaceCameraRef.current.up.copy(surfaceNormal);
-      }
-    }
-  });
 
   // A simplistic approach to calculate optimal distance
   function calculateOptimalDistance(planetRadius) {
@@ -170,28 +139,15 @@ const SceneOne = () => {
     rotateSpeed: 0.1,
     zoomSpeed: 0.8,
   };
-
+  // console.log(cameraSurfacePoint)
   return (
     <>
       {!isSurfaceCameraActive && (
-        <CameraControls ref={cameraControlsRef} makeDefault {...cameraConfig} minDistance={Math.max(0.02, minDistance)} />
+        <CameraControls ref={cameraControlsRef} makeDefault {...cameraConfig} minDistance={Math.max(0.01, minDistance)} />
       )}
 
       <Stars />
       {/* <StarField /> */}
-
-      {/* First Person Camera */}
-      {surfacePoint && isSurfaceCameraActive && (
-        <PerspectiveCamera
-          ref={surfaceCameraRef}
-          makeDefault
-          position={[surfacePoint.x, surfacePoint.y + heightAboveSurface, surfacePoint.z]}
-          fov={50}
-          near={0.01}
-          far={100000}
-        // lookAt={[0, 0, 0]}
-        />
-      )}
 
       <Planet bodyData={planetsData.Earth} textures={earthTextures} />
 

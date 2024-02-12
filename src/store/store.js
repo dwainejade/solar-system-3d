@@ -121,9 +121,13 @@ const usePlanetStore = create((set) => ({
 const useCameraStore = create((set) => ({
     surfacePoint: null,
     setSurfacePoint: (surfacePoint) => set({ surfacePoint }),
-
     surfaceNormal: [0, 1, 0],
     setSurfaceNormal: (surfaceNormal) => set({ surfaceNormal }),
+
+    cameraSurfacePoint: null,
+    setCameraSurfacePoint: (cameraSurfacePoint) => set({ cameraSurfacePoint }),
+    cameraSurfaceNormal: [0, 1, 0],
+    setCameraSurfaceNormal: (cameraSurfaceNormal) => set({ cameraSurfaceNormal }),
 
     isSurfaceCameraActive: false,
     toggleSurfaceCamera: () => set((state) => ({ isSurfaceCameraActive: !state.isSurfaceCameraActive })),

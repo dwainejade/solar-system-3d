@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
-import { useLoader, useThree } from '@react-three/fiber';
+import { useThree } from '@react-three/fiber';
 import { CubeTextureLoader } from 'three';
-import { BackSide } from 'three';
 import useStore from '../store/store';
 
 

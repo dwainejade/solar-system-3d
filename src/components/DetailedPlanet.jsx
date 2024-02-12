@@ -34,7 +34,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
 
   const { simSpeed, updateRotationCount, incrementDate, simulationDate, orbitPaths } = useStore();
   const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels, setSelectedMoon } = usePlanetStore();
-  const { setSurfacePoint, surfacePoint, setSurfaceNormal, surfaceNormal } = useCameraStore();
+  const { setSurfacePoint, surfacePoint, setSurfaceNormal, surfaceNormal, setCameraSurfacePoint, setCameraSurfaceNormal } = useCameraStore();
 
   const localRef = ref || useRef();
   const localAngleRef = useRef(planetAngles[name] || 0); // Initialize with saved angle or 0
@@ -135,9 +135,11 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     const intersects = raycaster.intersectObject(meshRef.current, true);
     if (intersects.length > 0) {
       let intersectionPoint = intersects[0].point; // This is in world space
+      let cameraIntersectionPoint = intersects[0].point; // This is in world space
       // Convert from world to local space relative to the planet
       intersectionPoint = localRef.current.worldToLocal(intersectionPoint.clone());
       setSurfacePoint([intersectionPoint.x, intersectionPoint.y, intersectionPoint.z]);
+      setCameraSurfacePoint([cameraIntersectionPoint.x, cameraIntersectionPoint.y, cameraIntersectionPoint.z]);
       const normal = new Vector3().subVectors(intersectionPoint, new Vector3()).normalize();
       setSurfaceNormal([normal.x, normal.y, normal.z]);
     }
