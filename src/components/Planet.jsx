@@ -32,7 +32,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
 
   const { simSpeed, updateRotationCount, incrementDate, simulationDate, orbitPaths } = useStore();
   const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels, planetPositions } = usePlanetStore();
-  const { setSurfacePoint, surfacePoint } = useCameraStore();
+  const { setSurfacePoint, surfacePoint, isSurfaceCameraActive, setCameraSurfacePoint } = useCameraStore();
 
   const localRef = ref || useRef();
   const localAngleRef = useRef(planetAngles[name] || 0); // Initialize with saved angle or 0
@@ -63,7 +63,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   useFrame((state, delta) => {
     // Adjust delta based on simulation speed (simSpeed)
     const adjustedDelta = delta * simSpeed;
-
+    console.log(simSpeed)
     // Update planet's orbital position
     const planetOrbitalSpeed = (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60); // Assuming orbitalPeriod is in Earth days
     // localAngleRef.current += planetOrbitalSpeed * adjustedDelta;
@@ -71,7 +71,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     if (localAngleRef.current === 0) {
       localAngleRef.current = initialOrbitalAngle * (Math.PI / 180); // Convert to radians if initialOrbitalAngle is in degrees
     } else {
-      localAngleRef.current += planetOrbitalSpeed * adjustedDelta;
+      localAngleRef.current -= planetOrbitalSpeed * adjustedDelta;
     }
     const x = scaledOrbitalRadius * Math.cos(localAngleRef.current);
     const z = scaledOrbitalRadius * Math.sin(localAngleRef.current);
@@ -132,17 +132,17 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
 
     // Update the raycaster with the current mouse and camera positions
     raycaster.setFromCamera(mouse, camera);
-
-    // Calculate the intersection with the mesh
     const intersects = raycaster.intersectObject(meshRef.current, true);
     if (intersects.length > 0) {
-      const intersectionPoint = intersects[0].point;
-      console.log({ intersectionPoint });
-      setSurfacePoint(intersectionPoint);
-      const normal = new Vector3().subVectors(intersectionPoint, new Vector3(...localRef.current?.position)).normalize();
+      let intersectionPoint = intersects[0].point; // This is in world space
+      let cameraIntersectionPoint = intersects[0].point; // This is in world space
+      // Convert from world to local space relative to the planet
+      intersectionPoint = localRef.current.worldToLocal(intersectionPoint.clone());
+      setSurfacePoint([intersectionPoint.x, intersectionPoint.y, intersectionPoint.z]);
+      setCameraSurfacePoint([cameraIntersectionPoint.x, cameraIntersectionPoint.y, cameraIntersectionPoint.z]);
+      const normal = new Vector3().subVectors(intersectionPoint, new Vector3()).normalize();
       setSurfaceNormal([normal.x, normal.y, normal.z]);
     }
-    console.log("Surface Point:", surfacePoint, "Surface Normal:", surfaceNormal);
   };
 
   // New handler for pointer down
@@ -181,7 +181,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     setHoveredPlanet(null);
   };
 
-  const detailLevel = isPlanetSelected ? 64 : 32;
+  const detailLevel = isSurfaceCameraActive ? 128 : (isPlanetSelected ? 64 : 32);
 
   // Calculate points for the axial tilt line
   const lineLength = scaledRadius * 2; // Make the line extend out of the planet
@@ -257,8 +257,11 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
             />
           </Html>
         )}
+
+        {surfacePoint && surfaceNormal && isPlanetSelected && (
+          <SurfacePlane position={surfacePoint} normal={surfaceNormal} planetRef={localRef} surfaceColor={color} />
+        )}
       </group>
-      {surfacePoint && surfaceNormal && isPlanetSelected && <SurfacePlane position={surfacePoint} normal={surfaceNormal} planetRef={localRef} surfaceColor={color} />}
       {orbitPaths && (
         <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />
       )}

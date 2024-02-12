@@ -56,7 +56,7 @@ const SurfacePlane = ({ position, normal, surfaceColor }) => {
     if (isDragging) {
       const deltaX = event.clientX - lastMousePosition.x;
       const deltaY = event.clientY - lastMousePosition.y;
-      console.log(event.clientX, event.clientY)
+
       // Update the last mouse position
       setLastMousePosition({ x: event.clientX, y: event.clientY });
 

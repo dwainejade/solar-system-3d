@@ -74,7 +74,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     if (localAngleRef.current === 0) {
       localAngleRef.current = initialOrbitalAngle * (Math.PI / 180); // Convert to radians if initialOrbitalAngle is in degrees
     } else {
-      localAngleRef.current += planetOrbitalSpeed * adjustedDelta;
+      localAngleRef.current -= planetOrbitalSpeed * adjustedDelta;
     }
     const x = scaledOrbitalRadius * Math.cos(localAngleRef.current);
     const z = scaledOrbitalRadius * Math.sin(localAngleRef.current);
@@ -182,7 +182,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     setHoveredPlanet(null);
   };
 
-  const detailLevel = isSurfaceCameraActive ? 128 : 32;
+  const detailLevel = isSurfaceCameraActive ? 128 : (isPlanetSelected ? 64 : 32);
 
   // Calculate points for the axial tilt line
   // const lineLength = scaledRadius * 2; // Make the line extend out of the planet
@@ -263,12 +263,12 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
           </Html>
         )}
         {/* Plane for surface view */}
-        {surfacePoint && surfaceNormal && (
+        {surfacePoint && surfaceNormal && isPlanetSelected && (
           <SurfacePlane position={surfacePoint} normal={surfaceNormal} planetRef={localRef} surfaceColor={color} />
         )}
       </group>
 
-      {orbitPaths && !isSurfaceCameraActive && (
+      {orbitPaths && (
         <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />
       )}
     </>

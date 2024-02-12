@@ -113,7 +113,7 @@ const Moon = forwardRef(({ bodyData, parentPosition, parentName, textures }, ref
           <div className='moon-point' style={{ backgroundColor: color }} onClick={handleClick} />
         </Html>
       )}
-      {orbitPaths && parentPosition && !isSurfaceCameraActive && (
+      {orbitPaths && parentPosition && (
         <group position={[parentPosition.x, parentPosition.y, parentPosition.z]}>
           <OrbitPath
             origin={[0, 0, 0]} // Now relative to the group's position
