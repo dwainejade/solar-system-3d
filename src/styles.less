@@ -112,6 +112,7 @@ body {
 
   .menu-wrapper {
     position: relative;
+    z-index: 999;
   }
 
   // MENU
@@ -179,7 +180,6 @@ body {
       cursor: pointer;
       padding: 5px 10px;
       border-radius: 5px;
-      z-index: 999;
     }
   }
 
@@ -220,7 +220,7 @@ body {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    opacity: 1;
+    opacity: 0.8;
   }
   .moon-point {
     width: 6px;
@@ -229,4 +229,27 @@ body {
     opacity: 1;
     position: relative;
   }
+}
+
+/* Menu.css */
+.menu-wrapper .menu-con .menu-content .menu-item .slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 5px;
+  background: #ddd;
+  outline: none;
+  -webkit-transition: 0.2s;
+  transition: opacity 0.2s;
+  margin-top: 10px; /* Space between label and slider */
+}
+
+.menu-wrapper .menu-con .menu-content .menu-item .slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: mediumpurple;
+  cursor: pointer;
 }

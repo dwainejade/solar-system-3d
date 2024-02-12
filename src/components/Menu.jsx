@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import planetsData from "../data/planetsData";
 
@@ -16,7 +16,6 @@ const Menu = () => {
     return new Intl.NumberFormat("en-US", { maximumSignificantDigits: 3 }).format(number);
   };
 
-  const [currentSpeedIndex, setCurrentSpeedIndex] = useState(7);
   const speedOptions = [
     { label: "-5yr", value: -157788000 },
     { label: "-1yr", value: -31557600 },
@@ -34,12 +33,16 @@ const Menu = () => {
     { label: "1yr", value: 31557600 },
     { label: "5yr", value: 157788000 },
   ];
-  const adjustSpeed = (direction) => {
-    const newIndex = currentSpeedIndex + direction;
-    if (newIndex >= 0 && newIndex < speedOptions.length) {
-      setCurrentSpeedIndex(newIndex);
-      setSimSpeed(speedOptions[newIndex].value);
-    }
+  // Finding the index of the current simulation speed in the speedOptions array
+  const currentSpeedIndex = useMemo(
+    () => speedOptions.findIndex(option => option.value === simSpeed),
+    [simSpeed]
+  );
+
+  // Handle the change in slider value
+  const handleSliderChange = (event) => {
+    const newIndex = parseInt(event.target.value, 10);
+    setSimSpeed(speedOptions[newIndex].value);
   };
 
   // Handle planet selection change
@@ -57,26 +60,18 @@ const Menu = () => {
           Menu
         </button>
         <div className='menu-content'>
-          {/* <div className='menu-item'>
-            <label htmlFor='simSpeed'>Simulation Speed: </label>
-            <select id='simSpeed' onChange={handleSpeedChange}>
-              <option value='realtime'>Realtime</option>
-              <option value='1min'>1s equals 1 minute</option>
-              <option value='1hr'>1s equals 1 hour</option>
-              <option value='1day'>1s equals 1 day</option>
-              <option value='1wk'>1s equals 1 week</option>
-              <option value='1mon'>1s equals 1 month</option>
-              <option value='1yr'>1s equals 1 year</option>
-              <option value='5yr'>1s equals 5 years</option>
-              <option value='10yr'>1s equals 10 years</option>
-            </select>
-          </div> */}
-          <div className='menu-item'>
-            <label>Simulation Speed: </label>
-            <button onClick={() => adjustSpeed(-1)}>-</button>
-            {speedOptions[currentSpeedIndex].label}
-            <button onClick={() => adjustSpeed(1)}>+</button>
+          <div className="menu-item">
+            <label htmlFor="simSpeed">Simulation Speed: {speedOptions[currentSpeedIndex].label}</label>
           </div>
+          <input
+            id="simSpeed"
+            type="range"
+            min="0"
+            max={speedOptions.length - 1}
+            value={currentSpeedIndex}
+            onChange={handleSliderChange}
+            className="slider"
+          />
 
           {/* Dropdown for selecting planets */}
           <div className='menu-item'>
