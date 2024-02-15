@@ -32,19 +32,16 @@ const Sun = ({ position, resetCamera, textures }) => {
 
   // New handler for pointer move
   const handlePointerMove = e => {
-    // Calculate the distance moved
     const distanceMoved = Math.sqrt(
       Math.pow(e.clientX - initialClickPosition.current.x, 2) + Math.pow(e.clientY - initialClickPosition.current.y, 2)
     );
     if (distanceMoved > 5) {
-      // Threshold to consider as a drag, adjust as needed
       setIsDragging(true);
     }
   };
 
-  // New handler for pointer up
   const handlePointerUp = e => {
-    setIsDragging(false); // Reset dragging state
+    setIsDragging(false);
   };
 
   const handlePointerOver = e => {
@@ -95,7 +92,7 @@ const Sun = ({ position, resetCamera, textures }) => {
         <Html center zIndexRange={[100, 0]}>
           <div
             className='planet-point'
-            style={{ backgroundColor: "rgb(255, 255, 0)" }}
+            style={{ backgroundColor: "rgba(255, 255, 0,0.9)" }}
             onClick={handleClick}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
