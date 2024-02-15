@@ -1,4 +1,4 @@
-import React, { useRef, forwardRef, useState } from "react";
+import React, { useRef, forwardRef, useState, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import OrbitPath from "./OrbitPath";
 import { Html, Torus } from "@react-three/drei";
@@ -190,6 +190,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   //   [0, lineLength / 1.8, 0], // Ending point of the line
   // ];
 
+
   return (
     <>
       <group ref={localRef}>
@@ -259,7 +260,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
         )}
 
         {surfacePoint && surfaceNormal && isPlanetSelected && (
-          <SurfaceCamera position={surfacePoint} normal={surfaceNormal} planetRef={localRef} surfaceColor={color} />
+          <SurfaceCamera key={name} position={surfacePoint} normal={surfaceNormal} planetRef={localRef} surfaceColor={color} />
         )}
       </group>
       {orbitPaths && (

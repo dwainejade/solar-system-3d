@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import { CameraControls, PerspectiveCamera, useHelper } from "@react-three/drei";
+import { PerspectiveCamera, useHelper } from "@react-three/drei";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { useCameraStore } from "../store/store";
@@ -13,7 +13,7 @@ const SurfaceCamera = ({ position, normal, color }) => {
   const [lastMousePosition, setLastMousePosition] = useState({ x: 0, y: 0 });
   // Initialize the camera based on the normal and position
   useEffect(() => {
-    if (normal && surfaceCameraRef.current) {
+    if (position && normal && surfaceCameraRef.current) {
       // Align the camera to the provided normal
       const targetNormal = new THREE.Vector3(...normal);
       const quaternion = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), targetNormal.normalize());
@@ -25,6 +25,7 @@ const SurfaceCamera = ({ position, normal, color }) => {
       surfaceCameraRef.current.position.copy(offsetPosition);
       surfaceCameraRef.current.quaternion.copy(quaternion);
       surfaceCameraRef.current.lookAt(0, 0, 0)
+      console.log(surfaceCameraRef.current)
     }
   }, [position, normal]);
 
