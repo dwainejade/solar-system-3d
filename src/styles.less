@@ -122,8 +122,8 @@ body {
     right: 0;
     width: 300px;
     height: 100%; /* Full height of its parent */
-    background-color: #333;
-    color: white;
+    background-color: #243e4f;
+    color: #deceae;
     transition:
       width ease-in-out 0.2s,
       height ease-in-out 0.2s;
@@ -142,6 +142,7 @@ body {
     .btn {
       border: 0;
       border-radius: 5px;
+      background-color: #ddcdad;
     }
 
     .menu-content {
@@ -169,6 +170,9 @@ body {
       .planet-details {
         max-height: 100%;
         overflow-y: auto; /* Enables scrolling */
+        h2 {
+          color: #c99050;
+        }
       }
     }
 
@@ -176,6 +180,7 @@ body {
       position: absolute;
       right: 0;
       top: 0;
+      background-color: #ddcdad;
       border: none;
       cursor: pointer;
       padding: 5px 10px;
@@ -183,26 +188,26 @@ body {
     }
   }
 
-  .fullscreen-btn {
-    width: 40px;
-    height: 40px;
-    border: 1px solid white;
-    background-color: #333;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  // .fullscreen-btn {
+  //   width: 40px;
+  //   height: 40px;
+  //   border: 1px solid white;
+  //   background-color: #333;
+  //   background-size: contain;
+  //   background-repeat: no-repeat;
+  //   background-position: center;
+  //   cursor: pointer;
+  //   display: flex;
+  //   align-items: center;
+  //   justify-content: center;
 
-    &.fullscreen {
-      background-image: url("/assets/icons/fullscreen-exit.svg");
-    }
-    &.minimized {
-      background-image: url("/assets/icons/fullscreen-enter.svg");
-    }
-  }
+  //   &.fullscreen {
+  //     background-image: url("/assets/icons/fullscreen-exit.svg");
+  //   }
+  //   &.minimized {
+  //     background-image: url("/assets/icons/fullscreen-enter.svg");
+  //   }
+  // }
   .label-wrap {
     border: solid 1px white;
     width: 2px;
