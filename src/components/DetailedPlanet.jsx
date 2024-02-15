@@ -5,8 +5,7 @@ import { Html, Torus } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import planetsData, { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 import { Vector3 } from "three";
-import SurfacePlane from "./SurfacePlane";
-// import SaturnRings from "./SaturnRings";
+import SurfaceCamera from "./SurfaceCamera";
 
 // default values
 const defaultBodyData = planetsData.Earth;
@@ -130,7 +129,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
     setSelectedMoon(null);
     setSelectedPlanet(mergedData);
 
-    // code to position surfaceplane
+    // code to position SurfaceCamera
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObject(meshRef.current, true);
     if (intersects.length > 0) {
@@ -264,7 +263,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
         )}
         {/* Plane for surface view */}
         {surfacePoint && surfaceNormal && isPlanetSelected && (
-          <SurfacePlane position={surfacePoint} normal={surfaceNormal} planetRef={localRef} surfaceColor={color} />
+          <SurfaceCamera position={surfacePoint} normal={surfaceNormal} planetRef={localRef} surfaceColor={color} />
         )}
       </group>
 

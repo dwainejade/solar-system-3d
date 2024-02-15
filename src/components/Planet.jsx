@@ -5,7 +5,7 @@ import { Html, Torus } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import planetsData, { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 import { Vector3 } from "three";
-import SurfacePlane from "./SurfacePlane";
+import SurfaceCamera from "./SurfaceCamera";
 // import SaturnRings from "./SaturnRings";
 
 // default values
@@ -184,11 +184,11 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
   const detailLevel = isSurfaceCameraActive ? 128 : (isPlanetSelected ? 64 : 32);
 
   // Calculate points for the axial tilt line
-  const lineLength = scaledRadius * 2; // Make the line extend out of the planet
-  const axialTiltLinePoints = [
-    [0, -lineLength / 1.8, 0], // Starting point of the line
-    [0, lineLength / 1.8, 0], // Ending point of the line
-  ];
+  // const lineLength = scaledRadius * 2; // Make the line extend out of the planet
+  // const axialTiltLinePoints = [
+  //   [0, -lineLength / 1.8, 0], // Starting point of the line
+  //   [0, lineLength / 1.8, 0], // Ending point of the line
+  // ];
 
   return (
     <>
@@ -259,7 +259,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
         )}
 
         {surfacePoint && surfaceNormal && isPlanetSelected && (
-          <SurfacePlane position={surfacePoint} normal={surfaceNormal} planetRef={localRef} surfaceColor={color} />
+          <SurfaceCamera position={surfacePoint} normal={surfaceNormal} planetRef={localRef} surfaceColor={color} />
         )}
       </group>
       {orbitPaths && (
