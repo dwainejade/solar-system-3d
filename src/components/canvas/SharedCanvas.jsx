@@ -2,18 +2,47 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import Stars from "../Stars";
-import { Environment, Html, Preload, Stats, useProgress } from "@react-three/drei";
-import useStore from "../../store/store";
+import { Html, Preload, Stats, useProgress } from "@react-three/drei";
+import useStore, { useCameraStore } from "../../store/store";
 import Menu from "../Menu";
 import { Bloom, EffectComposer } from "@react-three/postprocessing";
+import ContextMenu from "../ContextMenu"
 import "../../styles.css";
 
 const SharedCanvas = ({ children }) => {
   const { fullscreen } = useStore();
+  const { setTriggerReset } = useCameraStore()
+
   const { errors, loaded } = useProgress();
   const totalAssets = 12;
   const progressPercentage = (loaded / totalAssets) * 100;
+  const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 });
+
+  const handleAuxClick = (event) => {
+    event.preventDefault();
+    setContextMenu({
+      visible: true,
+      x: event.clientX,
+      y: event.clientY,
+    });
+  };
+
+  const hideContextMenu = () => {
+    setContextMenu({ ...contextMenu, visible: false });
+  };
+
+  const resetCamera = () => {
+    setTriggerReset(true)
+    hideContextMenu();
+  };
+
+  // Listen for clicks to hide the context menu if visible
+  useEffect(() => {
+    document.addEventListener('click', hideContextMenu);
+    return () => {
+      document.removeEventListener('click', hideContextMenu);
+    };
+  }, []);
 
   useEffect(() => {
     if (errors.length) {
@@ -36,7 +65,9 @@ const SharedCanvas = ({ children }) => {
 
   return (
     <div className={`Main ${fullscreen ? "fullscreen" : "minimized"}`}>
-      <Canvas id='Canvas' dpr={[1, 2]} camera={{ fov: 50, position: [5000, 5000, 5000], near: 0.1, far: 1000000 }} >
+      <Canvas id='Canvas' dpr={[1, 2]} camera={{ fov: 50, position: [5000, 5000, 5000], near: 0.1, far: 1000000 }}
+        onAuxClick={handleAuxClick}
+      >
         <Suspense fallback={<Loader />}>
           <Stats />
           {/* <ambientLight intensity={0.04} /> */}
@@ -49,6 +80,7 @@ const SharedCanvas = ({ children }) => {
         </Suspense>
         <Preload all />
       </Canvas>
+      {contextMenu.visible && <ContextMenu x={contextMenu.x} y={contextMenu.y} onResetView={resetCamera} />}
       <Menu />
     </div>
   );

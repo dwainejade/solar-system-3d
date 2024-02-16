@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { PerspectiveCamera, useHelper } from "@react-three/drei";
 import * as THREE from "three";
-import { useFrame } from "@react-three/fiber";
 import { useCameraStore } from "../store/store";
 
 const SurfaceCamera = ({ position, normal, color, radius }) => {
@@ -28,8 +27,6 @@ const SurfaceCamera = ({ position, normal, color, radius }) => {
       // Look at a point slightly further along the "forward" direction from the camera position
       const lookAtTarget = cameraPosition.clone().add(upDirection.clone().negate()); // Adjust based on desired forward direction
       surfaceCameraRef.current.lookAt(lookAtTarget);
-
-      console.log("Camera Initialized", surfaceCameraRef.current);
     }
   }, [position, normal]);
 

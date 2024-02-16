@@ -1,0 +1,18 @@
+.context-menu {
+  position: fixed;
+  z-index: 9999;
+  width: auto;
+  background-color: #deceae;
+  border-radius: 5px;
+  padding: 5px 0;
+  font-size: 14px;
+  color: #333;
+  user-select: none;
+}
+.context-menu-item {
+  padding: 8px 20px;
+  cursor: pointer;
+}
+.context-menu-item:hover {
+  background-color: lightcoral;
+}

@@ -14,16 +14,18 @@ import Stars from "@/components/Stars"
 
 const SceneOne = () => {
   const { sunSettings } = useStore();
-  const { planetPositions, selectedPlanet, selectedMoon } = usePlanetStore();
-  const { surfacePoint, isSurfaceCameraActive, cameraTarget, setCameraTarget, surfaceNormal, cameraSurfacePoint, cameraSurfaceNormal } = useCameraStore();
+  const { planetPositions, selectedPlanet, setSelectedPlanet, selectedMoon, setSelectedMoon } = usePlanetStore();
+  const { cameraTarget, setCameraTarget, surfaceNormal, cameraSurfacePoint, cameraSurfaceNormal } = useCameraStore();
+  const { surfacePoint, isSurfaceCameraActive, triggerReset, setTriggerReset } = useCameraStore();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
   const [cameraOffset, setCameraOffset] = useState(0); // Initial offset distance
   const [target, setTarget] = useState(null)
-  // console.log(cameraTarget)
 
   const resetCamera = () => {
     if (!cameraControlsRef.current) return;
+    setSelectedPlanet(null)
+    setSelectedMoon(null)
     setMinDistance(200);
     setCameraTarget(new Vector3(sunSettings.position.x, sunSettings.position.y, sunSettings.position.z));
     const isometricPosition = {
@@ -85,6 +87,14 @@ const SceneOne = () => {
       resetCamera();
     }
   }, [selectedPlanet, sunSettings.position]);
+
+  // Handle resetting the camera from state
+  useEffect(() => {
+    if (resetCamera) {
+      resetCamera()
+      setTriggerReset(false)
+    }
+  }, [triggerReset]);
 
 
   useFrame(() => {

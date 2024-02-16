@@ -15,14 +15,16 @@ import Stars from "@/components/Stars"
 
 const SceneOne = () => {
   const { sunSettings, rotationCounts, simulationDate } = useStore();
-  const { planetPositions, selectedPlanet, selectedMoon } = usePlanetStore();
-  const { surfacePoint, isSurfaceCameraActive } = useCameraStore();
+  const { planetPositions, selectedPlanet, setSelectedPlanet, selectedMoon, setSelectedMoon } = usePlanetStore();
+  const { surfacePoint, isSurfaceCameraActive, triggerReset, setTriggerReset } = useCameraStore();
   const surfaceCameraRef = useRef();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
 
   const resetCamera = () => {
     if (!cameraControlsRef.current) return;
+    setSelectedPlanet(null)
+    setSelectedMoon(null)
     setMinDistance(200);
     // Set the target to the sun's position
     cameraControlsRef.current.setTarget(sunSettings.position.x, sunSettings.position.y, sunSettings.position.z, true);
@@ -73,12 +75,14 @@ const SceneOne = () => {
     }
   }, [selectedMoon, moonsData]);
 
-  // Handle resetting the camera when no planet is selected
+  // Handle resetting the camera from state
   useEffect(() => {
-    if (!selectedPlanet && cameraControlsRef.current) {
-      resetCamera();
+    if (resetCamera) {
+      resetCamera()
+      setTriggerReset(false)
     }
-  }, [selectedPlanet, sunSettings.position]);
+  }, [triggerReset]);
+
 
   const heightAboveSurface = 10;
   useFrame(() => {

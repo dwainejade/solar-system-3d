@@ -22,6 +22,8 @@ const useStore = create((set, get) => ({
         }
     },
 
+
+
     orbitPaths: true,
     toggleOrbitPaths: () => set(state => ({ orbitPaths: !state.orbitPaths })),
 
@@ -134,6 +136,9 @@ const useCameraStore = create((set) => ({
 
     cameraTarget: new THREE.Vector3(),
     setCameraTarget: (target) => set({ cameraTarget: target }),
+
+    triggerReset: null, // Placeholder for a function to reset the camera
+    setTriggerReset: (newState) => set({ triggerReset: newState }),
 }));
 
 
