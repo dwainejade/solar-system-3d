@@ -14,18 +14,13 @@
       "static/chunks/main-app-42abb123e46411d3.js",
       "static/chunks/app/layout-464bbb7a64cea06b.js"
     ],
-    "/scene-one/page": [
+    "/page": [
       "static/chunks/webpack-35770acf31f89998.js",
       "static/chunks/fd9d1056-81c0d026b96e96d0.js",
       "static/chunks/468-a0f605fdefae3530.js",
       "static/chunks/main-app-42abb123e46411d3.js",
-      "static/chunks/b536a0f1-ea110584b08b6d53.js",
-      "static/chunks/a3cd4a83-acbeb129f2228a23.js",
-      "static/chunks/0c4b6b70-4dc409a51a02fda1.js",
-      "static/chunks/577-b05316fc8b187817.js",
-      "static/chunks/531-05aa00e4a0654fb7.js",
-      "static/css/cc7c666821308929.css",
-      "static/chunks/app/scene-one/page-e289e2bd07dd89b6.js"
+      "static/chunks/250-9928487618ed4524.js",
+      "static/chunks/app/page-112a693f414fcbbc.js"
     ],
     "/scene-two/page": [
       "static/chunks/webpack-35770acf31f89998.js",
@@ -36,17 +31,22 @@
       "static/chunks/a3cd4a83-acbeb129f2228a23.js",
       "static/chunks/0c4b6b70-4dc409a51a02fda1.js",
       "static/chunks/577-b05316fc8b187817.js",
-      "static/chunks/531-05aa00e4a0654fb7.js",
+      "static/chunks/531-e44341a2503fd09f.js",
       "static/css/cc7c666821308929.css",
-      "static/chunks/app/scene-two/page-df38e3936506fffe.js"
+      "static/chunks/app/scene-two/page-1d95926f188f37ef.js"
     ],
-    "/page": [
+    "/scene-one/page": [
       "static/chunks/webpack-35770acf31f89998.js",
       "static/chunks/fd9d1056-81c0d026b96e96d0.js",
       "static/chunks/468-a0f605fdefae3530.js",
       "static/chunks/main-app-42abb123e46411d3.js",
-      "static/chunks/250-9928487618ed4524.js",
-      "static/chunks/app/page-112a693f414fcbbc.js"
+      "static/chunks/b536a0f1-ea110584b08b6d53.js",
+      "static/chunks/a3cd4a83-acbeb129f2228a23.js",
+      "static/chunks/0c4b6b70-4dc409a51a02fda1.js",
+      "static/chunks/577-b05316fc8b187817.js",
+      "static/chunks/531-e44341a2503fd09f.js",
+      "static/css/cc7c666821308929.css",
+      "static/chunks/app/scene-one/page-7cb7e0cb6aa0ecf5.js"
     ]
   }
 }
