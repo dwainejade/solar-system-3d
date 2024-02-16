@@ -5,7 +5,7 @@ import { Html, Torus } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import planetsData, { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 import { Vector3 } from "three";
-import SurfaceCamera from "./SurfaceCamera";
+import SurfaceCamera from "./SurfaceCamera2";
 // import SaturnRings from "./SaturnRings";
 
 // default values
@@ -260,7 +260,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
         )}
 
         {surfacePoint && surfaceNormal && isPlanetSelected && (
-          <SurfaceCamera key={name} position={surfacePoint} normal={surfaceNormal} planetRef={localRef} surfaceColor={color} />
+          <SurfaceCamera key={name} position={surfacePoint} normal={surfaceNormal} planetRef={localRef} surfaceColor={color} radius={scaledRadius} />
         )}
       </group>
       {orbitPaths && (
