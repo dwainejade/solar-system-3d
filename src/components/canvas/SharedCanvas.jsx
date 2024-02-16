@@ -6,7 +6,7 @@ import { Html, Preload, Stats, useProgress } from "@react-three/drei";
 import useStore, { useCameraStore } from "../../store/store";
 import Menu from "../Menu";
 import { Bloom, EffectComposer } from "@react-three/postprocessing";
-import ContextMenu from "../ContextMenu"
+import ContextMenu from "../ContextMenu";
 import "../../styles.css";
 
 const SharedCanvas = ({ children }) => {
