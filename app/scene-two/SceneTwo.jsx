@@ -133,7 +133,7 @@ const SceneOne = () => {
 
   // camera settings
   const cameraConfig = {
-    maxDistance: 100000,
+    maxDistance: 1000000,
     smoothTime: 0.8, // 1.5 is default
     truckSpeed: 0.8,
     rotateSpeed: 0.1,
