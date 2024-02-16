@@ -4,7 +4,7 @@ import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { useCameraStore } from "../store/store";
 
-const SurfaceCamera = ({ position, normal, color }) => {
+const SurfaceCamera = ({ position, normal, color, radius }) => {
   const { isSurfaceCameraActive } = useCameraStore()
   const surfaceCameraRef = useRef();
   useHelper(surfaceCameraRef, THREE.CameraHelper);
@@ -14,37 +14,50 @@ const SurfaceCamera = ({ position, normal, color }) => {
   // Initialize the camera based on the normal and position
   useEffect(() => {
     if (position && normal && surfaceCameraRef.current) {
-      // Align the camera to the provided normal
-      const targetNormal = new THREE.Vector3(...normal);
-      const quaternion = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), targetNormal.normalize());
+      // Calculate "up" direction as the normal from the planet's surface
+      const upDirection = new THREE.Vector3(...normal).normalize();
 
-      // Offset the camera position
-      const offsetPosition = new THREE.Vector3(...position).add(targetNormal.multiplyScalar(0.01));
-      const upDirection = offsetPosition.clone().normalize();
+      // Calculate a realistic height above the surface for the camera position
+      const heightAboveSurface = .005; // Simulating average human eye level in meters
+      const scaledNormal = upDirection.clone().multiplyScalar(heightAboveSurface);
+      const cameraPosition = new THREE.Vector3(...position).add(scaledNormal);
+
+      surfaceCameraRef.current.position.copy(cameraPosition);
       surfaceCameraRef.current.up.copy(upDirection);
-      surfaceCameraRef.current.position.copy(offsetPosition);
-      surfaceCameraRef.current.quaternion.copy(quaternion);
-      surfaceCameraRef.current.lookAt(0, 0, 0)
-      console.log(surfaceCameraRef.current)
+
+      // Look at a point slightly further along the "forward" direction from the camera position
+      const lookAtTarget = cameraPosition.clone().add(upDirection.clone().negate()); // Adjust based on desired forward direction
+      surfaceCameraRef.current.lookAt(lookAtTarget);
+
+      console.log("Camera Initialized", surfaceCameraRef.current);
     }
   }, [position, normal]);
+
 
   // Update the camera rotation based on mouse movement
   const updateCameraRotation = (deltaX, deltaY) => {
     if (!surfaceCameraRef.current) return;
 
-    // Convert the deltas into a rotational movement
-    const euler = new THREE.Euler(0, 0, 0, 'YXZ');
+    const rotateSpeed = 0.005; // Adjust based on sensitivity
 
-    euler.setFromQuaternion(surfaceCameraRef.current.quaternion);
+    // Horizontal rotation (yaw)
+    const horizontalRotation = new THREE.Quaternion().setFromAxisAngle(
+      surfaceCameraRef.current.up, // Use the camera's "up" for horizontal rotation axis
+      deltaX * -rotateSpeed // Inverted to match typical camera control conventions
+    );
 
-    euler.y -= deltaX * 0.002;
-    euler.x -= deltaY * 0.002;
+    // Vertical rotation (pitch) - need to determine the camera's right vector
+    const verticalRotation = new THREE.Quaternion().setFromAxisAngle(
+      new THREE.Vector3(-1, 0, 0), // Rotating around X axis
+      deltaY * rotateSpeed
+    );
 
-    // Clamp the x rotation to prevent flipping
-    euler.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, euler.x));
-    surfaceCameraRef.current.quaternion.setFromEuler(euler);
+    // Apply rotations
+    surfaceCameraRef.current.quaternion.premultiply(horizontalRotation);
+    surfaceCameraRef.current.quaternion.multiply(verticalRotation);
   };
+
+
 
   // Mouse event handlers
   useEffect(() => {
@@ -79,12 +92,13 @@ const SurfaceCamera = ({ position, normal, color }) => {
     };
   }, [isDragging, lastMousePosition]);
 
+
   return (
     <PerspectiveCamera
       ref={surfaceCameraRef}
       fov={30}
       near={0.001}
-      far={1000000}
+      far={100000}
       makeDefault={isSurfaceCameraActive}
       position={position}
     />

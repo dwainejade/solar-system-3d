@@ -5,7 +5,7 @@ import { Html, Torus } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import planetsData, { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 import { Vector3 } from "three";
-import SurfaceCamera from "./SurfaceCamera2";
+import SurfaceCamera from "./SurfaceCamera";
 // import SaturnRings from "./SaturnRings";
 
 // default values
