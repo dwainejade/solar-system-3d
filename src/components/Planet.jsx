@@ -260,7 +260,7 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
         )}
 
         {surfacePoint && surfaceNormal && isPlanetSelected && (
-          <SurfaceCamera key={name} position={surfacePoint} normal={surfaceNormal} planetRef={localRef} color={color} radius={scaledRadius} />
+          <SurfaceCamera key={name} position={surfacePoint} normal={surfaceNormal} planetRef={localRef} color={color} radius={scaledRadius} planetCenter={localRef.current.position} />
         )}
       </group>
       {orbitPaths && (
