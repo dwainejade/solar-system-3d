@@ -1,20 +1,17 @@
 "use client";
 import React, { useMemo, useState } from "react";
-import useStore, { useCameraStore, usePlanetStore } from "../store/store";
-import planetsData from "../data/planetsData";
+import useStore, { useCameraStore, usePlanetStore } from "../../store/store";
+import planetsData from "../../data/planetsData";
+import Details from "./PlanetDetails"
 
 const Menu = () => {
-  const { simSpeed, setSimSpeed, showConstellations, toggleConstellations, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths } = useStore();
-  const { selectedPlanet, setSelectedPlanet, selectedMoon, displayLabels, toggleDisplayLabels } = usePlanetStore();
-  const { isSurfaceCameraActive, toggleSurfaceCamera, surfacePoint } = useCameraStore();
+  const { simSpeed, setSimSpeed, showConstellations, toggleConstellations, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths, isEditing, setIsEditing } = useStore();
+  const { selectedPlanet, setSelectedPlanet, selectedMoon, displayLabels, toggleDisplayLabels, updateSelectedPlanet } = usePlanetStore();
   const [isMenuOpen, setMenuOpen] = useState(false);
   const toggleMenu = () => {
     setMenuOpen(!isMenuOpen);
   };
 
-  const formatNumber = number => {
-    return new Intl.NumberFormat("en-US", { maximumSignificantDigits: 3 }).format(number);
-  };
 
   const speedOptions = [
     { label: "-5 year /s", value: -157788000 },
@@ -60,6 +57,7 @@ const Menu = () => {
     const newSelectedPlanet = planetsData[newSelectedPlanetName];
     setSelectedPlanet(newSelectedPlanet); // Update the selected planet in the store
   };
+
 
   return (
     <div className="menu-wrapper">
@@ -120,33 +118,10 @@ const Menu = () => {
               {showConstellations ? "ON" : "OFF"}
             </button>
           </div>
-          <div className='menu-item'>
-            <label htmlFor='cameraToggle'>Toggle Camera:</label>
-            {surfacePoint &&
-              <button id='cameraToggle' className='btn' onClick={toggleSurfaceCamera}>
-                {isSurfaceCameraActive ? "SURFACE" : "DEFAULT"}
-              </button>
-            }
-          </div>
 
-          {selectedPlanet && !selectedMoon && (
-            <div className='planet-details'>
-              <h2>{selectedPlanet.name}</h2>
-              <p>Mass: {selectedPlanet.mass?.toString().replace("e+", "e")} kg</p>
-              <p>Radius: {selectedPlanet.radius} km</p>
-              <p>Orbital Period: {selectedPlanet.orbitalPeriod} days</p>
-              <p>Rotation Period: {selectedPlanet.rotationPeriod} hours</p>
-              <p>Surface Temperature: {selectedPlanet.surfaceTemp} °C</p>
-              <p>Gravity: {selectedPlanet.gravity} m/s²</p>
-            </div>
-          )}
-          {selectedMoon && selectedPlanet && (
-            <div className='planet-details'>
-              <h2>{selectedMoon.bodyData.name}</h2>
-              <p>Mass: {selectedMoon.bodyData.mass?.toString().replace("e+", "e")} kg</p>
-              <p>Radius: {selectedMoon.bodyData.radius} km</p>
-              <p>Orbital Period: {selectedMoon.bodyData.orbitalPeriod} days</p>
-            </div>
+
+          {selectedPlanet && (
+            <Details />
           )}
         </div>
       </div>

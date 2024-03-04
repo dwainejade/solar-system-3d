@@ -13,6 +13,7 @@
     "@react-three/postprocessing": "^2.15.11",
     "@react-three/rapier-addons": "^3.0.3",
     "glsl-random": "^0.0.5",
+    "immer": "^10.0.3",
     "next": "^14.1.0",
     "papaparse": "^5.4.1",
     "r3f-perf": "^7.1.2",

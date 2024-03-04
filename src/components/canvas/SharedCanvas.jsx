@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Html, Preload, Stats, useProgress } from "@react-three/drei";
 import useStore, { useCameraStore } from "../../store/store";
-import Menu from "../Menu";
+import Menu from "../UI/Menu";
 import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import ContextMenu from "../ContextMenu";
 import "../../styles.css";

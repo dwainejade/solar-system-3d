@@ -169,9 +169,22 @@ body {
 
       .planet-details {
         max-height: 100%;
-        overflow-y: auto; /* Enables scrolling */
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+
         h2 {
           color: #c99050;
+        }
+        div {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          height: 30px;
+          gap: 4px;
+        }
+        input {
+          width: 80px;
         }
       }
     }

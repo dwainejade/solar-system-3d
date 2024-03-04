@@ -181,14 +181,14 @@ const SceneThree = () => {
 
       <Stars />
 
-      <Planet bodyData={planetsData.Earth} textures={earthTextures} />
-      <Planet bodyData={planetsData.Mars} textures={marsTextures} />
-      <Planet bodyData={planetsData.Venus} textures={venusTextures} />
-      <Planet bodyData={planetsData.Mercury} textures={mercuryTextures} />
-      <Planet bodyData={planetsData.Jupiter} textures={jupiterTextures} />
-      <Planet bodyData={planetsData.Saturn} textures={saturnTextures} />
-      <Planet bodyData={planetsData.Uranus} textures={uranusTextures} />
-      <Planet bodyData={planetsData.Neptune} textures={neptuneTextures} />
+      <Planet name="Earth" textures={earthTextures} />
+      <Planet name="Mars" textures={marsTextures} />
+      <Planet name="Venus" textures={venusTextures} />
+      <Planet name="Mercury" textures={mercuryTextures} />
+      <Planet name="Jupiter" textures={jupiterTextures} />
+      <Planet name="Saturn" textures={saturnTextures} />
+      <Planet name="Uranus" textures={uranusTextures} />
+      <Planet name="Neptune" textures={neptuneTextures} />
 
       {/* Render moons */}
       {Object.entries(moonsData).map(([planetName, planetData]) => renderMoons(planetName, planetData))}

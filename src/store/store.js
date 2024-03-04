@@ -1,5 +1,7 @@
 import { create } from 'zustand';
+import { immer } from 'zustand/middleware/immer'
 import * as THREE from 'three';
+import planetsData from '../data/planetsData';
 
 const useStore = create((set, get) => ({
     simSpeed: 1, // 1 is realtime speed
@@ -22,7 +24,8 @@ const useStore = create((set, get) => ({
         }
     },
 
-
+    isEditing: false, // allow user to edit planet data
+    setIsEditing: (newState) => set({ isEditing: newState }),
 
     orbitPaths: true,
     toggleOrbitPaths: () => set(state => ({ orbitPaths: !state.orbitPaths })),
@@ -90,7 +93,8 @@ const useStore = create((set, get) => ({
 export default useStore;
 
 
-const usePlanetStore = create((set) => ({
+const usePlanetStore = create(immer((set, get) => ({
+    // Existing store properties and methods
     displayLabels: false, // render planet names in scene
     toggleDisplayLabels: () => set((state) => ({ displayLabels: !state.displayLabels })),
 
@@ -99,7 +103,6 @@ const usePlanetStore = create((set) => ({
         set((state) => ({
             planetPositions: { ...state.planetPositions, [name]: position },
         })),
-
 
     planetAngles: {},
     updatePlanetAngle: (name, angle) =>
@@ -118,7 +121,19 @@ const usePlanetStore = create((set) => ({
         set(() => ({
             selectedMoon: moonData,
         })),
-}));
+
+    planetsData: planetsData,
+    updatePlanetData: (planetName, updates) => {
+        set((state) => {
+            if (state.planetsData[planetName]) {
+                Object.keys(updates).forEach(key => {
+                    state.planetsData[planetName][key] = updates[key];
+                });
+            }
+        });
+    },
+})));
+
 
 const useCameraStore = create((set) => ({
     surfacePoint: null,

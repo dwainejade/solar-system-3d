@@ -147,10 +147,21 @@ body {
 .Main .menu-con .menu-content .planet-details {
   max-height: 100%;
   overflow-y: auto;
-  /* Enables scrolling */
+  display: flex;
+  flex-direction: column;
 }
 .Main .menu-con .menu-content .planet-details h2 {
   color: #c99050;
+}
+.Main .menu-con .menu-content .planet-details div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 30px;
+  gap: 4px;
+}
+.Main .menu-con .menu-content .planet-details input {
+  width: 80px;
 }
 .Main .menu-con .menu-toggle-btn {
   position: absolute;

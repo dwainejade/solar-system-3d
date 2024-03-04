@@ -5,15 +5,16 @@ import { useFrame, useThree } from "@react-three/fiber";
 import OrbitPath from "./OrbitPath";
 import { Html, Torus } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
-import planetsData, { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
+import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 
 // default values
-const defaultBodyData = planetsData.Earth;
 
-const Planet = forwardRef(({ bodyData, textures }, ref) => {
-  const mergedData = { ...defaultBodyData, ...bodyData };
+const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
+  const { planetsData } = usePlanetStore()
+  const bodyData = planetsData[name];
+
+  const mergedData = { ...bodyData };
   const {
-    name,
     mass,
     radius,
     orbitalOrigin,
