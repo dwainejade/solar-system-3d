@@ -262,9 +262,9 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
           </Html>
         )}
         {/* Plane for surface view */}
-        {surfacePoint && surfaceNormal && isPlanetSelected && (
+        {/* {surfacePoint && surfaceNormal && isPlanetSelected && (
           <SurfaceCamera position={surfacePoint} normal={surfaceNormal} planetRef={localRef} color={color} />
-        )}
+        )} */}
       </group>
 
       {orbitPaths && (
