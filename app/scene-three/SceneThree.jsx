@@ -3,7 +3,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { CameraControls, useTexture, PerspectiveCamera } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "@/store/store";
-import planetsData, { sizeScaleFactor } from "@/data/planetsData";
+import { sizeScaleFactor } from "@/data/planetsData";
 import { moonsData, moonSizeScaleFactor } from "@/data/moonsData";
 
 import Moon from "@/components/Moon";
@@ -13,7 +13,7 @@ import Stars from "@/components/Stars"
 
 const SceneThree = () => {
   const { sunSettings, rotationCounts, simulationDate } = useStore();
-  const { planetPositions, selectedPlanet, setSelectedPlanet, selectedMoon, setSelectedMoon } = usePlanetStore();
+  const { planetPositions, selectedPlanet, setSelectedPlanet, selectedMoon, setSelectedMoon, planetsData } = usePlanetStore();
   const { surfacePoint, isSurfaceCameraActive, triggerReset, setTriggerReset } = useCameraStore();
   const surfaceCameraRef = useRef();
   const cameraControlsRef = useRef();

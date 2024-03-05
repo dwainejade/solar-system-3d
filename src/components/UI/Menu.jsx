@@ -1,13 +1,13 @@
 "use client";
 import React, { useMemo, useState } from "react";
-import useStore, { useCameraStore, usePlanetStore } from "../../store/store";
-import planetsData from "../../data/planetsData";
+import useStore, { usePlanetStore } from "../../store/store";
 import Details from "./PlanetDetails"
 
 const Menu = () => {
   const { simSpeed, setSimSpeed, showConstellations, toggleConstellations, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths, isEditing, setIsEditing } = useStore();
-  const { selectedPlanet, setSelectedPlanet, selectedMoon, displayLabels, toggleDisplayLabels, updateSelectedPlanet } = usePlanetStore();
+  const { selectedPlanet, setSelectedPlanet, selectedMoon, displayLabels, toggleDisplayLabels, updateSelectedPlanet, planetsData } = usePlanetStore();
   const [isMenuOpen, setMenuOpen] = useState(false);
+
   const toggleMenu = () => {
     setMenuOpen(!isMenuOpen);
   };
@@ -118,7 +118,6 @@ const Menu = () => {
               {showConstellations ? "ON" : "OFF"}
             </button>
           </div>
-
 
           {selectedPlanet && (
             <Details />
