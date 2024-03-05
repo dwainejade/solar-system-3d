@@ -13,7 +13,6 @@ const Annotation = ({ label, color, pos, ...props }) => {
       const distance = camera.position.distanceToSquared(pos);
       // Adjust scale based on distance
       const scale = calculateScale(distance);
-      console.log(scale);
       // Apply the scale to the Html element
       ref.current.transform = `scale(${scale})`;
     }
