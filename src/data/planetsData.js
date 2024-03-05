@@ -207,3 +207,9 @@ export default planetsData;
 export const distanceScaleFactor = 0.00001;
 export const sizeScaleFactor = 0.0001;
 export const rotationSpeedScaleFactor = 600000;
+
+// constants for formulas
+export const G = 6.67430e-11; // Gravitational constant in m^3 kg^-1 s^-2
+export const MASS_OF_SUN = 1.989e30; // kg
+export const LUMINOSITY_OF_SUN = 3.828e26; // Watts
+export const STEFAN_BOLTZMANN_CONSTANT = 5.670374419e-8; // W/m^2/K^4
