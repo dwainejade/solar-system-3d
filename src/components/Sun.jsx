@@ -1,12 +1,13 @@
 import React, { useState, useRef } from "react";
 import { usePlanetStore } from "../store/store";
-import planetsData from "../data/planetsData";
+import { sizeScaleFactor } from "../data/planetsData";
 import { Html } from "@react-three/drei";
 
 const Sun = ({ position, resetCamera, textures }) => {
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
-  const { selectedPlanet, setSelectedPlanet, displayLabels } = usePlanetStore();
+  const { selectedPlanet, setSelectedPlanet, displayLabels, planetsData } = usePlanetStore();
+  const sunRadius = planetsData["Sun"].radius * sizeScaleFactor
 
   // Modify the handleClick to account for dragging
   const handleClick = e => {
@@ -65,7 +66,7 @@ const Sun = ({ position, resetCamera, textures }) => {
         onPointerOver={handlePointerOver}
         onPointerOut={handlePointerOut}
       >
-        <sphereGeometry args={[50, 64, 64]} />
+        <sphereGeometry args={[sunRadius, 64, 64]} />
         {textures ? (
           <meshPhysicalMaterial map={textures.map} color={[10, 3, 0]} toneMapped={false} zIndexRange={[100 - 1]} />
         ) : (
