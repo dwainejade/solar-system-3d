@@ -69,21 +69,10 @@ const Menu = () => {
         </button>
 
         <div className="left-con">
-          <div className="menu-item">
-            <label htmlFor="simSpeedSelect">Simulation Speed:</label>
-            <select id="simSpeedSelect" onChange={handleSpeedChange} value={simSpeed}>
-              {speedOptions.map((option, index) => (
-                <option key={index} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
 
           {/* Dropdown for selecting planets */}
           <div className='menu-item'>
-            <label htmlFor='planetSelection'>Select a Planet:</label>
+            <label htmlFor='planetSelection'>Select a Planet</label>
             <select id='planetSelection' onChange={handlePlanetChange} value={selectedPlanet?.name || "Select a Planet"}>
               <option value='Select a Planet' disabled>
                 Select a Planet
@@ -95,23 +84,51 @@ const Menu = () => {
               ))}
             </select>
           </div>
+          {/* Dropdown for sim speed */}
+          <div className="menu-item">
+            <label htmlFor="simSpeedSelect">Simulation Speed</label>
+            <select id="simSpeedSelect" onChange={handleSpeedChange} value={simSpeed}>
+              {speedOptions.map((option, index) => (
+                <option key={index} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
 
         </div>
         {/* divider */}
         <div className="divider" />
         <div className="right-con">
-          <div className='menu-item'>
-            <label htmlFor='orbitPathToggle'>Toggle Orbit Paths:</label>
-            <button id='orbitPathToggle' className='btn' onClick={toggleOrbitPaths}>
-              {orbitPaths ? "ON" : "OFF"}
-            </button>
+          <div className="menu-item">
+            <label htmlFor="orbitPathToggle">Orbit Paths</label>
+            <div className="switch" onClick={() => toggleOrbitPaths(!orbitPaths)}>
+              <input
+                id="orbitPathToggle"
+                type="checkbox"
+                checked={orbitPaths}
+                onChange={() => { }}
+                style={{ display: 'none' }}
+              />
+              <div className="slider round"></div>
+            </div>
+
           </div>
-          <div className='menu-item'>
-            <label htmlFor='labelToggle'>Toggle Labels:</label>
-            <button id='labelToggle' className='btn' onClick={toggleDisplayLabels}>
-              {displayLabels ? "NAMES" : "POINTS"}
-            </button>
+
+          <div className="menu-item">
+            <label htmlFor="labelToggle">Labels</label>
+            <div className="switch" onClick={() => toggleDisplayLabels(!displayLabels)}>
+              <input
+                id="labelToggle"
+                type="checkbox"
+                checked={displayLabels}
+                onChange={() => { }}
+                style={{ display: 'none' }}
+              />
+              <div className="slider round"></div>
+            </div>
           </div>
+
           {/* <div className='menu-item'>
             <label htmlFor='fullscreenToggle'>Toggle Fullscreen:</label>
             <button id='fullscreenToggle' onClick={toggleFullscreen} className='btn'>
@@ -125,13 +142,11 @@ const Menu = () => {
             </button>
           </div> */}
         </div>
-
-
       </div>
 
       {/* Side menu */}
       <div className={`side-menu`}>
-        {isMenuOpen && selectedPlanet && (
+        {selectedPlanet && (
           <Details />
         )}
       </div>
