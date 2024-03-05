@@ -14,29 +14,29 @@ const Menu = () => {
 
 
   const speedOptions = [
-    { label: "-5 year /s", value: -157788000 },
+    // { label: "-5 year /s", value: -157788000 },
     { label: "-1 year /s", value: -31557600 },
-    { label: "-3 month /s", value: -7889400 },
+    // { label: "-3 month /s", value: -7889400 },
     { label: "-1 month /s", value: -2629800 },
-    { label: "-2 week /s", value: -1209600 },
+    // { label: "-2 week /s", value: -1209600 },
     { label: "-1 week /s", value: -604800 },
     { label: "-1 day /s", value: -86400 },
-    { label: "-4 hour /s", value: -14400 },
+    // { label: "-4 hour /s", value: -14400 },
     { label: "-1 hour /s", value: -3600 },
-    { label: "-30 minute /s", value: -1800 },
+    // { label: "-30 minute /s", value: -1800 },
     { label: "-1 minute /s", value: -60 },
     { label: "Realtime", value: 1 },
     { label: "1 minute /s", value: 60 },
-    { label: "30 min /s", value: 1800 },
+    // { label: "30 min /s", value: 1800 },
     { label: "1 hour /s", value: 3600 },
-    { label: "4 hour /s", value: 14400 },
+    // { label: "4 hour /s", value: 14400 },
     { label: "1 day /s", value: 86400 },
     { label: "1 week /s", value: 604800 },
-    { label: "2 week /s", value: 1209600 },
+    // { label: "2 week /s", value: 1209600 },
     { label: "1 month /s", value: 2629800 },
-    { label: "3 month /s", value: 7889400 },
+    // { label: "3 month /s", value: 7889400 },
     { label: "1 year /s", value: 31557600 },
-    { label: "5 year /s", value: 157788000 },
+    // { label: "5 year /s", value: 157788000 },
   ];
   // Finding the index of the current simulation speed in the speedOptions array
   const currentSpeedIndex = useMemo(
@@ -44,10 +44,10 @@ const Menu = () => {
     [simSpeed]
   );
 
-  // Handle the change in slider value
-  const handleSliderChange = (event) => {
-    const newIndex = parseInt(event.target.value, 10);
-    setSimSpeed(speedOptions[newIndex].value);
+  // Adjust this function to handle dropdown changes
+  const handleSpeedChange = (event) => {
+    const newSpeed = parseInt(event.target.value, 10);
+    setSimSpeed(newSpeed);
   };
 
   // Handle planet selection change
@@ -61,23 +61,25 @@ const Menu = () => {
 
   return (
     <div className="menu-wrapper">
-      <div className={`menu-con ${isMenuOpen ? "open" : "close"}`}>
+
+      {/* Bottom menu */}
+      <div className={`bottom-menu`}>
         <button onClick={toggleMenu} className='menu-toggle-btn'>
           Menu
         </button>
-        <div className='menu-content'>
+
+        <div className="left-con">
           <div className="menu-item">
-            <label htmlFor="simSpeed">Simulation Speed: {speedOptions[currentSpeedIndex].label}</label>
+            <label htmlFor="simSpeedSelect">Simulation Speed:</label>
+            <select id="simSpeedSelect" onChange={handleSpeedChange} value={simSpeed}>
+              {speedOptions.map((option, index) => (
+                <option key={index} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
-          <input
-            id="simSpeed"
-            type="range"
-            min="0"
-            max={speedOptions.length - 1}
-            value={currentSpeedIndex}
-            onChange={handleSliderChange}
-            className="slider"
-          />
+
 
           {/* Dropdown for selecting planets */}
           <div className='menu-item'>
@@ -94,12 +96,10 @@ const Menu = () => {
             </select>
           </div>
 
-          <div className='menu-item'>
-            <label htmlFor='fullscreenToggle'>Toggle Fullscreen:</label>
-            <button id='fullscreenToggle' onClick={toggleFullscreen} className='btn'>
-              {fullscreen ? "ON" : "OFF"}
-            </button>
-          </div>
+        </div>
+        {/* divider */}
+        <div className="divider" />
+        <div className="right-con">
           <div className='menu-item'>
             <label htmlFor='orbitPathToggle'>Toggle Orbit Paths:</label>
             <button id='orbitPathToggle' className='btn' onClick={toggleOrbitPaths}>
@@ -112,17 +112,28 @@ const Menu = () => {
               {displayLabels ? "NAMES" : "POINTS"}
             </button>
           </div>
-          <div className='menu-item'>
+          {/* <div className='menu-item'>
+            <label htmlFor='fullscreenToggle'>Toggle Fullscreen:</label>
+            <button id='fullscreenToggle' onClick={toggleFullscreen} className='btn'>
+              {fullscreen ? "ON" : "OFF"}
+            </button>
+          </div> */}
+          {/* <div className='menu-item'>
             <label htmlFor='constellationsToggle'>Toggle Constellations:</label>
             <button id='constellationsToggle' className='btn' onClick={toggleConstellations}>
               {showConstellations ? "ON" : "OFF"}
             </button>
-          </div>
-
-          {selectedPlanet && (
-            <Details />
-          )}
+          </div> */}
         </div>
+
+
+      </div>
+
+      {/* Side menu */}
+      <div className={`side-menu`}>
+        {isMenuOpen && selectedPlanet && (
+          <Details />
+        )}
       </div>
     </div>
   );
