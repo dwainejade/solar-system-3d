@@ -147,10 +147,10 @@ const SceneThree = () => {
   // camera settings
   const cameraConfig = {
     maxDistance: 90000,
-    smoothTime: 0.8, // 1.5 is default
+    smoothTime: 1, // 1.5 is default
     truckSpeed: 0.6,
     rotateSpeed: 0.6,
-    zoomSpeed: 0.1,
+
   };
 
   const renderMoons = (planetName, planetData) => {
@@ -168,7 +168,7 @@ const SceneThree = () => {
       )}
 
       {/* First Person Camera */}
-      {surfacePoint && isSurfaceCameraActive && (
+      {/* {surfacePoint && isSurfaceCameraActive && (
         <PerspectiveCamera
           ref={surfaceCameraRef}
           makeDefault
@@ -177,7 +177,7 @@ const SceneThree = () => {
           near={0.01}
           far={1000000}
         />
-      )}
+      )} */}
 
       <Stars />
 

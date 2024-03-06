@@ -1,17 +1,27 @@
 "use client";
 import React, { useMemo, useState } from "react";
-import useStore, { usePlanetStore } from "../../store/store";
+import useStore, { usePlanetStore, useCameraStore } from "../../store/store";
 import Details from "./PlanetDetails"
 
 const Menu = () => {
   const { simSpeed, setSimSpeed, showConstellations, toggleConstellations, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths, isEditing, setIsEditing } = useStore();
-  const { selectedPlanet, setSelectedPlanet, selectedMoon, displayLabels, toggleDisplayLabels, updateSelectedPlanet, planetsData } = usePlanetStore();
+  const { selectedPlanet, setSelectedPlanet, selectedMoon, displayLabels, toggleDisplayLabels, updateSelectedPlanet, planetsData, resetPlanetsData } = usePlanetStore();
+  const { setTriggerReset } = useCameraStore()
+
   const [isMenuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => {
     setMenuOpen(!isMenuOpen);
   };
 
+  const resetCamera = () => {
+    // setTriggerReset(true)
+    resetPlanetsData()
+  };
+
+  const handleFullscreen = () => {
+    toggleFullscreen()
+  }
 
   const speedOptions = [
     // { label: "-5 year /s", value: -157788000 },
@@ -62,9 +72,9 @@ const Menu = () => {
   return (
     <div className="menu-wrapper">
       {/* reset button */}
-      <button className="reset-all-btn btn" />
+      <button className="reset-all-btn btn" onClick={resetCamera} />
       {/* fullscreen button */}
-      <button className="fullscreen-btn btn" />
+      <button className="fullscreen-btn btn" onClick={handleFullscreen} />
 
       {/* Bottom menu */}
       <div className={`bottom-menu ${isMenuOpen ? "open" : "closed"}`}>
@@ -78,8 +88,8 @@ const Menu = () => {
           <div className='menu-item'>
             <label htmlFor='planetSelection'>Select a Planet</label>
             <select id='planetSelection' onChange={handlePlanetChange} value={selectedPlanet?.name || "Select a Planet"}>
-              <option value='Select a Planet' disabled>
-                Select a Planet
+              <option value='Select a Planet'>
+                Solar System
               </option>
               {Object.keys(planetsData).map(planetName => (
                 <option key={planetName} value={planetName}>

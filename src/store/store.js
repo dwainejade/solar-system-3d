@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer'
 import * as THREE from 'three';
-import planetsData from '../data/planetsData';
+import initialPlanetsData from '../data/planetsData';
 
 const useStore = create((set, get) => ({
     simSpeed: 1, // 1 is realtime speed
@@ -122,13 +122,26 @@ const usePlanetStore = create(immer((set, get) => ({
             selectedMoon: moonData,
         })),
 
-    planetsData: planetsData,
+    planetsData: initialPlanetsData,
     updatePlanetData: (planetName, updates) => {
         set((state) => {
             if (state.planetsData[planetName]) {
                 Object.keys(updates).forEach(key => {
                     state.planetsData[planetName][key] = updates[key];
                 });
+            }
+        });
+    },
+    // Action to reset all planetsData to initial state
+    resetPlanetsData: () => {
+        set((state) => {
+            state.planetsData = initialPlanetsData;
+        });
+    },
+    resetSinglePlanetData: (planetName) => {
+        set((state) => {
+            if (state.planetsData[planetName] && initialPlanetsData[planetName]) {
+                state.planetsData[planetName] = initialPlanetsData[planetName];
             }
         });
     },
