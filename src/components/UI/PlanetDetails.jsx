@@ -10,13 +10,13 @@ const calculateOrbitalPeriod = (radiusKm) => {
   const radiusMeters = radiusKm * 1000; // Convert km to meters
   const periodSeconds = Math.sqrt((4 * Math.PI ** 2 * radiusMeters ** 3) / (G * MASS_OF_SUN));
   const periodDays = periodSeconds / (60 * 60 * 24); // Convert seconds to days
-  return periodDays.toFixed(2); // Limit to 2 decimal places
+  return periodDays.toFixed(1); // Limit to 2 decimal places
 };
 
 const calculateSunGravitationalPull = (distanceKm) => {
   const distanceMeters = distanceKm * 1000; // Convert km to meters
-  const gravitationalPull = (G * MASS_OF_SUN) / (distanceMeters ** 2);
-  return gravitationalPull; // Returns gravitational pull in m/s^2
+  const pull = (G * MASS_OF_SUN) / (distanceMeters ** 2);
+  return pull;
 };
 
 const Menu = () => {
@@ -26,8 +26,6 @@ const Menu = () => {
   const [gravitationalPull, setGravitationalPull] = useState(0)
   useEffect(() => {
     if (selectedPlanet) {
-      // Directly set editablePlanet to reflect the latest data from planetsData
-      // This ensures that changes to planetsData are reflected here
       const currentPlanetData = planetsData[selectedPlanet.name];
       setEditablePlanet(currentPlanetData || {});
       setGravitationalPull(calculateSunGravitationalPull(selectedPlanet.orbitalRadius))
@@ -48,17 +46,23 @@ const Menu = () => {
   const handleChange = (field) => (e) => {
     let newValue = e.target.type === 'number' ? Number(e.target.value) : e.target.value;
 
+    // Create a copy of the editablePlanet to modify
     let updatedPlanet = { ...editablePlanet, [field]: newValue };
 
-    // Recalculate both the orbitalPeriod and temperature when orbitalRadius is changed
     if (field === 'orbitalRadius') {
+      // Recalculate the orbital period and gravitational pull
       const newOrbitalPeriod = calculateOrbitalPeriod(newValue);
-      const newGravitationalPull = calculateSunGravitationalPull(newValue); // Assuming newValue is the distance from the Sun in km
-      updatedPlanet = { ...updatedPlanet, orbitalPeriod: newOrbitalPeriod, gravity: newGravitationalPull.toFixed(2) };
+      const acceleration = calculateSunGravitationalPull(newValue);
+      updatedPlanet.orbitalPeriod = newOrbitalPeriod;
+      updatedPlanet.gravitationalAcceleration = acceleration.toFixed(3);
     }
-
     setEditablePlanet(updatedPlanet);
+
+    if (isEditing) {
+      updatePlanetData(selectedPlanet.name, updatedPlanet);
+    }
   };
+
 
 
   return (
@@ -88,16 +92,10 @@ const Menu = () => {
           </div>
           <div className="item w2">
             <label htmlFor="orbitalPeriod">Orbital Period:</label>
-            <input
-              type="text"
-              value={editablePlanet.orbitalPeriod || ''}
-              onChange={handleChange('orbitalPeriod')}
-              disabled={!isEditing}
-            />
-            <span>days</span>
+            <span>{editablePlanet.orbitalPeriod || ''} days</span>
           </div>
           <div className="item w2">
-            <label htmlFor="rotationPeriod">Rotation Period:</label>
+            <label htmlFor="rotationPeriod">Day Length:</label>
             <input
               type="text"
               value={editablePlanet.rotationPeriod || ''}
@@ -107,8 +105,9 @@ const Menu = () => {
             <span>hours</span>
           </div>
           <div className="item w4">
-            <label htmlFor="gravity">Gravitational Pull:</label>
-            <p>{gravitationalPull.toFixed(3) || ''} m/s²</p>
+            <label htmlFor="gravity">Acceleration:</label>
+            <span>{editablePlanet.gravitationalAcceleration || ''} m/s²</span>
+
           </div>
 
           <div className='button-con'>

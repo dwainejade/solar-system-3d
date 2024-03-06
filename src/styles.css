@@ -187,7 +187,7 @@ body {
   background-color: #fdf3e0;
   position: absolute;
   height: fit-content;
-  width: 250px;
+  width: 260px;
   top: 20%;
   right: -100%;
   display: flex;
@@ -221,6 +221,7 @@ body {
 .Main .menu-wrapper .side-menu .item input {
   width: 100px;
   font-size: 1rem;
+  color: #861b1d;
 }
 .Main .menu-wrapper .side-menu .item input:disabled {
   color: #463a39;
