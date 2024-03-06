@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import useStore, { usePlanetStore, useCameraStore } from "../../store/store";
 import Details from "./PlanetDetails"
 
@@ -14,10 +14,13 @@ const Menu = () => {
     setMenuOpen(!isMenuOpen);
   };
 
-  const resetCamera = () => {
-    // setTriggerReset(true)
+  const resetAll = () => {
+    setTriggerReset(true)
     resetPlanetsData()
   };
+  const resetCamera = () => {
+    setTriggerReset(true)
+  }
 
   const handleFullscreen = () => {
     toggleFullscreen()
@@ -48,11 +51,6 @@ const Menu = () => {
     { label: "1 year /s", value: 31557600 },
     // { label: "5 year /s", value: 157788000 },
   ];
-  // Finding the index of the current simulation speed in the speedOptions array
-  const currentSpeedIndex = useMemo(
-    () => speedOptions.findIndex(option => option.value === simSpeed),
-    [simSpeed]
-  );
 
   // Adjust this function to handle dropdown changes
   const handleSpeedChange = (event) => {
@@ -62,17 +60,20 @@ const Menu = () => {
 
   // Handle planet selection change
   const handlePlanetChange = e => {
-    // Update selected planet based on user selection
     const newSelectedPlanetName = e.target.value;
-    const newSelectedPlanet = planetsData[newSelectedPlanetName];
-    setSelectedPlanet(newSelectedPlanet); // Update the selected planet in the store
-  };
-
+    if (newSelectedPlanetName === 'reset-camera') {
+      resetCamera();
+      setSelectedPlanet(null);
+    } else {
+      const newSelectedPlanet = planetsData[newSelectedPlanetName];
+      setSelectedPlanet(newSelectedPlanet);
+    };
+  }
 
   return (
     <div className="menu-wrapper">
       {/* reset button */}
-      <button className="reset-all-btn btn" onClick={resetCamera} />
+      <button className="reset-all-btn btn" onClick={resetAll} />
       {/* fullscreen button */}
       <button className="fullscreen-btn btn" onClick={handleFullscreen} />
 
@@ -88,7 +89,7 @@ const Menu = () => {
           <div className='menu-item'>
             <label htmlFor='planetSelection'>Select a Planet</label>
             <select id='planetSelection' onChange={handlePlanetChange} value={selectedPlanet?.name || "Select a Planet"}>
-              <option value='Select a Planet'>
+              <option value='reset-camera'>
                 Solar System
               </option>
               {Object.keys(planetsData).map(planetName => (
