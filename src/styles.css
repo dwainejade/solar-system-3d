@@ -38,6 +38,12 @@ body {
   overflow: hidden;
   position: relative;
 }
+.Main .btn {
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  pointer-events: auto;
+}
 .Main.fullscreen {
   max-width: 100vw;
   max-height: 100dvh;
@@ -104,7 +110,7 @@ body {
 }
 .Main .menu-wrapper .bottom-menu {
   position: relative;
-  bottom: 0;
+  bottom: -85px;
   left: 0;
   display: flex;
   flex-direction: row;
@@ -116,14 +122,30 @@ body {
   background-color: #dcccad;
   color: #463a39;
   margin: auto auto 0 auto;
-  pointer-events: all;
+  pointer-events: auto;
   padding: 1.5%;
   border-radius: 6px 6px 0 0;
+  transition: bottom 0.3s ease-in-out;
+}
+.Main .menu-wrapper .bottom-menu.open {
+  bottom: 0;
+  /* Slide up */
+}
+.Main .menu-wrapper .bottom-menu.open .menu-toggle-btn {
+  rotate: 180deg;
 }
 .Main .menu-wrapper .bottom-menu .menu-toggle-btn {
   position: absolute;
   left: 5%;
-  top: -8px;
+  top: -20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  border: 0;
+  background: url("../public/assets/icons/chevron.svg") no-repeat center center;
+  background-size: 70%;
+  background-color: #c99050;
+  transition: rotate ease 0.3s;
 }
 .Main .menu-wrapper .bottom-menu .left-con,
 .Main .menu-wrapper .bottom-menu .right-con {
@@ -163,12 +185,70 @@ body {
   height: fit-content;
   width: 250px;
   top: 20%;
-  right: 0;
+  right: -100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
   border-radius: 6px 0 0 6px;
+  padding: 2%;
+  pointer-events: auto;
+  transition: all 0.3s ease-out;
+}
+.Main .menu-wrapper .side-menu.open {
+  right: 0;
+}
+.Main .menu-wrapper .side-menu h2 {
+  font: 1.4rem;
+  margin: 0;
+}
+.Main .menu-wrapper .side-menu .item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 6px;
+  height: 24px;
+}
+.Main .menu-wrapper .side-menu .item input {
+  width: 90px;
+}
+.Main .menu-wrapper .side-menu .item.w1 {
+  width: 140px;
+}
+.Main .menu-wrapper .side-menu .button-con {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-evenly;
+}
+.Main .menu-wrapper .side-menu .button-con .edit-planet-btn,
+.Main .menu-wrapper .side-menu .button-con .reset-planet-btn {
+  height: 30px;
+  width: 90px;
+}
+.Main .menu-wrapper .side-menu .button-con .edit-planet-btn {
+  background-color: #c99050;
+  color: #fff;
+}
+.Main .menu-wrapper .side-menu .button-con .reset-planet-btn {
+  background-color: #861b1d;
+  color: #fff;
+}
+.Main .reset-all-btn,
+.Main .fullscreen-btn {
+  position: absolute;
+  top: 0;
+  height: 40px;
+  width: 40px;
+}
+.Main .reset-all-btn {
+  left: 0;
+  background: url("../public/assets/icons/reset.svg") no-repeat center center;
+  background-size: 70%;
+}
+.Main .fullscreen-btn {
+  right: 0;
+  background: url("../public/assets/icons/fullscreen.svg") no-repeat center center;
+  background-size: 80%;
 }
 .Main .switch {
   position: relative;
@@ -211,6 +291,21 @@ body {
 }
 .Main .switch input:checked + .slider:before {
   transform: translateX(30px);
+}
+.Main select {
+  background-color: #fdf5e8;
+  color: #463a39;
+  border: none;
+  padding: 8px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  border-radius: 0;
+}
+.Main select option:checked {
+  background-color: #add1d7;
 }
 .Main .label-wrap {
   width: 2px;

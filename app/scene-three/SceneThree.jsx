@@ -5,7 +5,6 @@ import { CameraControls, useTexture, PerspectiveCamera } from "@react-three/drei
 import useStore, { useCameraStore, usePlanetStore } from "@/store/store";
 import { sizeScaleFactor } from "@/data/planetsData";
 import { moonsData, moonSizeScaleFactor } from "@/data/moonsData";
-
 import Moon from "@/components/Moon";
 import Sun from "@/components/Sun";
 import Planet from "@/components/PlanetBasic";
@@ -18,6 +17,14 @@ const SceneThree = () => {
   const surfaceCameraRef = useRef();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
+
+
+  // A simplistic approach to calculate optimal distance
+  const calculateOptimalDistance = (planetRadius) => {
+    const baseDistance = 4.2;
+    return planetRadius * baseDistance;
+  }
+
 
   const resetCamera = () => {
     if (!cameraControlsRef.current) return;
@@ -111,13 +118,6 @@ const SceneThree = () => {
   //   }
   // });
 
-  // A simplistic approach to calculate optimal distance
-  function calculateOptimalDistance(planetRadius) {
-    // This is a simple heuristic. You might need a more complex calculation based on FOV and viewport size.
-    const baseDistance = 4; // This depends on how large you want the planet to appear
-    return planetRadius * baseDistance;
-  }
-
   const earthTextures = useTexture({
     map: "../assets/earth/2k_earth_daymap.jpg",
   });
@@ -164,7 +164,7 @@ const SceneThree = () => {
   return (
     <>
       {!isSurfaceCameraActive && (
-        <CameraControls ref={cameraControlsRef} makeDefault {...cameraConfig} minDistance={Math.max(0.02, minDistance)} />
+        <CameraControls ref={cameraControlsRef} makeDefault {...cameraConfig} minDistance={Math.min(1, minDistance)} />
       )}
 
       {/* First Person Camera */}

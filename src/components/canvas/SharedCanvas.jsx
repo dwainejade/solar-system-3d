@@ -5,7 +5,8 @@ import { Canvas } from "@react-three/fiber";
 import { Html, Preload, Stats, useProgress } from "@react-three/drei";
 import useStore, { useCameraStore } from "../../store/store";
 import Menu from "../UI/Menu";
-import { Bloom, EffectComposer } from "@react-three/postprocessing";
+import { Bloom, EffectComposer, Noise } from "@react-three/postprocessing";
+import { BlendFunction } from "postprocessing";
 import ContextMenu from "../ContextMenu";
 import "../../styles.css";
 
@@ -65,22 +66,23 @@ const SharedCanvas = ({ children }) => {
 
   return (
     <div className={`Main ${fullscreen ? "fullscreen" : "minimized"}`}>
-      <Canvas id='Canvas' dpr={[1, 2]} camera={{ fov: 50, position: [5000, 5000, 5000], near: 0.1, far: 1000000 }}
+      <Canvas id='Canvas' dpr={[1, 2]} camera={{ fov: 50, position: [5000, 5000, 5000], near: 0.01, far: 1000000 }}
         onAuxClick={handleAuxClick}
       >
         <Suspense fallback={<Loader />}>
-          <Stats />
+          {/* <Stats /> */}
           {/* <ambientLight intensity={0.04} /> */}
           <pointLight color='#f6f3ea' intensity={2} position={[0, 0, 0]} />
           <EffectComposer>
-            <Bloom mipmapBlur intensity={0.3} luminanceThreshold={1} luminanceSmoothing={1.2} radius={0.6} />
+            <Bloom mipmapBlur intensity={.6} luminanceThreshold={1} luminanceSmoothing={1.2} radius={.6} />
+            <Noise premultiply blendFunction={BlendFunction.ADD} opacity={.85} />
           </EffectComposer>
 
           {children}
         </Suspense>
         <Preload all />
       </Canvas>
-      {contextMenu.visible && <ContextMenu x={contextMenu.x} y={contextMenu.y} onResetView={resetCamera} />}
+      {/* {contextMenu.visible && <ContextMenu x={contextMenu.x} y={contextMenu.y} onResetView={resetCamera} />} */}
       <Menu />
     </div>
   );

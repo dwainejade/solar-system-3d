@@ -55,6 +55,13 @@ body {
   overflow: hidden;
   position: relative;
 
+  .btn {
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
   &.fullscreen {
     max-width: 100vw;
     max-height: 100dvh;
@@ -135,7 +142,7 @@ body {
 
     .bottom-menu {
       position: relative;
-      bottom: 0;
+      bottom: -85px;
       left: 0;
       display: flex;
       flex-direction: row;
@@ -147,14 +154,29 @@ body {
       background-color: @bg-color-1;
       color: @text-color-1;
       margin: auto auto 0 auto;
-      pointer-events: all;
+      pointer-events: auto;
       padding: 1.5%;
       border-radius: 6px 6px 0 0;
+      transition: bottom 0.3s ease-in-out;
+      &.open {
+        bottom: 0; /* Slide up */
 
+        .menu-toggle-btn {
+          rotate: 180deg;
+        }
+      }
       .menu-toggle-btn {
         position: absolute;
         left: 5%;
-        top: -8px;
+        top: -20px;
+        width: 40px;
+        height: 40px;
+        border-radius: 20px;
+        border: 0;
+        background: url("../public/assets/icons/chevron.svg") no-repeat center center;
+        background-size: 70%;
+        background-color: @btn-color-1;
+        transition: rotate ease 0.3s;
       }
       .left-con,
       .right-con {
@@ -195,13 +217,87 @@ body {
       height: fit-content;
       width: 250px;
       top: 20%;
-      right: 0;
+      right: -100%;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      align-items: center;
       border-radius: 6px 0 0 6px;
+      padding: 2%;
+      pointer-events: auto;
+      transition: all 0.3s ease-out;
+      &.open {
+        right: 0;
+      }
+
+      h2 {
+        font: 1.4rem;
+        margin: 0;
+      }
+
+      .item {
+        display: flex;
+        flex-direction: row;
+        // justify-content: space-between;
+        align-items: center;
+        margin-top: 6px;
+        height: 24px;
+        input {
+          width: 90px;
+        }
+
+        &.w1 {
+          width: 140px;
+        }
+        &.w2 {
+        }
+        &.w3 {
+        }
+        &.w4 {
+        }
+
+        .values {
+        }
+      }
+
+      .button-con {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-evenly;
+
+        .edit-planet-btn,
+        .reset-planet-btn {
+          height: 30px;
+          width: 90px;
+        }
+        .edit-planet-btn {
+          background-color: @btn-color-1;
+          color: #fff;
+        }
+        .reset-planet-btn {
+          background-color: @btn-color-2;
+          color: #fff;
+        }
+      }
     }
+  }
+
+  .reset-all-btn,
+  .fullscreen-btn {
+    position: absolute;
+    top: 0;
+    height: 40px;
+    width: 40px;
+  }
+  .reset-all-btn {
+    left: 0;
+    background: url("../public/assets/icons/reset.svg") no-repeat center center;
+    background-size: 70%;
+  }
+  .fullscreen-btn {
+    right: 0;
+    background: url("../public/assets/icons/fullscreen.svg") no-repeat center center;
+    background-size: 80%;
   }
 
   // Switch sliders
@@ -254,91 +350,23 @@ body {
     }
   }
 
-  // MENU
-  // .menu-con {
-  //   position: absolute;
-  //   top: 0;
-  //   right: 0;
-  //   width: 300px;
-  //   height: 100%; /* Full height of its parent */
-  //   background-color: #243e4f;
-  //   color: #deceae;
-  //   transition:
-  //     width ease-in-out 0.2s,
-  //     height ease-in-out 0.2s;
-
-  //   &.close {
-  //     width: 0;
-  //     height: 0;
-  //     .menu-content {
-  //       opacity: 0;
-  //     }
-  //   }
-  //   &.open {
-  //     width: 300px;
-  //   }
-
-  //   .btn {
-  //     border: 0;
-  //     border-radius: 5px;
-  //     background-color: #ddcdad;
-  //   }
-
-  //   .menu-content {
-  //     display: flex;
-  //     flex-direction: column;
-  //     gap: 4px;
-  //     margin-top: 40px;
-  //     padding: 0 2%;
-  //     max-height: 100%; /* Set max height to 100% of parent */
-  //     overflow-y: auto; /* Enables scrolling */
-
-  //     .menu-item {
-  //       display: flex;
-  //       flex-direction: row;
-  //       align-items: center;
-  //       gap: 10px;
-  //       label {
-  //         flex: 1 1;
-  //       }
-  //       input {
-  //         width: 60px;
-  //       }
-  //     }
-
-  //     .planet-details {
-  //       max-height: 100%;
-  //       overflow-y: auto;
-  //       display: flex;
-  //       flex-direction: column;
-
-  //       h2 {
-  //         color: #c99050;
-  //       }
-  //       div {
-  //         display: flex;
-  //         flex-direction: row;
-  //         align-items: center;
-  //         height: 30px;
-  //         gap: 4px;
-  //       }
-  //       input {
-  //         width: 80px;
-  //       }
-  //     }
-  //   }
-
-  //   .menu-toggle-btn {
-  //     position: absolute;
-  //     right: 0;
-  //     top: 0;
-  //     background-color: #ddcdad;
-  //     border: none;
-  //     cursor: pointer;
-  //     padding: 5px 10px;
-  //     border-radius: 5px;
-  //   }
-  // }
+  // dropdown styling
+  select {
+    background-color: #fdf5e8;
+    color: #463a39;
+    border: none;
+    padding: 8px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    // background-image: url("dropdown-arrow.png"); /* Your dropdown arrow image */
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    border-radius: 0;
+  }
+  select option:checked {
+    background-color: #add1d7;
+  }
 
   // Planet labels
   .label-wrap {

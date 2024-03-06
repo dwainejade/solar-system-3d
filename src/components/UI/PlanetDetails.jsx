@@ -90,103 +90,86 @@ const Menu = () => {
 
   return (
     <>
-      <h2>{selectedPlanet.name}</h2>
-      <div className='menu-item'>
-        <button onClick={toggleEditing} className='btn'>
-          {isEditing ? "Save Changes" : "Edit Details"}
-        </button>
-      </div>
+      <h2>{selectedPlanet?.name}</h2>
 
       {editablePlanet && (
-        <div className='planet-details'>
-          <div>
-            <label htmlFor="mass">Mass:</label>
-            {isEditing ? (
-              <input
-                type="text"
-                id="mass"
-                value={editablePlanet.mass || ''}
-                onChange={handleChange('mass')}
-              />
-            ) : (
-              <span> {editablePlanet.mass?.toString().replace("e+", "e")} kg</span>
-            )}
+        <div className={`planet-details ${isEditing ? 'editing' : 'saved'}`}>
+          <div className="item w1">
+            <label htmlFor="mass">Mass</label>
+            <input
+              type="text"
+              id="mass"
+              value={editablePlanet.mass || ''}
+              onChange={handleChange('mass')}
+              disabled={!isEditing}
+            />
+            <span>kg</span>
           </div>
-          <div>
-            <label htmlFor="radius">Planet Radius:</label>
-            {isEditing ? (
-              <input
-                type="text"
-                id="radius"
-                value={editablePlanet.radius || ''}
-                onChange={handleChange('radius')}
-              />
-            ) : (
-              <span> {editablePlanet.radius} km</span>
-            )}
+          <div className="item w1">
+            <label htmlFor="radius">Radius</label>
+            <input
+              type="text"
+              id="radius"
+              value={editablePlanet.radius || ''}
+              onChange={handleChange('radius')}
+              disabled={!isEditing}
+            />
+            <span>km</span>
           </div>
-          <div>
-            <label htmlFor="orbitalRadius">Orbital Radius:</label>
-            {isEditing ? (
-              <input
-                type="text"
-                id="orbitalRadius"
-                value={editablePlanet.orbitalRadius || ''}
-                onChange={handleChange('orbitalRadius')}
-              />
-            ) : (
-              <span> {editablePlanet.orbitalRadius} km</span>
-            )}
+          <div className="item w2">
+            <label htmlFor="orbitalRadius">Orbit Radius:</label>
+            <input
+              type="text"
+              id="orbitalRadius"
+              value={editablePlanet.orbitalRadius || ''}
+              onChange={handleChange('orbitalRadius')}
+              disabled={!isEditing}
+            />
+            <span>km</span>
           </div>
-          <div>
+          <div className="item w2">
             <label htmlFor="orbitalPeriod">Orbital Period:</label>
-            {isEditing ? (
-              <input
-                type="text"
-                value={editablePlanet.orbitalPeriod || ''}
-                onChange={handleChange('orbitalPeriod')}
-              />
-            ) : (
-              <span> {editablePlanet.orbitalPeriod} days</span>
-            )}
+            <input
+              type="text"
+              value={editablePlanet.orbitalPeriod || ''}
+              onChange={handleChange('orbitalPeriod')}
+              disabled={!isEditing}
+            />
+            <span>days</span>
           </div>
-          <div>
+          <div className="item w2">
             <label htmlFor="rotationPeriod">Rotation Period:</label>
-            {isEditing ? (
-              <input
-                type="text"
-                value={editablePlanet.rotationPeriod || ''}
-                onChange={handleChange('rotationPeriod')}
-              />
-            ) : (
-              <span> {editablePlanet.rotationPeriod} hours</span>
-            )}
+            <input
+              type="text"
+              value={editablePlanet.rotationPeriod || ''}
+              onChange={handleChange('rotationPeriod')}
+              disabled={!isEditing}
+            />
+            <span>hours</span>
           </div>
-          <div>
-            <label htmlFor="surfaceTemp">Surface Temperature:</label>
-            {isEditing ? (
-              <input
-                type="text"
-                value={editablePlanet.surfaceTemp || ''}
-                onChange={handleChange('surfaceTemp')}
-              />
-            ) : (
-              <span> {editablePlanet.surfaceTemp} °C</span>
-            )}
-          </div>
-          <div>
+          <div className="item w4">
             <label htmlFor="gravity">Gravity:</label>
-            {isEditing ? (
-              <input
-                type="text"
-                value={editablePlanet.gravity || ''}
-                onChange={handleChange('gravity')}
-              />
-            ) : (
-              <span> {editablePlanet.gravity} m/s²</span>
-            )}
+            <input
+              type="text"
+              value={editablePlanet.gravity || ''}
+              onChange={handleChange('gravity')}
+              disabled={!isEditing}
+            />
+            <span>m/s²</span>
+          </div>
+
+          <div className='button-con'>
+            <button onClick={toggleEditing} className='edit-planet-btn btn'>
+              {isEditing ? "Save Changes" : "Adjust Values"}
+            </button>
+
+            <button onClick={() => { }} className='reset-planet-btn btn'>
+              Reset Values
+            </button>
           </div>
         </div>
+
+
       )}
     </>
   );

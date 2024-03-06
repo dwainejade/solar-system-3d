@@ -61,11 +61,15 @@ const Menu = () => {
 
   return (
     <div className="menu-wrapper">
+      {/* reset button */}
+      <button className="reset-all-btn btn" />
+      {/* fullscreen button */}
+      <button className="fullscreen-btn btn" />
 
       {/* Bottom menu */}
-      <div className={`bottom-menu`}>
-        <button onClick={toggleMenu} className='menu-toggle-btn'>
-          Menu
+      <div className={`bottom-menu ${isMenuOpen ? "open" : "closed"}`}>
+        <button onClick={toggleMenu} className='menu-toggle-btn btn'>
+
         </button>
 
         <div className="left-con">
@@ -145,10 +149,8 @@ const Menu = () => {
       </div>
 
       {/* Side menu */}
-      <div className={`side-menu`}>
-        {selectedPlanet && (
-          <Details />
-        )}
+      <div className={`side-menu ${selectedPlanet ? 'open' : 'closed'}`}>
+        <Details />
       </div>
     </div>
   );
