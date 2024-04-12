@@ -14,12 +14,11 @@ npm install
 npm run dev
 npm run build
 npm run preview
-npm run sandbox
 ```
 
 ### TODOS
 
-- [ ] Add labels to planets
+- [x] Add labels to planets
 - [x] Match realtime orbit speeds
 - [x] Implement onclick interactions for detailed planet information
 - [ ] Angle orbit paths to reflect real orbital inclinations

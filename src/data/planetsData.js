@@ -16,13 +16,44 @@ const sunData = {
     surfaceTemp: 5505, // in Celsius (average effective temperature)
     color: "#FFFF00", // Bright yellow color
     gravity: 274, // in m/s² (surface gravity)
-    textures: {
-        map: '/assets/sun/2k_sun.jpg', // Base texture
-        highResMap: '/assets/sun/2k_sun.jpg' // Higher resolution texture
-    },
 };
 
-// Similar data objects for other planets...
+const mercuryData = {
+    name: "Mercury",
+    mass: 3.285e23, // in kilograms
+    radius: 2439.7, // in kilometers
+    orbitalOrigin: sunPosition,
+    orbitalRadius: 57.9e6, // in kilometers
+    orbitalSpeed: 47.87, // in kilometers per second
+    orbitalPeriod: 88, // in Earth days
+    initialOrbitalAngle: Math.random() * 360, // DONT SET TO ZERO
+    orbitalInclination: 7, // in degrees
+    axialTilt: 0.034, // in degrees (very small)
+    rotationPeriod: 1407.6, // in hours
+    surfaceTemp: 167, // in Celsius (average day)
+    color: "gray",
+    gravity: 3.7, // in m/s²
+    gravitationalAcceleration: 0.0396, // m/s²
+};
+
+const venusData = {
+    name: "Venus",
+    mass: 4.867e24, // in kilograms
+    radius: 6051.8, // in kilometers
+    orbitalOrigin: sunPosition,
+    orbitalRadius: 108.2e6, // in kilometers
+    orbitalSpeed: 35.02, // in kilometers per second
+    orbitalPeriod: 225, // in Earth days
+    initialOrbitalAngle: Math.random() * 360, // DONT SET TO ZERO
+    orbitalInclination: 3.39, // in degrees
+    axialTilt: 177.4, // in degrees (rotates in opposite direction)
+    rotationPeriod: 5832.5, // in hours (retrograde rotation)
+    surfaceTemp: 464, // in Celsius
+    color: "#ff9e43",
+    gravity: 8.87, // in m/s²
+    gravitationalAcceleration: 0.0113, // m/s²
+};
+
 const earthData = {
     name: "Earth",
     mass: 5.972e24, // in kilograms
@@ -38,31 +69,7 @@ const earthData = {
     surfaceTemp: 14, // in Celsius
     color: "dodgerblue",
     gravity: 9.807, // in m/s²
-    textures: {
-        map: '/assets/earth/2k_earth_daymap.jpg', // Base texture
-        highResMap: '/assets/earth/2k_earth_daymap.jpg' // Higher resolution texture
-    },
-};
-
-const moonData = {
-    name: "Moon",
-    mass: 7.342e22, // in kilograms
-    radius: 1737.4, // in kilometers
-    orbitalOrigin: new THREE.Vector3(10, 0, 0), // Assuming Earth's position is stored in earthData
-    orbitalRadius: 3.84e5, // in kilometers (average distance to Earth)
-    orbitalSpeed: 1.022, // in kilometers per second
-    orbitalPeriod: 27.3, // in Earth days (sidereal period)
-    initialOrbitalAngle: Math.random() * 360, // DONT SET TO ZERO
-    orbitalInclination: 5.14, // in degrees (to the ecliptic)
-    axialTilt: 1.54, // in degrees
-    rotationPeriod: 655.7, // in hours (same as its orbital period, hence the same side always faces Earth)
-    surfaceTemp: -53, // in Celsius (average)
-    color: "silver",
-    gravity: 1.62, // in m/s²
-    textures: {
-        map: '/assets/moon/2k_moon.jpg', // Base texture
-        highResMap: '/assets/moon/2k_moon.jpg' // Higher resolution texture
-    },
+    gravitationalAcceleration: 0.00593, // m/s²
 };
 
 const marsData = {
@@ -80,40 +87,7 @@ const marsData = {
     surfaceTemp: -63, // in Celsius
     color: "salmon",
     gravity: 3.72076, // in m/s²
-};
-
-const mercuryData = {
-    name: "Mercury",
-    mass: 3.285e23, // in kilograms
-    radius: 2439.7, // in kilometers
-    orbitalOrigin: sunPosition,
-    orbitalRadius: 57.9e6, // in kilometers
-    orbitalSpeed: 47.87, // in kilometers per second
-    orbitalPeriod: 88, // in Earth days
-    initialOrbitalAngle: Math.random() * 360, // DONT SET TO ZERO
-    orbitalInclination: 7, // in degrees
-    axialTilt: 0.034, // in degrees (very small)
-    rotationPeriod: 1407.6, // in hours
-    surfaceTemp: 167, // in Celsius (average day)
-    color: "gray",
-    gravity: 3.7 // in m/s²
-};
-
-const venusData = {
-    name: "Venus",
-    mass: 4.867e24, // in kilograms
-    radius: 6051.8, // in kilometers
-    orbitalOrigin: sunPosition,
-    orbitalRadius: 108.2e6, // in kilometers
-    orbitalSpeed: 35.02, // in kilometers per second
-    orbitalPeriod: 225, // in Earth days
-    initialOrbitalAngle: Math.random() * 360, // DONT SET TO ZERO
-    orbitalInclination: 3.39, // in degrees
-    axialTilt: 177.4, // in degrees (rotates in opposite direction)
-    rotationPeriod: 5832.5, // in hours (retrograde rotation)
-    surfaceTemp: 464, // in Celsius
-    color: "#ff9e43",
-    gravity: 8.87 // in m/s²
+    gravitationalAcceleration: 0.00256, // m/s²
 };
 
 const jupiterData = {
@@ -131,6 +105,7 @@ const jupiterData = {
     surfaceTemp: -145, // in Celsius (average)
     color: "#FFD27D",
     gravity: 24.79, // in m/s²
+    gravitationalAcceleration: 0.000219, // m/s²
 };
 
 const saturnData = {
@@ -148,23 +123,7 @@ const saturnData = {
     surfaceTemp: -139, // in Celsius (average)
     color: "#FFCC99",
     gravity: 10.44, // in m/s²
-};
-
-const neptuneData = {
-    name: "Neptune",
-    mass: 1.024e26, // in kilograms
-    radius: 24622, // in kilometers
-    orbitalOrigin: sunPosition,
-    orbitalRadius: 4.495e9, // in kilometers
-    orbitalSpeed: 5.43, // in kilometers per second
-    orbitalPeriod: 60182, // in Earth days
-    initialOrbitalAngle: Math.random() * 360, // DONT SET TO ZERO
-    orbitalInclination: 1.77, // in degrees
-    axialTilt: 28.32, // in degrees
-    rotationPeriod: 16, // in hours
-    surfaceTemp: -201, // in Celsius (average)
-    color: "#4973AB",
-    gravity: 11.15, // in m/s²
+    gravitationalAcceleration: 0.0000646, // m/s²
 };
 
 const uranusData = {
@@ -182,6 +141,25 @@ const uranusData = {
     surfaceTemp: -195, // in Celsius (average)
     color: "#AECBC9",
     gravity: 8.69, // in m/s²
+    gravitationalAcceleration: 0.0000161, // m/s²
+};
+
+const neptuneData = {
+    name: "Neptune",
+    mass: 1.024e26, // in kilograms
+    radius: 24622, // in kilometers
+    orbitalOrigin: sunPosition,
+    orbitalRadius: 4.495e9, // in kilometers
+    orbitalSpeed: 5.43, // in kilometers per second
+    orbitalPeriod: 60182, // in Earth days
+    initialOrbitalAngle: Math.random() * 360, // DONT SET TO ZERO
+    orbitalInclination: 1.77, // in degrees
+    axialTilt: 28.32, // in degrees
+    rotationPeriod: 16, // in hours
+    surfaceTemp: -201, // in Celsius (average)
+    color: "#4973AB",
+    gravity: 11.15, // in m/s²
+    gravitationalAcceleration: 0.00000657, // m/s²
 };
 
 const plutoData = {
@@ -207,17 +185,19 @@ const planetsData = {
     Mercury: mercuryData,
     Venus: venusData,
     Earth: earthData,
-    // Moon: moonData,
     Mars: marsData,
     Jupiter: jupiterData,
     Saturn: saturnData,
     Uranus: uranusData,
     Neptune: neptuneData,
-    // Pluto: plutoData,
 };
 export default planetsData;
 
 
 export const distanceScaleFactor = 0.00001;
-export const sizeScaleFactor = 0.002;
+export const sizeScaleFactor = 0.0001;
 export const rotationSpeedScaleFactor = 600000;
+
+// constants for formulas
+export const G = 6.67430e-11; // Gravitational constant in m^3 kg^-1 s^-2
+export const MASS_OF_SUN = 1.989e30; // kg

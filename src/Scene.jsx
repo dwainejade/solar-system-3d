@@ -1,22 +1,26 @@
 import React, { useRef, useEffect, useState } from "react";
 import { CameraControls, useTexture, Environment, PerspectiveCamera } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "./store/store";
-import planetsData from "./data/planetsData";
+import planetsData, { sizeScaleFactor } from "./data/planetsData";
+import { moonsData, moonSizeScaleFactor } from "./data/moonsData";
+
 import Planet from "./components/Planet";
 // import Moon from "./components/Moon";
 import Sun from "./components/Sun";
-import { sizeScaleFactor } from "./data/planetsData";
 import { Vector3 } from "three";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import Stars from "./components/Stars";
+import Moon from "./components/Moon";
+// import SurfacePlane from "./components/SurfacePlane";
 
 const Scene = () => {
   const { sunSettings, rotationCounts, simulationDate } = useStore();
-  const { planetPositions, selectedPlanet } = usePlanetStore();
+  const { planetPositions, selectedPlanet, selectedMoon } = usePlanetStore();
   const { surfacePoint, isSurfaceCameraActive } = useCameraStore();
   const surfaceCameraRef = useRef();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
+  const { scene } = useThree();
 
   const resetCamera = () => {
     if (!cameraControlsRef.current) return;
@@ -52,6 +56,23 @@ const Scene = () => {
       }
     }
   }, [selectedPlanet, planetPositions]);
+  useEffect(() => {
+    if (selectedMoon && cameraControlsRef.current) {
+      const moonPosition = selectedMoon.position;
+      if (moonPosition) {
+        // Calculate the optimal distance to view the moon
+        const scaledRadius = selectedMoon.bodyData.radius * moonSizeScaleFactor;
+        const optimalDistance = calculateOptimalDistance(scaledRadius);
+
+        // Adjust the minimum distance for the camera to avoid getting too close
+        setMinDistance(optimalDistance / 2);
+
+        // Smoothly transition the camera to the moon's position
+        cameraControlsRef.current.setTarget(moonPosition.x, moonPosition.y, moonPosition.z, true);
+        cameraControlsRef.current.dollyTo(optimalDistance, true);
+      }
+    }
+  }, [selectedMoon, moonsData]);
 
   // Handle resetting the camera when no planet is selected
   useEffect(() => {
@@ -60,26 +81,31 @@ const Scene = () => {
     }
   }, [selectedPlanet, sunSettings.position]);
 
-  const heightAboveSurface = 0.1;
-
+  const heightAboveSurface = 10;
   useFrame(() => {
     if (isSurfaceCameraActive && surfacePoint && selectedPlanet) {
       const planetPosition = planetPositions[selectedPlanet.name];
       if (planetPosition) {
-        // Create a Vector3 instance from the planet's position
-        const planetPositionVector = new Vector3(planetPosition.x, planetPosition.y, planetPosition.z);
+        // Assuming planetPosition is the center of the planet
+        const centerOfPlanet = new Vector3(planetPosition.x, planetPosition.y, planetPosition.z);
 
-        // Calculate the initial offset if it's not already set
-        const initialOffset = new Vector3(surfacePoint.x, surfacePoint.y, surfacePoint.z).sub(planetPositionVector);
+        // Calculate the normal as the vector from the planet's center to the surface point
+        const surfaceNormal = new Vector3(surfacePoint.x, surfacePoint.y, surfacePoint.z).sub(centerOfPlanet).normalize();
 
-        // Calculate the new camera position
-        const newCameraPosition = planetPositionVector.add(initialOffset);
+        // Position the camera slightly above the surface point
+        const cameraHeightAboveSurface = 0.1; // Adjust as needed
+        const cameraPosition = new Vector3(surfacePoint.x, surfacePoint.y, surfacePoint.z).add(
+          surfaceNormal.multiplyScalar(cameraHeightAboveSurface)
+        );
 
-        // Update the camera's position
-        surfaceCameraRef.current.position.set(newCameraPosition.x, newCameraPosition.y, newCameraPosition.z);
+        surfaceCameraRef.current.position.copy(cameraPosition);
 
-        // Orient the camera - adjust as needed
-        surfaceCameraRef.current.lookAt(planetPositionVector);
+        // Set the camera to look at a point directly 'up' from the surface
+        const lookAtPoint = cameraPosition.clone().add(surfaceNormal);
+        surfaceCameraRef.current.lookAt(lookAtPoint);
+
+        // Align the camera's up vector with the surface normal
+        surfaceCameraRef.current.up.copy(surfaceNormal);
       }
     }
   });
@@ -93,8 +119,8 @@ const Scene = () => {
 
   const earthTextures = useTexture({
     map: "/assets/earth/2k_earth_daymap.jpg",
-    normal: "/assets/earth/2k_earth_normal_map.png",
-    specular: "/assets/earth/2k_earth_specular_map.png",
+    // normal: "/assets/earth/2k_earth_normal_map.png",
+    // specular: "/assets/earth/2k_earth_specular_map.png",
   });
   // const sunTextures = useTexture({
   //   map: "/assets/sun/2k_sun.jpg",
@@ -125,15 +151,26 @@ const Scene = () => {
 
   // camera settings
   const cameraConfig = {
-    maxDistance: 100000,
+    maxDistance: 90000,
     smoothTime: 0.8, // 1.5 is default
     truckSpeed: 1,
     rotateSpeed: 1,
-    zoomSpeed: 2,
+    zoomSpeed: 0.1,
   };
+
+  const renderMoons = (planetName, planetData) => {
+    // Ensure planetMoons is always an array. If moonsData[planetName] is undefined, use an empty array
+    const planetMoons = moonsData[planetName] || [];
+    return planetMoons.map((moonData, index) => (
+      <Moon key={`${planetName}-moon-${index}`} bodyData={moonData} parentPosition={planetPositions[planetName]} parentName={planetName} />
+    ));
+  };
+
   return (
     <>
-      {!isSurfaceCameraActive && <CameraControls ref={cameraControlsRef} makeDefault {...cameraConfig} minDistance={minDistance} />}
+      {!isSurfaceCameraActive && (
+        <CameraControls ref={cameraControlsRef} makeDefault {...cameraConfig} minDistance={Math.max(0.02, minDistance)} />
+      )}
 
       {/* First Person Camera */}
       {surfacePoint && isSurfaceCameraActive && (
@@ -142,34 +179,40 @@ const Scene = () => {
           makeDefault
           position={[surfacePoint.x, surfacePoint.y + heightAboveSurface, surfacePoint.z]}
           fov={70}
-          near={0.00001}
-          far={1000}
+          near={0.01}
+          far={1000000}
           // You may also want to set the lookAt property
         />
       )}
+
+      <Stars />
+
       <ambientLight intensity={0.1} />
       <pointLight color='#f6f3ea' intensity={1} position={[0, 0, 0]} />
-      <Planet bodyData={planetsData.Earth} textures={earthTextures} />
-      {/* <Moon bodyData={planetsData.Moon} parentPosition={planetPositions.Earth} /> */}
-      <Planet bodyData={planetsData.Mars} textures={marsTextures} />
-      <Planet bodyData={planetsData.Venus} textures={venusTextures} />
-      <Planet bodyData={planetsData.Mercury} textures={mercuryTextures} />
-      <Planet bodyData={planetsData.Jupiter} textures={jupiterTextures} />
-      <Planet bodyData={planetsData.Saturn} textures={saturnTextures} />
-      <Planet bodyData={planetsData.Uranus} textures={uranusTextures} />
-      <Planet bodyData={planetsData.Neptune} textures={neptuneTextures} />
+
+      <Planet bodyData={planetsData.Earth} textures={earthTextures} moonsData={moonsData.Earth} />
+      <Planet bodyData={planetsData.Mars} textures={marsTextures} moonsData={moonsData.Mars} />
+      <Planet bodyData={planetsData.Venus} textures={venusTextures} moonsData={moonsData.Venus} />
+      <Planet bodyData={planetsData.Mercury} textures={mercuryTextures} moonsData={moonsData.Mercury} />
+      <Planet bodyData={planetsData.Jupiter} textures={jupiterTextures} moonsData={moonsData.Jupiter} />
+      <Planet bodyData={planetsData.Saturn} textures={saturnTextures} moonsData={moonsData.Saturn} />
+      <Planet bodyData={planetsData.Uranus} textures={uranusTextures} moonsData={moonsData.Uranus} />
+      <Planet bodyData={planetsData.Neptune} textures={neptuneTextures} moonsData={moonsData.Neptune} />
+
+      {/* Render moons */}
+      {Object.entries(moonsData).map(([planetName, planetData]) => renderMoons(planetName, planetData))}
+
       {/* <Planet bodyData={planetsData.Pluto} /> */}
       <Sun key={"Sun-plain"} position={sunSettings.position} resetCamera={resetCamera} />
+
+      {/* <SurfacePlane /> */}
 
       {/* <Stars radius={7000} count={1000} factor={100} saturation={0} fade speed={0.5} /> */}
       {/* <Environment
         background
         files={["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"]}
         path={`/assets/stars/stars-cube-map/`}
-        near={100}
-        far={2000}
       /> */}
-      <Stars />
     </>
   );
 };

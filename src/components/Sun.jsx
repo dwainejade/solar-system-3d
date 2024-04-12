@@ -1,12 +1,13 @@
 import React, { useState, useRef } from "react";
 import { usePlanetStore } from "../store/store";
-import planetsData from "../data/planetsData";
+import { sizeScaleFactor } from "../data/planetsData";
 import { Html } from "@react-three/drei";
 
-const Sun = ({ position, resetCamera }) => {
+const Sun = ({ position, resetCamera, textures }) => {
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
-  const { selectedPlanet, setSelectedPlanet, displayLabels } = usePlanetStore();
+  const { selectedPlanet, setSelectedPlanet, displayLabels, planetsData } = usePlanetStore();
+  const sunRadius = planetsData["Sun"].radius * sizeScaleFactor
 
   // Modify the handleClick to account for dragging
   const handleClick = e => {
@@ -32,19 +33,16 @@ const Sun = ({ position, resetCamera }) => {
 
   // New handler for pointer move
   const handlePointerMove = e => {
-    // Calculate the distance moved
     const distanceMoved = Math.sqrt(
       Math.pow(e.clientX - initialClickPosition.current.x, 2) + Math.pow(e.clientY - initialClickPosition.current.y, 2)
     );
     if (distanceMoved > 5) {
-      // Threshold to consider as a drag, adjust as needed
       setIsDragging(true);
     }
   };
 
-  // New handler for pointer up
   const handlePointerUp = e => {
-    setIsDragging(false); // Reset dragging state
+    setIsDragging(false);
   };
 
   const handlePointerOver = e => {
@@ -68,8 +66,12 @@ const Sun = ({ position, resetCamera }) => {
         onPointerOver={handlePointerOver}
         onPointerOut={handlePointerOut}
       >
-        <sphereGeometry args={[50, 64, 64]} />
-        <meshBasicMaterial color={[10, 3, 0]} toneMapped={false} />
+        <sphereGeometry args={[sunRadius, 64, 64]} />
+        {textures ? (
+          <meshPhysicalMaterial map={textures.map} color={[10, 3, 0]} toneMapped={false} zIndexRange={[100 - 1]} />
+        ) : (
+          <meshBasicMaterial color={[10, 3, 0]} toneMapped={false} />
+        )}
       </mesh>
       {/* Display planet names */}
       {displayLabels ? (
@@ -91,7 +93,7 @@ const Sun = ({ position, resetCamera }) => {
         <Html center zIndexRange={[100, 0]}>
           <div
             className='planet-point'
-            style={{ backgroundColor: "rgb(255, 255, 0)" }}
+            style={{ backgroundColor: "rgba(255, 255, 0,0.9)" }}
             onClick={handleClick}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}

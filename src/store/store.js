@@ -1,5 +1,7 @@
 import { create } from 'zustand';
+import { immer } from 'zustand/middleware/immer'
 import * as THREE from 'three';
+import initialPlanetsData from '../data/planetsData';
 
 const useStore = create((set, get) => ({
     simSpeed: 1, // 1 is realtime speed
@@ -22,14 +24,14 @@ const useStore = create((set, get) => ({
         }
     },
 
+    isEditing: false, // allow user to edit planet data
+    setIsEditing: (newState) => set({ isEditing: newState }),
+
     orbitPaths: true,
     toggleOrbitPaths: () => set(state => ({ orbitPaths: !state.orbitPaths })),
 
     showConstellations: false,
     toggleConstellations: () => set(state => ({ showConstellations: !state.showConstellations })),
-
-    // FPMode: false, 
-    // toggleFPMode: () => set(state => ({ FPMode: !state.FPMode })),
 
     sunSettings: {
         position: new THREE.Vector3(0, 0, 0),
@@ -68,16 +70,16 @@ const useStore = create((set, get) => ({
     camera: new THREE.PerspectiveCamera(),
     orbitControls: null,
     previousCameraPosition: new THREE.Vector3(),
-    previousCameraTarget: new THREE.Vector3(),
+    // previousCameraTarget: new THREE.Vector3(),
     setOrbitControls: (controls) => set({ orbitControls: controls }),
 
-    setCameraTarget: (position) => {
-        const { orbitControls } = get();
-        if (orbitControls) {
-            orbitControls.target.copy(position);
-            orbitControls.update();
-        }
-    },
+    // setCameraTarget: (position) => {
+    //     const { orbitControls } = get();
+    //     if (orbitControls) {
+    //         orbitControls.target.copy(position);
+    //         orbitControls.update();
+    //     }
+    // },
 
     resetCamera: () => {
         const { orbitControls } = get();
@@ -91,7 +93,8 @@ const useStore = create((set, get) => ({
 export default useStore;
 
 
-const usePlanetStore = create((set) => ({
+const usePlanetStore = create(immer((set, get) => ({
+    // Existing store properties and methods
     displayLabels: false, // render planet names in scene
     toggleDisplayLabels: () => set((state) => ({ displayLabels: !state.displayLabels })),
 
@@ -100,7 +103,6 @@ const usePlanetStore = create((set) => ({
         set((state) => ({
             planetPositions: { ...state.planetPositions, [name]: position },
         })),
-
 
     planetAngles: {},
     updatePlanetAngle: (name, angle) =>
@@ -114,14 +116,59 @@ const usePlanetStore = create((set) => ({
             selectedPlanet: planetData,
         })),
 
-}));
+    selectedMoon: null,
+    setSelectedMoon: (moonData) =>
+        set(() => ({
+            selectedMoon: moonData,
+        })),
+
+    planetsData: initialPlanetsData,
+    updatePlanetData: (planetName, updates) => {
+        set((state) => {
+            if (state.planetsData[planetName]) {
+                Object.keys(updates).forEach(key => {
+                    state.planetsData[planetName][key] = updates[key];
+                });
+            }
+        });
+    },
+    // Action to reset all planetsData to initial state
+    resetPlanetsData: () => {
+        set((state) => {
+            state.planetsData = initialPlanetsData;
+        });
+    },
+    resetSinglePlanetData: (planetName) => {
+        set((state) => {
+            if (state.planetsData[planetName] && initialPlanetsData[planetName]) {
+                state.planetsData[planetName] = initialPlanetsData[planetName];
+            }
+        });
+    },
+})));
+
 
 const useCameraStore = create((set) => ({
     surfacePoint: null,
-    setSurfacePoint: (point) => set({ surfacePoint: point }),
+    setSurfacePoint: (surfacePoint) => set({ surfacePoint }),
+    surfaceNormal: [0, 1, 0],
+    setSurfaceNormal: (surfaceNormal) => set({ surfaceNormal }),
+
+    cameraSurfacePoint: null,
+    setCameraSurfacePoint: (cameraSurfacePoint) => set({ cameraSurfacePoint }),
+    cameraSurfaceNormal: [0, 1, 0],
+    setCameraSurfaceNormal: (cameraSurfaceNormal) => set({ cameraSurfaceNormal }),
 
     isSurfaceCameraActive: false,
     toggleSurfaceCamera: () => set((state) => ({ isSurfaceCameraActive: !state.isSurfaceCameraActive })),
+
+    cameraTarget: new THREE.Vector3(),
+    setCameraTarget: (target) => set({ cameraTarget: target }),
+
+    triggerReset: null, // Placeholder for a function to reset the camera
+    setTriggerReset: (newState) => set({ triggerReset: newState }),
 }));
+
+
 
 export { usePlanetStore, useCameraStore }
