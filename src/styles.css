@@ -114,6 +114,7 @@ body {
 }
 .Main .menu-wrapper .bottom-menu {
   position: relative;
+  z-index: 200;
   bottom: -85px;
   left: 0;
   display: flex;
@@ -123,13 +124,34 @@ body {
   height: 100px;
   width: 100%;
   max-width: 540px;
-  background-color: #dcccad;
-  color: #463a39;
+  color: #f19a00;
   margin: auto auto 0 auto;
   pointer-events: auto;
   padding: 1.5%;
   border-radius: 6px 6px 0 0;
   transition: bottom 0.3s ease-in-out;
+}
+.Main .menu-wrapper .bottom-menu::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(circle, #4a3c6f, #3e3161, #332654, #271b47, #1c113a);
+  clip-path: polygon(98% 0, 100% 12%, 100% 50%, 99% 60%, 99% 100%, 1% 100%, 1% 60%, 0 50%, 0 12%, 2% 0);
+  z-index: -1;
+}
+.Main .menu-wrapper .bottom-menu::after {
+  content: "";
+  position: absolute;
+  top: -2%;
+  left: -0.5%;
+  width: 101%;
+  height: 102%;
+  background-color: #41cdec;
+  clip-path: polygon(98% 0, 100% 12%, 100% 50%, 99% 60%, 99% 100%, 1% 100%, 1% 60%, 0 50%, 0 12%, 2% 0);
+  z-index: -2;
 }
 .Main .menu-wrapper .bottom-menu.open {
   bottom: 0;
@@ -145,10 +167,10 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 20px;
-  border: 0;
+  border: #4cddfb 2px solid;
   background: url("../public/assets/icons/chevron.svg") no-repeat center center;
   background-size: 70%;
-  background-color: #c99050;
+  background-color: #f46a68;
   transition: rotate ease 0.3s;
 }
 .Main .menu-wrapper .bottom-menu .left-con,
@@ -283,7 +305,7 @@ body {
   right: 0;
   bottom: 0;
   border-radius: 34px;
-  background-color: #ba7a97;
+  background-color: #f46a68;
   transition: 0.3s;
 }
 .Main .switch .slider:before {
@@ -298,10 +320,10 @@ body {
   transition: 0.3s;
 }
 .Main .switch input:checked + .slider {
-  background-color: #6c6f20;
+  background-color: #969b17;
 }
 .Main .switch input:focus + .slider {
-  box-shadow: 0 0 1px #6c6f20;
+  box-shadow: 0 0 1px #969b17;
 }
 .Main .switch input:checked + .slider:before {
   transform: translateX(30px);
