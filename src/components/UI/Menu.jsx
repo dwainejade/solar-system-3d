@@ -161,7 +161,9 @@ const Menu = () => {
 
       {/* Side menu */}
       <div className={`side-menu ${selectedPlanet ? 'open' : 'closed'}`}>
-        <Details />
+        <div className="side-menu-inner">
+          <Details />
+        </div>
       </div>
     </div>
   );

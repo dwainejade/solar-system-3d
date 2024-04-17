@@ -112,7 +112,7 @@ const Menu = () => {
 
           <div className='button-con'>
             <button onClick={toggleEditing} className='edit-planet-btn btn'>
-              {isEditing ? "Save Changes" : "Adjust Values"}
+              {isEditing ? "Save Values" : "Adjust Values"}
             </button>
 
             <button onClick={() => { resetSinglePlanetData(selectedPlanet?.name) }} className='reset-planet-btn btn'>

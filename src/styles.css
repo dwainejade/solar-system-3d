@@ -1,3 +1,15 @@
+@font-face {
+  font-family: "Termina-Black";
+  src: url("fonts/Termina_Black.ttf"), format("truetype");
+  font-weight: 900;
+  font-style: normal;
+}
+@font-face {
+  font-family: "FranklinGothic-URW";
+  src: url("fonts/FranklinGothic_URW_Medium.ttf"), format("truetype");
+  font-weight: medium;
+  font-style: normal;
+}
 * {
   box-sizing: border-box;
 }
@@ -184,6 +196,7 @@ body {
 }
 .Main .menu-wrapper .bottom-menu .left-con label,
 .Main .menu-wrapper .bottom-menu .right-con label {
+  font-family: "FranklinGothic-URW", "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   font-size: 1rem;
   font-weight: bold;
 }
@@ -206,27 +219,59 @@ body {
   width: 1px;
 }
 .Main .menu-wrapper .side-menu {
-  background-color: #fdf3e0;
   position: absolute;
+  z-index: 200;
   height: fit-content;
-  width: 260px;
-  top: 20%;
+  width: 250px;
+  top: 15%;
   right: -100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   border-radius: 6px 0 0 6px;
-  padding: 2%;
   pointer-events: auto;
   transition: all 0.3s ease-out;
+}
+.Main .menu-wrapper .side-menu .side-menu-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  padding: 4%;
+}
+.Main .menu-wrapper .side-menu .side-menu-inner::before {
+  content: "";
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(to right top, #201047, #271649, #2d1d4b, #33234d, #392a4f);
+  clip-path: polygon(100% 0, 100% 100%, 5% 100%, 0 95%, 0 5%, 5% 0);
+  z-index: -1;
+}
+.Main .menu-wrapper .side-menu .side-menu-inner::after {
+  content: "";
+  position: absolute;
+  top: -1%;
+  right: 0%;
+  width: 103%;
+  height: 102%;
+  background-image: linear-gradient(to bottom, #5fe5ff, #74cbff, #bda6fc, #ef7cbc, #ef6866);
+  clip-path: polygon(2% 20%, 2% 5%, 7% 0, 100% 0, 100% 100%, 7% 100%, 2% 95%, 2% 50%, 0 45%, 0 25%);
+  z-index: -2;
 }
 .Main .menu-wrapper .side-menu.open {
   right: 0;
 }
 .Main .menu-wrapper .side-menu h2 {
-  font: 1.4rem;
+  font-family: "Termina-Black";
+  text-transform: uppercase;
+  font-size: 1.5rem;
   margin: 0;
   margin-bottom: 4px;
+  color: #e1cdaa;
 }
 .Main .menu-wrapper .side-menu .item {
   position: relative;
@@ -239,6 +284,9 @@ body {
 .Main .menu-wrapper .side-menu .item label {
   white-space: nowrap;
   margin-right: 6px;
+  color: #f19a00;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 .Main .menu-wrapper .side-menu .item input {
   width: 100px;
@@ -247,6 +295,9 @@ body {
 }
 .Main .menu-wrapper .side-menu .item input:disabled {
   color: #463a39;
+}
+.Main .menu-wrapper .side-menu .item span {
+  color: #fff;
 }
 .Main .menu-wrapper .side-menu .button-con {
   display: flex;
@@ -259,13 +310,14 @@ body {
 .Main .menu-wrapper .side-menu .button-con .reset-planet-btn {
   height: 30px;
   width: 90px;
+  font-weight: 600;
 }
 .Main .menu-wrapper .side-menu .button-con .edit-planet-btn {
-  background-color: #c99050;
+  background-color: #969b17;
   color: #fff;
 }
 .Main .menu-wrapper .side-menu .button-con .reset-planet-btn {
-  background-color: #861b1d;
+  background-color: #f46a68;
   color: #fff;
 }
 .Main .reset-all-btn,
@@ -305,7 +357,7 @@ body {
   right: 0;
   bottom: 0;
   border-radius: 34px;
-  background-color: #f46a68;
+  background-color: #861b1d;
   transition: 0.3s;
 }
 .Main .switch .slider:before {
