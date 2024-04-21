@@ -15,18 +15,17 @@ const Satellite = ({ target, size, satelliteCamera }) => {
         setMouseDownPosition({ x: event.clientX, y: event.clientY });
     }, []);
 
+    // orbit around target
     const handleMouseMove = useCallback((event) => {
         if (isDragging) {
             const dx = event.clientX - mouseDownPosition.x;
             const dy = event.clientY - mouseDownPosition.y;
 
             setSpherical(prevSpherical => {
-                const newSpherical = new THREE.Spherical(prevSpherical.radius, prevSpherical.phi - dy * 0.0025, prevSpherical.theta - dx * 0.0025);
+                const newSpherical = new THREE.Spherical(prevSpherical.radius, prevSpherical.phi - dy * 0.003, prevSpherical.theta - dx * 0.003);
                 newSpherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, newSpherical.phi));
-
                 return newSpherical;
             });
-
             setMouseDownPosition({ x: event.clientX, y: event.clientY });
         }
     }, [isDragging, mouseDownPosition]);
@@ -35,19 +34,29 @@ const Satellite = ({ target, size, satelliteCamera }) => {
         setIsDragging(false);
     }, []);
 
+    // zoom in and out
+    const handleWheel = useCallback((event) => {
+        setSpherical(prevSpherical => {
+            const newRadius = prevSpherical.radius + event.deltaY * 0.03;
+            return new THREE.Spherical(Math.max(size * 2.5, Math.min(500, newRadius)), prevSpherical.phi, prevSpherical.theta);
+        });
+    }, [size]);
+
     useEffect(() => {
         const domElement = gl.domElement;
 
         domElement.addEventListener('mousedown', handleMouseDown);
         domElement.addEventListener('mousemove', handleMouseMove);
         domElement.addEventListener('mouseup', handleMouseUp);
+        domElement.addEventListener('wheel', handleWheel);
 
         return () => {
             domElement.removeEventListener('mousedown', handleMouseDown);
             domElement.removeEventListener('mousemove', handleMouseMove);
             domElement.removeEventListener('mouseup', handleMouseUp);
+            domElement.removeEventListener('wheel', handleWheel);
         };
-    }, [handleMouseDown, handleMouseMove, handleMouseUp, gl.domElement]);
+    }, [handleMouseDown, handleMouseMove, handleMouseUp, handleWheel, gl.domElement]);
 
     useFrame(() => {
         if (cameraRef.current && target) {
