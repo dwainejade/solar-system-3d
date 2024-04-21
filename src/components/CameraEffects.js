@@ -5,7 +5,7 @@ import { usePlanetStore } from "../store/store";
 const CameraEffects = () => {
     const { camera } = useThree();
     const { selectedPlanet, selectedMoon } = usePlanetStore();
-
+    console.log(selectedPlanet)
     // Effect to change camera properties based on selectedPlanet
     useEffect(() => {
         if (selectedPlanet) {
@@ -16,6 +16,7 @@ const CameraEffects = () => {
             // Additional properties can be set here
             camera.fov = calculateFOV(selectedPlanet);
             camera.updateProjectionMatrix();
+
         }
         if (selectedMoon) {
             // Example: Set the camera position relative to the planet size

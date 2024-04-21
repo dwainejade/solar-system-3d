@@ -6,7 +6,7 @@ import Details from "./PlanetDetails"
 const Menu = () => {
   const { simSpeed, setSimSpeed, showConstellations, toggleConstellations, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths, isEditing, setIsEditing } = useStore();
   const { selectedPlanet, setSelectedPlanet, selectedMoon, displayLabels, toggleDisplayLabels, updateSelectedPlanet, planetsData, resetPlanetsData } = usePlanetStore();
-  const { setTriggerReset } = useCameraStore()
+  const { setTriggerReset, satelliteCamera, toggleSatelliteCamera } = useCameraStore()
 
   const [isMenuOpen, setMenuOpen] = useState(false);
 
@@ -76,6 +76,9 @@ const Menu = () => {
       <button className="reset-all-btn btn" onClick={resetAll} />
       {/* fullscreen button */}
       <button className="fullscreen-btn btn" onClick={handleFullscreen} />
+      <button className="satelliteCamera-btn btn" onClick={toggleSatelliteCamera}
+        style={{ height: "30px", width: "30px", backgroundColor: satelliteCamera ? "red" : "green", position: "absolute", left: "10px", bottom: "10px" }}
+      >s</button>
 
       {/* Bottom menu */}
       <div className={`bottom-menu ${isMenuOpen ? "open" : "closed"}`}>

@@ -1,17 +1,25 @@
 // Planet without surface camera
 
-import React, { useRef, forwardRef, useState } from "react";
-import { useFrame, useThree } from "@react-three/fiber";
-import OrbitPath from "./OrbitPath";
-import { Html, Torus } from "@react-three/drei";
+import React, { useRef, forwardRef, useState, useEffect } from "react";
+import { useFrame, useThree, extend } from "@react-three/fiber";
+// import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { Html, Torus, PerspectiveCamera, OrbitControls } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
+import OrbitPath from "./OrbitPath";
+import useFollowCam from "../hooks/useFollowCam";
+import Satellite from "./Satellite";
+
+// extend({ OrbitControls });
 
 // default values
-
 const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   const { planetsData } = usePlanetStore()
   const bodyData = planetsData[name];
+
+  const { camera, gl } = useThree();
+  const planetCameraRef = useRef();
+  const controlsRef = useRef();
 
   const mergedData = { ...bodyData };
   const {
@@ -32,8 +40,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
   const { simSpeed, updateRotationCount, incrementDate, simulationDate, orbitPaths } = useStore();
   const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels, planetPositions } = usePlanetStore();
-  const { setSurfacePoint, surfacePoint, isSurfaceCameraActive, setCameraSurfacePoint } = useCameraStore();
-
+  const { setSurfacePoint, surfacePoint, isSurfaceCameraActive, satelliteCamera, toggleSatelliteCamera } = useCameraStore();
   const localRef = ref || useRef();
   const localAngleRef = useRef(planetAngles[name] || 0); // Initialize with saved angle or 0
 
@@ -113,6 +120,24 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
     }
   });
 
+  // useFollowCam(isPlanetSelected ? localRef : null, camera, { x: 0, y: 0, z: 20 });  // Pass the camera to the hook
+  // ************************ NEW CAMERA CODE HERE *************************************************************************************************************************
+  // const [firstRender, setFirstRender] = useState(false);
+  // useFrame(() => {
+  //   // Setup and position the camera when the planet is selected
+  //   if (isPlanetSelected) {
+  //     // useFollowCam(localRef, { x: 0, y: 0, z: orbitalRadius * 1.5 });
+  //   }
+  // });
+
+  useFrame(() => {
+    if (isPlanetSelected && planetCameraRef.current) {
+      planetCameraRef.current.target.set(localRef.current.position.x, localRef.current.position.y, localRef.current.position.z);
+    }
+  });
+  // ************************ NEW CAMERA CODE HERE************************************************************************************************************************
+
+
   // Modify the handleClick to account for dragging
   const handleClick = e => {
     e.stopPropagation();
@@ -159,7 +184,28 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
   return (
     <>
+      {/* <FakeCamera target={localRef.current} satelliteCamera={satelliteCamera} size={scaledRadius} /> */}
+      {isPlanetSelected && localRef.current &&
+        <Satellite target={localRef.current} color={color} size={scaledRadius} satelliteCamera={satelliteCamera} toggleSatelliteCamera={toggleSatelliteCamera} />
+      }
+
       <group ref={localRef}>
+        {/* place a camera here that follows the planet and can be controlled */}
+        {/* {isPlanetSelected && (
+          <OrbitControls
+            ref={planetCameraRef}
+            args={[camera, gl.domElement]} // Attach the default camera and DOM element
+            enableZoom={true}
+            enableRotate={true}
+            enablePan={false}
+            target={localRef.current.position}
+            maxDistance={scaledRadius * 6}
+            minDistance={scaledRadius * 2.5}
+            enableDamping={true}
+            dampingFactor={0.1}
+          />
+        )} */}
+
         <mesh
           ref={meshRef}
           onClick={handleClick}
@@ -179,10 +225,10 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         {name === "Saturn" && (
           <group>
             <Torus args={[scaledRadius * 2, scaledRadius * 0.15, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
-              <meshBasicMaterial color={"#Ffffff"} transparent opacity={0.6} />
+              <meshBasicMaterial color={"#Ffffff"} transparent opacity={0.25} />
             </Torus>
             <Torus args={[scaledRadius * 1.5, scaledRadius * 0.3, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
-              <meshBasicMaterial color={"#F4E1C1"} transparent opacity={0.6} />
+              <meshBasicMaterial color={"#F4E1C1"} transparent opacity={0.25} />
             </Torus>
           </group>
         )}

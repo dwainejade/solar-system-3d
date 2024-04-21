@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
-import { CameraControls, useTexture, PerspectiveCamera } from "@react-three/drei";
+import { CameraControls, useTexture, PerspectiveCamera, OrbitControls } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "@/store/store";
 import { sizeScaleFactor } from "@/data/planetsData";
 import { moonsData, moonSizeScaleFactor } from "@/data/moonsData";
@@ -9,15 +9,15 @@ import Moon from "@/components/Moon";
 import Sun from "@/components/Sun";
 import Planet from "@/components/PlanetBasic";
 import Stars from "@/components/Stars"
+import { useFrame } from "@react-three/fiber";
 
 const SceneThree = () => {
   const { sunSettings, rotationCounts, simulationDate } = useStore();
   const { planetPositions, selectedPlanet, setSelectedPlanet, selectedMoon, setSelectedMoon, planetsData } = usePlanetStore();
-  const { surfacePoint, isSurfaceCameraActive, triggerReset, setTriggerReset } = useCameraStore();
+  const { satelliteCamera, isSurfaceCameraActive, triggerReset, setTriggerReset } = useCameraStore();
   const surfaceCameraRef = useRef();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
-
 
   // A simplistic approach to calculate optimal distance
   const calculateOptimalDistance = (planetRadius) => {
@@ -44,7 +44,7 @@ const SceneThree = () => {
   };
 
   // Handle camera adjustments when a planet is selected
-  useEffect(() => {
+  useFrame(() => {
     if (selectedPlanet && cameraControlsRef.current) {
       const planetPosition = planetPositions[selectedPlanet.name];
       if (planetPosition) {
@@ -54,6 +54,10 @@ const SceneThree = () => {
         setMinDistance(optimalDistance / 2);
         cameraControlsRef.current.setTarget(planetPosition.x, planetPosition.y, planetPosition.z, true);
         cameraControlsRef.current.dollyTo(optimalDistance, true);
+        // cameraControlsRef.current.camera.rotation.set(-.79, -1.18, -0.75);
+        // console.log(cameraControlsRef.current.camera); // Set these values to your desired fixed rotation angles
+        // console.log(cameraControlsRef.current.camera.rotation)
+
       }
       if (selectedPlanet.name === "Sun") {
         setMinDistance(200);
@@ -61,15 +65,15 @@ const SceneThree = () => {
         cameraControlsRef.current.dollyTo(200, true);
       }
     }
-  }, [selectedPlanet, planetPositions]);
-  useEffect(() => {
+  });
+  useFrame(() => {
     if (selectedMoon && cameraControlsRef.current) {
       const moonPosition = selectedMoon.position;
       if (moonPosition) {
         // Calculate the optimal distance to view the moon
         const scaledRadius = selectedMoon.bodyData.radius * moonSizeScaleFactor;
         const optimalDistance = calculateOptimalDistance(scaledRadius);
-
+        console.log(moonPosition)
         // Adjust the minimum distance for the camera to avoid getting too close
         setMinDistance(optimalDistance / 2);
 
@@ -78,8 +82,8 @@ const SceneThree = () => {
         cameraControlsRef.current.dollyTo(optimalDistance, true);
       }
     }
-  }, [selectedMoon, moonsData]);
-
+  });
+  // console.log(cameraControlsRef.current?.camera)
   // Handle resetting the camera from state
   useEffect(() => {
     if (resetCamera) {
@@ -148,8 +152,8 @@ const SceneThree = () => {
   const cameraConfig = {
     maxDistance: 90000,
     smoothTime: 1, // 1.5 is default
-    truckSpeed: 0.6,
-    rotateSpeed: 0.6,
+    truckSpeed: 0,
+    rotateSpeed: 0,
 
   };
 
@@ -163,10 +167,9 @@ const SceneThree = () => {
 
   return (
     <>
-      {!isSurfaceCameraActive && (
-        <CameraControls ref={cameraControlsRef} makeDefault {...cameraConfig} minDistance={Math.min(1, minDistance)} />
+      {!satelliteCamera && (
+        <CameraControls ref={cameraControlsRef} makeDefault={!satelliteCamera} {...cameraConfig} minDistance={Math.min(1, minDistance)} />
       )}
-
       {/* First Person Camera */}
       {/* {surfacePoint && isSurfaceCameraActive && (
         <PerspectiveCamera
@@ -198,5 +201,24 @@ const SceneThree = () => {
     </>
   );
 };
+
+// function ControlledCamera({ selectedPlanet, planetPositions, planetsData, sizeScaleFactor }) {
+//   const orbitRef = useRef();
+//   const { camera, gl } = useThree();
+
+//   useEffect(() => {
+//     if (selectedPlanet && orbitRef.current) {
+//       const position = planetPositions[selectedPlanet.name];
+//       const data = planetsData[selectedPlanet.name];
+//       const distance = data.radius * sizeScaleFactor * 4.2; // or any other logic to determine the distance
+
+//       orbitRef.current.target.set(position.x, position.y, position.z);
+//       camera.position.set(position.x + distance, position.y + distance, position.z + distance);
+//       orbitRef.current.update();
+//     }
+//   }, [selectedPlanet, planetPositions, planetsData, sizeScaleFactor, camera]);
+
+//   return <OrbitControls makeDefault ref={orbitRef} args={[camera, gl.domElement]} />;
+// }
 
 export default SceneThree;
