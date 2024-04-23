@@ -40,7 +40,7 @@ const SharedCanvas = ({ children }) => {
       <Canvas
         id='Canvas'
         shadows dpr={[1, 2]}
-        gl={{ antialias: true }}
+        gl={{ antialias: true, logarithmicDepthBuffer: true }}
         camera={{ fov: 50, position: [5000, 5000, 5000], near: 0.01, far: 1000000 }}
       >
         <Suspense fallback={<Loader />}>

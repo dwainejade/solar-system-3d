@@ -1,7 +1,7 @@
 // Planet without surface camera
 
 import React, { useRef, forwardRef, useState, useEffect } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useLoader } from "@react-three/fiber";
 import { Html, Torus } from "@react-three/drei";
 import * as THREE from "three";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
@@ -123,11 +123,11 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   });
 
   useEffect(() => {
-    // Set the axial tilt using Euler angles, aligning the rotation axis
+    // Set the axial tilt 
     if (meshRef.current) {
-      meshRef.current.rotation.order = 'YXZ'; // This is critical to ensure the tilt is applied around the world Y, then rotation around local Y
+      meshRef.current.rotation.order = 'YXZ'; // ensure the tilt is applied around the world Y, then rotation around local Y
       meshRef.current.rotation.y = 0; // Reset initial Y rotation
-      meshRef.current.rotation.x = THREE.MathUtils.degToRad(axialTilt); // Apply axial tilt around the new local X after Y rotation reset
+      meshRef.current.rotation.x = THREE.MathUtils.degToRad(axialTilt); // Apply axial tilt around the new local X
     }
   }, [axialTilt]);
 
@@ -182,6 +182,12 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   });
 
 
+  // texture for saturn rings
+  const ringTexture = useLoader(THREE.TextureLoader, "../assets/saturn/saturn-rings-alpha.png");
+  ringTexture.wrapS = THREE.RepeatWrapping;
+  ringTexture.wrapT = THREE.ClampToEdgeWrapping;
+
+
   return (
     <>
       {isPlanetSelected && localRef.current &&
@@ -213,12 +219,9 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
         </mesh>
         {name === "Saturn" && (
-          <group>
-            <Torus args={[scaledRadius * 2, scaledRadius * 0.15, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
-              <meshBasicMaterial color={"#ffffff"} transparent opacity={0.25} />
-            </Torus>
-            <Torus args={[scaledRadius * 1.5, scaledRadius * 0.3, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
-              <meshBasicMaterial color={"#F4E1C1"} transparent opacity={0.25} />
+          <group rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} >
+            <Torus args={[scaledRadius * 1.7, scaledRadius * 0.5, 2, 100]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+              <meshBasicMaterial map={ringTexture} side={THREE.DoubleSide} transparent opacity={0.9} />
             </Torus>
           </group>
         )}
