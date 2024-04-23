@@ -117,9 +117,9 @@ const SceneThree = () => {
   // camera settings
   const cameraConfig = {
     maxDistance: 90000,
-    smoothTime: .8, // 1.5 is default
-    truckSpeed: 0,
-    rotateSpeed: 0,
+    smoothTime: .8,
+    truckSpeed: 1,
+    rotateSpeed: 1,
   };
 
   const renderMoons = (planetName) => {
