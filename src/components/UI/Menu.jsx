@@ -78,9 +78,9 @@ const Menu = () => {
       <button className="reset-all-btn btn" onClick={resetAll} />
       {/* fullscreen button */}
       <button className="fullscreen-btn btn" onClick={handleFullscreen} />
-      <button className="satelliteCamera-btn btn" onClick={() => toggleSatelliteCamera(!satelliteCamera)}
+      {/* <button className="satelliteCamera-btn btn" onClick={() => toggleSatelliteCamera(!satelliteCamera)}
         style={{ height: "30px", width: "30px", position: "absolute", left: "10px", bottom: "10px" }}
-      >{satelliteCamera ? "ON" : "OFF"}</button>
+      >{satelliteCamera ? "ON" : "OFF"}</button> */}
 
       {/* Bottom menu */}
       <div className={`bottom-menu ${isMenuOpen ? "open" : "closed"}`}>
