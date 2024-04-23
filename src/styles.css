@@ -408,10 +408,21 @@ body {
   height: 2px;
 }
 .Main .planet-point {
-  width: 10px;
-  height: 10px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   opacity: 0.8;
+  cursor: pointer;
+}
+.Main .planet-icon {
+  width: 12px;
+  height: 12px;
+  cursor: pointer;
+}
+.Main .planet-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 .Main .moon-point {
   width: 6px;
