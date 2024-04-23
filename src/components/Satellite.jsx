@@ -9,6 +9,7 @@ const Satellite = ({ target, size, satelliteCamera, toggleSatelliteCamera }) => 
     const [isDragging, setIsDragging] = useState(false);
     const [mouseDownPosition, setMouseDownPosition] = useState({ x: 0, y: 0 });
     const [spherical, setSpherical] = useState(new THREE.Spherical());
+    const [timerId, setTimerId] = useState(null);
 
     const handleMouseDown = useCallback((event) => {
         setIsDragging(true);
@@ -35,11 +36,27 @@ const Satellite = ({ target, size, satelliteCamera, toggleSatelliteCamera }) => 
     }, []);
 
     const handleWheel = useCallback((event) => {
+        const currentPosition = new THREE.Vector3().setFromSpherical(spherical);
+        const currentDistance = currentPosition.length();
+        const targetDistance = new THREE.Vector3(target.position.x, target.position.y, target.position.z).length();
+        const distanceRatio = currentDistance / targetDistance;
+
+        // Adjust the zoom factor based on the distance
+        const zoomSensitivity = 0.5;
+        const adjustedZoomFactor = zoomSensitivity * distanceRatio;
+
+        // Calculate the new radius
+        const newRadius = spherical.radius + event.deltaY * adjustedZoomFactor; // Use subtraction to invert 
+
         setSpherical(prevSpherical => {
-            const newRadius = prevSpherical.radius + event.deltaY * 0.03;
-            return new THREE.Spherical(Math.max(size * 2.5, Math.min(500, newRadius)), prevSpherical.phi, prevSpherical.theta);
+            return new THREE.Spherical(
+                Math.max(size * 2.5, Math.min(500, newRadius)),
+                prevSpherical.phi,
+                prevSpherical.theta
+            );
         });
-    }, [size]);
+    }, [size, spherical, target.position]);
+
 
     useEffect(() => {
         const canvasElement = gl.domElement;
@@ -74,18 +91,42 @@ const Satellite = ({ target, size, satelliteCamera, toggleSatelliteCamera }) => 
             cameraRef.current.updateMatrixWorld();
 
             const distance = camera.position.distanceTo(target.position);
-            if (distance < size * 8 && !satelliteCamera) {
+            const switchCamera = () => {
                 const relativePosition = new THREE.Vector3().subVectors(camera.position, target.position);
                 const radius = relativePosition.length();
                 const phi = Math.acos(relativePosition.y / radius);
                 const theta = Math.atan2(relativePosition.z, relativePosition.x);
-
                 setSpherical(new THREE.Spherical(radius, phi, theta));
-
                 toggleSatelliteCamera(true);
+            }
+
+            if (distance < size * 8) {
+                if (!satelliteCamera) {
+                    switchCamera();
+                    if (timerId) {
+                        clearTimeout(timerId);
+                        setTimerId(null);
+                    }
+                }
+            } else if (!timerId && !satelliteCamera) {
+                const id = setTimeout(() => {
+                    if (!satelliteCamera) {
+                        switchCamera()
+                    }
+                }, 4000);
+                setTimerId(id);
             }
         }
     });
+
+    useEffect(() => {
+        // Cleanup on unmount
+        return () => {
+            if (timerId) {
+                clearTimeout(timerId);
+            }
+        };
+    }, [timerId]);
 
     return (
         <PerspectiveCamera
