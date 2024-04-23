@@ -1,25 +1,26 @@
 // Planet without surface camera
 
-import React, { useRef, forwardRef, useState, useEffect } from "react";
-import { useFrame, useThree, extend } from "@react-three/fiber";
-// import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { Html, Torus, PerspectiveCamera, OrbitControls } from "@react-three/drei";
+import React, { useRef, forwardRef, useState } from "react";
+import { useFrame } from "@react-three/fiber";
+import { Html, Torus } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 import OrbitPath from "./OrbitPath";
-import useFollowCam from "../hooks/useFollowCam";
 import Satellite from "./Satellite";
+import mercuryIcon from "../../public/assets/icons/mercury-icon.png";
+import venusIcon from "../../public/assets/icons/venus-icon.png";
+import earthIcon from "../../public/assets/icons/earth-icon.png";
+import marsIcon from "../../public/assets/icons/mars-icon.png";
+import jupiterIcon from "../../public/assets/icons/jupiter-icon.png";
+import saturnIcon from "../../public/assets/icons/saturn-icon.png";
+import uranusIcon from "../../public/assets/icons/uranus-icon.png";
+import neptuneIcon from "../../public/assets/icons/neptune-icon.png";
 
-// extend({ OrbitControls });
 
 // default values
 const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   const { planetsData } = usePlanetStore()
   const bodyData = planetsData[name];
-
-  const { camera, gl } = useThree();
-  const planetCameraRef = useRef();
-  const controlsRef = useRef();
 
   const mergedData = { ...bodyData };
   const {
@@ -37,10 +38,20 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
     gravity,
     initialOrbitalAngle,
   } = mergedData;
+  const iconsMap = {
+    Mercury: mercuryIcon,
+    Venus: venusIcon,
+    Earth: earthIcon,
+    Mars: marsIcon,
+    Jupiter: jupiterIcon,
+    Saturn: saturnIcon,
+    Uranus: uranusIcon,
+    Neptune: neptuneIcon
+  }
 
-  const { simSpeed, updateRotationCount, incrementDate, simulationDate, orbitPaths } = useStore();
-  const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels, planetPositions } = usePlanetStore();
-  const { setSurfacePoint, surfacePoint, isSurfaceCameraActive, satelliteCamera, toggleSatelliteCamera } = useCameraStore();
+  const { simSpeed, updateRotationCount, incrementDate, orbitPaths } = useStore();
+  const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels } = usePlanetStore();
+  const { isSurfaceCameraActive, satelliteCamera, toggleSatelliteCamera } = useCameraStore();
   const localRef = ref || useRef();
   const localAngleRef = useRef(planetAngles[name] || 0); // Initialize with saved angle or 0
 
@@ -53,8 +64,9 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   rotationSpeed *= rotationSpeedScaleFactor;
 
   const isPlanetSelected = selectedPlanet && selectedPlanet.name === name; // clicked planet
+  const detailLevel = isPlanetSelected ? 64 : 32;
 
-  const [planetRotation, setPlanetRotation] = useState({ x: 0, y: 0, z: 0 });
+  // const [planetRotation, setPlanetRotation] = useState({ x: 0, y: 0, z: 0 });
 
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
@@ -94,11 +106,11 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
         // Increment the rotation
         localRef.current.rotation.y += rotationIncrement;
-        setPlanetRotation({
-          x: localRef.current.rotation.x,
-          y: localRef.current.rotation.y,
-          z: localRef.current.rotation.z,
-        });
+        // setPlanetRotation({
+        //   x: localRef.current.rotation.x,
+        //   y: localRef.current.rotation.y,
+        //   z: localRef.current.rotation.z,
+        // });
         // Check for a complete rotation
         if (localRef.current.rotation.y >= 2 * Math.PI) {
           localRef.current.rotation.y %= 2 * Math.PI; // Reset rotation for next cycle
@@ -110,33 +122,6 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
       }
     }
   });
-
-  const [showTextures, setShowTextures] = useState(false);
-  const textureDisplayDistance = 8000; // Set the distance threshold for showing textures
-  useFrame(({ camera }) => {
-    if (localRef.current) {
-      const distance = camera.position.distanceTo(localRef.current.position);
-      setShowTextures(distance < textureDisplayDistance);
-    }
-  });
-
-  // useFollowCam(isPlanetSelected ? localRef : null, camera, { x: 0, y: 0, z: 20 });  // Pass the camera to the hook
-  // ************************ NEW CAMERA CODE HERE *************************************************************************************************************************
-  // const [firstRender, setFirstRender] = useState(false);
-  // useFrame(() => {
-  //   // Setup and position the camera when the planet is selected
-  //   if (isPlanetSelected) {
-  //     // useFollowCam(localRef, { x: 0, y: 0, z: orbitalRadius * 1.5 });
-  //   }
-  // });
-
-  useFrame(() => {
-    if (isPlanetSelected && planetCameraRef.current) {
-      planetCameraRef.current.target.set(localRef.current.position.x, localRef.current.position.y, localRef.current.position.z);
-    }
-  });
-  // ************************ NEW CAMERA CODE HERE************************************************************************************************************************
-
 
   // Modify the handleClick to account for dragging
   const handleClick = e => {
@@ -152,19 +137,16 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
     initialClickPosition.current = { x: e.clientX, y: e.clientY }; // Record initial click position
   };
 
-  // New handler for pointer move
   const handlePointerMove = e => {
     // Calculate the distance moved
     const distanceMoved = Math.sqrt(
       Math.pow(e.clientX - initialClickPosition.current.x, 2) + Math.pow(e.clientY - initialClickPosition.current.y, 2)
     );
-    if (distanceMoved > 5) {
-      // Threshold to consider as a drag, adjust as needed
+    if (distanceMoved > 5) { // Threshold to consider as a drag
       setIsDragging(true);
     }
   };
 
-  // New handler for pointer up
   const handlePointerUp = e => {
     setIsDragging(false); // Reset dragging state
   };
@@ -179,32 +161,25 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
     document.body.style.cursor = "auto";
   };
 
-  const detailLevel = isPlanetSelected ? 64 : 32;
+  // scale planet size based on distance. Also use to toggle textures on/off
+  const [scale, setScale] = useState(scaledRadius);
+  useFrame(({ camera }) => {
+    if (!meshRef.current) return;
+    const distance = localRef.current.position.distanceTo(camera.position);
+    if (distance / 100 <= scaledRadius) {
+      setScale(scaledRadius);
+    } else {
+      setScale(distance / 100);
+    }
+  });
 
 
   return (
     <>
-      {/* <FakeCamera target={localRef.current} satelliteCamera={satelliteCamera} size={scaledRadius} /> */}
       {isPlanetSelected && localRef.current &&
         <Satellite target={localRef.current} color={color} size={scaledRadius} satelliteCamera={satelliteCamera} toggleSatelliteCamera={toggleSatelliteCamera} />
       }
-
       <group ref={localRef}>
-        {/* place a camera here that follows the planet and can be controlled */}
-        {/* {isPlanetSelected && (
-          <OrbitControls
-            ref={planetCameraRef}
-            args={[camera, gl.domElement]} // Attach the default camera and DOM element
-            enableZoom={true}
-            enableRotate={true}
-            enablePan={false}
-            target={localRef.current.position}
-            maxDistance={scaledRadius * 6}
-            minDistance={scaledRadius * 2.5}
-            enableDamping={true}
-            dampingFactor={0.1}
-          />
-        )} */}
 
         <mesh
           ref={meshRef}
@@ -215,17 +190,24 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
           onPointerOver={handlePointerOver}
           onPointerOut={handlePointerOut}
         >
-          <sphereGeometry args={[scaledRadius, detailLevel, detailLevel]} />
-          {textures ? (
-            <meshStandardMaterial metalness={0.3} roughness={0.65} map={textures.map} />
-          ) : (
-            <meshStandardMaterial color={color} />
-          )}
+          <sphereGeometry args={[scale, detailLevel, detailLevel]} />
+          {scale <= scaledRadius ?
+            <meshStandardMaterial
+              metalness={0.3}
+              roughness={0.65}
+              map={textures.map}
+            />
+            :
+            <meshBasicMaterial
+              color={color}
+            />
+          }
+
         </mesh>
         {name === "Saturn" && (
           <group>
             <Torus args={[scaledRadius * 2, scaledRadius * 0.15, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
-              <meshBasicMaterial color={"#Ffffff"} transparent opacity={0.25} />
+              <meshBasicMaterial color={"#ffffff"} transparent opacity={0.25} />
             </Torus>
             <Torus args={[scaledRadius * 1.5, scaledRadius * 0.3, 2, 80]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
               <meshBasicMaterial color={"#F4E1C1"} transparent opacity={0.25} />
@@ -234,7 +216,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         )}
 
         {/* Display planet names */}
-        {displayLabels ? (
+        {displayLabels && (
           <Html
             as='span'
             wrapperClass='label-wrapper'
@@ -255,19 +237,6 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
             >
               {name}
             </span>
-          </Html>
-        ) : (
-          <Html as='div' center zIndexRange={[100, 0]}>
-            <div
-              className='planet-point'
-              style={{ backgroundColor: color }}
-              onClick={handleClick}
-              onPointerDown={handlePointerDown}
-              onPointerMove={handlePointerMove}
-              onPointerUp={handlePointerUp}
-              onPointerOver={handlePointerOver}
-              onPointerOut={handlePointerOut}
-            />
           </Html>
         )}
 

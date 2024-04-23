@@ -90,18 +90,7 @@ const Sun = ({ position, resetCamera, textures }) => {
           </div>
         </Html>
       ) : (
-        <Html center zIndexRange={[100, 0]}>
-          <div
-            className='planet-point'
-            style={{ backgroundColor: "rgba(255, 255, 0,0.9)" }}
-            onClick={handleClick}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerOver={handlePointerOver}
-            onPointerOut={handlePointerOut}
-          />
-        </Html>
+        null
       )}
     </group>
   );

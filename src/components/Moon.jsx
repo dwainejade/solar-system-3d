@@ -1,16 +1,14 @@
 import React, { useRef, forwardRef, useState, useMemo, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Html } from "@react-three/drei";
-import useStore, { usePlanetStore, useCameraStore } from "../store/store";
-import { moonsData, moonDistanceScaleFactor, moonSizeScaleFactor } from "../data/moonsData";
+import useStore, { usePlanetStore } from "../store/store";
+import { moonDistanceScaleFactor, moonSizeScaleFactor } from "../data/moonsData";
 
 import OrbitPath from "./OrbitPath";
 import { Vector3 } from "three";
 
 const Moon = forwardRef(({ bodyData, parentPosition, parentName, textures }, ref) => {
   const { simSpeed, orbitPaths } = useStore();
-  const { displayNames, selectedPlanet, selectedMoon, setSelectedMoon, setSelectedPlanet } = usePlanetStore();
-  const { isSurfaceCameraActive } = useCameraStore()
+  const { selectedPlanet, selectedMoon, setSelectedMoon, setSelectedPlanet } = usePlanetStore();
 
   const localRef = ref || useRef();
   const localAngleRef = useRef(0);
@@ -32,14 +30,8 @@ const Moon = forwardRef(({ bodyData, parentPosition, parentName, textures }, ref
   }, []);
 
   useFrame((state, delta) => {
-    // Calculate the moon's orbital speed based on its orbital period
-    // bodyData.orbitalPeriod in Earth days
-
     // Update the angle based on the simulation speed
     localAngleRef.current -= orbitalSpeed * simSpeed * delta;
-    // console.log(orbitalSpeed * simSpeed);
-
-    // Calculate moon's position relative to its parent planet
     // Calculate moon's position relative to its parent planet
     const angle = localAngleRef.current;
     const moonX = Math.cos(angle) * scaledOrbitalRadius + parentPosition?.x;
@@ -89,38 +81,42 @@ const Moon = forwardRef(({ bodyData, parentPosition, parentName, textures }, ref
     }
   };
 
+  const [scale, setScale] = useState(scaledRadius);
+  useFrame(({ camera }) => {
+    if (!localRef.current) return;
+
+    const distance = localRef.current.position.distanceTo(camera.position);
+    if (distance / 100 <= scaledRadius) {
+      setScale(scaledRadius);
+    } else {
+      setScale(distance / 160);
+    }
+  });
+
+  // if planet not selected then moon will not be visible
+  if (!selectedPlanet || selectedPlanet.name !== parentName) {
+    return null;
+  }
+
   return (
-    // (selectedPlanet?.name === parentName || name === "Moon") && (
     <group>
-      <mesh ref={localRef} onClick={handleClick}>
-        <sphereGeometry args={[scaledRadius, 32, 32]} />
-        {textures ? (
-          <meshStandardMaterial metalness={0.9} roughness={0.65} map={textures.map} zIndexRange={[100 - 1]} />
+      <mesh ref={localRef} >
+        <sphereGeometry args={[scale, 16, 16]} />
+        {scale <= scaledRadius ? (
+          <meshStandardMaterial metalness={0.9} roughness={0.65} map={textures?.map} zIndexRange={[100 - 1]} />
         ) : (
-          <meshStandardMaterial color={color} />
+          <meshBasicMaterial color={color} />
         )}
       </mesh>
 
-      {parentName === selectedPlanet?.name && (
-        <Html
-          position={[moonPosition?.x, moonPosition?.y, moonPosition?.z]}
-          as='div'
-          wrapperClass='moon-wrapper'
-          center
-          zIndexRange={[100, 0]}
-          onClick={handleClick}
-        >
-          <div className='moon-point' style={{ backgroundColor: color }} onClick={handleClick} />
-        </Html>
-      )}
-      {orbitPaths && parentPosition && (
-        <group position={[parentPosition.x, parentPosition.y, parentPosition.z]}>
+      {orbitPaths && parentPosition && parentName === selectedPlanet?.name && (
+        <group position={[parentPosition.x, parentPosition.y, parentPosition.z]} >
           <OrbitPath
-            origin={[0, 0, 0]} // Now relative to the group's position
+            origin={[0, 0, 0]}
             radius={scaledOrbitalRadius}
             orbitalInclination={orbitalInclination}
             color={color}
-            name={name}
+            name={name + "-orbit-path"}
           />
         </group>
       )}
