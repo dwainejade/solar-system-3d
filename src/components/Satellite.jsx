@@ -42,7 +42,7 @@ const Satellite = ({ target, size, satelliteCamera, toggleSatelliteCamera }) => 
         const distanceRatio = currentDistance / targetDistance;
 
         // Adjust the zoom factor based on the distance
-        const zoomSensitivity = 0.5;
+        const zoomSensitivity = 1;
         const adjustedZoomFactor = zoomSensitivity * distanceRatio;
 
         // Calculate the new radius
