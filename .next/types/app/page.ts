@@ -1,4 +1,4 @@
-// File: /Users/dmatthew8972/Desktop/personal/solar-sim/app/page.jsx
+// File: /Users/dmatthew8972/Desktop/strongmind/github/solar-system-interactive/app/page.jsx
 import * as entry from '../../../app/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
