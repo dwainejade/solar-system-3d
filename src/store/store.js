@@ -150,7 +150,7 @@ const usePlanetStore = create(immer((set, get) => ({
 
 const useCameraStore = create((set) => ({
     satelliteCamera: false,
-    toggleSatelliteCamera: () => set((state) => ({ satelliteCamera: !state.satelliteCamera })),
+    toggleSatelliteCamera: (newState) => set(() => ({ satelliteCamera: newState })),
 
     surfacePoint: null,
     setSurfacePoint: (surfacePoint) => set({ surfacePoint }),

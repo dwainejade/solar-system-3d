@@ -3,19 +3,18 @@ import { useThree, useFrame } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 
-const Satellite = ({ target, size, satelliteCamera }) => {
-    const { gl } = useThree();
+const Satellite = ({ target, size, satelliteCamera, toggleSatelliteCamera }) => {
+    const { camera, gl } = useThree();
     const cameraRef = useRef();
     const [isDragging, setIsDragging] = useState(false);
     const [mouseDownPosition, setMouseDownPosition] = useState({ x: 0, y: 0 });
-    const [spherical, setSpherical] = useState(new THREE.Spherical(size * 4, Math.PI / 2, Math.PI / 2));
+    const [spherical, setSpherical] = useState(new THREE.Spherical());
 
     const handleMouseDown = useCallback((event) => {
         setIsDragging(true);
         setMouseDownPosition({ x: event.clientX, y: event.clientY });
     }, []);
 
-    // orbit around target
     const handleMouseMove = useCallback((event) => {
         if (isDragging) {
             const dx = event.clientX - mouseDownPosition.x;
@@ -26,6 +25,7 @@ const Satellite = ({ target, size, satelliteCamera }) => {
                 newSpherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, newSpherical.phi));
                 return newSpherical;
             });
+
             setMouseDownPosition({ x: event.clientX, y: event.clientY });
         }
     }, [isDragging, mouseDownPosition]);
@@ -34,7 +34,6 @@ const Satellite = ({ target, size, satelliteCamera }) => {
         setIsDragging(false);
     }, []);
 
-    // zoom in and out
     const handleWheel = useCallback((event) => {
         setSpherical(prevSpherical => {
             const newRadius = prevSpherical.radius + event.deltaY * 0.03;
@@ -43,20 +42,29 @@ const Satellite = ({ target, size, satelliteCamera }) => {
     }, [size]);
 
     useEffect(() => {
-        const domElement = gl.domElement;
+        const canvasElement = gl.domElement;
+        const bodyElement = document.body;
 
-        domElement.addEventListener('mousedown', handleMouseDown);
-        domElement.addEventListener('mousemove', handleMouseMove);
-        domElement.addEventListener('mouseup', handleMouseUp);
-        domElement.addEventListener('wheel', handleWheel);
+        canvasElement.addEventListener('mousedown', handleMouseDown);
+        bodyElement.addEventListener('mousemove', handleMouseMove);
+        bodyElement.addEventListener('mouseup', handleMouseUp);
+        canvasElement.addEventListener('wheel', handleWheel);
 
         return () => {
-            domElement.removeEventListener('mousedown', handleMouseDown);
-            domElement.removeEventListener('mousemove', handleMouseMove);
-            domElement.removeEventListener('mouseup', handleMouseUp);
-            domElement.removeEventListener('wheel', handleWheel);
+            canvasElement.removeEventListener('mousedown', handleMouseDown);
+            bodyElement.removeEventListener('mousemove', handleMouseMove);
+            bodyElement.removeEventListener('mouseup', handleMouseUp);
+            canvasElement.removeEventListener('wheel', handleWheel);
         };
     }, [handleMouseDown, handleMouseMove, handleMouseUp, handleWheel, gl.domElement]);
+
+    useEffect(() => {
+        return () => {
+            if (satelliteCamera) {
+                toggleSatelliteCamera(false);
+            }
+        };
+    }, [satelliteCamera, toggleSatelliteCamera]);
 
     useFrame(() => {
         if (cameraRef.current && target) {
@@ -64,6 +72,18 @@ const Satellite = ({ target, size, satelliteCamera }) => {
             cameraRef.current.position.set(newPosition.x + target.position.x, newPosition.y + target.position.y, newPosition.z + target.position.z);
             cameraRef.current.lookAt(target.position);
             cameraRef.current.updateMatrixWorld();
+
+            const distance = camera.position.distanceTo(target.position);
+            if (distance < size * 8 && !satelliteCamera) {
+                const relativePosition = new THREE.Vector3().subVectors(camera.position, target.position);
+                const radius = relativePosition.length();
+                const phi = Math.acos(relativePosition.y / radius);
+                const theta = Math.atan2(relativePosition.z, relativePosition.x);
+
+                setSpherical(new THREE.Spherical(radius, phi, theta));
+
+                toggleSatelliteCamera(true);
+            }
         }
     });
 
@@ -77,5 +97,7 @@ const Satellite = ({ target, size, satelliteCamera }) => {
         />
     );
 };
+
+
 
 export default Satellite;

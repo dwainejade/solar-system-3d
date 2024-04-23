@@ -17,10 +17,12 @@ const Menu = () => {
   const resetAll = () => {
     setTriggerReset(true)
     resetPlanetsData()
+    toggleSatelliteCamera(false)
   };
   const resetCamera = () => {
     setTriggerReset(true)
   }
+
 
   const handleFullscreen = () => {
     toggleFullscreen()
@@ -76,9 +78,9 @@ const Menu = () => {
       <button className="reset-all-btn btn" onClick={resetAll} />
       {/* fullscreen button */}
       <button className="fullscreen-btn btn" onClick={handleFullscreen} />
-      <button className="satelliteCamera-btn btn" onClick={toggleSatelliteCamera}
-        style={{ height: "30px", width: "30px", backgroundColor: satelliteCamera ? "red" : "green", position: "absolute", left: "10px", bottom: "10px" }}
-      >s</button>
+      <button className="satelliteCamera-btn btn" onClick={() => toggleSatelliteCamera(!satelliteCamera)}
+        style={{ height: "30px", width: "30px", position: "absolute", left: "10px", bottom: "10px" }}
+      >{satelliteCamera ? "ON" : "OFF"}</button>
 
       {/* Bottom menu */}
       <div className={`bottom-menu ${isMenuOpen ? "open" : "closed"}`}>
