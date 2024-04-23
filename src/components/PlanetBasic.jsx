@@ -1,8 +1,9 @@
 // Planet without surface camera
 
-import React, { useRef, forwardRef, useState } from "react";
+import React, { useRef, forwardRef, useState, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Html, Torus } from "@react-three/drei";
+import * as THREE from "three";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 import OrbitPath from "./OrbitPath";
@@ -105,12 +106,10 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         const rotationIncrement = rotationSpeed * adjustedDelta;
 
         // Increment the rotation
-        localRef.current.rotation.y += rotationIncrement;
-        // setPlanetRotation({
-        //   x: localRef.current.rotation.x,
-        //   y: localRef.current.rotation.y,
-        //   z: localRef.current.rotation.z,
-        // });
+        // localRef.current.rotation.y += rotationIncrement;
+        const yAxis = new THREE.Vector3(0, 1, 0);
+        meshRef.current.rotateOnAxis(yAxis, rotationIncrement);
+
         // Check for a complete rotation
         if (localRef.current.rotation.y >= 2 * Math.PI) {
           localRef.current.rotation.y %= 2 * Math.PI; // Reset rotation for next cycle
@@ -122,6 +121,15 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
       }
     }
   });
+
+  useEffect(() => {
+    // Set the axial tilt using Euler angles, aligning the rotation axis
+    if (meshRef.current) {
+      meshRef.current.rotation.order = 'YXZ'; // This is critical to ensure the tilt is applied around the world Y, then rotation around local Y
+      meshRef.current.rotation.y = 0; // Reset initial Y rotation
+      meshRef.current.rotation.x = THREE.MathUtils.degToRad(axialTilt); // Apply axial tilt around the new local X after Y rotation reset
+    }
+  }, [axialTilt]);
 
   // Modify the handleClick to account for dragging
   const handleClick = e => {
