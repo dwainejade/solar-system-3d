@@ -58,6 +58,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   const initialClickPosition = useRef({ x: 0, y: 0 });
 
   const meshRef = useRef();
+  const saturnRingRef = useRef();
 
   useFrame((state, delta) => {
     // Adjust delta based on simulation speed (simSpeed)
@@ -91,7 +92,6 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         const rotationIncrement = rotationSpeed * adjustedDelta;
 
         // Increment the rotation
-        // localRef.current.rotation.y += rotationIncrement;
         const yAxis = new THREE.Vector3(0, 1, 0);
         meshRef.current.rotateOnAxis(yAxis, rotationIncrement);
 
@@ -102,6 +102,9 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
           if (name === "Earth") {
             incrementDate(); // Increment the simulation date by one day
           }
+        }
+        if (saturnRingRef.current) { // rotate saturns rings
+          saturnRingRef.current.rotation.y += rotationIncrement;
         }
       }
     }
@@ -200,10 +203,11 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
 
         </mesh>
+        {/* Saturns rings */}
         {name === "Saturn" && (
-          <group rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} >
+          <group ref={saturnRingRef} rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} >
             <Torus args={[scaledRadius * 1.7, scaledRadius * 0.5, 2, 100]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
-              <meshBasicMaterial map={ringTexture} side={THREE.DoubleSide} transparent opacity={0.9} />
+              <meshBasicMaterial map={ringTexture} side={THREE.DoubleSide} transparent />
             </Torus>
           </group>
         )}
