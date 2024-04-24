@@ -2,20 +2,14 @@
 
 import React, { useRef, forwardRef, useState, useEffect } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
-import { Html, Torus } from "@react-three/drei";
+import { Html, Torus, Trail } from "@react-three/drei";
 import * as THREE from "three";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 import OrbitPath from "./OrbitPath";
 import Satellite from "./Satellite";
-import mercuryIcon from "../../public/assets/icons/mercury-icon.png";
-import venusIcon from "../../public/assets/icons/venus-icon.png";
-import earthIcon from "../../public/assets/icons/earth-icon.png";
-import marsIcon from "../../public/assets/icons/mars-icon.png";
-import jupiterIcon from "../../public/assets/icons/jupiter-icon.png";
-import saturnIcon from "../../public/assets/icons/saturn-icon.png";
-import uranusIcon from "../../public/assets/icons/uranus-icon.png";
-import neptuneIcon from "../../public/assets/icons/neptune-icon.png";
+import Moon from "./Moon";
+import { moonsData } from "@/data/moonsData";
 
 
 // default values
@@ -39,16 +33,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
     gravity,
     initialOrbitalAngle,
   } = mergedData;
-  const iconsMap = {
-    Mercury: mercuryIcon,
-    Venus: venusIcon,
-    Earth: earthIcon,
-    Mars: marsIcon,
-    Jupiter: jupiterIcon,
-    Saturn: saturnIcon,
-    Uranus: uranusIcon,
-    Neptune: neptuneIcon
-  }
+
 
   const { simSpeed, updateRotationCount, incrementDate, orbitPaths } = useStore();
   const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels } = usePlanetStore();
@@ -187,6 +172,8 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   ringTexture.wrapS = THREE.RepeatWrapping;
   ringTexture.wrapT = THREE.ClampToEdgeWrapping;
 
+  // get moons data
+  const moons = moonsData[name] || [];
 
   return (
     <>
@@ -194,7 +181,6 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         <Satellite target={localRef.current} color={color} size={scaledRadius} satelliteCamera={satelliteCamera} toggleSatelliteCamera={toggleSatelliteCamera} />
       }
       <group ref={localRef}>
-
         <mesh
           ref={meshRef}
           onClick={handleClick}
@@ -205,17 +191,13 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
           onPointerOut={handlePointerOut}
         >
           <sphereGeometry args={[scale, detailLevel, detailLevel]} />
-          {scale <= scaledRadius ?
-            <meshStandardMaterial
-              metalness={0.3}
-              roughness={0.65}
-              map={textures.map}
-            />
-            :
-            <meshBasicMaterial
-              color={color}
-            />
-          }
+
+          <meshStandardMaterial
+            metalness={0.3}
+            roughness={0.8}
+            map={textures.map}
+          />
+
 
         </mesh>
         {name === "Saturn" && (
@@ -251,9 +233,16 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
           </Html>
         )}
 
+        {/* Render moons */}
+        {moons.map((moon, index) => (
+          <Moon key={`${name}-moon-${index}`} moonData={moon} planetPosition={localRef.current?.position} />
+        ))}
+
+
+
       </group>
       {orbitPaths && (
-        <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} />
+        <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} hiRes={isPlanetSelected} />
       )}
     </>
   );
