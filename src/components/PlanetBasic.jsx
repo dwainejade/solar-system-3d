@@ -234,11 +234,9 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         )}
 
         {/* Render moons */}
-        {moons.map((moon, index) => (
+        {isPlanetSelected && moons.map((moon, index) => (
           <Moon key={`${name}-moon-${index}`} moonData={moon} planetPosition={localRef.current?.position} />
         ))}
-
-
 
       </group>
       {orbitPaths && (
