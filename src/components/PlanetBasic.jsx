@@ -1,8 +1,8 @@
 // Planet without surface camera
 
-import React, { useRef, forwardRef, useState, useEffect } from "react";
+import React, { useRef, forwardRef, useState, useEffect, cloneElement } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
-import { Html, Torus, Trail } from "@react-three/drei";
+import { Html, Torus } from "@react-three/drei";
 import * as THREE from "three";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
@@ -146,15 +146,18 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   const handlePointerUp = e => {
     setIsDragging(false); // Reset dragging state
   };
+  const [isHovered, setIsHovered] = useState(false);
 
   const handlePointerOver = e => {
     e.stopPropagation();
     document.body.style.cursor = "pointer";
+    setIsHovered(true);
   };
 
   const handlePointerOut = e => {
     e.stopPropagation();
     document.body.style.cursor = "auto";
+    setIsHovered(false);
   };
 
   // scale planet size based on distance. Also use to toggle textures on/off
@@ -194,13 +197,14 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
           onPointerOut={handlePointerOut}
         >
           <sphereGeometry args={[scale, detailLevel, detailLevel]} />
-
-          <meshStandardMaterial
-            metalness={0.3}
-            roughness={0.8}
-            map={textures.map}
-          />
-
+          {isPlanetSelected && textures ?
+            <meshStandardMaterial
+              metalness={0.6}
+              roughness={0.8}
+              map={textures.map}
+            /> :
+            <meshBasicMaterial color={color} />
+          }
 
         </mesh>
         {/* Saturns rings */}
@@ -219,7 +223,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
             wrapperClass='label-wrapper'
             center
             occlude
-            position-y={scaledRadius + scaledRadius * 0.25}
+            position-y={scale + scale * 0.25}
             zIndexRange={[100, 0]}
           >
             <span
@@ -234,6 +238,15 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
             >
               {name}
             </span>
+          </Html>
+        )}
+
+        {/* Display planet name on hover */}
+        {isHovered && !isPlanetSelected && !displayLabels && (
+          <Html position={[0, 100, 0]} style={{ pointerEvents: 'none' }}>
+            <div style={{ color: 'white', padding: '6px 10px', background: 'rgba(0,0,0,0.5)', borderRadius: '8px' }}>
+              {name}
+            </div>
           </Html>
         )}
 
