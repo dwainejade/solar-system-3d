@@ -92,8 +92,6 @@ const SceneThree = () => {
       setPrevSpeed(simSpeed);
       setSimSpeed(0); // Pause the simulation
       toggleCameraTransitioning(true); // Start the camera transition
-      console.log("Camera transition started", { simSpeed, prevSpeed });
-      console.log({ isCameraTransitioning })
     }
   }, [selectedPlanet]);
 
@@ -101,13 +99,13 @@ const SceneThree = () => {
   const earthTextures = useTexture({
     map: "../assets/earth/8k_earth_daymap.jpg",
     clouds: "../assets/earth/2k_earth_clouds.jpg",
-    night: "../assets/earth/2k_earth_nightmap.jpg",
-    normal: "../assets/earth/2k_earth_normal_map.png",
-    specular: "../assets/earth/2k_earth_specular_map.png",
+    // night: "../assets/earth/2k_earth_nightmap.jpg",
+    // normal: "../assets/earth/2k_earth_normal_map.png",
+    // specular: "../assets/earth/2k_earth_specular_map.png",
   });
   const venusTextures = useTexture({
     map: "../assets/venus/2k_venus_surface.jpg",
-    surface: "../assets/venus/2k_venus_atmosphere.jpg",
+    // surface: "../assets/venus/2k_venus_atmosphere.jpg",
   });
   const mercuryTextures = useTexture({
     map: "../assets/mercury/2k_mercury.jpg",
@@ -134,6 +132,8 @@ const SceneThree = () => {
     smoothTime: .8,
     truckSpeed: 1,
     rotateSpeed: 1,
+    near: 0.001,
+    far: 1000000
   };
 
 

@@ -4,9 +4,9 @@ import useStore, { usePlanetStore, useCameraStore } from "../../store/store";
 import Details from "./PlanetDetails"
 
 const Menu = () => {
-  const { simSpeed, setSimSpeed, showConstellations, toggleConstellations, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths, isEditing, setIsEditing } = useStore();
-  const { selectedPlanet, setSelectedPlanet, selectedMoon, displayLabels, toggleDisplayLabels, updateSelectedPlanet, planetsData, resetPlanetsData } = usePlanetStore();
-  const { setTriggerReset, satelliteCamera, toggleSatelliteCamera } = useCameraStore()
+  const { simSpeed, setSimSpeed, prevSpeed, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths } = useStore();
+  const { selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels, planetsData, resetPlanetsData } = usePlanetStore();
+  const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning } = useCameraStore()
 
   const [isMenuOpen, setMenuOpen] = useState(false);
 
@@ -107,7 +107,8 @@ const Menu = () => {
           {/* Dropdown for sim speed */}
           <div className="menu-item">
             <label htmlFor="simSpeedSelect">Simulation Speed</label>
-            <select id="simSpeedSelect" onChange={handleSpeedChange} value={simSpeed}>
+            <select id="simSpeedSelect" onChange={handleSpeedChange}
+              value={isCameraTransitioning ? prevSpeed : simSpeed} disabled={isCameraTransitioning}>
               {speedOptions.map((option, index) => (
                 <option key={index} value={option.value}>
                   {option.label}

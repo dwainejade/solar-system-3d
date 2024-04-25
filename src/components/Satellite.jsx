@@ -6,15 +6,15 @@ import useStore, { useCameraStore } from '../store/store';
 
 
 const Satellite = ({ target, size, satelliteCamera, toggleSatelliteCamera }) => {
-    const { isCameraTransitioning, toggleCameraTransitioning } = useCameraStore();
-    const { prevSpeed, setPrevSpeed, setSimSpeed, simSpeed } = useStore();
+    const { toggleCameraTransitioning } = useCameraStore();
+    const { prevSpeed, setSimSpeed } = useStore();
 
     const { camera, gl } = useThree();
     const cameraRef = useRef();
     const [isDragging, setIsDragging] = useState(false);
     const [mouseDownPosition, setMouseDownPosition] = useState({ x: 0, y: 0 });
     const [spherical, setSpherical] = useState(new THREE.Spherical());
-    const [timerId, setTimerId] = useState(null);
+
 
     const handleMouseDown = useCallback((event) => {
         setIsDragging(true);
@@ -47,7 +47,7 @@ const Satellite = ({ target, size, satelliteCamera, toggleSatelliteCamera }) => 
         const distanceRatio = currentDistance / targetDistance;
 
         // Adjust the zoom factor based on the distance
-        const zoomSensitivity = -1; // Lower this if zooming is too fast
+        const zoomSensitivity = -.8; // Lower this if zooming is too fast
         const deltaY = event.deltaY * zoomSensitivity;
 
         // Normalize deltaY to avoid too fast zoom changes
@@ -97,7 +97,6 @@ const Satellite = ({ target, size, satelliteCamera, toggleSatelliteCamera }) => 
             cameraRef.current.lookAt(target.position);
             cameraRef.current.updateMatrixWorld();
 
-
             const distance = camera.position.distanceTo(target.position);
             const switchCamera = () => {
                 const relativePosition = new THREE.Vector3().subVectors(camera.position, target.position);
@@ -108,30 +107,17 @@ const Satellite = ({ target, size, satelliteCamera, toggleSatelliteCamera }) => 
                 toggleSatelliteCamera(true);
                 toggleCameraTransitioning(false);
                 setSimSpeed(prevSpeed)
-                console.log('switched Camera', { simSpeed });
             }
 
-            if (distance < size * 8) {
+            if (distance <= size * 5) {
                 if (!satelliteCamera) {
                     switchCamera();
-                    if (timerId) {
-                        clearTimeout(timerId);
-                        setTimerId(null);
-                    }
                 }
             }
         }
     });
 
 
-    useEffect(() => {
-        // Cleanup on unmount
-        return () => {
-            if (timerId) {
-                clearTimeout(timerId);
-            }
-        };
-    }, [timerId]);
 
     return (
         <PerspectiveCamera
