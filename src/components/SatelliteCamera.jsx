@@ -40,29 +40,41 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera 
         setIsDragging(false);
     }, []);
 
+
+    const [targetRadius, setTargetRadius] = useState(spherical.radius);
     const handleWheel = useCallback((event) => {
         const currentPosition = new THREE.Vector3().setFromSpherical(spherical);
-        const currentDistance = currentPosition.length();
-        const targetDistance = new THREE.Vector3(target.position.x, target.position.y, target.position.z).distanceTo(camera.position);
-        const distanceRatio = currentDistance / targetDistance;
+        const currentDistance = currentPosition.distanceTo(new THREE.Vector3(0, 0, 0));
 
-        // Adjust the zoom factor based on the distance
-        const zoomSensitivity = -.8; // Lower this if zooming is too fast
+        // Dynamic zoom sensitivity adjustment
+        const baseZoomSensitivity = -0.05;
+        const sensitivityAdjustment = Math.pow(currentDistance / 500, size * 0.001); // Root scaling for smoother adjustment at closer distances
+        const zoomSensitivity = baseZoomSensitivity * sensitivityAdjustment;
         const deltaY = event.deltaY * zoomSensitivity;
+        const normalizedDeltaY = Math.sign(deltaY) * Math.min(Math.abs(deltaY), 10);
 
-        // Normalize deltaY to avoid too fast zoom changes
-        const normalizedDeltaY = Math.sign(deltaY) * Math.min(Math.abs(deltaY), 3);
+        // Set the new target radius
+        const newTargetRadius = spherical.radius - normalizedDeltaY;
+        setTargetRadius(Math.max(size * 3, Math.min(500, newTargetRadius)));
+    }, [spherical]);
 
-        // Calculate the new radius, inversely proportional to the zoom sensitivity
-        const newRadius = spherical.radius + normalizedDeltaY * distanceRatio * -1; // Negative to invert the zoom direction
 
-        setSpherical(prevSpherical => new THREE.Spherical(
-            Math.max(size * 2.5, Math.min(500, newRadius)),
-            prevSpherical.phi,
-            prevSpherical.theta
-        ));
-    }, [size, spherical, target.position]);
+    useFrame(() => {
+        if (cameraRef.current && target) {
+            // Lerp the spherical radius towards the target radius
+            const lerpFactor = .5;  // Adjust this factor to change the interpolation speed
+            setSpherical(prevSpherical => new THREE.Spherical(
+                THREE.MathUtils.lerp(prevSpherical.radius, targetRadius, lerpFactor),
+                prevSpherical.phi,
+                prevSpherical.theta
+            ));
 
+            // Update the camera position based on the new spherical coordinates
+            const newPosition = new THREE.Vector3().setFromSpherical(spherical);
+            cameraRef.current.position.set(newPosition.x + target.position.x, newPosition.y + target.position.y, newPosition.z + target.position.z);
+            cameraRef.current.lookAt(target.position);
+        }
+    });
 
 
     useEffect(() => {
@@ -126,7 +138,7 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera 
             makeDefault={satelliteCamera}
             fov={50}
             near={size}
-            far={100000}
+            far={1000000}
             enablePan={true}
         />
     );
