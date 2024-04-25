@@ -1,21 +1,28 @@
 import React, { useRef, forwardRef, useState, useMemo, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
-import useStore, { usePlanetStore } from "../store/store";
-import { moonDistanceScaleFactor, moonSizeScaleFactor } from "../data/moonsData";
-
-import OrbitPath from "./OrbitPath";
+import useStore, { useCameraStore, usePlanetStore } from "../store/store";
+import { useTexture } from "@react-three/drei";
 import { Vector3 } from "three";
-import { Trail } from "@react-three/drei";
+import { moonDistanceScaleFactor, moonSizeScaleFactor } from "../data/moonsData";
+import OrbitPath from "./OrbitPath";
+import Satellite from "./Satellite";
 
-const Moon = forwardRef(({ moonData, textures }, ref) => {
-  const { simSpeed, orbitPaths } = useStore();
+const Moon = forwardRef(({ moonData }, ref) => {
+  const { simSpeed, orbitPaths, setSimSpeed } = useStore();
   const { selectedPlanet, selectedMoon, setSelectedMoon, setSelectedPlanet } = usePlanetStore();
+  const { satelliteCamera, toggleSatelliteCamera } = useCameraStore()
 
   const localRef = ref || useRef();
   const localAngleRef = useRef(0);
-  const [moonPosition, setMoonPosition] = useState({ x: 0, y: 0, z: 0 });
+  // const [moonPosition, setMoonPosition] = useState({ x: 0, y: 0, z: 0 });
+  // load textures here
+  // an object to store the moon's textures
+  const moonTextures = useTexture({
+    Moon: '../assets/earth/moon/2k_moon.jpg'
+  })
 
   const { name, orbitalRadius, radius, color, orbitalPeriod, orbitalInclination } = moonData;
+  const isMoonSelected = selectedMoon && selectedMoon.name === name; // clicked planet
 
   // Apply moon-specific scaling factors
   const scaledRadius = radius * moonSizeScaleFactor;
@@ -33,6 +40,7 @@ const Moon = forwardRef(({ moonData, textures }, ref) => {
   useFrame((state, delta) => {
     // Update the angle based on the simulation speed
     localAngleRef.current -= orbitalSpeed * simSpeed * delta;
+
     // Calculate moon's position relative to its parent planet
     const angle = localAngleRef.current;
     const moonX = Math.cos(angle) * scaledOrbitalRadius;
@@ -43,20 +51,15 @@ const Moon = forwardRef(({ moonData, textures }, ref) => {
     // Update the moon's position
     if (localRef.current) {
       localRef.current.position.set(moonX, moonY, moonZ);
-      setMoonPosition({ x: moonX, y: moonY, z: moonZ });
-    }
 
-    // If orbit paths are enabled, update the orbit path rotation to keep it stationary
-    if (orbitPaths && localRef.current) {
-      localRef.current.children.forEach(child => {
-        if (child instanceof OrbitPath) {
-          child.rotation.x = -parentRotation.x;
-          child.rotation.y = -parentRotation.y;
-          child.rotation.z = -parentRotation.z;
-        }
-      });
+      // Point the moon towards the Earth: Earth is assumed to be at the origin (0,0,0)
+      localRef.current.lookAt(new Vector3(0, 0, 0));
+
+      // setMoonPosition({ x: moonX, y: moonY, z: moonZ });
     }
   });
+
+
 
 
   // useEffect(() => {
@@ -71,16 +74,13 @@ const Moon = forwardRef(({ moonData, textures }, ref) => {
   // }, []);
 
 
-  // const handleClick = e => {
-  //   e.stopPropagation();
-  //   const moonData = { bodyData, position: moonPosition };
-  //   if (selectedMoon && selectedMoon.name === name) {
-  //     setSelectedMoon(null);
-  //   } else {
-  //     setSelectedPlanet(null);
-  //     setSelectedMoon(moonData);
-  //   }
-  // };
+  const handleClick = e => {
+    e.stopPropagation();
+    if (selectedMoon && selectedMoon.name === name) return
+
+    setSelectedPlanet(null);
+    setSelectedMoon(moonData);
+  };
 
   // const [scale, setScale] = useState(scaledRadius);
   // useFrame(({ camera }) => {
@@ -110,12 +110,13 @@ const Moon = forwardRef(({ moonData, textures }, ref) => {
 
   return (
     <group>
+      {isMoonSelected && localRef.current &&
+        <Satellite target={localRef.current} color={color} size={scaledRadius} satelliteCamera={satelliteCamera} toggleSatelliteCamera={toggleSatelliteCamera} />
+      }
 
-      <mesh ref={localRef} >
-        <sphereGeometry args={[scaledRadius, 16, 16]} />
-
-        <meshStandardMaterial metalness={0.9} roughness={0.65} map={textures?.map} zIndexRange={[100 - 1]} />
-
+      <mesh ref={localRef}>
+        <sphereGeometry args={[scaledRadius, 32, 16]} />
+        <meshStandardMaterial metalness={0.9} roughness={0.65} map={moonTextures[name] || null} zIndexRange={[100 - 1]} />
       </mesh>
 
       {orbitPaths && (
