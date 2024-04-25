@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { usePlanetStore } from "../store/store";
 import { sizeScaleFactor } from "../data/planetsData";
-import { Html } from "@react-three/drei";
+// import { Html } from "@react-three/drei";
 
 const Sun = ({ position, resetCamera, textures }) => {
   const [isDragging, setIsDragging] = useState(false);
@@ -74,7 +74,7 @@ const Sun = ({ position, resetCamera, textures }) => {
         )}
       </mesh>
       {/* Display planet names */}
-      {displayLabels ? (
+      {/* {displayLabels ? (
         <Html as='div' center occlude position-y={60} zIndexRange={[100, 0]}>
           <div
             className='planet-label'
@@ -91,7 +91,7 @@ const Sun = ({ position, resetCamera, textures }) => {
         </Html>
       ) : (
         null
-      )}
+      )} */}
     </group>
   );
 };

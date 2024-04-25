@@ -7,7 +7,7 @@ import * as THREE from "three";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 import OrbitPath from "./OrbitPath";
-import Satellite from "./Satellite";
+import SatelliteCamera from "./SatelliteCamera";
 import Moon from "./Moon";
 import { moonsData } from "@/data/moonsData";
 
@@ -188,18 +188,27 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   return (
     <>
       {isPlanetSelected && localRef.current &&
-        <Satellite target={localRef.current} color={color} size={scaledRadius} satelliteCamera={satelliteCamera} toggleSatelliteCamera={toggleSatelliteCamera} />
+        <SatelliteCamera target={localRef.current} color={color} size={scaledRadius} satelliteCamera={satelliteCamera} toggleSatelliteCamera={toggleSatelliteCamera} />
       }
       <group ref={localRef}>
+        {/* Invisible mesh for interaction */}
         <mesh
-          ref={meshRef}
-          key={isPlanetSelected ? name + '-textured' : name + '-basic'}
+          visible={false}
           onClick={handleClick}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerOver={handlePointerOver}
           onPointerOut={handlePointerOut}
+        >
+          {isPlanetSelected
+            ? <sphereGeometry args={[scale, 16, 16]} />
+            : <sphereGeometry args={[scale * 3, 8, 8]} />}
+        </mesh>
+
+        <mesh
+          ref={meshRef}
+          key={isPlanetSelected ? name + '-textured' : name + '-basic'}
         >
           <sphereGeometry args={[scale, detailLevel, detailLevel]} />
           {!isPlanetSelected && texturesLoaded ?
@@ -223,14 +232,16 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         )}
 
         {/* Display planet names */}
-        {displayLabels && (
+        {(displayLabels || isHovered && !isPlanetSelected) && (
           <Html
             as='span'
             wrapperClass='label-wrapper'
             center
             occlude
-            position-y={scale + scale * 0.25}
+            position-y={isPlanetSelected ? scale + scale * 0.25 : scale * 4}
+            // fix for top down view. maybe move + y and + z
             zIndexRange={[100, 0]}
+            style={{ pointerEvents: 'none' }}
           >
             <span
               className='planet-label'
@@ -248,13 +259,13 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         )}
 
         {/* Display planet name on hover */}
-        {isHovered && !isPlanetSelected && !displayLabels && (
+        {/* {isHovered && !isPlanetSelected && !displayLabels && (
           <Html position={[0, 100, 0]} style={{ pointerEvents: 'none' }}>
             <div style={{ color: 'white', padding: '6px 10px', background: 'rgba(0,0,0,0.5)', borderRadius: '8px' }}>
               {name}
             </div>
           </Html>
-        )}
+        )} */}
 
         {/* Render moons */}
         {isPlanetSelected && moons.map((moon, index) => (
