@@ -1,5 +1,5 @@
 export const moonDistanceScaleFactor = 0.0001;
-export const moonSizeScaleFactor = .0004;
+export const moonSizeScaleFactor = .00035;
 
 export const moonsData = {
     Mercury: [], // Mercury has no moons
