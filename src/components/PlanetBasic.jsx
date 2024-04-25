@@ -190,6 +190,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
       {isPlanetSelected && localRef.current &&
         <SatelliteCamera target={localRef.current} color={color} size={scaledRadius} satelliteCamera={satelliteCamera} toggleSatelliteCamera={toggleSatelliteCamera} />
       }
+
       <group ref={localRef}>
         {/* Invisible mesh for interaction */}
         <mesh

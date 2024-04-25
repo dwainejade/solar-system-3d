@@ -1,15 +1,15 @@
 import React, { useRef, forwardRef, useState, useMemo, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
-import { useTexture } from "@react-three/drei";
+import { useTexture, Html } from "@react-three/drei";
 import { Vector3 } from "three";
 import { moonDistanceScaleFactor, moonSizeScaleFactor } from "../data/moonsData";
 import OrbitPath from "./OrbitPath";
-import Satellite from "./Satellite";
+import SatelliteCamera from "./SatelliteCamera";
 
 const Moon = forwardRef(({ moonData }, ref) => {
-  const { simSpeed, orbitPaths, setSimSpeed } = useStore();
-  const { selectedPlanet, selectedMoon, setSelectedMoon, setSelectedPlanet } = usePlanetStore();
+  const { simSpeed, orbitPaths } = useStore();
+  const { selectedPlanet, selectedMoon, setSelectedMoon, setSelectedPlanet, displayLabels } = usePlanetStore();
   const { satelliteCamera, toggleSatelliteCamera } = useCameraStore()
 
   const localRef = ref || useRef();
@@ -78,8 +78,8 @@ const Moon = forwardRef(({ moonData }, ref) => {
     e.stopPropagation();
     if (selectedMoon && selectedMoon.name === name) return
 
-    setSelectedPlanet(null);
-    setSelectedMoon(moonData);
+    // setSelectedPlanet(null);
+    // setSelectedMoon(moonData);
   };
 
   // const [scale, setScale] = useState(scaledRadius);
@@ -108,17 +108,67 @@ const Moon = forwardRef(({ moonData }, ref) => {
   //   return null;
   // }
 
+  const [isHovered, setIsHovered] = useState(false);
+  const handlePointerOver = e => {
+    e.stopPropagation();
+    setIsHovered(true);
+  };
+
+  const handlePointerOut = e => {
+    e.stopPropagation();
+    setIsHovered(false);
+  };
+
   return (
-    <group>
+    <>
       {isMoonSelected && localRef.current &&
-        <Satellite target={localRef.current} color={color} size={scaledRadius} satelliteCamera={satelliteCamera} toggleSatelliteCamera={toggleSatelliteCamera} />
+        <SatelliteCamera target={localRef.current} color={color} size={scaledRadius} satelliteCamera={satelliteCamera} toggleSatelliteCamera={toggleSatelliteCamera} />
       }
+      <group ref={localRef}>
 
-      <mesh ref={localRef}>
-        <sphereGeometry args={[scaledRadius, 32, 16]} />
-        <meshStandardMaterial metalness={0.9} roughness={0.65} map={moonTextures[name] || null} zIndexRange={[100 - 1]} />
-      </mesh>
+        {/* Invisible mesh for interaction */}
+        <mesh
+          visible={false}
+          onClick={handleClick}
+          onPointerOver={handlePointerOver}
+          onPointerOut={handlePointerOut}
+          position={localRef.current?.position || null}
+        >
+          {isMoonSelected
+            ? <sphereGeometry args={[scaledRadius, 16, 16]} />
+            : <sphereGeometry args={[scaledRadius * 2, 8, 8]} />}
+          <meshBasicMaterial color={color} wireframe />
+        </mesh>
 
+
+        <mesh >
+          <sphereGeometry args={[scaledRadius, 32, 16]} />
+          <meshStandardMaterial metalness={0.9} roughness={0.65} map={moonTextures[name] || null} zIndexRange={[100 - 1]} />
+        </mesh>
+
+        {(displayLabels || isHovered && !isMoonSelected) && simSpeed < 200000 && (
+          <Html
+            as='span'
+            wrapperClass='label-wrapper'
+            center
+            position-y={scaledRadius * 2.5}
+            // fix for top down view. maybe move + y and + z
+            zIndexRange={[100, 0]}
+            style={{ pointerEvents: 'none' }}
+          >
+            <span
+              className='planet-label'
+              style={{ color }}
+              onClick={handleClick}
+              onPointerOver={handlePointerOver}
+              onPointerOut={handlePointerOut}
+            >
+              {name}
+            </span>
+          </Html>
+        )}
+
+      </group>
       {orbitPaths && (
         <group position={[0, 0, 0]} >
           <OrbitPath
@@ -130,8 +180,8 @@ const Moon = forwardRef(({ moonData }, ref) => {
           />
         </group>
       )}
-    </group>
-    // )
+    </>
+
   );
 });
 
