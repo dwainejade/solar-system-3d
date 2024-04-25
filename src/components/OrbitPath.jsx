@@ -9,7 +9,7 @@ const OrbitPath = forwardRef(
 
     const points = useMemo(() => {
       const pathPoints = [];
-      const resolution = hiRes ? Math.min(radius / 2, 1000) : 30;
+      const resolution = hiRes ? Math.min(Math.max(radius / 2, 30), 1000) : 30;
 
       for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / resolution) {
         const x = radius * Math.cos(angle);
@@ -20,19 +20,6 @@ const OrbitPath = forwardRef(
       return pathPoints;
     }, [radius, orbitalInclination, hiRes]);
 
-    // Memoize the line material based on lineType
-    const lineMaterial = useMemo(() => {
-      if (lineType === "dashed") {
-        return {
-          dashSize: 0.5,
-          gapSize: 0.5,
-          scale: 1,
-          useDash: true
-        };
-      }
-      // Default material setup for a solid line
-      return {};
-    }, [lineType]);
 
     return (
       <Line
