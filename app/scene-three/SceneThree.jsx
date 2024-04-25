@@ -88,7 +88,7 @@ const SceneThree = () => {
   }, [triggerReset]);
 
   useEffect(() => {
-    if (selectedPlanet) {
+    if (selectedPlanet && selectedPlanet.name !== "Sun") {
       setPrevSpeed(simSpeed);
       setSimSpeed(0); // Pause the simulation
       toggleCameraTransitioning(true); // Start the camera transition
@@ -144,7 +144,8 @@ const SceneThree = () => {
           ref={cameraControlsRef}
           makeDefault={!satelliteCamera}
           {...cameraConfig}
-          minDistance={Math.min(1, minDistance)}
+          minDistance={minDistance}
+          maxDistance={90000}
         />
       )}
       {/* {selectedPlanet && <CameraPath targetPosition={planetPositions[selectedPlanet.name]} />} */}

@@ -1,10 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import useStore, { usePlanetStore, useCameraStore } from "../../store/store";
-import Details from "./PlanetDetails"
+import DetailsMenu from "./DetailsMenu"
 
 const Menu = () => {
-  const { simSpeed, setSimSpeed, prevSpeed, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths } = useStore();
+  const { simSpeed, setSimSpeed, prevSpeed, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths, showDetailsMenu, toggleDetailsMenu } = useStore();
   const { selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels, planetsData, resetPlanetsData } = usePlanetStore();
   const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning } = useCameraStore()
 
@@ -22,7 +22,6 @@ const Menu = () => {
   const resetCamera = () => {
     setTriggerReset(true)
   }
-
 
   const handleFullscreen = () => {
     toggleFullscreen()
@@ -71,6 +70,7 @@ const Menu = () => {
       setSelectedPlanet(newSelectedPlanet);
     };
   }
+
 
   return (
     <div className="menu-wrapper">
@@ -165,10 +165,10 @@ const Menu = () => {
         </div>
       </div>
 
-      {/* Side menu */}
-      <div className={`side-menu ${selectedPlanet && !isCameraTransitioning ? 'open' : 'closed'}`}>
-        <div className="side-menu-inner">
-          <Details />
+      {/* Details menu */}
+      <div className={`details-menu ${selectedPlanet && !isCameraTransitioning && showDetailsMenu ? 'open' : 'closed'}`}>
+        <div className="details-menu-inner">
+          <DetailsMenu />
         </div>
       </div>
     </div>

@@ -36,7 +36,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   } = mergedData;
 
 
-  const { simSpeed, updateRotationCount, incrementDate, orbitPaths } = useStore();
+  const { simSpeed, updateRotationCount, incrementDate, orbitPaths, toggleDetailsMenu } = useStore();
   const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels, setSelectedMoon } = usePlanetStore();
   const { isSurfaceCameraActive, satelliteCamera, toggleSatelliteCamera } = useCameraStore();
   const localRef = ref || useRef();
@@ -122,6 +122,10 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   const handleClick = e => {
     e.stopPropagation();
     if (isDragging) return;
+
+    toggleDetailsMenu(true);
+
+    if (isPlanetSelected) return
     setSelectedPlanet(mergedData);
     setSelectedMoon(null);
   };

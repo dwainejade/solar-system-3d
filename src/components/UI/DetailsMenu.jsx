@@ -19,11 +19,12 @@ const calculateSunGravitationalPull = (distanceKm) => {
   return pull;
 };
 
-const Menu = () => {
-  const { isEditing, setIsEditing } = useStore();
+const DetailsMenu = () => {
+  const { isEditing, setIsEditing, showDetailsMenu, toggleDetailsMenu } = useStore();
   const { selectedPlanet, updatePlanetData, planetsData, setSelectedPlanet, resetSinglePlanetData } = usePlanetStore();
   const [editablePlanet, setEditablePlanet] = useState({});
   const [gravitationalPull, setGravitationalPull] = useState(0)
+
   useEffect(() => {
     if (selectedPlanet) {
       const currentPlanetData = planetsData[selectedPlanet.name];
@@ -35,12 +36,13 @@ const Menu = () => {
   const toggleEditing = () => {
     if (isEditing && selectedPlanet?.name) {
       updatePlanetData(selectedPlanet.name, editablePlanet);
-      setSelectedPlanet({ ...selectedPlanet, ...editablePlanet });
+      // setSelectedPlanet({ ...selectedPlanet, ...editablePlanet });
       setIsEditing(false); // Exit editing mode
     } else {
       setIsEditing(!isEditing);
     }
   };
+
 
 
   const handleChange = (field) => (e) => {
@@ -128,4 +130,4 @@ const Menu = () => {
 
 };
 
-export default Menu;
+export default DetailsMenu;
