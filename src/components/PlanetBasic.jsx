@@ -32,17 +32,18 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
     color,
     gravity,
     initialOrbitalAngle,
+    interestPoints
   } = mergedData;
 
 
   const { simSpeed, updateRotationCount, incrementDate, orbitPaths } = useStore();
-  const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels } = usePlanetStore();
+  const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels, setSelectedMoon } = usePlanetStore();
   const { isSurfaceCameraActive, satelliteCamera, toggleSatelliteCamera } = useCameraStore();
   const localRef = ref || useRef();
   const localAngleRef = useRef(planetAngles[name] || 0); // Initialize with saved angle or 0
 
+  const [texturesLoaded, setTexturesLoaded] = useState(false);
   // calculating scaled values
-  // const numberOfRotationsPerOrbit = rotationPeriod ? (orbitalPeriod * 24) / rotationPeriod : 0;
   const scaledOrbitalRadius = orbitalRadius * (isSurfaceCameraActive ? .0001 : distanceScaleFactor);
   const scaledRadius = radius * sizeScaleFactor;
   // const scaledOrbitalSpeed = orbitalSpeed * simSpeed;
@@ -51,8 +52,6 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
   const isPlanetSelected = selectedPlanet && selectedPlanet.name === name; // clicked planet
   const detailLevel = isPlanetSelected ? 64 : 32;
-
-  // const [planetRotation, setPlanetRotation] = useState({ x: 0, y: 0, z: 0 });
 
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
@@ -111,19 +110,20 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   });
 
   useEffect(() => {
-    // Set the axial tilt 
+    // Set the axial tilt using Euler angles, aligning the rotation axis
     if (meshRef.current) {
-      meshRef.current.rotation.order = 'YXZ'; // ensure the tilt is applied around the world Y, then rotation around local Y
+      meshRef.current.rotation.order = 'YXZ'; // This is critical to ensure the tilt is applied around the world Y, then rotation around local Y
       meshRef.current.rotation.y = 0; // Reset initial Y rotation
-      meshRef.current.rotation.x = THREE.MathUtils.degToRad(axialTilt); // Apply axial tilt around the new local X
+      meshRef.current.rotation.x = THREE.MathUtils.degToRad(axialTilt); // Apply axial tilt around the new local X after Y rotation reset
     }
-  }, [axialTilt]);
+  }, [axialTilt, selectedPlanet]);
 
   // Modify the handleClick to account for dragging
   const handleClick = e => {
     e.stopPropagation();
     if (isDragging) return;
     setSelectedPlanet(mergedData);
+    setSelectedMoon(null);
   };
 
   // New handler for pointer down
@@ -174,12 +174,16 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
 
   // texture for saturn rings
-  const ringTexture = useLoader(THREE.TextureLoader, "../assets/saturn/saturn-rings-alpha.png");
+  const ringTexture = useLoader(THREE.TextureLoader, "../assets/saturn/saturn-rings.png");
   ringTexture.wrapS = THREE.RepeatWrapping;
   ringTexture.wrapT = THREE.ClampToEdgeWrapping;
 
   // get moons data
   const moons = moonsData[name] || [];
+
+
+
+
 
   return (
     <>
@@ -189,6 +193,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
       <group ref={localRef}>
         <mesh
           ref={meshRef}
+          key={isPlanetSelected ? name + '-textured' : name + '-basic'}
           onClick={handleClick}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -197,15 +202,16 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
           onPointerOut={handlePointerOut}
         >
           <sphereGeometry args={[scale, detailLevel, detailLevel]} />
-          {isPlanetSelected && textures ?
+          {!isPlanetSelected && texturesLoaded ?
+            <meshBasicMaterial color={color} />
+            :
             <meshStandardMaterial
               metalness={0.6}
               roughness={0.8}
-              map={textures.map}
-            /> :
-            <meshBasicMaterial color={color} />
+              map={textures?.map}
+              onBuild={() => setTexturesLoaded(true)}   // load textures first then swap to basic material. Trick for color issues
+            />
           }
-
         </mesh>
         {/* Saturns rings */}
         {name === "Saturn" && (
