@@ -10,11 +10,12 @@ import Sun from "@/components/Sun";
 import Planet from "@/components/PlanetBasic";
 import Stars from "@/components/Stars"
 import { useFrame } from "@react-three/fiber";
+import CameraPath from '@/components/CameraPath';
 
 const SceneThree = () => {
-  const { sunSettings } = useStore();
+  const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed } = useStore();
   const { planetPositions, selectedPlanet, setSelectedPlanet, selectedMoon, setSelectedMoon, planetsData } = usePlanetStore();
-  const { satelliteCamera, triggerReset, setTriggerReset } = useCameraStore();
+  const { satelliteCamera, triggerReset, setTriggerReset, toggleCameraTransitioning, isCameraTransitioning } = useCameraStore();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
 
@@ -68,7 +69,6 @@ const SceneThree = () => {
         // Calculate the optimal distance to view the moon
         const scaledRadius = selectedMoon.bodyData.radius * moonSizeScaleFactor;
         const optimalDistance = calculateOptimalDistance(scaledRadius);
-        console.log(moonPosition)
         // Adjust the minimum distance for the camera to avoid getting too close
         setMinDistance(optimalDistance / 2);
 
@@ -87,9 +87,23 @@ const SceneThree = () => {
     }
   }, [triggerReset]);
 
+  useEffect(() => {
+    if (selectedPlanet) {
+      setPrevSpeed(simSpeed);
+      setSimSpeed(0); // Pause the simulation
+      toggleCameraTransitioning(true); // Start the camera transition
+      console.log("Camera transition started", { simSpeed, prevSpeed });
+      console.log({ isCameraTransitioning })
+    }
+  }, [selectedPlanet]);
+
 
   const earthTextures = useTexture({
-    map: "../assets/earth/2k_earth_daymap.jpg",
+    map: "../assets/earth/8k_earth_daymap.jpg",
+    clouds: "../assets/earth/2k_earth_clouds.jpg",
+    night: "../assets/earth/2k_earth_nightmap.jpg",
+    normal: "../assets/earth/2k_earth_normal_map.png",
+    specular: "../assets/earth/2k_earth_specular_map.png",
   });
   const venusTextures = useTexture({
     map: "../assets/venus/2k_venus_surface.jpg",
@@ -122,13 +136,6 @@ const SceneThree = () => {
     rotateSpeed: 1,
   };
 
-  const renderMoons = (planetName) => {
-    // Ensure planetMoons is always an array. If moonsData[planetName] is undefined, use an empty array
-    const planetMoons = moonsData[planetName] || [];
-    return planetMoons.map((moonData, index) => (
-      <Moon key={`${planetName}-moon-${index}`} bodyData={moonData} parentPosition={planetPositions[planetName]} parentName={planetName} />
-    ));
-  };
 
   return (
     <>
@@ -138,9 +145,10 @@ const SceneThree = () => {
           makeDefault={!satelliteCamera}
           {...cameraConfig}
           minDistance={Math.min(1, minDistance)}
-
         />
       )}
+      {/* {selectedPlanet && <CameraPath targetPosition={planetPositions[selectedPlanet.name]} />} */}
+
       {/* First Person Camera */}
       {/* {surfacePoint && isSurfaceCameraActive && (
         <PerspectiveCamera
@@ -165,7 +173,7 @@ const SceneThree = () => {
       <Planet name="Neptune" textures={neptuneTextures} />
 
       {/* Render moons */}
-      {Object.entries(moonsData).map(([planetName]) => renderMoons(planetName))}
+      {/* {Object.entries(moonsData).map(([planetName]) => renderMoons(planetName))} */}
 
       {/* <Planet bodyData={planetsData.Pluto} /> */}
       <Sun key={"Sun-plain"} position={sunSettings.position} resetCamera={resetCamera} />

@@ -2,8 +2,13 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
+import useStore, { useCameraStore } from '../store/store';
+
 
 const Satellite = ({ target, size, satelliteCamera, toggleSatelliteCamera }) => {
+    const { isCameraTransitioning, toggleCameraTransitioning } = useCameraStore();
+    const { prevSpeed, setPrevSpeed, setSimSpeed, simSpeed } = useStore();
+
     const { camera, gl } = useThree();
     const cameraRef = useRef();
     const [isDragging, setIsDragging] = useState(false);
@@ -38,24 +43,26 @@ const Satellite = ({ target, size, satelliteCamera, toggleSatelliteCamera }) => 
     const handleWheel = useCallback((event) => {
         const currentPosition = new THREE.Vector3().setFromSpherical(spherical);
         const currentDistance = currentPosition.length();
-        const targetDistance = new THREE.Vector3(target.position.x, target.position.y, target.position.z).length();
+        const targetDistance = new THREE.Vector3(target.position.x, target.position.y, target.position.z).distanceTo(camera.position);
         const distanceRatio = currentDistance / targetDistance;
 
         // Adjust the zoom factor based on the distance
-        const zoomSensitivity = 1;
-        const adjustedZoomFactor = zoomSensitivity * distanceRatio;
+        const zoomSensitivity = -1; // Lower this if zooming is too fast
+        const deltaY = event.deltaY * zoomSensitivity;
 
-        // Calculate the new radius
-        const newRadius = spherical.radius + event.deltaY * adjustedZoomFactor; // Use subtraction to invert 
+        // Normalize deltaY to avoid too fast zoom changes
+        const normalizedDeltaY = Math.sign(deltaY) * Math.min(Math.abs(deltaY), 3);
 
-        setSpherical(prevSpherical => {
-            return new THREE.Spherical(
-                Math.max(size * 2.5, Math.min(500, newRadius)),
-                prevSpherical.phi,
-                prevSpherical.theta
-            );
-        });
+        // Calculate the new radius, inversely proportional to the zoom sensitivity
+        const newRadius = spherical.radius + normalizedDeltaY * distanceRatio * -1; // Negative to invert the zoom direction
+
+        setSpherical(prevSpherical => new THREE.Spherical(
+            Math.max(size * 2.5, Math.min(500, newRadius)),
+            prevSpherical.phi,
+            prevSpherical.theta
+        ));
     }, [size, spherical, target.position]);
+
 
 
     useEffect(() => {
@@ -90,6 +97,7 @@ const Satellite = ({ target, size, satelliteCamera, toggleSatelliteCamera }) => 
             cameraRef.current.lookAt(target.position);
             cameraRef.current.updateMatrixWorld();
 
+
             const distance = camera.position.distanceTo(target.position);
             const switchCamera = () => {
                 const relativePosition = new THREE.Vector3().subVectors(camera.position, target.position);
@@ -98,6 +106,9 @@ const Satellite = ({ target, size, satelliteCamera, toggleSatelliteCamera }) => 
                 const theta = Math.atan2(relativePosition.z, relativePosition.x);
                 setSpherical(new THREE.Spherical(radius, phi, theta));
                 toggleSatelliteCamera(true);
+                toggleCameraTransitioning(false);
+                setSimSpeed(prevSpeed)
+                console.log('switched Camera', { simSpeed });
             }
 
             if (distance < size * 8) {
@@ -108,16 +119,10 @@ const Satellite = ({ target, size, satelliteCamera, toggleSatelliteCamera }) => 
                         setTimerId(null);
                     }
                 }
-            } else if (!timerId && !satelliteCamera) {
-                const id = setTimeout(() => {
-                    if (!satelliteCamera) {
-                        switchCamera()
-                    }
-                }, 4000);
-                setTimerId(id);
             }
         }
     });
+
 
     useEffect(() => {
         // Cleanup on unmount
@@ -131,10 +136,12 @@ const Satellite = ({ target, size, satelliteCamera, toggleSatelliteCamera }) => 
     return (
         <PerspectiveCamera
             ref={cameraRef}
+            name='satellite-camera'
             makeDefault={satelliteCamera}
             fov={50}
             near={size}
             far={100000}
+            enablePan={true}
         />
     );
 };
