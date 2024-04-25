@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import useStore, { useCameraStore } from '../store/store';
 
 
-const Satellite = ({ target, size, satelliteCamera, toggleSatelliteCamera }) => {
+const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera }) => {
     const { toggleCameraTransitioning } = useCameraStore();
     const { prevSpeed, setSimSpeed } = useStore();
 
@@ -134,4 +134,4 @@ const Satellite = ({ target, size, satelliteCamera, toggleSatelliteCamera }) => 
 
 
 
-export default Satellite;
+export default SatelliteCamera;
