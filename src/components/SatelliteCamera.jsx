@@ -70,7 +70,6 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
         },
         [spherical, target.position, size, targetRadius]
     );
-    console.log(targetName, size, targetRadius);
 
     useFrame(() => {
         if (cameraRef.current && target) {
