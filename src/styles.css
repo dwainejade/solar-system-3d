@@ -218,7 +218,7 @@ body {
   border-left: solid #c4bdbd;
   width: 1px;
 }
-.Main .menu-wrapper .side-menu {
+.Main .menu-wrapper .details-menu {
   position: absolute;
   z-index: 200;
   height: fit-content;
@@ -232,7 +232,7 @@ body {
   pointer-events: auto;
   transition: all 0.3s ease-out;
 }
-.Main .menu-wrapper .side-menu .side-menu-inner {
+.Main .menu-wrapper .details-menu .details-menu-inner {
   position: relative;
   width: 100%;
   height: 100%;
@@ -240,7 +240,7 @@ body {
   left: 0;
   padding: 4%;
 }
-.Main .menu-wrapper .side-menu .side-menu-inner::before {
+.Main .menu-wrapper .details-menu .details-menu-inner::before {
   content: "";
   position: absolute;
   top: 0%;
@@ -251,7 +251,7 @@ body {
   clip-path: polygon(100% 0, 100% 100%, 5% 100%, 0 95%, 0 5%, 5% 0);
   z-index: -1;
 }
-.Main .menu-wrapper .side-menu .side-menu-inner::after {
+.Main .menu-wrapper .details-menu .details-menu-inner::after {
   content: "";
   position: absolute;
   top: -1%;
@@ -262,10 +262,10 @@ body {
   clip-path: polygon(2% 20%, 2% 5%, 7% 0, 100% 0, 100% 100%, 7% 100%, 2% 95%, 2% 50%, 0 45%, 0 25%);
   z-index: -2;
 }
-.Main .menu-wrapper .side-menu.open {
+.Main .menu-wrapper .details-menu.open {
   right: 0;
 }
-.Main .menu-wrapper .side-menu h2 {
+.Main .menu-wrapper .details-menu h2 {
   font-family: "Termina-Black";
   text-transform: uppercase;
   font-size: 1.5rem;
@@ -273,7 +273,7 @@ body {
   margin-bottom: 4px;
   color: #e1cdaa;
 }
-.Main .menu-wrapper .side-menu .item {
+.Main .menu-wrapper .details-menu .item {
   position: relative;
   display: flex;
   flex-direction: row;
@@ -281,42 +281,43 @@ body {
   margin-top: 6px;
   height: 28px;
 }
-.Main .menu-wrapper .side-menu .item label {
+.Main .menu-wrapper .details-menu .item label {
   white-space: nowrap;
   margin-right: 6px;
   color: #f19a00;
   font-weight: 600;
   font-size: 0.9rem;
 }
-.Main .menu-wrapper .side-menu .item input {
+.Main .menu-wrapper .details-menu .item input {
   width: 100px;
   font-size: 1rem;
   color: #861b1d;
 }
-.Main .menu-wrapper .side-menu .item input:disabled {
+.Main .menu-wrapper .details-menu .item input:disabled {
   color: #463a39;
 }
-.Main .menu-wrapper .side-menu .item span {
+.Main .menu-wrapper .details-menu .item span {
   color: #fff;
 }
-.Main .menu-wrapper .side-menu .button-con {
+.Main .menu-wrapper .details-menu .button-con {
   display: flex;
   flex-direction: row;
   width: 100%;
   justify-content: space-evenly;
   margin-top: 10px;
 }
-.Main .menu-wrapper .side-menu .button-con .edit-planet-btn,
-.Main .menu-wrapper .side-menu .button-con .reset-planet-btn {
+.Main .menu-wrapper .details-menu .button-con .edit-planet-btn,
+.Main .menu-wrapper .details-menu .button-con .reset-planet-btn {
   height: 30px;
-  width: 90px;
+  width: 100px;
   font-weight: 600;
+  font-size: 0.8rem;
 }
-.Main .menu-wrapper .side-menu .button-con .edit-planet-btn {
+.Main .menu-wrapper .details-menu .button-con .edit-planet-btn {
   background-color: #969b17;
   color: #fff;
 }
-.Main .menu-wrapper .side-menu .button-con .reset-planet-btn {
+.Main .menu-wrapper .details-menu .button-con .reset-planet-btn {
   background-color: #f46a68;
   color: #fff;
 }

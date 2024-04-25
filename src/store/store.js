@@ -26,6 +26,9 @@ const useStore = create((set, get) => ({
         }
     },
 
+    showDetailsMenu: false,
+    toggleDetailsMenu: (newState) => set(state => ({ showDetailsMenu: newState })),
+
     isEditing: false, // allow user to edit planet data
     setIsEditing: (newState) => set({ isEditing: newState }),
 
