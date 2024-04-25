@@ -166,7 +166,7 @@ const Menu = () => {
       </div>
 
       {/* Side menu */}
-      <div className={`side-menu ${selectedPlanet ? 'open' : 'closed'}`}>
+      <div className={`side-menu ${selectedPlanet && !isCameraTransitioning ? 'open' : 'closed'}`}>
         <div className="side-menu-inner">
           <Details />
         </div>

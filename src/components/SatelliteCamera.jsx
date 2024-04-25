@@ -150,9 +150,15 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
                     camera.position,
                     target.position
                 );
-                const radius = size * 6; // Set the desired distance from the target
-                const phi = Math.acos(relativePosition.y / radius);
-                const theta = Math.atan2(relativePosition.z, relativePosition.x);
+                const radius = size * 6;
+                const sunDirection = new THREE.Vector3(0, 0, 0).sub(target.position).applyMatrix4(target.parent.matrixWorld).normalize();
+                const cameraDirection = relativePosition.clone().applyMatrix4(target.parent.matrixWorld).normalize();
+
+                // Calculate the desired camera orientation
+                const desiredOrientation = cameraDirection.clone().sub(sunDirection).normalize();
+                const phi = Math.acos(desiredOrientation.y);
+                const theta = Math.atan2(desiredOrientation.z, desiredOrientation.x);
+
                 setSpherical(new THREE.Spherical(radius, phi, theta));
                 toggleSatelliteCamera(true);
                 toggleCameraTransitioning(false);
