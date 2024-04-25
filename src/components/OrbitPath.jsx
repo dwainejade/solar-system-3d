@@ -3,7 +3,7 @@ import { Line } from "@react-three/drei";
 import * as THREE from "three";
 
 const OrbitPath = forwardRef(
-  ({ origin = new THREE.Vector3(0, 0, 0), radius = 2, color = "white", name = "orbit-path", orbitalInclination, hiRes = false, lineType = "solid" }, ref) => {
+  ({ origin = new THREE.Vector3(0, 0, 0), radius = 2, color = "white", name = "orbit-path", orbitalInclination, hiRes = false, lineType = "solid", opacity = 1 }, ref) => {
     // Convert inclination to radians
     const inclination = orbitalInclination * (Math.PI / 180);
 
@@ -44,6 +44,8 @@ const OrbitPath = forwardRef(
         depthWrite
         dashed={lineType === "dashed"}
         dashScale={2}
+        transparent
+        opacity={opacity}
       />
     );
   }

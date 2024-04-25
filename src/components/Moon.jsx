@@ -14,9 +14,7 @@ const Moon = forwardRef(({ moonData }, ref) => {
 
   const localRef = ref || useRef();
   const localAngleRef = useRef(0);
-  // const [moonPosition, setMoonPosition] = useState({ x: 0, y: 0, z: 0 });
-  // load textures here
-  // an object to store the moon's textures
+
   const moonTextures = useTexture({
     Moon: '../assets/earth/moon/2k_moon.jpg'
   })
@@ -54,24 +52,8 @@ const Moon = forwardRef(({ moonData }, ref) => {
 
       // Point the moon towards the Earth: Earth is assumed to be at the origin (0,0,0)
       localRef.current.lookAt(new Vector3(0, 0, 0));
-
-      // setMoonPosition({ x: moonX, y: moonY, z: moonZ });
     }
   });
-
-
-
-
-  // useEffect(() => {
-  //   if (localRef.current) {
-  //     // Calculate the initial direction vector pointing from the moon to the parent planet
-  //     const initialDirectionToParent = new Vector3().subVectors(new Vector3(0, 0, 0));
-  //     const initialAngleToParent = Math.atan2(initialDirectionToParent.z, initialDirectionToParent.x);
-
-  //     // Set the initial rotation of the moon mesh to face away from the parent planet
-  //     localRef.current.rotation.y = initialAngleToParent - Math.PI / 2; // Adjust as needed
-  //   }
-  // }, []);
 
 
   const handleClick = e => {
@@ -81,32 +63,6 @@ const Moon = forwardRef(({ moonData }, ref) => {
     // setSelectedPlanet(null);
     // setSelectedMoon(moonData);
   };
-
-  // const [scale, setScale] = useState(scaledRadius);
-  // useFrame(({ camera }) => {
-  //   if (!localRef.current) return;
-
-  //   const distance = localRef.current.position.distanceTo(camera.position);
-  //   let newScale;
-
-  //   if (distance > 20000) {
-  //     // Scale down the moon as the camera gets closer but no smaller than scaledRadius
-  //     newScale = Math.max(scaledRadius, (distance / 1000) * scaledRadius);
-  //   } else {
-  //     // When the distance is greater than 50 units, just use the scaledRadius
-  //     newScale = scaledRadius;
-  //   }
-
-  //   setScale(newScale);
-  //   if (name === 'Moon') {
-  //     console.log({ newScale, scaledRadius })
-  //   }
-  // });
-
-  // if planet not selected then moon will not be visible
-  // if (!selectedPlanet || selectedPlanet.name !== moonData) {
-  //   return null;
-  // }
 
   const [isHovered, setIsHovered] = useState(false);
   const handlePointerOver = e => {
@@ -152,7 +108,7 @@ const Moon = forwardRef(({ moonData }, ref) => {
             wrapperClass='label-wrapper'
             center
             occlude
-            position-y={scaledRadius * 2.5}
+            position-y={scaledRadius * 5}
             // fix for top down view. maybe move + y and + z
             zIndexRange={[100, 0]}
             style={{ pointerEvents: 'none' }}
@@ -180,6 +136,7 @@ const Moon = forwardRef(({ moonData }, ref) => {
             name={name + "-orbit-path"}
             hiRes={isMoonSelected}
             lineType={'solid'}
+            opacity={.4}
           />
         </group>
       )}
