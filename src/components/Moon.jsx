@@ -151,6 +151,7 @@ const Moon = forwardRef(({ moonData }, ref) => {
             as='span'
             wrapperClass='label-wrapper'
             center
+            occlude
             position-y={scaledRadius * 2.5}
             // fix for top down view. maybe move + y and + z
             zIndexRange={[100, 0]}
@@ -177,6 +178,8 @@ const Moon = forwardRef(({ moonData }, ref) => {
             orbitalInclination={orbitalInclination}
             color={color}
             name={name + "-orbit-path"}
+            hiRes={isMoonSelected}
+            lineType={'solid'}
           />
         </group>
       )}

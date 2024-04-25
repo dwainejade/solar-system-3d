@@ -188,7 +188,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   return (
     <>
       {isPlanetSelected && localRef.current &&
-        <SatelliteCamera target={localRef.current} color={color} size={scaledRadius} satelliteCamera={satelliteCamera} toggleSatelliteCamera={toggleSatelliteCamera} />
+        <SatelliteCamera target={localRef.current} targetName={name} color={color} size={scaledRadius} satelliteCamera={satelliteCamera} toggleSatelliteCamera={toggleSatelliteCamera} />
       }
 
       <group ref={localRef}>
@@ -203,7 +203,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
           onPointerOut={handlePointerOut}
         >
           {isPlanetSelected
-            ? <sphereGeometry args={[scale, 16, 16]} />
+            ? <sphereGeometry args={[scaledRadius, 16, 16]} />
             : <sphereGeometry args={[scale * 3, 8, 8]} />}
         </mesh>
 

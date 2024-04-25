@@ -3,7 +3,7 @@ import { Line } from "@react-three/drei";
 import * as THREE from "three";
 
 const OrbitPath = forwardRef(
-  ({ origin = new THREE.Vector3(0, 0, 0), radius = 2, color = "white", name = "orbit-path", orbitalInclination, hiRes = false }, ref) => {
+  ({ origin = new THREE.Vector3(0, 0, 0), radius = 2, color = "white", name = "orbit-path", orbitalInclination, hiRes = false, lineType = "solid" }, ref) => {
     // Convert inclination to radians
     const inclination = orbitalInclination * (Math.PI / 180);
 
@@ -18,9 +18,34 @@ const OrbitPath = forwardRef(
         pathPoints.push(new THREE.Vector3(x, y, z));
       }
       return pathPoints;
-    }, [origin, radius, hiRes]);
+    }, [radius, orbitalInclination, hiRes]);
 
-    return <Line ref={ref} points={points} color={color} lineWidth={0.25} />;
+    // Memoize the line material based on lineType
+    const lineMaterial = useMemo(() => {
+      if (lineType === "dashed") {
+        return {
+          dashSize: 0.5,
+          gapSize: 0.5,
+          scale: 1,
+          useDash: true
+        };
+      }
+      // Default material setup for a solid line
+      return {};
+    }, [lineType]);
+
+    return (
+      <Line
+        ref={ref}
+        points={points}
+        color={color}
+        lineWidth={0.2}
+        // lineMaterial={lineMaterial}
+        depthWrite
+        dashed={lineType === "dashed"}
+        dashScale={2}
+      />
+    );
   }
 );
 
