@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
-import { CameraControls, useTexture, PerspectiveCamera } from "@react-three/drei";
+import { CameraControls, useTexture } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "@/store/store";
 import { sizeScaleFactor } from "@/data/planetsData";
 import { moonsData, moonSizeScaleFactor } from "@/data/moonsData";
@@ -9,15 +9,15 @@ import Moon from "@/components/Moon";
 import Sun from "@/components/Sun";
 import Planet from "@/components/PlanetBasic";
 import Stars from "@/components/Stars"
+import { useFrame } from "@react-three/fiber";
+import CameraPath from '@/components/CameraPath';
 
 const SceneThree = () => {
-  const { sunSettings, rotationCounts, simulationDate } = useStore();
+  const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed } = useStore();
   const { planetPositions, selectedPlanet, setSelectedPlanet, selectedMoon, setSelectedMoon, planetsData } = usePlanetStore();
-  const { surfacePoint, isSurfaceCameraActive, triggerReset, setTriggerReset } = useCameraStore();
-  const surfaceCameraRef = useRef();
+  const { satelliteCamera, triggerReset, setTriggerReset, toggleCameraTransitioning, isCameraTransitioning } = useCameraStore();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
-
 
   // A simplistic approach to calculate optimal distance
   const calculateOptimalDistance = (planetRadius) => {
@@ -44,7 +44,7 @@ const SceneThree = () => {
   };
 
   // Handle camera adjustments when a planet is selected
-  useEffect(() => {
+  useFrame(() => {
     if (selectedPlanet && cameraControlsRef.current) {
       const planetPosition = planetPositions[selectedPlanet.name];
       if (planetPosition) {
@@ -61,15 +61,14 @@ const SceneThree = () => {
         cameraControlsRef.current.dollyTo(200, true);
       }
     }
-  }, [selectedPlanet, planetPositions]);
-  useEffect(() => {
+  });
+  useFrame(() => {
     if (selectedMoon && cameraControlsRef.current) {
       const moonPosition = selectedMoon.position;
       if (moonPosition) {
         // Calculate the optimal distance to view the moon
         const scaledRadius = selectedMoon.bodyData.radius * moonSizeScaleFactor;
         const optimalDistance = calculateOptimalDistance(scaledRadius);
-
         // Adjust the minimum distance for the camera to avoid getting too close
         setMinDistance(optimalDistance / 2);
 
@@ -78,7 +77,7 @@ const SceneThree = () => {
         cameraControlsRef.current.dollyTo(optimalDistance, true);
       }
     }
-  }, [selectedMoon, moonsData]);
+  });
 
   // Handle resetting the camera from state
   useEffect(() => {
@@ -88,42 +87,25 @@ const SceneThree = () => {
     }
   }, [triggerReset]);
 
+  useEffect(() => {
+    if (selectedPlanet && selectedPlanet.name !== "Sun") {
+      setPrevSpeed(simSpeed);
+      setSimSpeed(0); // Pause the simulation
+      toggleCameraTransitioning(true); // Start the camera transition
+    }
+  }, [selectedPlanet]);
 
-  // const heightAboveSurface = 10;
-  // useFrame(() => {
-  //   if (isSurfaceCameraActive && surfacePoint && selectedPlanet) {
-  //     const planetPosition = planetPositions[selectedPlanet.name];
-  //     if (planetPosition) {
-  //       // Assuming planetPosition is the center of the planet
-  //       const centerOfPlanet = new Vector3(planetPosition.x, planetPosition.y, planetPosition.z);
-
-  //       // Calculate the normal as the vector from the planet's center to the surface point
-  //       const surfaceNormal = new Vector3(surfacePoint.x, surfacePoint.y, surfacePoint.z).sub(centerOfPlanet).normalize();
-
-  //       // Position the camera slightly above the surface point
-  //       const cameraHeightAboveSurface = 0.1; // Adjust as needed
-  //       const cameraPosition = new Vector3(surfacePoint.x, surfacePoint.y, surfacePoint.z).add(
-  //         surfaceNormal.multiplyScalar(cameraHeightAboveSurface)
-  //       );
-
-  //       surfaceCameraRef.current.position.copy(cameraPosition);
-
-  //       // Set the camera to look at a point directly 'up' from the surface
-  //       const lookAtPoint = cameraPosition.clone().add(surfaceNormal);
-  //       surfaceCameraRef.current.lookAt(lookAtPoint);
-
-  //       // Align the camera's up vector with the surface normal
-  //       surfaceCameraRef.current.up.copy(surfaceNormal);
-  //     }
-  //   }
-  // });
 
   const earthTextures = useTexture({
-    map: "../assets/earth/2k_earth_daymap.jpg",
+    map: "../assets/earth/8k_earth_daymap.jpg",
+    clouds: "../assets/earth/2k_earth_clouds.jpg",
+    // night: "../assets/earth/2k_earth_nightmap.jpg",
+    // normal: "../assets/earth/2k_earth_normal_map.png",
+    // specular: "../assets/earth/2k_earth_specular_map.png",
   });
   const venusTextures = useTexture({
     map: "../assets/venus/2k_venus_surface.jpg",
-    surface: "../assets/venus/2k_venus_atmosphere.jpg",
+    // surface: "../assets/venus/2k_venus_atmosphere.jpg",
   });
   const mercuryTextures = useTexture({
     map: "../assets/mercury/2k_mercury.jpg",
@@ -147,25 +129,26 @@ const SceneThree = () => {
   // camera settings
   const cameraConfig = {
     maxDistance: 90000,
-    smoothTime: 1, // 1.5 is default
-    truckSpeed: 0.6,
-    rotateSpeed: 0.6,
-
+    smoothTime: .8,
+    truckSpeed: 1,
+    rotateSpeed: 1,
+    near: 0.001,
+    far: 1000000
   };
 
-  const renderMoons = (planetName, planetData) => {
-    // Ensure planetMoons is always an array. If moonsData[planetName] is undefined, use an empty array
-    const planetMoons = moonsData[planetName] || [];
-    return planetMoons.map((moonData, index) => (
-      <Moon key={`${planetName}-moon-${index}`} bodyData={moonData} parentPosition={planetPositions[planetName]} parentName={planetName} />
-    ));
-  };
 
   return (
     <>
-      {!isSurfaceCameraActive && (
-        <CameraControls ref={cameraControlsRef} makeDefault {...cameraConfig} minDistance={Math.min(1, minDistance)} />
+      {!satelliteCamera && (
+        <CameraControls
+          ref={cameraControlsRef}
+          makeDefault={!satelliteCamera}
+          {...cameraConfig}
+          minDistance={minDistance}
+          maxDistance={90000}
+        />
       )}
+      {/* {selectedPlanet && <CameraPath targetPosition={planetPositions[selectedPlanet.name]} />} */}
 
       {/* First Person Camera */}
       {/* {surfacePoint && isSurfaceCameraActive && (
@@ -191,12 +174,31 @@ const SceneThree = () => {
       <Planet name="Neptune" textures={neptuneTextures} />
 
       {/* Render moons */}
-      {Object.entries(moonsData).map(([planetName, planetData]) => renderMoons(planetName, planetData))}
+      {/* {Object.entries(moonsData).map(([planetName]) => renderMoons(planetName))} */}
 
       {/* <Planet bodyData={planetsData.Pluto} /> */}
       <Sun key={"Sun-plain"} position={sunSettings.position} resetCamera={resetCamera} />
     </>
   );
 };
+
+// function ControlledCamera({ selectedPlanet, planetPositions, planetsData, sizeScaleFactor }) {
+//   const orbitRef = useRef();
+//   const { camera, gl } = useThree();
+
+//   useEffect(() => {
+//     if (selectedPlanet && orbitRef.current) {
+//       const position = planetPositions[selectedPlanet.name];
+//       const data = planetsData[selectedPlanet.name];
+//       const distance = data.radius * sizeScaleFactor * 4.2; // or any other logic to determine the distance
+
+//       orbitRef.current.target.set(position.x, position.y, position.z);
+//       camera.position.set(position.x + distance, position.y + distance, position.z + distance);
+//       orbitRef.current.update();
+//     }
+//   }, [selectedPlanet, planetPositions, planetsData, sizeScaleFactor, camera]);
+
+//   return <OrbitControls makeDefault ref={orbitRef} args={[camera, gl.domElement]} />;
+// }
 
 export default SceneThree;

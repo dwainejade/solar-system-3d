@@ -1,12 +1,12 @@
 "use client";
 import React, { useState } from "react";
 import useStore, { usePlanetStore, useCameraStore } from "../../store/store";
-import Details from "./PlanetDetails"
+import DetailsMenu from "./DetailsMenu"
 
 const Menu = () => {
-  const { simSpeed, setSimSpeed, showConstellations, toggleConstellations, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths, isEditing, setIsEditing } = useStore();
-  const { selectedPlanet, setSelectedPlanet, selectedMoon, displayLabels, toggleDisplayLabels, updateSelectedPlanet, planetsData, resetPlanetsData } = usePlanetStore();
-  const { setTriggerReset } = useCameraStore()
+  const { simSpeed, setSimSpeed, prevSpeed, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths, showDetailsMenu, toggleDetailsMenu } = useStore();
+  const { selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels, planetsData, resetPlanetsData } = usePlanetStore();
+  const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning } = useCameraStore()
 
   const [isMenuOpen, setMenuOpen] = useState(false);
 
@@ -17,6 +17,7 @@ const Menu = () => {
   const resetAll = () => {
     setTriggerReset(true)
     resetPlanetsData()
+    toggleSatelliteCamera(false)
   };
   const resetCamera = () => {
     setTriggerReset(true)
@@ -70,12 +71,16 @@ const Menu = () => {
     };
   }
 
+
   return (
     <div className="menu-wrapper">
       {/* reset button */}
       <button className="reset-all-btn btn" onClick={resetAll} />
       {/* fullscreen button */}
       <button className="fullscreen-btn btn" onClick={handleFullscreen} />
+      {/* <button className="satelliteCamera-btn btn" onClick={() => toggleSatelliteCamera(!satelliteCamera)}
+        style={{ height: "30px", width: "30px", position: "absolute", left: "10px", bottom: "10px" }}
+      >{satelliteCamera ? "ON" : "OFF"}</button> */}
 
       {/* Bottom menu */}
       <div className={`bottom-menu ${isMenuOpen ? "open" : "closed"}`}>
@@ -102,7 +107,8 @@ const Menu = () => {
           {/* Dropdown for sim speed */}
           <div className="menu-item">
             <label htmlFor="simSpeedSelect">Simulation Speed</label>
-            <select id="simSpeedSelect" onChange={handleSpeedChange} value={simSpeed}>
+            <select id="simSpeedSelect" onChange={handleSpeedChange}
+              value={isCameraTransitioning ? prevSpeed : simSpeed} disabled={isCameraTransitioning}>
               {speedOptions.map((option, index) => (
                 <option key={index} value={option.value}>
                   {option.label}
@@ -159,9 +165,11 @@ const Menu = () => {
         </div>
       </div>
 
-      {/* Side menu */}
-      <div className={`side-menu ${selectedPlanet ? 'open' : 'closed'}`}>
-        <Details />
+      {/* Details menu */}
+      <div className={`details-menu ${selectedPlanet && !isCameraTransitioning && showDetailsMenu ? 'open' : 'closed'}`}>
+        <div className="details-menu-inner">
+          <DetailsMenu />
+        </div>
       </div>
     </div>
   );

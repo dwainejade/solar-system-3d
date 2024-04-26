@@ -2,10 +2,25 @@
 @bg-color-2: #fdf3e0;
 @text-color-1: #463a39;
 @text-color-2: #861b1d;
+@label-color: #f19a00;
 @btn-color-1: #c99050;
 @btn-color-2: #861b1d;
-@btn-color-3: #6c6f20;
-@btn-color-4: #ba7a97;
+@btn-color-3: #969b17;
+@btn-color-4: #f46a68;
+
+// import fonts from fonts folder
+@font-face {
+  font-family: "Termina-Black";
+  src: url("./fonts/Termina_Black.ttf"), format("truetype");
+  font-weight: 900;
+  font-style: normal;
+}
+@font-face {
+  font-family: "FranklinGothic-URW";
+  src: url("./fonts/FranklinGothic_URW_Medium.ttf"), format("truetype");
+  font-weight: medium;
+  font-style: normal;
+}
 
 * {
   box-sizing: border-box;
@@ -45,7 +60,6 @@ body {
 }
 
 .Main {
-  border: solid;
   height: 100%;
   max-height: 520px;
   width: 100%;
@@ -130,10 +144,8 @@ body {
 
   #Canvas {
     background-color: black;
+    position: relative;
   }
-
-  // .menu-wrapper {
-  //   position: relative;
 
   .menu-wrapper {
     z-index: 999;
@@ -147,6 +159,7 @@ body {
 
     .bottom-menu {
       position: relative;
+      z-index: 200;
       bottom: -85px;
       left: 0;
       display: flex;
@@ -156,13 +169,34 @@ body {
       height: 100px;
       width: 100%;
       max-width: 540px;
-      background-color: @bg-color-1;
-      color: @text-color-1;
+      color: @label-color;
       margin: auto auto 0 auto;
       pointer-events: auto;
       padding: 1.5%;
       border-radius: 6px 6px 0 0;
       transition: bottom 0.3s ease-in-out;
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(circle, #4a3c6f, #3e3161, #332654, #271b47, #1c113a);
+        clip-path: polygon(98% 0, 100% 12%, 100% 50%, 99% 60%, 99% 100%, 1% 100%, 1% 60%, 0 50%, 0 12%, 2% 0);
+        z-index: -1;
+      }
+      &::after {
+        content: "";
+        position: absolute;
+        top: -2%;
+        left: -0.5%;
+        width: 101%;
+        height: 102%;
+        background-color: #41cdec;
+        clip-path: polygon(98% 0, 100% 12%, 100% 50%, 99% 60%, 99% 100%, 1% 100%, 1% 60%, 0 50%, 0 12%, 2% 0);
+        z-index: -2;
+      }
       &.open {
         bottom: 0; /* Slide up */
 
@@ -177,10 +211,10 @@ body {
         width: 40px;
         height: 40px;
         border-radius: 20px;
-        border: 0;
+        border: #4cddfb 2px solid;
         background: url("../public/assets/icons/chevron.svg") no-repeat center center;
         background-size: 70%;
-        background-color: @btn-color-1;
+        background-color: #f46a68;
         transition: rotate ease 0.3s;
       }
       .left-con,
@@ -192,6 +226,7 @@ body {
         padding: 4%;
         gap: 10px;
         label {
+          font-family: "FranklinGothic-URW", "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
           font-size: 1rem;
           font-weight: bold;
         }
@@ -216,30 +251,64 @@ body {
       }
     }
 
-    .side-menu {
-      background-color: @bg-color-2;
+    .details-menu {
       position: absolute;
+      z-index: 200;
       height: fit-content;
-      width: 260px;
-      top: 20%;
+      width: 250px;
+      top: 15%;
       right: -100%;
       display: flex;
       flex-direction: column;
       justify-content: center;
       border-radius: 6px 0 0 6px;
-      padding: 2%;
       pointer-events: auto;
       transition: all 0.3s ease-out;
+
+      .details-menu-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        padding: 4%;
+        &::before {
+          content: "";
+          position: absolute;
+          top: 0%;
+          left: 0%;
+          width: 100%;
+          height: 100%;
+          background-image: linear-gradient(to right top, #201047, #271649, #2d1d4b, #33234d, #392a4f);
+          clip-path: polygon(100% 0, 100% 100%, 5% 100%, 0 95%, 0 5%, 5% 0);
+          z-index: -1;
+        }
+
+        &::after {
+          content: "";
+          position: absolute;
+          top: -1%;
+          right: 0%;
+          width: 103%;
+          height: 102%;
+          background-image: linear-gradient(to bottom, #5fe5ff, #74cbff, #bda6fc, #ef7cbc, #ef6866);
+          clip-path: polygon(2% 20%, 2% 5%, 7% 0, 100% 0, 100% 100%, 7% 100%, 2% 95%, 2% 50%, 0 45%, 0 25%);
+          z-index: -2;
+        }
+      }
+
       &.open {
         right: 0;
       }
 
       h2 {
-        font: 1.4rem;
+        font-family: "Termina-Black";
+        text-transform: uppercase;
+        font-size: 1.5rem;
         margin: 0;
         margin-bottom: 4px;
+        color: #e1cdaa;
       }
-
       // .planet-details {
       //   &.editing input,
       //   .unit {
@@ -261,6 +330,9 @@ body {
         label {
           white-space: nowrap;
           margin-right: 6px;
+          color: @label-color;
+          font-weight: 600;
+          font-size: 0.9rem;
         }
 
         input {
@@ -272,6 +344,7 @@ body {
           color: @text-color-1;
         }
         span {
+          color: #fff;
         }
         // .unit {
         //   position: absolute;
@@ -298,14 +371,16 @@ body {
         .edit-planet-btn,
         .reset-planet-btn {
           height: 30px;
-          width: 90px;
+          width: 100px;
+          font-weight: 600;
+          font-size: 0.8rem;
         }
         .edit-planet-btn {
-          background-color: @btn-color-1;
+          background-color: @btn-color-3;
           color: #fff;
         }
         .reset-planet-btn {
-          background-color: @btn-color-2;
+          background-color: @btn-color-4;
           color: #fff;
         }
       }
@@ -352,7 +427,7 @@ body {
       right: 0;
       bottom: 0;
       border-radius: 34px;
-      background-color: @btn-color-4;
+      background-color: @btn-color-2;
       transition: 0.3s;
 
       &:before {
@@ -369,11 +444,11 @@ body {
     }
 
     input:checked + .slider {
-      background-color: @btn-color-3;
+      background-color: #969b17;
     }
 
     input:focus + .slider {
-      box-shadow: 0 0 1px @btn-color-3;
+      box-shadow: 0 0 1px #969b17;
     }
 
     input:checked + .slider:before {
@@ -413,10 +488,21 @@ body {
     height: 2px;
   }
   .planet-point {
-    width: 10px;
-    height: 10px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     opacity: 0.8;
+    cursor: pointer;
+  }
+  .planet-icon {
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
   }
   .moon-point {
     width: 6px;

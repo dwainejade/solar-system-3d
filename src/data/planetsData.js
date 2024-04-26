@@ -88,6 +88,12 @@ const marsData = {
     color: "salmon",
     gravity: 3.72076, // in m/s²
     gravitationalAcceleration: 0.00256, // m/s²
+    interestPoints: [
+        {
+            title: "Olympus Mons",
+            coordinates: new THREE.Vector3(10, 15, 0) // Example coordinates
+        }
+    ]
 };
 
 const jupiterData = {
@@ -106,6 +112,12 @@ const jupiterData = {
     color: "#FFD27D",
     gravity: 24.79, // in m/s²
     gravitationalAcceleration: 0.000219, // m/s²
+    interestPoints: [
+        {
+            title: "Great Red Spot",
+            coordinates: [-5, 5, 0] // Example coordinates
+        }
+    ]
 };
 
 const saturnData = {
@@ -124,6 +136,12 @@ const saturnData = {
     color: "#FFCC99",
     gravity: 10.44, // in m/s²
     gravitationalAcceleration: 0.0000646, // m/s²
+    interestPoints: [
+        {
+            title: "Hexagon Storm",
+            coordinates: new THREE.Vector3(-10, 20, 0) // Example coordinates
+        }
+    ]
 };
 
 const uranusData = {
@@ -160,6 +178,12 @@ const neptuneData = {
     color: "#4973AB",
     gravity: 11.15, // in m/s²
     gravitationalAcceleration: 0.00000657, // m/s²
+    interestPoints: [
+        {
+            title: "Great Dark Spot",
+            coordinates: new THREE.Vector3(-5, -5, 0) // Example coordinates
+        }
+    ]
 };
 
 const plutoData = {

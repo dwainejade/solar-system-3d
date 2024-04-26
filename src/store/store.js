@@ -6,6 +6,8 @@ import initialPlanetsData from '../data/planetsData';
 const useStore = create((set, get) => ({
     simSpeed: 1, // 1 is realtime speed
     setSimSpeed: (newSpeed) => set({ simSpeed: newSpeed }),
+    prevSpeed: 1,
+    setPrevSpeed: (newSpeed) => set({ prevSpeed: newSpeed }),
 
     fullscreen: false,
     toggleFullscreen: () => {
@@ -23,6 +25,9 @@ const useStore = create((set, get) => ({
             }
         }
     },
+
+    showDetailsMenu: false,
+    toggleDetailsMenu: (newState) => set(state => ({ showDetailsMenu: newState })),
 
     isEditing: false, // allow user to edit planet data
     setIsEditing: (newState) => set({ isEditing: newState }),
@@ -149,6 +154,11 @@ const usePlanetStore = create(immer((set, get) => ({
 
 
 const useCameraStore = create((set) => ({
+    satelliteCamera: false,
+    toggleSatelliteCamera: (newState) => set(() => ({ satelliteCamera: newState })),
+    isCameraTransitioning: false,
+    toggleCameraTransitioning: (newState) => set(() => ({ isCameraTransitioning: newState })),
+
     surfacePoint: null,
     setSurfacePoint: (surfacePoint) => set({ surfacePoint }),
     surfaceNormal: [0, 1, 0],
