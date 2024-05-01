@@ -2,11 +2,12 @@
 import React, { useState } from "react";
 import useStore, { usePlanetStore, useCameraStore } from "../../store/store";
 import DetailsMenu from "./DetailsMenu"
+import ResetModal from "./ResetModal";
 
 const Menu = () => {
   const { simSpeed, setSimSpeed, prevSpeed, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths, showDetailsMenu, toggleDetailsMenu } = useStore();
-  const { selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels, planetsData, resetPlanetsData } = usePlanetStore();
-  const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning } = useCameraStore()
+  const { selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels, planetsData, resetPlanetsData, showResetPlanetModal, showResetAllModal, toggleResetPlanetModal, toggleResetAllModal } = usePlanetStore();
+  const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning, } = useCameraStore()
 
   const [isMenuOpen, setMenuOpen] = useState(false);
 
@@ -14,7 +15,10 @@ const Menu = () => {
     setMenuOpen(!isMenuOpen);
   };
 
-  const resetAll = () => {
+  const handleResetBtn = () => {
+    toggleResetAllModal(true)
+  }
+  const handleResetAll = () => {
     setTriggerReset(true)
     resetPlanetsData()
     toggleSatelliteCamera(false)
@@ -75,7 +79,7 @@ const Menu = () => {
   return (
     <div className="menu-wrapper">
       {/* reset button */}
-      <button className="reset-all-btn btn" onClick={resetAll} />
+      <button className="reset-all-btn btn" onClick={handleResetBtn} />
       {/* fullscreen button */}
       <button className="fullscreen-btn btn" onClick={handleFullscreen} />
       {/* <button className="satelliteCamera-btn btn" onClick={() => toggleSatelliteCamera(!satelliteCamera)}
@@ -171,6 +175,9 @@ const Menu = () => {
           <DetailsMenu />
         </div>
       </div>
+
+      {(showResetPlanetModal || showResetAllModal) &&
+        <ResetModal type={showResetPlanetModal ? 'single' : 'all'} handleResetAll={handleResetAll} />}
     </div>
   );
 };

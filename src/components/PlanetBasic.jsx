@@ -2,7 +2,7 @@
 
 import React, { useRef, forwardRef, useState, useEffect, cloneElement } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
-import { Html, Torus } from "@react-three/drei";
+import { BBAnchor, Html, Torus } from "@react-three/drei";
 import * as THREE from "three";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
@@ -226,6 +226,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
               onBuild={() => setTexturesLoaded(true)}   // load textures first then swap to basic material. Trick for color issues
             />
           }
+
         </mesh>
         {/* Saturns rings */}
         {name === "Saturn" && (
@@ -244,13 +245,12 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
             center
             occlude
             position-y={isPlanetSelected ? scale + scale * 0.25 : scale * 4}
-            // fix for top down view. maybe move + y and + z
             zIndexRange={[100, 0]}
             style={{ pointerEvents: 'none' }}
           >
             <span
               className='planet-label'
-              style={{ color }}
+              style={{ color, pointerEvents: isHovered ? 'none' : 'auto' }}
               onClick={handleClick}
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
@@ -263,24 +263,18 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
           </Html>
         )}
 
-        {/* Display planet name on hover */}
-        {/* {isHovered && !isPlanetSelected && !displayLabels && (
-          <Html position={[0, 100, 0]} style={{ pointerEvents: 'none' }}>
-            <div style={{ color: 'white', padding: '6px 10px', background: 'rgba(0,0,0,0.5)', borderRadius: '8px' }}>
-              {name}
-            </div>
-          </Html>
-        )} */}
+
 
         {/* Render moons */}
         {isPlanetSelected && moons.map((moon, index) => (
           <Moon key={`${name}-moon-${index}`} moonData={moon} planetPosition={localRef.current?.position} />
         ))}
 
-      </group>
+      </group >
       {orbitPaths && (
         <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} hiRes={isPlanetSelected} />
-      )}
+      )
+      }
     </>
   );
 });

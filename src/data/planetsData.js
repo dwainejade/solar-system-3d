@@ -115,7 +115,7 @@ const jupiterData = {
     interestPoints: [
         {
             title: "Great Red Spot",
-            coordinates: [-5, 5, 0] // Example coordinates
+            coordinates: [-1, 1, 1] // Example coordinates
         }
     ]
 };

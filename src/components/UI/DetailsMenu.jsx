@@ -21,7 +21,7 @@ const calculateSunGravitationalPull = (distanceKm) => {
 
 const DetailsMenu = () => {
   const { isEditing, setIsEditing, showDetailsMenu, toggleDetailsMenu } = useStore();
-  const { selectedPlanet, updatePlanetData, planetsData, setSelectedPlanet, resetSinglePlanetData } = usePlanetStore();
+  const { selectedPlanet, updatePlanetData, planetsData, setSelectedPlanet, resetSinglePlanetData, toggleResetPlanetModal } = usePlanetStore();
   const [editablePlanet, setEditablePlanet] = useState({});
   const [gravitationalPull, setGravitationalPull] = useState(0)
 
@@ -117,7 +117,7 @@ const DetailsMenu = () => {
               {isEditing ? "Save Values" : "Adjust Values"}
             </button>
 
-            <button onClick={() => { resetSinglePlanetData(selectedPlanet?.name) }} className='reset-planet-btn btn'>
+            <button onClick={() => { toggleResetPlanetModal(true) }} className='reset-planet-btn btn'>
               Reset Values
             </button>
           </div>

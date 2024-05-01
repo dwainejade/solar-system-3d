@@ -99,6 +99,12 @@ export default useStore;
 
 
 const usePlanetStore = create(immer((set, get) => ({
+    showResetPlanetModal: false,
+    toggleResetPlanetModal: (newState) => set(state => ({ showResetPlanetModal: newState })),
+
+    showResetAllModal: false,
+    toggleResetAllModal: (newState) => set(state => ({ showResetAllModal: newState })),
+
     // Existing store properties and methods
     displayLabels: false, // render planet names in scene
     toggleDisplayLabels: () => set((state) => ({ displayLabels: !state.displayLabels })),
