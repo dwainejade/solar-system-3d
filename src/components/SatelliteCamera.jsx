@@ -90,17 +90,16 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
 
     useEffect(() => {
         const canvasElement = gl.domElement;
-        const bodyElement = document.body;
 
         canvasElement.addEventListener('mousedown', handleMouseDown);
-        bodyElement.addEventListener('mousemove', handleMouseMove);
-        bodyElement.addEventListener('mouseup', handleMouseUp);
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
         canvasElement.addEventListener('wheel', handleWheel);
 
         return () => {
             canvasElement.removeEventListener('mousedown', handleMouseDown);
-            bodyElement.removeEventListener('mousemove', handleMouseMove);
-            bodyElement.removeEventListener('mouseup', handleMouseUp);
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
             canvasElement.removeEventListener('wheel', handleWheel);
         };
     }, [handleMouseDown, handleMouseMove, handleMouseUp, handleWheel, gl.domElement]);
