@@ -186,9 +186,6 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   const moons = moonsData[name] || [];
 
 
-
-
-
   return (
     <>
       {isPlanetSelected && localRef.current &&
