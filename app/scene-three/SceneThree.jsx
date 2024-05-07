@@ -14,10 +14,11 @@ import CameraPath from '@/components/CameraPath';
 
 const SceneThree = () => {
   const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed } = useStore();
-  const { planetPositions, selectedPlanet, setSelectedPlanet, selectedMoon, setSelectedMoon, planetsData } = usePlanetStore();
+  const { planetPositions, selectedPlanet, setSelectedPlanet, moonPositions, selectedMoon, setSelectedMoon, planetsData } = usePlanetStore();
   const { satelliteCamera, triggerReset, setTriggerReset, toggleCameraTransitioning, isCameraTransitioning } = useCameraStore();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
+  const [moonsParent, setMoonsParent] = useState(null);
 
   // A simplistic approach to calculate optimal distance
   const calculateOptimalDistance = (planetRadius) => {
@@ -33,7 +34,6 @@ const SceneThree = () => {
     setMinDistance(200);
     // Set the target to the sun's position
     cameraControlsRef.current.setTarget(sunSettings.position.x, sunSettings.position.y, sunSettings.position.z, true);
-
     // Define an isometric position for the camera
     const isometricPosition = {
       x: sunSettings.position.x + -2000,
@@ -41,6 +41,7 @@ const SceneThree = () => {
       z: sunSettings.position.z + 1000,
     };
     cameraControlsRef.current.setPosition(isometricPosition.x, isometricPosition.y, isometricPosition.z, true);
+    cameraControlsRef.current.camera.updateProjectionMatrix()
   };
 
   // Handle camera adjustments when a planet is selected
@@ -48,7 +49,6 @@ const SceneThree = () => {
     if (selectedPlanet && cameraControlsRef.current) {
       const planetPosition = planetPositions[selectedPlanet.name];
       if (planetPosition) {
-        // Assuming planet's position and other data are ready
         const scaledRadius = planetsData[selectedPlanet.name].radius * sizeScaleFactor;
         const optimalDistance = calculateOptimalDistance(scaledRadius);
         setMinDistance(optimalDistance / 2);
@@ -62,17 +62,19 @@ const SceneThree = () => {
       }
     }
   });
+  const getMoonData = (planetName, moonName) => {
+    const moons = moonsData[planetName];
+    const moon = moons.find(m => m.name === moonName);
+    return moon;
+  };
   useFrame(() => {
     if (selectedMoon && cameraControlsRef.current) {
-      const moonPosition = selectedMoon.position;
+      const moonPosition = moonPositions[selectedMoon.name];
       if (moonPosition) {
-        // Calculate the optimal distance to view the moon
-        const scaledRadius = selectedMoon.bodyData.radius * moonSizeScaleFactor;
+        const moonInfo = getMoonData(moonsParent, selectedMoon.name)
+        const scaledRadius = moonInfo.radius * moonSizeScaleFactor;
         const optimalDistance = calculateOptimalDistance(scaledRadius);
-        // Adjust the minimum distance for the camera to avoid getting too close
         setMinDistance(optimalDistance / 2);
-
-        // Smoothly transition the camera to the moon's position
         cameraControlsRef.current.setTarget(moonPosition.x, moonPosition.y, moonPosition.z, true);
         cameraControlsRef.current.dollyTo(optimalDistance, true);
       }
@@ -92,8 +94,14 @@ const SceneThree = () => {
       setPrevSpeed(simSpeed);
       setSimSpeed(0); // Pause the simulation
       toggleCameraTransitioning(true); // Start the camera transition
+      setMoonsParent(selectedPlanet.name);
     }
-  }, [selectedPlanet]);
+    if (selectedMoon) {
+      setPrevSpeed(simSpeed);
+      setSimSpeed(0);
+      toggleCameraTransitioning(true);
+    }
+  }, [selectedPlanet, selectedMoon]);
 
 
   const earthTextures = useTexture({
