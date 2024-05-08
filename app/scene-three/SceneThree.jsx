@@ -111,6 +111,9 @@ const SceneThree = () => {
     // normal: "../assets/earth/2k_earth_normal_map.png",
     // specular: "../assets/earth/2k_earth_specular_map.png",
   });
+  const sunTextures = useTexture({
+    map: "../assets/sun/2k_sun.jpg",
+  })
   const venusTextures = useTexture({
     map: "../assets/venus/2k_venus_surface.jpg",
     // surface: "../assets/venus/2k_venus_atmosphere.jpg",
@@ -185,7 +188,7 @@ const SceneThree = () => {
       {/* {Object.entries(moonsData).map(([planetName]) => renderMoons(planetName))} */}
 
       {/* <Planet bodyData={planetsData.Pluto} /> */}
-      <Sun key={"Sun-plain"} position={sunSettings.position} resetCamera={resetCamera} />
+      <Sun key={"Sun-plain"} textures={sunTextures} position={sunSettings.position} resetCamera={resetCamera} />
     </>
   );
 };

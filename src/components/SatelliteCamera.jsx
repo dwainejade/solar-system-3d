@@ -119,20 +119,7 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
             cameraRef.current.updateMatrixWorld();
 
             const distance = camera.position.distanceTo(target.position);
-            const switchCamera = () => {
-                const relativePosition = new THREE.Vector3().subVectors(
-                    camera.position,
-                    target.position
-                );
 
-                const sphericalPosition = convertVectorToSpherical(relativePosition)
-
-                setSpherical(sphericalPosition);
-                toggleSatelliteCamera(true);
-                toggleCameraTransitioning(false);
-                setSimSpeed(prevSpeed);
-                setIsTransitioning(false);
-            };
 
             if (distance <= size * 6) {
                 if (!satelliteCamera) {
@@ -142,6 +129,22 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
         }
 
     });
+
+    function switchCamera() {
+        const relativePosition = new THREE.Vector3().subVectors(
+            camera.position,
+            target.position
+        );
+
+        const sphericalPosition = convertVectorToSpherical(relativePosition)
+        cameraRef.current.updateProjectionMatrix();
+        console.log(cameraRef.current);
+        setSpherical(sphericalPosition);
+        toggleSatelliteCamera(true);
+        toggleCameraTransitioning(false);
+        setSimSpeed(prevSpeed);
+        setIsTransitioning(false);
+    };
 
     function convertVectorToSpherical(vector) {
         const spherical = new THREE.Spherical();

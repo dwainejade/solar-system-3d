@@ -205,7 +205,8 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         >
           {isPlanetSelected
             ? <sphereGeometry args={[scaledRadius, 16, 16]} />
-            : <sphereGeometry args={[scale * 3, 8, 8]} />}
+            : <sphereGeometry args={[scale * 3, 8, 8]} />
+          }
         </mesh>
 
         <mesh
@@ -261,7 +262,6 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         )}
 
 
-
         {/* Render moons */}
         {isPlanetSelected && moons.map((moon, index) => (
           <Moon key={`${name}-moon-${index}`} moonData={moon} planetPosition={localRef.current?.position} />
@@ -270,8 +270,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
       </group >
       {orbitPaths && (
         <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} hiRes={isPlanetSelected} />
-      )
-      }
+      )}
     </>
   );
 });

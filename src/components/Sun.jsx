@@ -68,30 +68,12 @@ const Sun = ({ position, resetCamera, textures }) => {
       >
         <sphereGeometry args={[sunRadius, 64, 64]} />
         {textures ? (
-          <meshPhysicalMaterial map={textures.map} color={[10, 3, 0]} toneMapped={false} zIndexRange={[100 - 1]} />
+          <meshBasicMaterial map={textures.map} color={[10, 3, 0]} toneMapped={false} zIndexRange={[100 - 1]} />
         ) : (
-          <meshBasicMaterial color={[10, 3, 0]} toneMapped={false} />
+          <meshBasicMaterial color={[10, 4, 0]} toneMapped={false} />
         )}
       </mesh>
-      {/* Display planet names */}
-      {/* {displayLabels ? (
-        <Html as='div' center occlude position-y={60} zIndexRange={[100, 0]}>
-          <div
-            className='planet-label'
-            style={{ color: "rgb(255, 255, 0)" }}
-            onClick={handleClick}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerOver={handlePointerOver}
-            onPointerOut={handlePointerOut}
-          >
-            Sun
-          </div>
-        </Html>
-      ) : (
-        null
-      )} */}
+
     </group>
   );
 };

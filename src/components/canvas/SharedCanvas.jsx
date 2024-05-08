@@ -5,7 +5,6 @@ import { Canvas } from "@react-three/fiber";
 import { Html, Preload, Stats, useProgress } from "@react-three/drei";
 import useStore, { usePlanetStore } from "../../store/store";
 import Menu from "../UI/Menu";
-import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import "../../styles.css";
 
 const SharedCanvas = ({ children }) => {
@@ -42,13 +41,10 @@ const SharedCanvas = ({ children }) => {
         gl={{ antialias: true, logarithmicDepthBuffer: true }}
         camera={{ fov: 50, position: [5000, 5000, 5000], near: 0.01, far: 1000000 }}
       >
+        {/* <Stats showPanel={2} /> */}
         <Suspense fallback={<Loader />}>
-          {/* <Stats showPanel={2} /> */}
           <ambientLight intensity={0.04} />
           <pointLight color='#f6f3ea' intensity={2} position={[0, 0, 0]} key={selectedPlanet?.name || 'basic'} />
-          <EffectComposer>
-            <Bloom mipmapBlur intensity={.6} luminanceThreshold={1} luminanceSmoothing={1.2} radius={.6} />
-          </EffectComposer>
           {children}
         </Suspense>
         <Preload all />
