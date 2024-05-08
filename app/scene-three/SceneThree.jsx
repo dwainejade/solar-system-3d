@@ -40,8 +40,8 @@ const SceneThree = () => {
       y: sunSettings.position.y + 1000,
       z: sunSettings.position.z + 1000,
     };
-    cameraControlsRef.current.setPosition(isometricPosition.x, isometricPosition.y, isometricPosition.z, true);
     cameraControlsRef.current.camera.updateProjectionMatrix()
+    cameraControlsRef.current.setPosition(isometricPosition.x, isometricPosition.y, isometricPosition.z, true);
   };
 
   // Handle camera adjustments when a planet is selected

@@ -118,6 +118,7 @@ const usePlanetStore = create(
             // Existing store properties and methods
             displayLabels: false, // render planet names in scene
             toggleDisplayLabels: () => set((state) => ({ displayLabels: !state.displayLabels })),
+            // TODO: move orbit lines here
 
             planetPositions: {},
             updatePlanetPosition: (name, position) =>
@@ -135,12 +136,6 @@ const usePlanetStore = create(
             setSelectedPlanet: (planetData) =>
                 set(() => ({
                     selectedPlanet: planetData,
-                })),
-
-            selectedMoon: null,
-            setSelectedMoon: (moonData) =>
-                set(() => ({
-                    selectedMoon: moonData,
                 })),
 
             planetsData: initialPlanetsData,
@@ -166,15 +161,26 @@ const usePlanetStore = create(
                     }
                 });
             },
+
+            selectedMoon: null,
+            setSelectedMoon: (moonData) =>
+                set(() => ({
+                    selectedMoon: moonData,
+                })),
+            moonPositions: {},
+            updateMoonPosition: (name, position) =>
+                set((state) => ({
+                    moonPositions: { ...state.moonPositions, [name]: position },
+                })),
         })),
         // storage:
         {
             name: 'solar-system-planets', // name of the item in the storage (must be unique)
             storage: createJSONStorage(() => localStorage), // (optional) by default, 'localStorage' is used
+            // TODO: remove some states from localStorage. ex: isTransitioning, etc.
+
         },
-
     ));
-
 
 const useCameraStore = create((set) => ({
     satelliteCamera: false,

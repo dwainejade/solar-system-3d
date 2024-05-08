@@ -2,7 +2,7 @@
 
 import React, { useRef, forwardRef, useState, useEffect, cloneElement } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
-import { BBAnchor, Html, Torus } from "@react-three/drei";
+import { Html, Torus } from "@react-three/drei";
 import * as THREE from "three";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
@@ -212,7 +212,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
           ref={meshRef}
           key={isPlanetSelected ? name + '-textured' : name + '-basic'}
         >
-          <sphereGeometry args={[scale, detailLevel, detailLevel]} />
+          <sphereGeometry args={[(isPlanetSelected ? scaledRadius : scale), detailLevel, detailLevel]} />
           {!isPlanetSelected && texturesLoaded ?
             <meshBasicMaterial color={color} />
             :
