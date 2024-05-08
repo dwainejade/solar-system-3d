@@ -9,7 +9,7 @@ import SatelliteCamera from "./SatelliteCamera";
 
 const Moon = forwardRef(({ moonData }, ref) => {
   const { simSpeed, orbitPaths } = useStore();
-  const { selectedPlanet, selectedMoon, setSelectedMoon, setSelectedPlanet, displayLabels } = usePlanetStore();
+  const { selectedPlanet, selectedMoon, setSelectedMoon, updateMoonPosition, setSelectedPlanet, displayLabels } = usePlanetStore();
   const { satelliteCamera, toggleSatelliteCamera } = useCameraStore()
 
   const localRef = ref || useRef();
@@ -49,7 +49,7 @@ const Moon = forwardRef(({ moonData }, ref) => {
     // Update the moon's position
     if (localRef.current) {
       localRef.current.position.set(moonX, moonY, moonZ);
-
+      updateMoonPosition(name, { moonX, moonY, moonZ });
       // Point the moon towards the Earth: Earth is assumed to be at the origin (0,0,0)
       localRef.current.lookAt(new Vector3(0, 0, 0));
     }
@@ -60,34 +60,37 @@ const Moon = forwardRef(({ moonData }, ref) => {
     e.stopPropagation();
     if (selectedMoon && selectedMoon.name === name) return
 
-    // setSelectedPlanet(null);
-    // setSelectedMoon(moonData);
+    setSelectedPlanet(null);
+    setSelectedMoon(moonData);
   };
 
   const [isHovered, setIsHovered] = useState(false);
   const handlePointerOver = e => {
     e.stopPropagation();
+    document.body.style.cursor = "pointer";
     setIsHovered(true);
   };
 
   const handlePointerOut = e => {
     e.stopPropagation();
     setIsHovered(false);
+    document.body.style.cursor = "auto";
   };
 
   return (
     <>
       {isMoonSelected && localRef.current &&
-        <SatelliteCamera target={localRef.current} color={color} size={scaledRadius} satelliteCamera={satelliteCamera} toggleSatelliteCamera={toggleSatelliteCamera} />
+        <SatelliteCamera target={localRef.current} targetName={name} color={color} size={scaledRadius} satelliteCamera={satelliteCamera} toggleSatelliteCamera={toggleSatelliteCamera} />
       }
+
       <group ref={localRef}>
 
         {/* Invisible mesh for interaction */}
         <mesh
           visible={false}
-          onClick={handleClick}
-          onPointerOver={handlePointerOver}
-          onPointerOut={handlePointerOut}
+          // onClick={handleClick}
+          // onPointerOver={handlePointerOver}
+          // onPointerOut={handlePointerOut}
           position={localRef.current?.position || null}
         >
           {isMoonSelected
@@ -116,9 +119,9 @@ const Moon = forwardRef(({ moonData }, ref) => {
             <span
               className='planet-label'
               style={{ color }}
-              onClick={handleClick}
-              onPointerOver={handlePointerOver}
-              onPointerOut={handlePointerOut}
+            // onClick={handleClick}
+            // onPointerOver={handlePointerOver}
+            // onPointerOut={handlePointerOut}
             >
               {name}
             </span>
