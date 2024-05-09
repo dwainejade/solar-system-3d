@@ -6,7 +6,6 @@ import useStore, { useCameraStore } from '../store/store';
 
 
 const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera, targetName }) => {
-    // console.log({ target, size, satelliteCamera, toggleSatelliteCamera, targetName })
     const { toggleCameraTransitioning } = useCameraStore();
     const { prevSpeed, setSimSpeed } = useStore();
 
@@ -18,7 +17,7 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
     const [spherical, setSpherical] = useState(new THREE.Spherical());
     const [isTransitioning, setIsTransitioning] = useState(false);
 
-    const [targetRadius, setTargetRadius] = useState(size * 5);
+    const [targetRadius, setTargetRadius] = useState(size * 5.5);
     const lerpFactor = 0.18; // Adjust this value to control the smoothness of the transition
 
     const handleMouseDown = useCallback((event) => {
@@ -55,6 +54,8 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
 
     const handleWheel = useCallback(
         (event) => {
+            if (!satelliteCamera) return;
+
             const currentPosition = new THREE.Vector3().setFromSpherical(spherical);
             const distanceToTarget = currentPosition.distanceTo(target.position);
 
@@ -64,7 +65,7 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
             // Calculate the new target radius based on the wheel event and the zoom factor
             const zoomSpeed = -0.2; // Adjust this value to control the zoom speed
             const deltaRadius = event.deltaY * zoomSpeed * zoomFactor;
-            const newTargetRadius = Math.max(size * 3, Math.min(500, targetRadius - deltaRadius));
+            const newTargetRadius = Math.max(size * 2.5, Math.min(500, targetRadius - deltaRadius));
 
             setTargetRadius(newTargetRadius);
             convertVectorToSpherical("camRef", cameraRef.current.position);
@@ -121,7 +122,7 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
             const distance = camera.position.distanceTo(target.position);
 
 
-            if (distance <= size * 6) {
+            if (distance <= size * 5.5) {
                 if (!satelliteCamera) {
                     switchCamera();
                 }
@@ -138,7 +139,6 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
 
         const sphericalPosition = convertVectorToSpherical(relativePosition)
         cameraRef.current.updateProjectionMatrix();
-        console.log(cameraRef.current);
         setSpherical(sphericalPosition);
         toggleSatelliteCamera(true);
         toggleCameraTransitioning(false);

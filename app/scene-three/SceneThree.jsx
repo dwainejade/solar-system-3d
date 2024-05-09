@@ -40,7 +40,6 @@ const SceneThree = () => {
       y: sunSettings.position.y + 1000,
       z: sunSettings.position.z + 1000,
     };
-    cameraControlsRef.current.camera.updateProjectionMatrix()
     cameraControlsRef.current.setPosition(isometricPosition.x, isometricPosition.y, isometricPosition.z, true);
   };
 
@@ -101,18 +100,19 @@ const SceneThree = () => {
       setSimSpeed(0);
       toggleCameraTransitioning(true);
     }
+    cameraControlsRef.current?.camera.updateProjectionMatrix()
   }, [selectedPlanet, selectedMoon]);
 
 
   const earthTextures = useTexture({
     map: "../assets/earth/8k_earth_daymap.jpg",
-    clouds: "../assets/earth/2k_earth_clouds.jpg",
-    // night: "../assets/earth/2k_earth_nightmap.jpg",
-    // normal: "../assets/earth/2k_earth_normal_map.png",
+    night: "../assets/earth/2k_earth_nightmap.jpg",
+    normal: "../assets/earth/8k_earth_normal_map.png",
+    clouds: "../assets/earth/8k_earth_clouds.jpg",
     // specular: "../assets/earth/2k_earth_specular_map.png",
   });
   const sunTextures = useTexture({
-    map: "../assets/sun/2k_sun.jpg",
+    map: "../assets/sun/8k_sun.jpg",
   })
   const venusTextures = useTexture({
     map: "../assets/venus/2k_venus_surface.jpg",
@@ -140,9 +140,8 @@ const SceneThree = () => {
   // camera settings
   const cameraConfig = {
     maxDistance: 90000,
-    smoothTime: .8,
-    truckSpeed: 1,
-    rotateSpeed: 1,
+    smoothTime: 0.7,
+    polarRotateSpeed: 0.5,
     near: 0.001,
     far: 1000000
   };

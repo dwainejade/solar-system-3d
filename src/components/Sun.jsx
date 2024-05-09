@@ -1,7 +1,10 @@
 import React, { useState, useRef } from "react";
 import { usePlanetStore } from "../store/store";
 import { sizeScaleFactor } from "../data/planetsData";
+import { useFrame } from "@react-three/fiber";
 // import { Html } from "@react-three/drei";
+import { sunOuterShader } from "../shaders/atmosphere";
+
 
 const Sun = ({ position, resetCamera, textures }) => {
   const [isDragging, setIsDragging] = useState(false);
@@ -55,9 +58,23 @@ const Sun = ({ position, resetCamera, textures }) => {
     document.body.style.cursor = "auto";
   };
 
+  // scale planet size based on distance. Also use to toggle textures on/off
+  const localRef = useRef()
+  const [scale, setScale] = useState(sunRadius);
+  const [shaderScale, setShaderScale] = useState(sunRadius * 1.08);
+  useFrame(({ camera }) => {
+    const distance = localRef.current.position.distanceTo(camera.position);
+    if (distance / 100 <= sunRadius) {
+      setScale(sunRadius);
+    } else {
+      setScale(distance / 100);
+    }
+  });
+
   return (
     <group>
       <mesh
+        ref={localRef}
         position={position}
         onClick={handleClick}
         onPointerDown={handlePointerDown}
@@ -66,14 +83,17 @@ const Sun = ({ position, resetCamera, textures }) => {
         onPointerOver={handlePointerOver}
         onPointerOut={handlePointerOut}
       >
-        <sphereGeometry args={[sunRadius, 64, 64]} />
+        <sphereGeometry args={[scale, 32, 32]} />
         {textures ? (
           <meshBasicMaterial map={textures.map} color={[10, 3, 0]} toneMapped={false} zIndexRange={[100 - 1]} />
         ) : (
           <meshBasicMaterial color={[10, 4, 0]} toneMapped={false} />
         )}
       </mesh>
-
+      <mesh key={`${name}-atmosphere`}>
+        <sphereGeometry args={[shaderScale, 32, 32]} />
+        <shaderMaterial args={[sunOuterShader]} />
+      </mesh>
     </group>
   );
 };

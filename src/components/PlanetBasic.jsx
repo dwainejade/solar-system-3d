@@ -10,6 +10,7 @@ import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCamera";
 import Moon from "./Moon";
 import { moonsData } from "@/data/moonsData";
+import { earthAtmosphereShader } from "../shaders/atmosphere";
 
 
 // default values
@@ -41,6 +42,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   const { isSurfaceCameraActive, satelliteCamera, toggleSatelliteCamera } = useCameraStore();
   const localRef = ref || useRef();
   const localAngleRef = useRef(planetAngles[name] || 0); // Initialize with saved angle or 0
+  const cloudsRef = useRef();
 
   const [texturesLoaded, setTexturesLoaded] = useState(false);
   // calculating scaled values
@@ -104,6 +106,9 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         }
         if (saturnRingRef.current) { // rotate saturns rings
           saturnRingRef.current.rotation.y += rotationIncrement;
+        }
+        if (cloudsRef.current) {
+          cloudsRef.current.rotation.y += rotationIncrement * 1.2;
         }
       }
     }
@@ -217,20 +222,40 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
           {!isPlanetSelected && texturesLoaded ?
             <meshBasicMaterial color={color} />
             :
-            <meshStandardMaterial
-              metalness={0.6}
-              roughness={0.8}
-              map={textures?.map}
-              onBuild={() => setTexturesLoaded(true)}   // load textures first then swap to basic material. Trick for color issues
-            />
+            name === "Earth" ?
+              <>
+                <mesh key={`${name}-atmosphere`}>
+                  <sphereGeometry args={[scaledRadius * 1.05, detailLevel, detailLevel]} />
+                  <shaderMaterial args={[earthAtmosphereShader]} />
+                </mesh>
+                <meshStandardMaterial
+                  key={`${name}-day_texture`}
+                  metalness={.8}
+                  roughness={.8}
+                  map={textures?.map}
+                  onBuild={() => setTexturesLoaded(true)}   // load textures first then swap to basic material. Trick for color issues
+                />
+                <mesh ref={cloudsRef} key={`${name}-cloud_texture`}>
+                  <sphereGeometry args={[scaledRadius * 1.01, detailLevel, detailLevel]} />
+                  <meshStandardMaterial alphaMap={textures?.clouds} transparent />
+                </mesh>
+              </>
+              :
+              <meshStandardMaterial
+                metalness={0.6}
+                roughness={0.8}
+                map={textures?.map}
+                onBuild={() => setTexturesLoaded(true)}   // load textures first then swap to basic material. Trick for color issues
+              />
           }
+
 
         </mesh>
         {/* Saturns rings */}
         {name === "Saturn" && (
           <group ref={saturnRingRef} rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} >
             <Torus args={[scaledRadius * 1.7, scaledRadius * 0.5, 2, 100]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
-              <meshBasicMaterial map={ringTexture} side={THREE.DoubleSide} transparent />
+              <meshBasicMaterial map={ringTexture} />
             </Torus>
           </group>
         )}
