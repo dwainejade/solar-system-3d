@@ -26,7 +26,7 @@ const OrbitPath = forwardRef(
         ref={ref}
         points={points}
         color={color}
-        lineWidth={0.2}
+        lineWidth={1}
         // lineMaterial={lineMaterial}
         depthWrite
         dashed={lineType === "dashed"}

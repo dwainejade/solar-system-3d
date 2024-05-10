@@ -108,7 +108,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
           saturnRingRef.current.rotation.y += rotationIncrement;
         }
         if (cloudsRef.current) {
-          cloudsRef.current.rotation.y += rotationIncrement * 1.2;
+          cloudsRef.current.rotation.y += rotationIncrement * 1.2; // rotate faster than the planet
         }
       }
     }
@@ -294,7 +294,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
       </group >
       {orbitPaths && (
-        <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} hiRes={isPlanetSelected} />
+        <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} opacity={(isPlanetSelected || isHovered) ? .8 : .3} hiRes={isPlanetSelected} />
       )}
     </>
   );
