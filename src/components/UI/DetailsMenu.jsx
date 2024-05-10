@@ -42,12 +42,11 @@ const DetailsMenu = () => {
   const [gravitationalPull, setGravitationalPull] = useState(0)
 
   useEffect(() => {
+    // When selectedPlanet changes, update the local state to reflect the current data
     if (selectedPlanet) {
-      const currentPlanetData = planetsData[selectedPlanet.name];
-      setEditablePlanet(currentPlanetData || {});
-      setGravitationalPull(calculateSunGravitationalPull(selectedPlanet.orbitalRadius))
+      setEditablePlanet(planetsData[selectedPlanet.name] || {});
     }
-  }, [selectedPlanet, planetsData, isEditing]);
+  }, [selectedPlanet, planetsData]);
 
   const toggleEditing = () => {
     if (isEditing && selectedPlanet?.name) {
@@ -60,24 +59,56 @@ const DetailsMenu = () => {
   };
 
   const handleChange = (field) => (e) => {
-    let newValue = e.target.type === 'number' ? Number(e.target.value) : e.target.value;
+    const newValue = e.target.value; // Get the current value as string to allow typing freely
 
-    // Create a copy of the editablePlanet to modify
-    let updatedPlanet = { ...editablePlanet, [field]: newValue };
+    setEditablePlanet(prev => ({
+      ...prev,
+      [field]: newValue // Temporarily store any input including invalid ones like decimals
+    }));
+  };
+
+  const handleBlur = (field) => {
+    let value = parseFloat(editablePlanet[field]); // Convert the current input to a float
 
     if (field === 'orbitalRadius') {
-      // Recalculate the orbital period and gravitational pull
-      const newOrbitalPeriod = calculateOrbitalPeriod(newValue);
-      const acceleration = calculateSunGravitationalPull(newValue);
-      updatedPlanet.orbitalPeriod = newOrbitalPeriod;
-      updatedPlanet.gravitationalAcceleration = acceleration.toFixed(3);
-    }
-    setEditablePlanet(updatedPlanet);
-
-    if (isEditing) {
-      updatePlanetData(selectedPlanet.name, updatedPlanet);
+      value = Math.min(9000000000, Math.max(9000000, value));
+      const newOrbitalPeriod = calculateOrbitalPeriod(value);
+      const newGravitationalPull = calculateSunGravitationalPull(value);
+      setEditablePlanet(prev => ({
+        ...prev,
+        [field]: value,
+        orbitalPeriod: newOrbitalPeriod,
+        gravitationalAcceleration: newGravitationalPull.toFixed(3)
+      }));
+    } else if (field === 'rotationPeriod') {
+      value = Math.min(9000000000, Math.max(0.01, value));
+      setEditablePlanet(prev => ({
+        ...prev,
+        [field]: value
+      }));
+    } else {
+      setEditablePlanet(prev => ({
+        ...prev,
+        [field]: value
+      }));
     }
   };
+
+
+  const handleSave = () => {
+    // Update global state with the values from local state
+    updatePlanetData(selectedPlanet.name, editablePlanet);
+    setIsEditing(false); // Optionally close editing mode
+  };
+
+  const handleReset = () => {
+    toggleResetPlanetModal(true)
+  };
+
+  // initialize with adjust values button
+  useEffect(() => {
+    setIsEditing(false);
+  }, [])
 
 
   return (
@@ -103,7 +134,10 @@ const DetailsMenu = () => {
                 id="orbitalRadius"
                 value={formatScientificNotation(editablePlanet.orbitalRadius)}
                 onChange={handleChange('orbitalRadius')}
+                onBlur={() => handleBlur('orbitalRadius')}
                 disabled={!isEditing}
+                min="9000000"
+                max="9000000000"
               />
               <span className="measurement-unit">km</span>
             </div>
@@ -123,7 +157,10 @@ const DetailsMenu = () => {
                 type="text"
                 value={formatScientificNotation(editablePlanet.rotationPeriod)}
                 onChange={handleChange('rotationPeriod')}
+                onBlur={() => handleBlur('rotationPeriod')}
                 disabled={!isEditing}
+                min="0.01"
+                max="9000000000"
               />
               <span className="measurement-unit">hours</span>
             </div>
@@ -144,11 +181,11 @@ const DetailsMenu = () => {
 
           {selectedPlanet?.name !== 'Sun' &&
             <div className='button-con'>
-              <button onClick={toggleEditing} className='edit-planet-btn btn'>
+              <button onClick={isEditing ? handleSave : toggleEditing} className='edit-planet-btn btn'>
                 {isEditing ? "Save Values" : "Adjust Values"}
               </button>
 
-              <button onClick={() => { toggleResetPlanetModal(true) }} className='reset-planet-btn btn'>
+              <button onClick={handleReset} className='reset-planet-btn btn'>
                 Reset Values
               </button>
             </div>

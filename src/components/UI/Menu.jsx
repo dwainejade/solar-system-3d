@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useLayoutEffect } from "react";
 import useStore, { usePlanetStore, useCameraStore } from "../../store/store";
 import DetailsMenu from "./DetailsMenu"
 import ResetModal from "./ResetModal";
@@ -7,7 +7,7 @@ import ResetModal from "./ResetModal";
 const Menu = () => {
   const { simSpeed, setSimSpeed, prevSpeed, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths, showDetailsMenu, toggleDetailsMenu } = useStore();
   const { selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels, planetsData, resetPlanetsData, showResetPlanetModal, showResetAllModal, toggleResetPlanetModal, toggleResetAllModal } = usePlanetStore();
-  const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning, } = useCameraStore()
+  const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning, toggleCameraTransitioning } = useCameraStore()
 
   const [isMenuOpen, setMenuOpen] = useState(false);
 
@@ -75,6 +75,10 @@ const Menu = () => {
     };
   }
 
+  useLayoutEffect(() => {
+    setSimSpeed(1)
+    toggleCameraTransitioning(false)
+  }, [])
 
   return (
     <div className="menu-wrapper">
@@ -170,8 +174,8 @@ const Menu = () => {
       </div>
 
       {/* Details menu */}
-      <div className={`details-menu ${selectedPlanet && !isCameraTransitioning && showDetailsMenu ? 'open' : 'closed'}`}>
-        <div className="details-menu-inner">
+      <div className={`details-menu ${selectedPlanet && !isCameraTransitioning && showDetailsMenu ? 'open' : 'closed'}`} key={selectedPlanet?.name}>
+        <div className="details-menu-inner" >
           <DetailsMenu />
         </div>
       </div>
