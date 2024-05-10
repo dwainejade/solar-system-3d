@@ -6,8 +6,8 @@ import useStore, { useCameraStore } from '../store/store';
 
 
 const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera, targetName }) => {
-    const { toggleCameraTransitioning } = useCameraStore();
-    const { prevSpeed, setSimSpeed } = useStore();
+    const { toggleCameraTransitioning, setSatelliteCameraState } = useCameraStore();
+    const { prevSpeed, simSpeed, setSimSpeed } = useStore();
 
     const { camera, gl } = useThree();
     const cameraRef = useRef();
@@ -16,18 +16,34 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
     const [mouseDownPosition, setMouseDownPosition] = useState({ x: 0, y: 0 });
     const [spherical, setSpherical] = useState(new THREE.Spherical());
     const [isTransitioning, setIsTransitioning] = useState(false);
+    const [lastInteractionTime, setLastInteractionTime] = useState(null);
+    const [autoRotate, setAutoRotate] = useState(false);
 
     const [targetRadius, setTargetRadius] = useState(size * 5.5);
     const lerpFactor = 0.18; // Adjust this value to control the smoothness of the transition
+
+    const handleUserInteraction = useCallback(() => {
+        console.log('User interaction detected', autoRotate);
+        setLastInteractionTime(Date.now());
+        if (autoRotate) {
+            console.log('Auto-rotate disabled');
+            setAutoRotate(false)
+        };  // Disable auto-rotate when user interacts
+    }, []);
 
     const handleMouseDown = useCallback((event) => {
         setIsDragging(true);
         setMouseDownPosition({ x: event.clientX, y: event.clientY });
     }, []);
 
+    const handleMouseUp = useCallback(() => {
+        setIsDragging(false);
+    }, []);
+
     const handleMouseMove = useCallback(
         (event) => {
             if (isDragging) {
+                handleUserInteraction();
                 const dx = event.clientX - mouseDownPosition.x;
                 const dy = event.clientY - mouseDownPosition.y;
 
@@ -48,10 +64,6 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
         [isDragging, mouseDownPosition]
     );
 
-    const handleMouseUp = useCallback(() => {
-        setIsDragging(false);
-    }, []);
-
     const handleWheel = useCallback(
         (event) => {
             if (!satelliteCamera) return;
@@ -68,8 +80,7 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
             const newTargetRadius = Math.max(size * 2.5, Math.min(500, targetRadius - deltaRadius));
 
             setTargetRadius(newTargetRadius);
-            convertVectorToSpherical("camRef", cameraRef.current.position);
-            convertVectorToSpherical("target", target.position);
+            handleUserInteraction();
         },
         [spherical, target.position, size, targetRadius]
     );
@@ -102,10 +113,15 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
 
 
     // Lerp the spherical radius towards the target radius
-    useFrame(() => {
+    useFrame((state, delta) => {
         if (cameraRef.current && target) {
             const newRadius = THREE.MathUtils.lerp(spherical.radius, targetRadius, lerpFactor);
             setSpherical((prevSpherical) => new THREE.Spherical(newRadius, prevSpherical.phi, prevSpherical.theta));
+        }
+        if (autoRotate && cameraRef.current && target && simSpeed < 10000 && simSpeed > -10000) {
+            const rotationSpeed = -0.05 * delta;  // Slow rotation speed
+            spherical.theta += rotationSpeed;
+            const newPosition = new THREE.Vector3().setFromSpherical(spherical);
         }
     });
     useFrame(() => {
@@ -120,7 +136,6 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
             cameraRef.current.updateMatrixWorld();
 
             const distance = camera.position.distanceTo(target.position);
-
 
             if (distance <= size * 5.5) {
                 if (!satelliteCamera) {
@@ -144,6 +159,7 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
         toggleCameraTransitioning(false);
         setSimSpeed(prevSpeed);
         setIsTransitioning(false);
+        setLastInteractionTime(Date.now());
     };
 
     function convertVectorToSpherical(vector) {
@@ -151,6 +167,42 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
         spherical.setFromVector3(vector);
         return spherical;
     }
+
+    // Auto rotate the camera if idle
+    useFrame((state, delta) => {
+
+    });
+
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (!lastInteractionTime) return;
+            if (Date.now() - lastInteractionTime > 4000 && !autoRotate && !isTransitioning) {
+                setAutoRotate(true);
+            }
+        }, 1000);
+
+        if (autoRotate) clearInterval(interval);
+
+        return () => clearInterval(interval);
+    }, [lastInteractionTime, isTransitioning]);
+
+
+
+
+    // // Cleanup function to save the camera state when the component unmounts
+    // useEffect(() => {
+
+    //     if (satelliteCamera) {
+    //         setSatelliteCameraState(
+    //             camera.position,
+    //             target.position
+    //         );
+    //         console.log('Camera state saved:', camera.position, target.position);
+    //     }
+
+    // }, [target, satelliteCamera]);
+
 
     return (
         <PerspectiveCamera
@@ -164,7 +216,5 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
         />
     );
 };
-
-
 
 export default SatelliteCamera;
