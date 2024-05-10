@@ -1,16 +1,19 @@
 import React, { useState, useRef } from "react";
-import { usePlanetStore } from "../store/store";
+import useStore, { usePlanetStore } from "../store/store";
 import { sizeScaleFactor } from "../data/planetsData";
 import { useFrame } from "@react-three/fiber";
 // import { Html } from "@react-three/drei";
 import { sunOuterShader } from "../shaders/atmosphere";
+import { EffectComposer, GodRays } from "@react-three/postprocessing";
 
 
 const Sun = ({ position, resetCamera, textures }) => {
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
   const { selectedPlanet, setSelectedPlanet, planetsData } = usePlanetStore();
-  const sunRadius = planetsData["Sun"].radius * sizeScaleFactor
+  const { simSpeed } = useStore();
+  const { radius, name, rotationPeriod } = planetsData.Sun
+  const sunRadius = radius * sizeScaleFactor
 
   // Modify the handleClick to account for dragging
   const handleClick = e => {
@@ -62,14 +65,23 @@ const Sun = ({ position, resetCamera, textures }) => {
   const localRef = useRef()
   const [scale, setScale] = useState(sunRadius);
   const [shaderScale, setShaderScale] = useState(sunRadius * 1.08);
-  useFrame(({ camera }) => {
-    const distance = localRef.current.position.distanceTo(camera.position);
+  useFrame((state, delta) => {
+    const distance = localRef.current.position.distanceTo(state.camera.position);
     if (distance / 100 <= sunRadius) {
       setScale(sunRadius);
     } else {
       setScale(distance / 100);
     }
+    // add rotation based on planetsData.Sun.rotationPeriod
+    const adjustedDelta = delta * simSpeed;
+    const rotationPeriodInSeconds = rotationPeriod * 3600; // Convert hours to seconds
+    const rotationSpeed = (2 * Math.PI) / rotationPeriodInSeconds; // radians per second
+    const rotationIncrement = rotationSpeed * adjustedDelta;
+    if (localRef.current) {
+      localRef.current.rotation.y += rotationIncrement;
+    }
   });
+
 
   return (
     <group>
@@ -96,6 +108,7 @@ const Sun = ({ position, resetCamera, textures }) => {
         <shaderMaterial args={[sunOuterShader]} />
       </mesh>
     </group>
+
   );
 };
 
