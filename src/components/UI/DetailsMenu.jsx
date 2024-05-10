@@ -59,8 +59,6 @@ const DetailsMenu = () => {
     }
   };
 
-
-
   const handleChange = (field) => (e) => {
     let newValue = e.target.type === 'number' ? Number(e.target.value) : e.target.value;
 
@@ -82,7 +80,6 @@ const DetailsMenu = () => {
   };
 
 
-  // formatScientificNotation(editablePlanet?.mass)
   return (
     <>
       <h2>{selectedPlanet?.name}</h2>
@@ -97,49 +94,67 @@ const DetailsMenu = () => {
             <label htmlFor="radius">Radius:</label>
             <span>{formatScientificNotation(editablePlanet.radius)} km</span>
           </div>
-          <div className="item w2">
-            <label htmlFor="orbitalRadius">Orbit Radius:</label>
-            <input
-              type="text"
-              id="orbitalRadius"
-              value={formatScientificNotation(editablePlanet.orbitalRadius)}
-              onChange={handleChange('orbitalRadius')}
-              disabled={!isEditing}
-            />
-            <span className="measurement-unit">km</span>
-          </div>
-          <div className="item w2">
-            <label htmlFor="orbitalPeriod">Orbital Period:</label>
-            <span>{editablePlanet.orbitalPeriod || ''} days</span>
-          </div>
-          <div className="item w2">
-            <label htmlFor="rotationPeriod">Day Length:</label>
-            <input
-              type="text"
-              value={editablePlanet.rotationPeriod || ''}
-              onChange={handleChange('rotationPeriod')}
-              disabled={!isEditing}
-            />
-            <span className="measurement-unit">hours</span>
-          </div>
-          <div className="item w4">
-            <label htmlFor="gravity">Acceleration:</label>
-            <span>{editablePlanet.gravitationalAcceleration || ''} m/s²</span>
 
-          </div>
+          {selectedPlanet?.name !== 'Sun' &&
+            <div className="item w2">
+              <label htmlFor="orbitalRadius">Orbit Radius:</label>
+              <input
+                type="text"
+                id="orbitalRadius"
+                value={formatScientificNotation(editablePlanet.orbitalRadius)}
+                onChange={handleChange('orbitalRadius')}
+                disabled={!isEditing}
+              />
+              <span className="measurement-unit">km</span>
+            </div>
+          }
 
-          <div className='button-con'>
-            <button onClick={toggleEditing} className='edit-planet-btn btn'>
-              {isEditing ? "Save Values" : "Adjust Values"}
-            </button>
+          {selectedPlanet?.name !== 'Sun' &&
+            <div className="item w2">
+              <label htmlFor="orbitalPeriod">Orbital Period:</label>
+              <span>{formatScientificNotation(editablePlanet.orbitalPeriod)} days</span>
+            </div>
+          }
 
-            <button onClick={() => { toggleResetPlanetModal(true) }} className='reset-planet-btn btn'>
-              Reset Values
-            </button>
-          </div>
+          {selectedPlanet?.name !== 'Sun' &&
+            <div className="item w2">
+              <label htmlFor="rotationPeriod">Day Length:</label>
+              <input
+                type="text"
+                value={formatScientificNotation(editablePlanet.rotationPeriod)}
+                onChange={handleChange('rotationPeriod')}
+                disabled={!isEditing}
+              />
+              <span className="measurement-unit">hours</span>
+            </div>
+          }
+          {selectedPlanet?.name === 'Sun' &&
+            <div className="item w2">
+              <label htmlFor="rotationPeriod">Day Length:</label>
+              <span>{formatScientificNotation(editablePlanet.rotationPeriod)} hours</span>
+            </div>
+          }
+
+          {selectedPlanet?.name !== 'Sun' &&
+            <div className="item w4">
+              <label htmlFor="gravity">Acceleration:</label>
+              <span>{formatScientificNotation(editablePlanet.gravitationalAcceleration)} m/s²</span>
+            </div>
+          }
+
+          {selectedPlanet?.name !== 'Sun' &&
+            <div className='button-con'>
+              <button onClick={toggleEditing} className='edit-planet-btn btn'>
+                {isEditing ? "Save Values" : "Adjust Values"}
+              </button>
+
+              <button onClick={() => { toggleResetPlanetModal(true) }} className='reset-planet-btn btn'>
+                Reset Values
+              </button>
+            </div>
+          }
+
         </div>
-
-
       )}
     </>
   );

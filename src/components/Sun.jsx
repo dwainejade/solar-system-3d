@@ -85,7 +85,6 @@ const Sun = ({ position, resetCamera, textures }) => {
 
   return (
     <group>
-
       <mesh
         ref={localRef}
         position={position}
