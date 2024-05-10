@@ -23,12 +23,8 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
     const lerpFactor = 0.18; // Adjust this value to control the smoothness of the transition
 
     const handleUserInteraction = useCallback(() => {
-        console.log('User interaction detected', autoRotate);
         setLastInteractionTime(Date.now());
-        if (autoRotate) {
-            console.log('Auto-rotate disabled');
-            setAutoRotate(false)
-        };  // Disable auto-rotate when user interacts
+        setAutoRotate(false)
     }, []);
 
     const handleMouseDown = useCallback((event) => {
@@ -38,6 +34,7 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
 
     const handleMouseUp = useCallback(() => {
         setIsDragging(false);
+        setSpherical((prevSpherical) => new THREE.Spherical().copy(prevSpherical));
     }, []);
 
     const handleMouseMove = useCallback(
