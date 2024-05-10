@@ -204,6 +204,12 @@ const useCameraStore = create((set) => ({
     cameraTarget: new THREE.Vector3(),
     setCameraTarget: (target) => set({ cameraTarget: target }),
 
+    satelliteCameraState: {
+        position: new THREE.Vector3(),
+        target: new THREE.Vector3()
+    },
+    setSatelliteCameraState: (position, target) => set({ satelliteCameraState: { position, target } }),
+
     triggerReset: null, // Placeholder for a function to reset the camera
     setTriggerReset: (newState) => set({ triggerReset: newState }),
 }));

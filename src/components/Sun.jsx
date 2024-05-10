@@ -9,7 +9,7 @@ import { sunOuterShader } from "../shaders/atmosphere";
 const Sun = ({ position, resetCamera, textures }) => {
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
-  const { selectedPlanet, setSelectedPlanet, displayLabels, planetsData } = usePlanetStore();
+  const { selectedPlanet, setSelectedPlanet, planetsData } = usePlanetStore();
   const sunRadius = planetsData["Sun"].radius * sizeScaleFactor
 
   // Modify the handleClick to account for dragging
@@ -73,6 +73,7 @@ const Sun = ({ position, resetCamera, textures }) => {
 
   return (
     <group>
+
       <mesh
         ref={localRef}
         position={position}

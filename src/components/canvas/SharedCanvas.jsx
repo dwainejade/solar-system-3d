@@ -42,6 +42,7 @@ const SharedCanvas = ({ children }) => {
         camera={{ fov: 50, position: [5000, 5000, 5000], near: 0.01, far: 1000000 }}
       >
         <Stats showPanel={2} />
+
         <Suspense fallback={<Loader />}>
           <ambientLight intensity={0.04} />
           <pointLight color='#f6f3ea' intensity={2} position={[0, 0, 0]} key={selectedPlanet?.name || 'basic'} />

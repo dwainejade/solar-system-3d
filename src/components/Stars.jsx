@@ -26,20 +26,20 @@ const Stars = () => {
     '../assets/stars/stars-cube-map/pz.png',
     '../assets/stars/stars-cube-map/nz.png',
   ]);
-  const constellationsTexture = loader.load([
-    '../assets/stars/constellations-cube-map/px.png',
-    '../assets/stars/constellations-cube-map/nx.png',
-    '../assets/stars/constellations-cube-map/py.png',
-    '../assets/stars/constellations-cube-map/ny.png',
-    '../assets/stars/constellations-cube-map/pz.png',
-    '../assets/stars/constellations-cube-map/nz.png',
-  ]);
+  // const constellationsTexture = loader.load([
+  //   '../assets/stars/constellations-cube-map/px.png',
+  //   '../assets/stars/constellations-cube-map/nx.png',
+  //   '../assets/stars/constellations-cube-map/py.png',
+  //   '../assets/stars/constellations-cube-map/ny.png',
+  //   '../assets/stars/constellations-cube-map/pz.png',
+  //   '../assets/stars/constellations-cube-map/nz.png',
+  // ]);
 
   return (
     <>
       <SkyBox
         showConstellations={showConstellations}
-        texture={showConstellations ? constellationsTexture : starsTexture} />
+        texture={starsTexture} />
     </>
   );
 };

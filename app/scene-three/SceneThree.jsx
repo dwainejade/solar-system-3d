@@ -15,7 +15,7 @@ import CameraPath from '@/components/CameraPath';
 const SceneThree = () => {
   const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed } = useStore();
   const { planetPositions, selectedPlanet, setSelectedPlanet, moonPositions, selectedMoon, setSelectedMoon, planetsData } = usePlanetStore();
-  const { satelliteCamera, triggerReset, setTriggerReset, toggleCameraTransitioning, isCameraTransitioning } = useCameraStore();
+  const { satelliteCamera, triggerReset, setTriggerReset, toggleCameraTransitioning, satelliteCameraState } = useCameraStore();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
   const [moonsParent, setMoonsParent] = useState(null);
@@ -142,6 +142,8 @@ const SceneThree = () => {
     maxDistance: 90000,
     smoothTime: 0.7,
     polarRotateSpeed: 0.5,
+    azimuthRotateSpeed: 0.5,
+    enableDamping: true,
     near: 0.001,
     far: 1000000
   };
@@ -155,22 +157,8 @@ const SceneThree = () => {
           makeDefault={!satelliteCamera}
           {...cameraConfig}
           minDistance={minDistance}
-          maxDistance={90000}
         />
       )}
-      {/* {selectedPlanet && <CameraPath targetPosition={planetPositions[selectedPlanet.name]} />} */}
-
-      {/* First Person Camera */}
-      {/* {surfacePoint && isSurfaceCameraActive && (
-        <PerspectiveCamera
-          ref={surfaceCameraRef}
-          makeDefault
-          position={[surfacePoint.x, surfacePoint.y + heightAboveSurface, surfacePoint.z]}
-          fov={70}
-          near={0.01}
-          far={1000000}
-        />
-      )} */}
 
       <Stars />
 
