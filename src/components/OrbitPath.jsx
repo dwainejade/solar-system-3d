@@ -9,7 +9,7 @@ const OrbitPath = forwardRef(
 
     const points = useMemo(() => {
       const pathPoints = [];
-      const resolution = hiRes ? Math.min(Math.max(radius / 2, 30), 1000) : 30;
+      const resolution = hiRes ? Math.min(Math.max(radius / 2, 61), 2000) : 61;
 
       for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / resolution) {
         const x = radius * Math.cos(angle);
