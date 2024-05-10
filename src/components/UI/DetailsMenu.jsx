@@ -19,6 +19,22 @@ const calculateSunGravitationalPull = (distanceKm) => {
   return pull;
 };
 
+const formatScientificNotation = (num) => {
+  if (!num) return ''
+  let str = num.toString();
+  if (str.indexOf('e+') !== -1) {
+    const [base, exponent] = str.split('e+');
+    return (
+      <span>
+        {parseFloat(base).toFixed(2)} x 10<sup>{exponent}</sup>
+      </span>
+    );
+  }
+  return num; // return the number as is if not in exponential form
+};
+
+
+
 const DetailsMenu = () => {
   const { isEditing, setIsEditing, showDetailsMenu, toggleDetailsMenu } = useStore();
   const { selectedPlanet, updatePlanetData, planetsData, setSelectedPlanet, resetSinglePlanetData, toggleResetPlanetModal } = usePlanetStore();
@@ -66,7 +82,7 @@ const DetailsMenu = () => {
   };
 
 
-
+  // formatScientificNotation(editablePlanet?.mass)
   return (
     <>
       <h2>{selectedPlanet?.name}</h2>
@@ -75,22 +91,22 @@ const DetailsMenu = () => {
         <div className={`planet-details ${isEditing ? 'editing' : 'saved'}`}>
           <div className="item w1">
             <label htmlFor="mass">Mass:</label>
-            <span>{editablePlanet.mass || ''} kg</span>
+            <span>{formatScientificNotation(editablePlanet.mass)} kg</span>
           </div>
           <div className="item w1">
             <label htmlFor="radius">Radius:</label>
-            <span>{editablePlanet.radius || ''} kg</span>
+            <span>{formatScientificNotation(editablePlanet.radius)} km</span>
           </div>
           <div className="item w2">
             <label htmlFor="orbitalRadius">Orbit Radius:</label>
             <input
               type="text"
               id="orbitalRadius"
-              value={editablePlanet.orbitalRadius || ''}
+              value={formatScientificNotation(editablePlanet.orbitalRadius)}
               onChange={handleChange('orbitalRadius')}
               disabled={!isEditing}
             />
-            <span>km</span>
+            <span className="measurement-unit">km</span>
           </div>
           <div className="item w2">
             <label htmlFor="orbitalPeriod">Orbital Period:</label>
@@ -104,7 +120,7 @@ const DetailsMenu = () => {
               onChange={handleChange('rotationPeriod')}
               disabled={!isEditing}
             />
-            <span>hours</span>
+            <span className="measurement-unit">hours</span>
           </div>
           <div className="item w4">
             <label htmlFor="gravity">Acceleration:</label>
