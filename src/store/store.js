@@ -1,13 +1,11 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer'
 import { persist, createJSONStorage } from 'zustand/middleware'
-
 import * as THREE from 'three';
 import initialPlanetsData from '../data/planetsData';
 
 // add persitance to store
 const useStore = create(
-
     (set, get) => ({
         simSpeed: 1, // 1 is realtime speed
         setSimSpeed: (newSpeed) => set({ simSpeed: newSpeed }),
@@ -57,7 +55,7 @@ const useStore = create(
 
         rotationCounts: {},  // Tracks the number of rotations for each planet
         simulationDate: new Date(2020, 0, 1),  // Starting date
-        // Update rotation count for a planet
+
         // Function to update rotation count
         updateRotationCount: (planetName, additionalCount) =>
             set(state => {
@@ -75,21 +73,11 @@ const useStore = create(
                 simulationDate: new Date(state.simulationDate.setDate(state.simulationDate.getDate() + 1)),
             })),
 
-
         // cameraTarget: new THREE.Vector3(0, 0, 0),
         camera: new THREE.PerspectiveCamera(),
         orbitControls: null,
         previousCameraPosition: new THREE.Vector3(),
-        // previousCameraTarget: new THREE.Vector3(),
         setOrbitControls: (controls) => set({ orbitControls: controls }),
-
-        // setCameraTarget: (position) => {
-        //     const { orbitControls } = get();
-        //     if (orbitControls) {
-        //         orbitControls.target.copy(position);
-        //         orbitControls.update();
-        //     }
-        // },
 
         resetCamera: () => {
             const { orbitControls } = get();
@@ -99,7 +87,6 @@ const useStore = create(
             }
         },
     }
-        // storage:
 
     ));
 
@@ -110,10 +97,10 @@ const usePlanetStore = create(
     persist(
         immer((set, get) => ({
             showResetPlanetModal: false,
-            toggleResetPlanetModal: (newState) => set(state => ({ showResetPlanetModal: newState })),
+            toggleResetPlanetModal: (newState) => set({ showResetPlanetModal: newState }),
 
             showResetAllModal: false,
-            toggleResetAllModal: (newState) => set(state => ({ showResetAllModal: newState })),
+            toggleResetAllModal: (newState) => set({ showResetAllModal: newState }),
 
             // Existing store properties and methods
             displayLabels: false, // render planet names in scene
@@ -175,9 +162,14 @@ const usePlanetStore = create(
         })),
         // storage:
         {
-            name: 'solar-system-planets', // name of the item in the storage (must be unique)
-            storage: createJSONStorage(() => localStorage), // (optional) by default, 'localStorage' is used
-            // TODO: remove some states from localStorage. ex: isTransitioning, etc.
+            name: 'solar-system-planets',
+            storage: createJSONStorage(() => localStorage),
+            partialize: (state) => ({ // only save these properties to storage
+                planetsData: state.planetsData,
+                planetPositions: state.planetPositions,
+                planetAngles: state.planetAngles,
+                moonPositions: state.moonPositions,
+            }),
 
         },
     ));
