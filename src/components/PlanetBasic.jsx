@@ -2,7 +2,7 @@
 
 import React, { useRef, forwardRef, useState, useEffect, cloneElement } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
-import { Billboard, Html, Text, Torus } from "@react-three/drei";
+import { Billboard, Html, Line, Text, Torus } from "@react-three/drei";
 import * as THREE from "three";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
@@ -12,7 +12,6 @@ import Moon from "./Moon";
 import Labels from "./Labels";
 import { moonsData } from "@/data/moonsData";
 import { earthAtmosphereShader } from "../shaders/atmosphere";
-
 
 // default values
 const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
@@ -61,6 +60,12 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
   const meshRef = useRef();
   const saturnRingRef = useRef();
+
+  // scale planet size based on distance. Also use to toggle textures on/off
+  const [scale, setScale] = useState(scaledRadius);
+  const textSize = useRef(1);
+  const [showTextures, setShowTextures] = useState(false);
+  const textureDisplayDistance = 500;
 
   useFrame((state, delta) => {
     // Adjust delta based on simulation speed (simSpeed)
@@ -112,8 +117,21 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
           cloudsRef.current.rotation.y += rotationIncrement * 1.2; // rotate faster than the planet
         }
       }
+
+      const distance = localRef.current.position.distanceTo(state.camera.position);
+      if (distance / 100 <= scaledRadius) {
+        setScale(scaledRadius);
+      } else {
+        setScale(distance / 100);
+      }
+      setShowTextures(distance < textureDisplayDistance);
+
+      if (textSize.current) {
+        textSize.current = distance * 0.02;
+      }
     }
   });
+
 
   useEffect(() => {
     // Set the axial tilt using Euler angles, aligning the rotation axis
@@ -190,19 +208,8 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
     setIsHovered(false);
   };
 
-  // scale planet size based on distance. Also use to toggle textures on/off
-  const [scale, setScale] = useState(scaledRadius);
-  const [textSize, setTextSize] = useState(1);
-  useFrame(({ camera }) => {
-    if (!meshRef.current) return;
-    const distance = localRef.current.position.distanceTo(camera.position);
-    if (distance / 100 <= scaledRadius) {
-      setScale(scaledRadius);
-    } else {
-      setScale(distance / 100);
-    }
-    setTextSize(distance * 0.02);
-  });
+
+
 
 
   // texture for saturn rings
@@ -242,36 +249,55 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
           key={isPlanetSelected ? name + '-textured' : name + '-basic'}
         >
           <sphereGeometry args={[(isPlanetSelected ? scaledRadius : scale), detailLevel, detailLevel]} />
-          {!isPlanetSelected && texturesLoaded ?
+          {(!isPlanetSelected && texturesLoaded && !showTextures) ?
             <meshBasicMaterial color={color} />
             :
-            name === "Earth" ?
-              <>
-                <mesh key={`${name}-atmosphere`}>
-                  <sphereGeometry args={[scaledRadius * 1.05, detailLevel, detailLevel]} />
-                  <shaderMaterial args={[earthAtmosphereShader]} />
-                </mesh>
-                <meshStandardMaterial
-                  key={`${name}-day_texture`}
-                  metalness={.8}
-                  roughness={.8}
-                  map={textures?.map}
-                  onBuild={() => setTexturesLoaded(true)}   // load textures first then swap to basic material. Trick for color issues
-                />
-                <mesh ref={cloudsRef} key={`${name}-cloud_texture`}>
-                  <sphereGeometry args={[scaledRadius * 1.005, detailLevel, detailLevel]} />
-                  <meshStandardMaterial alphaMap={textures?.clouds} transparent />
-                </mesh>
-              </>
-              :
+            <>
               <meshStandardMaterial
                 metalness={0.6}
                 roughness={0.8}
                 map={textures?.map}
                 onBuild={() => setTexturesLoaded(true)}   // load textures first then swap to basic material. Trick for color issues
               />
+              {name === "Earth" &&
+                <>
+                  <mesh key={`${name}-atmosphere`}>
+                    <sphereGeometry args={[scaledRadius * 1.05, detailLevel, detailLevel]} />
+                    <shaderMaterial args={[earthAtmosphereShader]} />
+                  </mesh>
+
+                  <mesh ref={cloudsRef} key={`${name}-cloud_texture`}>
+                    <sphereGeometry args={[scaledRadius * 1.005, detailLevel, detailLevel]} />
+                    <meshStandardMaterial alphaMap={textures?.clouds} transparent />
+                  </mesh>
+                </>}
+
+              {/* {name === "Venus" &&
+                <mesh key={`${name}-atmosphere`}>
+                  <sphereGeometry args={[scaledRadius * 1.05, detailLevel, detailLevel]} />
+                  <meshStandardMaterial map={textures?.clouds} transparent />
+                </mesh>
+              } */}
+            </>
           }
+
+          {/* Display axial tilt */}
+          {/* {orbitPaths &&
+            <Line
+              key={name + '-line'}
+              points={[
+                [0, -scaledRadius * 1.2, 0],
+                [0, scaledRadius * 1.2, 0]
+              ]}
+              color={'white'}
+              lineWidth={2}
+              transparent
+              opacity={0.5}
+              rotation={[0, 0, 0]}
+            />
+          } */}
         </mesh>
+
 
         {/* Saturns rings */}
         {name === "Saturn" && (
@@ -284,9 +310,8 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
         {/* Display planet names */}
         {(displayLabels || isHovered && !isPlanetSelected) && (
-          <Labels key={name} text={name} size={textSize} position={[0, scale * 1.2 + textSize, 0]} color={color} handleClick={handleClick} font={'../assets/fonts/Termina_Black.ttf'} />
+          <Labels key={name} text={name} size={textSize?.current} position={[0, scale * 1.2 + textSize?.current, 0]} color={color} handleClick={handleClick} font={'../assets/fonts/Termina_Black.ttf'} />
         )}
-
 
         {/* Render moons */}
         {isPlanetSelected && moons.map((moon, index) => (
