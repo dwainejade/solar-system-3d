@@ -309,9 +309,34 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         )}
 
         {/* Display planet names */}
-        {(displayLabels || isHovered && !isPlanetSelected) && (
+        {(displayLabels && !isPlanetSelected || isHovered && !isPlanetSelected) && (
           <Labels key={name} text={name} size={textSize?.current} position={[0, scale * 1.2 + textSize?.current, 0]} color={color} handleClick={handleClick} font={'../assets/fonts/Termina_Black.ttf'} />
         )}
+        {/* Display planet names */}
+        {(displayLabels && isPlanetSelected) && (
+          <Html
+            as='span'
+            wrapperClass='label-wrapper'
+            center
+            position-y={isPlanetSelected ? scale + scale * 0.25 : scale * 4}
+            zIndexRange={[100, 0]}
+            style={{ pointerEvents: 'none' }}
+          >
+            <span
+              className='planet-label'
+              style={{ color }}
+              onClick={handleClick}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerOver={handlePointerOver}
+              onPointerOut={handlePointerOut}
+            >
+              {name}
+            </span>
+          </Html>
+        )}
+
 
         {/* Render moons */}
         {isPlanetSelected && moons.map((moon, index) => (
