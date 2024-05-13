@@ -5,12 +5,11 @@ import { CameraControls, useTexture } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "@/store/store";
 import { sizeScaleFactor } from "@/data/planetsData";
 import { moonsData, moonSizeScaleFactor } from "@/data/moonsData";
-import Moon from "@/components/Moon";
 import Sun from "@/components/Sun";
 import Planet from "@/components/PlanetBasic";
 import Stars from "@/components/Stars"
 import { useFrame } from "@react-three/fiber";
-import CameraPath from '@/components/CameraPath';
+// import CameraPath from '@/components/CameraPath';
 
 const SceneThree = () => {
   const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed } = useStore();
@@ -117,7 +116,7 @@ const SceneThree = () => {
   })
   const venusTextures = useTexture({
     map: "../assets/venus/2k_venus_surface.jpg",
-    // surface: "../assets/venus/2k_venus_atmosphere.jpg",
+    // clouds: "../assets/venus/2k_venus_atmosphere.jpg",
   });
   const mercuryTextures = useTexture({
     map: "../assets/mercury/2k_mercury.jpg",
@@ -126,7 +125,7 @@ const SceneThree = () => {
     map: "../assets/mars/2k_mars.jpg",
   });
   const jupiterTextures = useTexture({
-    map: "../assets/jupiter/2k_jupiter.jpg",
+    map: "../assets/jupiter/8k_jupiter.jpg",
   });
   const saturnTextures = useTexture({
     map: "../assets/saturn/2k_saturn.jpg",

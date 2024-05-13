@@ -7,13 +7,7 @@ const Home = () => {
       <nav>
         <ul>
           <li>
-            <Link href='/scene-one'>Scene 1</Link>
-          </li>
-          <li>
-            <Link href='/scene-two'>Scene 2</Link>
-          </li>
-          <li>
-            <Link href='/scene-three'>Scene 3</Link>
+            <Link href='/scene-three'>Main</Link>
           </li>
         </ul>
       </nav>
