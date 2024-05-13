@@ -169,6 +169,7 @@ const usePlanetStore = create(
                 planetPositions: state.planetPositions,
                 planetAngles: state.planetAngles,
                 moonPositions: state.moonPositions,
+                displayLabels: state.displayLabels
             }),
 
         },

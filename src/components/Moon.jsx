@@ -1,13 +1,14 @@
 import React, { useRef, forwardRef, useState, useMemo, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
-import { useTexture, Html } from "@react-three/drei";
+import { useTexture, Html, Text } from "@react-three/drei";
 import { Vector3 } from "three";
 import { moonDistanceScaleFactor, moonSizeScaleFactor } from "../data/moonsData";
 import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCamera";
+import Labels from "./Labels";
 
-const Moon = forwardRef(({ moonData }, ref) => {
+const Moon = forwardRef(({ moonData, planetPosition, planetScale }, ref) => {
   const { simSpeed, orbitPaths } = useStore();
   const { selectedPlanet, selectedMoon, setSelectedMoon, updateMoonPosition, setSelectedPlanet, displayLabels } = usePlanetStore();
   const { satelliteCamera, toggleSatelliteCamera } = useCameraStore()
@@ -15,12 +16,10 @@ const Moon = forwardRef(({ moonData }, ref) => {
   const localRef = ref || useRef();
   const localAngleRef = useRef(0);
 
-  const moonTextures = useTexture({
-    Moon: '../assets/earth/moon/2k_moon.jpg'
-  })
-
   const { name, orbitalRadius, radius, color, orbitalPeriod, orbitalInclination } = moonData;
   const isMoonSelected = selectedMoon && selectedMoon.name === name; // clicked planet
+
+  const moonTexture = name === 'Moon' ? useTexture('../assets/earth/moon/2k_moon.jpg') : null
 
   // Apply moon-specific scaling factors
   const scaledRadius = radius * moonSizeScaleFactor;
@@ -67,15 +66,37 @@ const Moon = forwardRef(({ moonData }, ref) => {
   const [isHovered, setIsHovered] = useState(false);
   const handlePointerOver = e => {
     e.stopPropagation();
-    document.body.style.cursor = "pointer";
+    // document.body.style.cursor = "pointer";
     setIsHovered(true);
   };
 
   const handlePointerOut = e => {
     e.stopPropagation();
     setIsHovered(false);
-    document.body.style.cursor = "auto";
+    // document.body.style.cursor = "auto";
   };
+
+  const [scale, setScale] = useState(scaledRadius); // scaledRadius = 0.6
+  const [textSize, setTextSize] = useState(1);
+  useFrame(({ camera }) => {
+    if (!localRef.current) return;
+
+    // Calculate distance between the moon and the camera
+    // change localref position to world position
+    const worldPosition = localRef.current.getWorldPosition(new Vector3());
+    const distance = worldPosition.distanceTo(camera.position);
+
+    // Dynamically adjust the scale of the moon based on the distance
+    if (distance / 100 <= scaledRadius) {
+      setScale(scaledRadius);
+    } else {
+      setScale(distance / 100);
+    }
+
+    // Set the text size based on distance, adjusting the scale to keep the text legible at different distances
+    const textSizeFactor = 0.016; // Adjust this factor to scale text size for better legibility
+    setTextSize(textSizeFactor * distance);
+  });
 
   return (
     <>
@@ -89,43 +110,27 @@ const Moon = forwardRef(({ moonData }, ref) => {
         <mesh
           visible={false}
           // onClick={handleClick}
-          // onPointerOver={handlePointerOver}
-          // onPointerOut={handlePointerOut}
-          position={localRef.current?.position || null}
+          key={'invisible-mesh' + name}
+          onPointerOver={handlePointerOver}
+          onPointerOut={handlePointerOut}
         >
           {isMoonSelected
-            ? <sphereGeometry args={[scaledRadius, 16, 16]} />
-            : <sphereGeometry args={[scaledRadius * 2, 8, 8]} />}
+            ? <sphereGeometry args={[(Math.max(scaledRadius, scale)), 16, 16]} />
+            : <sphereGeometry args={[(Math.max(scaledRadius, scale)) * 2, 8, 8]} />}
           <meshBasicMaterial color={color} wireframe />
         </mesh>
 
 
-        <mesh >
+        <mesh key={'textured-mesh' + name}>
           <sphereGeometry args={[scaledRadius, 32, 16]} />
-          <meshStandardMaterial metalness={0.9} roughness={0.65} map={moonTextures[name] || null} zIndexRange={[100 - 1]} />
+          <meshStandardMaterial metalness={0.9} roughness={0.65} map={moonTexture || null} zIndexRange={[100 - 1]}
+            color={!moonTexture ? color : null} />
         </mesh>
 
         {(displayLabels || isHovered && !isMoonSelected) && simSpeed < 200000 && (
-          <Html
-            as='span'
-            wrapperClass='label-wrapper'
-            center
-            occlude
-            position-y={scaledRadius * 5}
-            // fix for top down view. maybe move + y and + z
-            zIndexRange={[100, 0]}
-            style={{ pointerEvents: 'none' }}
-          >
-            <span
-              className='planet-label'
-              style={{ color }}
-            // onClick={handleClick}
-            // onPointerOver={handlePointerOver}
-            // onPointerOut={handlePointerOut}
-            >
-              {name}
-            </span>
-          </Html>
+          <Labels key={name + '-label'} text={name} size={textSize} position={[0, scale * 1.5, 0]} color={color}
+            font={'../assets/fonts/Termina_Heavy.ttf'}
+          />
         )}
 
       </group>

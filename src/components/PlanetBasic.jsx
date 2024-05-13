@@ -2,13 +2,14 @@
 
 import React, { useRef, forwardRef, useState, useEffect, cloneElement } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
-import { Html, Torus } from "@react-three/drei";
+import { Billboard, Html, Text, Torus } from "@react-three/drei";
 import * as THREE from "three";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCamera";
 import Moon from "./Moon";
+import Labels from "./Labels";
 import { moonsData } from "@/data/moonsData";
 import { earthAtmosphereShader } from "../shaders/atmosphere";
 
@@ -97,12 +98,12 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         meshRef.current.rotateOnAxis(yAxis, rotationIncrement);
 
         // Check for a complete rotation
-        if (localRef.current.rotation.y >= 2 * Math.PI) {
+        if (localRef.current.rotation.y >= 2 * Math.PI && isPlanetSelected) {
           localRef.current.rotation.y %= 2 * Math.PI; // Reset rotation for next cycle
-          updateRotationCount(name, 1); // Update rotation count in store for the planet
-          if (name === "Earth") {
-            incrementDate(); // Increment the simulation date by one day
-          }
+          // updateRotationCount(name, 1); // Update rotation count in store for the planet
+          // if (name === "Earth") {
+          //   incrementDate(); // Increment the simulation date by one day
+          // }
         }
         if (saturnRingRef.current) { // rotate saturns rings
           saturnRingRef.current.rotation.y += rotationIncrement;
@@ -122,6 +123,26 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
       meshRef.current.rotation.x = THREE.MathUtils.degToRad(axialTilt); // Apply axial tilt around the new local X after Y rotation reset
     }
   }, [axialTilt, selectedPlanet]);
+
+  useEffect(() => {
+    // Example: January 1, 2023, at 15:45:30
+    const specificDate = new Date(2023, 0, 1, 1, 45, 30); // Year, Month (0-11), Day, Hour, Minute, Second
+    const hourOfDay = specificDate.getHours();
+    const minuteOfHour = specificDate.getMinutes();
+    const secondOfMinute = specificDate.getSeconds();
+
+    const currentTimeOfDayInSeconds = hourOfDay * 3600 + minuteOfHour * 60 + secondOfMinute;
+    const rotationPeriodInSeconds = rotationPeriod * 3600;
+    const initialRotationFraction = currentTimeOfDayInSeconds / rotationPeriodInSeconds;
+    const initialRotationAngleRadians = initialRotationFraction * 2 * Math.PI;
+
+    if (meshRef.current) {
+      meshRef.current.rotation.order = 'YXZ';
+      meshRef.current.rotation.y = initialRotationAngleRadians; // Set initial rotation based on specific time
+      meshRef.current.rotation.x = THREE.MathUtils.degToRad(axialTilt); // Apply axial tilt
+    }
+  }, [selectedPlanet]);
+
 
   // Modify the handleClick to account for dragging
   const handleClick = e => {
@@ -171,6 +192,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
   // scale planet size based on distance. Also use to toggle textures on/off
   const [scale, setScale] = useState(scaledRadius);
+  const [textSize, setTextSize] = useState(1);
   useFrame(({ camera }) => {
     if (!meshRef.current) return;
     const distance = localRef.current.position.distanceTo(camera.position);
@@ -179,6 +201,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
     } else {
       setScale(distance / 100);
     }
+    setTextSize(distance * 0.02);
   });
 
 
@@ -236,7 +259,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
                   onBuild={() => setTexturesLoaded(true)}   // load textures first then swap to basic material. Trick for color issues
                 />
                 <mesh ref={cloudsRef} key={`${name}-cloud_texture`}>
-                  <sphereGeometry args={[scaledRadius * 1.01, detailLevel, detailLevel]} />
+                  <sphereGeometry args={[scaledRadius * 1.005, detailLevel, detailLevel]} />
                   <meshStandardMaterial alphaMap={textures?.clouds} transparent />
                 </mesh>
               </>
@@ -248,9 +271,8 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
                 onBuild={() => setTexturesLoaded(true)}   // load textures first then swap to basic material. Trick for color issues
               />
           }
-
-
         </mesh>
+
         {/* Saturns rings */}
         {name === "Saturn" && (
           <group ref={saturnRingRef} rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} >
@@ -262,34 +284,13 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
         {/* Display planet names */}
         {(displayLabels || isHovered && !isPlanetSelected) && (
-          <Html
-            as='span'
-            wrapperClass='label-wrapper'
-            center
-            occlude
-            position-y={isPlanetSelected ? scale + scale * 0.25 : scale * 4}
-            zIndexRange={[100, 0]}
-            style={{ pointerEvents: 'none' }}
-          >
-            <span
-              className='planet-label'
-              style={{ color, pointerEvents: isHovered ? 'none' : 'auto' }}
-              onClick={handleClick}
-              onPointerDown={handlePointerDown}
-              onPointerMove={handlePointerMove}
-              onPointerUp={handlePointerUp}
-              onPointerOver={handlePointerOver}
-              onPointerOut={handlePointerOut}
-            >
-              {name}
-            </span>
-          </Html>
+          <Labels key={name} text={name} size={textSize} position={[0, scale * 1.2 + textSize, 0]} color={color} handleClick={handleClick} font={'../assets/fonts/Termina_Black.ttf'} />
         )}
 
 
         {/* Render moons */}
         {isPlanetSelected && moons.map((moon, index) => (
-          <Moon key={`${name}-moon-${index}`} moonData={moon} planetPosition={localRef.current?.position} />
+          <Moon key={`${name}-moon-${index}`} moonData={moon} planetPosition={localRef.current?.position} planetScale={scale} />
         ))}
 
       </group >
