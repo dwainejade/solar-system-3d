@@ -93,9 +93,7 @@ const Menu = () => {
 
       {/* Bottom menu */}
       <div className={`bottom-menu ${isMenuOpen ? "open" : "closed"}`}>
-        <button onClick={toggleMenu} className='menu-toggle-btn btn'>
-
-        </button>
+        <button onClick={toggleMenu} className='menu-toggle-btn btn' />
 
         <div className="left-con">
 

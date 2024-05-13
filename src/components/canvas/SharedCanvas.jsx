@@ -8,17 +8,21 @@ import Menu from "../UI/Menu";
 import "../../styles.css";
 
 const SharedCanvas = ({ children }) => {
-  const { fullscreen } = useStore();
+  const { fullscreen, isLoading, toggleLoading } = useStore();
   const { selectedPlanet } = usePlanetStore();
-  const { errors, loaded } = useProgress();
-  const totalAssets = 12;
+  const { errors, loaded, progress } = useProgress();
+  const totalAssets = 25;
   const progressPercentage = (loaded / totalAssets) * 100;
 
   useEffect(() => {
     if (errors.length) {
       console.warn(errors);
     }
-  }, [errors]);
+    if (progressPercentage === 100) {
+      toggleLoading(false);
+    }
+
+  }, [errors, loaded, progress, progressPercentage]);
 
   const Loader = () => {
     return (
@@ -43,7 +47,6 @@ const SharedCanvas = ({ children }) => {
           alpha: false,
           stencil: true,
           logarithmicDepthBuffer: true
-
         }}
         camera={{ fov: 50, position: [5000, 5000, 5000], near: 0.01, far: 1000000 }}
 
@@ -57,7 +60,9 @@ const SharedCanvas = ({ children }) => {
         </Suspense>
         {/* <Preload all /> */}
       </Canvas>
-      <Menu />
+      {!isLoading &&
+        <Menu />
+      }
     </div>
   );
 };
