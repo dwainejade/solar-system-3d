@@ -195,7 +195,7 @@ body {
         height: 40px;
         border-radius: 20px;
         border: #4cddfb 2px solid;
-        background: url("../public/assets/icons/chevron.svg") no-repeat center center;
+        background: url("../public/assets/ui/icons/chevron.svg") no-repeat center center;
         background-size: 70%;
         background-color: #f46a68;
         transition: rotate ease 0.3s;
@@ -385,12 +385,12 @@ body {
   }
   .reset-all-btn {
     left: 0;
-    background: url("../public/assets/icons/reset.svg") no-repeat center center;
+    background: url("../public/assets/ui/icons/reset_icon.svg") no-repeat center center;
     background-size: 70%;
   }
   .fullscreen-btn {
     right: 0;
-    background: url("../public/assets/icons/fullscreen.svg") no-repeat center center;
+    background: url("../public/assets/ui/icons/fullscreen_icon.svg") no-repeat center center;
     background-size: 80%;
   }
 
@@ -511,23 +511,36 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.75);
   z-index: 500;
 
   .content {
-    background-color: #fff;
-    border-radius: 3px;
-    width: 280px;
-    padding: 20px;
+    width: 400px;
+    background: url("../public/assets/ui/dialog_box_bg.png") no-repeat center center;
+    background-size: 100% 100%;
+    padding: 2%;
     pointer-events: auto;
+    color: #f19a00;
+    font-size: 1.1rem;
 
     .btn-con {
       display: flex;
       justify-content: space-evenly;
       align-items: center;
-
-      button {
+      gap: 4%;
+      .confirm-btn {
+        background-color: @btn-color-3;
+      }
+      .cancel-btn {
+        background-color: @btn-color-4;
+      }
+      .btn {
         cursor: pointer;
+        width: 120px;
+        height: 38px;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
       }
     }
   }

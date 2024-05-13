@@ -32,8 +32,8 @@ function ResetModal({ type, handleResetAll }) {
                 <p>{description}</p>
 
                 <div className="btn-con">
-                    <button onClick={handleReset}>Yes</button>
-                    <button onClick={handleClose}>No</button>
+                    <button onClick={handleReset} className='btn confirm-btn'>Yes</button>
+                    <button onClick={handleClose} className='btn cancel-btn'>No</button>
                 </div>
 
             </div>
