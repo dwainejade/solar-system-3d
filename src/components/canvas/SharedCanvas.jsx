@@ -11,14 +11,14 @@ const SharedCanvas = ({ children }) => {
   const { fullscreen, isLoading, toggleLoading } = useStore();
   const { selectedPlanet } = usePlanetStore();
   const { errors, loaded, progress } = useProgress();
-  const totalAssets = 25;
+  const totalAssets = 25; // update this number based textures in use
   const progressPercentage = (loaded / totalAssets) * 100;
 
   useEffect(() => {
     if (errors.length) {
       console.warn(errors);
     }
-    if (progressPercentage === 100) {
+    if (progressPercentage >= 100) {
       toggleLoading(false);
     }
 
