@@ -174,7 +174,7 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
     useEffect(() => {
         const interval = setInterval(() => {
             if (!lastInteractionTime) return;
-            if (Date.now() - lastInteractionTime > 4000 && !autoRotate && !isTransitioning) {
+            if (Date.now() - lastInteractionTime > 8000 && !autoRotate && !isTransitioning) {
                 setAutoRotate(true);
             }
         }, 1000);
