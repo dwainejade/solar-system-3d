@@ -138,6 +138,7 @@ const DetailsMenu = () => {
                 disabled={!isEditing}
                 min="9000000"
                 max="9000000000"
+                className="input"
               />
               <span className="measurement-unit">km</span>
             </div>
@@ -161,6 +162,7 @@ const DetailsMenu = () => {
                 disabled={!isEditing}
                 min="0.01"
                 max="9000000000"
+                className="input"
               />
               <span className="measurement-unit">hours</span>
             </div>

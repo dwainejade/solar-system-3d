@@ -5,7 +5,7 @@ import DetailsMenu from "./DetailsMenu"
 import ResetModal from "./ResetModal";
 
 const Menu = () => {
-  const { simSpeed, setSimSpeed, prevSpeed, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths, showDetailsMenu, toggleDetailsMenu } = useStore();
+  const { simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, fullscreen, toggleFullscreen, orbitPaths, toggleOrbitPaths, showDetailsMenu, toggleDetailsMenu } = useStore();
   const { selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels, planetsData, resetPlanetsData, showResetPlanetModal, showResetAllModal, toggleResetPlanetModal, toggleResetAllModal } = usePlanetStore();
   const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning, toggleCameraTransitioning } = useCameraStore()
 
@@ -76,9 +76,10 @@ const Menu = () => {
   }
 
   useLayoutEffect(() => {
+    setPrevSpeed(1)
     setSimSpeed(1)
-    toggleCameraTransitioning(false)
   }, [])
+  // console.log(isCameraTransitioning)
 
   return (
     <div className="menu-wrapper">
