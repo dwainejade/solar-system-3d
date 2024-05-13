@@ -175,7 +175,7 @@ const Menu = () => {
       </div>
 
       {/* Details menu */}
-      <div className={`details-menu ${selectedPlanet && !isCameraTransitioning && showDetailsMenu ? 'open' : 'closed'}`} key={selectedPlanet?.name}>
+      <div className={`details-menu ${selectedPlanet && (!isCameraTransitioning && showDetailsMenu || selectedPlanet?.name === 'Sun') ? 'open' : 'closed'}`} key={selectedPlanet?.name}>
         <div className="details-menu-inner" >
           <DetailsMenu />
         </div>

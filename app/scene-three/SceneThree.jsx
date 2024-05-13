@@ -15,7 +15,7 @@ import CameraPath from '@/components/CameraPath';
 const SceneThree = () => {
   const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed } = useStore();
   const { planetPositions, selectedPlanet, setSelectedPlanet, moonPositions, selectedMoon, setSelectedMoon, planetsData } = usePlanetStore();
-  const { satelliteCamera, triggerReset, setTriggerReset, toggleCameraTransitioning, satelliteCameraState } = useCameraStore();
+  const { satelliteCamera, triggerReset, setTriggerReset, isCameraTransitioning, toggleCameraTransitioning, satelliteCameraState } = useCameraStore();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
   const [moonsParent, setMoonsParent] = useState(null);
@@ -89,13 +89,14 @@ const SceneThree = () => {
   }, [triggerReset]);
 
   useEffect(() => {
-    if (selectedPlanet && selectedPlanet.name !== "Sun") {
+
+    if (selectedPlanet && selectedPlanet.name !== "Sun" && !isCameraTransitioning) {
       setPrevSpeed(simSpeed);
       setSimSpeed(0); // Pause the simulation
       toggleCameraTransitioning(true); // Start the camera transition
       setMoonsParent(selectedPlanet.name);
     }
-    if (selectedMoon) {
+    if (selectedMoon && !isCameraTransitioning) {
       setPrevSpeed(simSpeed);
       setSimSpeed(0);
       toggleCameraTransitioning(true);
