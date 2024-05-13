@@ -7,6 +7,9 @@ import initialPlanetsData from '../data/planetsData';
 // add persitance to store
 const useStore = create(
     (set, get) => ({
+        isLoading: true,
+        toggleLoading: (newSate) => set(state => ({ isLoading: newSate })),
+
         simSpeed: 1, // 1 is realtime speed
         setSimSpeed: (newSpeed) => set({ simSpeed: newSpeed }),
         prevSpeed: 1,
