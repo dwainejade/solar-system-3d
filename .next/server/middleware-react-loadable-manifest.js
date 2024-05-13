@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST='{"node_modules/@react-three/drei/core/Text.js -> troika-three-text":{"id":null,"files":[]},"node_modules/@react-three/drei/web/FaceLandmarker.js -> @mediapipe/tasks-vision":{"id":null,"files":[]}}';
+self.__REACT_LOADABLE_MANIFEST='{"node_modules/@react-three/drei/core/Text.js -> troika-three-text":{"id":5212,"files":["static/chunks/0f8af13e.65e9f70631afb4e4.js","static/chunks/610.04419856ad100465.js"]},"node_modules/@react-three/drei/web/FaceLandmarker.js -> @mediapipe/tasks-vision":{"id":null,"files":[]}}';
