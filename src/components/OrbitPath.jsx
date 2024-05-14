@@ -9,7 +9,7 @@ const OrbitPath = forwardRef(
 
     const points = useMemo(() => {
       const pathPoints = [];
-      const resolution = hiRes ? Math.min(Math.max(radius / 2, Math.PI * 80), 2000) : Math.PI * 80;
+      const resolution = hiRes ? Math.min(Math.max(radius / 2, Math.PI * 80), 2500) : Math.PI * 80;
 
       for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / resolution) {
         const x = radius * Math.cos(angle);
@@ -23,14 +23,13 @@ const OrbitPath = forwardRef(
 
     return (
       <Line
+        key={name}
         ref={ref}
         points={points}
         color={color}
         lineWidth={1}
-        // lineMaterial={lineMaterial}
+        name={name}
         depthWrite
-        dashed={lineType === "dashed"}
-        dashScale={2}
         transparent
         opacity={opacity}
       />

@@ -66,6 +66,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   const textSize = useRef(1);
   const [showTextures, setShowTextures] = useState(false);
   const textureDisplayDistance = 500;
+  const [orbitPathOpacity, setOrbitPathOpacity] = useState(1);
 
   useFrame((state, delta) => {
     // Adjust delta based on simulation speed (simSpeed)
@@ -126,6 +127,11 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
       }
       setShowTextures(distance < textureDisplayDistance);
 
+      // Calculate orbit path opacity based on distance
+      const maxDistance = scaledRadius * 50; // full opacity
+      const minDistance = scaledRadius * 3; // zero opacity
+      const opacity = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
+      setOrbitPathOpacity(opacity);
       if (textSize.current) {
         textSize.current = distance * 0.02;
       }
@@ -143,8 +149,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   }, [axialTilt, selectedPlanet]);
 
   useEffect(() => {
-    // Example: January 1, 2023, at 15:45:30
-    const specificDate = new Date(2023, 0, 1, 1, 45, 30); // Year, Month (0-11), Day, Hour, Minute, Second
+    const specificDate = new Date(2023, 0, 1, 1, 45, 30);
     const hourOfDay = specificDate.getHours();
     const minuteOfHour = specificDate.getMinutes();
     const secondOfMinute = specificDate.getSeconds();
@@ -156,10 +161,10 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
     if (meshRef.current) {
       meshRef.current.rotation.order = 'YXZ';
-      meshRef.current.rotation.y = initialRotationAngleRadians; // Set initial rotation based on specific time
-      meshRef.current.rotation.x = THREE.MathUtils.degToRad(axialTilt); // Apply axial tilt
+      meshRef.current.rotation.y = initialRotationAngleRadians;
+      meshRef.current.rotation.x = THREE.MathUtils.degToRad(axialTilt);
     }
-  }, [selectedPlanet]);
+  }, [rotationPeriod, axialTilt]);
 
 
   // Modify the handleClick to account for dragging
@@ -207,9 +212,6 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
     document.body.style.cursor = "auto";
     setIsHovered(false);
   };
-
-
-
 
 
   // texture for saturn rings
@@ -345,7 +347,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
       </group >
       {orbitPaths && (
-        <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} opacity={(isPlanetSelected || isHovered) ? .8 : .3} hiRes={isPlanetSelected} />
+        <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} opacity={isPlanetSelected ? orbitPathOpacity : .5} hiRes={isPlanetSelected} />
       )}
     </>
   );

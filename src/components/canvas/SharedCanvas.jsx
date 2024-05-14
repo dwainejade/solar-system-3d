@@ -43,7 +43,7 @@ const SharedCanvas = ({ children }) => {
         id='Canvas'
         shadows dpr={[1, 2]}
         gl={{
-          antialias: false,
+          antialias: true,
           alpha: false,
           stencil: true,
           logarithmicDepthBuffer: true
