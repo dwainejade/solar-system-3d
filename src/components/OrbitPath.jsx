@@ -29,9 +29,9 @@ const OrbitPath = forwardRef(
         color={color}
         lineWidth={1}
         name={name}
-        depthWrite
         transparent
         opacity={opacity}
+        visible={opacity > 0.07}
       />
     );
   }
