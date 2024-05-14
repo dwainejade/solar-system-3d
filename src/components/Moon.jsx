@@ -8,10 +8,10 @@ import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCamera";
 import Labels from "./Labels";
 
-const Moon = forwardRef(({ moonData, planetPosition, planetScale }, ref) => {
+const Moon = forwardRef(({ moonData, planetPosition, planetScale, planetAxialTilt }, ref) => {
   const { simSpeed, orbitPaths } = useStore();
   const { selectedPlanet, selectedMoon, setSelectedMoon, updateMoonPosition, setSelectedPlanet, displayLabels } = usePlanetStore();
-  const { satelliteCamera, toggleSatelliteCamera } = useCameraStore()
+  const { satelliteCamera, toggleSatelliteCamera } = useCameraStore();
 
   const localRef = ref || useRef();
   const localAngleRef = useRef(0);
@@ -19,12 +19,12 @@ const Moon = forwardRef(({ moonData, planetPosition, planetScale }, ref) => {
   const { name, orbitalRadius, radius, color, orbitalPeriod, orbitalInclination } = moonData;
   const isMoonSelected = selectedMoon && selectedMoon.name === name; // clicked planet
 
-  const moonTexture = name === 'Moon' ? useTexture('../assets/earth/moon/2k_moon.jpg') : null
+  const moonTexture = name === 'Moon' ? useTexture('../assets/earth/moon/2k_moon.jpg') : null;
 
   // Apply moon-specific scaling factors
   const scaledRadius = radius * moonSizeScaleFactor;
   const scaledOrbitalRadius = orbitalRadius * moonDistanceScaleFactor;
-  // console.log(name, scaledRadius)
+
   // Calculate the moon's orbital speed
   const orbitalSpeed = useMemo(() => {
     return (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60); // Orbital period in Earth days
@@ -49,15 +49,14 @@ const Moon = forwardRef(({ moonData, planetPosition, planetScale }, ref) => {
     if (localRef.current) {
       localRef.current.position.set(moonX, moonY, moonZ);
       updateMoonPosition(name, { moonX, moonY, moonZ });
-      // Point the moon towards the Earth: Earth is assumed to be at the origin (0,0,0)
-      localRef.current.lookAt(new Vector3(0, 0, 0));
+      // Point the moon towards the parent planet's position
+      localRef.current.lookAt(planetPosition);
     }
   });
 
-
   const handleClick = e => {
     e.stopPropagation();
-    if (selectedMoon && selectedMoon.name === name) return
+    if (selectedMoon && selectedMoon.name === name) return;
 
     setSelectedPlanet(null);
     setSelectedMoon(moonData);
@@ -66,14 +65,12 @@ const Moon = forwardRef(({ moonData, planetPosition, planetScale }, ref) => {
   const [isHovered, setIsHovered] = useState(false);
   const handlePointerOver = e => {
     e.stopPropagation();
-    // document.body.style.cursor = "pointer";
     setIsHovered(true);
   };
 
   const handlePointerOut = e => {
     e.stopPropagation();
     setIsHovered(false);
-    // document.body.style.cursor = "auto";
   };
 
   const [scale, setScale] = useState(scaledRadius); // scaledRadius = 0.6
@@ -81,19 +78,15 @@ const Moon = forwardRef(({ moonData, planetPosition, planetScale }, ref) => {
   useFrame(({ camera }) => {
     if (!localRef.current) return;
 
-    // Calculate distance between the moon and the camera
-    // change localref position to world position
     const worldPosition = localRef.current.getWorldPosition(new Vector3());
     const distance = worldPosition.distanceTo(camera.position);
 
-    // Dynamically adjust the scale of the moon based on the distance
     if (distance / 100 <= scaledRadius) {
       setScale(scaledRadius);
     } else {
       setScale(distance / 100);
     }
 
-    // Set the text size based on distance, adjusting the scale to keep the text legible at different distances
     const textSizeFactor = 0.016; // Adjust this factor to scale text size for better legibility
     setTextSize(textSizeFactor * distance);
   });
@@ -104,38 +97,29 @@ const Moon = forwardRef(({ moonData, planetPosition, planetScale }, ref) => {
         <SatelliteCamera target={localRef.current} targetName={name} color={color} size={scaledRadius} satelliteCamera={satelliteCamera} toggleSatelliteCamera={toggleSatelliteCamera} />
       }
 
-      <group ref={localRef}>
-
+      <group ref={localRef} onClick={handleClick}>
         {/* Invisible mesh for interaction */}
         <mesh
           visible={false}
-          // onClick={handleClick}
-          key={'invisible-mesh' + name}
           onPointerOver={handlePointerOver}
           onPointerOut={handlePointerOut}
         >
-          {isMoonSelected
-            ? <sphereGeometry args={[(Math.max(scaledRadius, scale)), 16, 16]} />
-            : <sphereGeometry args={[(Math.max(scaledRadius, scale)) * 2, 8, 8]} />}
+          <sphereGeometry args={[(Math.max(scaledRadius, scale)) * 2, 8, 8]} />
           <meshBasicMaterial color={color} wireframe />
         </mesh>
 
-
-        <mesh key={'textured-mesh' + name}>
+        <mesh>
           <sphereGeometry args={[scaledRadius, 32, 16]} />
-          <meshStandardMaterial metalness={0.9} roughness={0.65} map={moonTexture || null} zIndexRange={[100 - 1]}
-            color={!moonTexture ? color : null} />
+          <meshStandardMaterial metalness={0.9} roughness={0.65} map={moonTexture || null} color={!moonTexture ? color : null} />
         </mesh>
 
         {(displayLabels || isHovered && !isMoonSelected) && simSpeed < 200000 && (
-          <Labels key={name + '-label'} text={name} size={textSize} position={[0, scale * 1.5, 0]} color={color}
-            font={'../assets/fonts/Termina_Heavy.ttf'}
-          />
+          <Labels key={name + '-label'} text={name} size={textSize} position={[0, scale * 1.5, 0]} color={color} font={'../assets/fonts/Termina_Heavy.ttf'} />
         )}
-
       </group>
+
       {orbitPaths && (
-        <group position={[0, 0, 0]} >
+        <group position={[0, 0, 0]}>
           <OrbitPath
             origin={[0, 0, 0]}
             radius={scaledOrbitalRadius}
@@ -144,12 +128,11 @@ const Moon = forwardRef(({ moonData, planetPosition, planetScale }, ref) => {
             name={name + "-orbit-path"}
             hiRes={isMoonSelected}
             lineType={'solid'}
-            opacity={.3}
+            opacity={0.3}
           />
         </group>
       )}
     </>
-
   );
 });
 

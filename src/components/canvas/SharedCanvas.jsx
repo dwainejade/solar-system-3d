@@ -10,9 +10,9 @@ import "../../styles.css";
 const SharedCanvas = ({ children }) => {
   const { fullscreen, isLoading, toggleLoading } = useStore();
   const { selectedPlanet } = usePlanetStore();
-  const { errors, loaded, progress } = useProgress();
-  const totalAssets = 25; // update this number based textures in use
-  const progressPercentage = (loaded / totalAssets) * 100;
+  const { errors, loaded, total } = useProgress();
+
+  const progressPercentage = (loaded / total) * 100;
 
   useEffect(() => {
     if (errors.length) {
@@ -20,17 +20,20 @@ const SharedCanvas = ({ children }) => {
     }
     if (progressPercentage >= 100) {
       toggleLoading(false);
+    } else {
+      toggleLoading(true);
     }
-
-  }, [errors, loaded, progress, progressPercentage]);
+    console.log(progressPercentage);
+  }, [errors, progressPercentage, toggleLoading]);
 
   const Loader = () => {
+    const { progress } = useProgress();
     return (
       <Html as='div' fullscreen className='loading-screen'>
         <div className='loading-con'>
           <p>Loading...</p>
           <div className='loading-bar-container'>
-            <div className='loading-bar' style={{ width: `${progressPercentage}%` }}></div>
+            <div className='loading-bar' style={{ width: `${progress}%` }}></div>
           </div>
         </div>
       </Html>
@@ -45,11 +48,9 @@ const SharedCanvas = ({ children }) => {
         gl={{
           antialias: true,
           alpha: false,
-          stencil: true,
-          logarithmicDepthBuffer: true
+          logarithmicDepthBuffer: true,
         }}
         camera={{ fov: 50, position: [5000, 5000, 5000], near: 0.01, far: 1000000 }}
-
       >
         <Stats showPanel={2} />
 
@@ -58,11 +59,9 @@ const SharedCanvas = ({ children }) => {
           <pointLight color='#f6f3ea' intensity={2} position={[0, 0, 0]} key={selectedPlanet?.name || 'basic'} />
           {children}
         </Suspense>
-        {/* <Preload all /> */}
+        <Preload all />
       </Canvas>
-      {!isLoading &&
-        <Menu />
-      }
+      {!isLoading && <Menu />}
     </div>
   );
 };

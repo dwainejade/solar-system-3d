@@ -57,7 +57,6 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
-
   const meshRef = useRef();
   const saturnRingRef = useRef();
 
@@ -86,7 +85,8 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
     if (localRef.current) {
       // Calculate the orbital inclination effect
-      const inclination = orbitalInclination * (Math.PI / 180); // Convert to radians 
+      const planetInclination = axialTilt * (Math.PI / 180); // Convert to radians
+      const inclination = orbitalInclination * (Math.PI / 180); // Convert to radians
       const y = Math.sin(inclination) * scaledOrbitalRadius * Math.sin(localAngleRef.current);
 
       localRef.current.position.set(x, y, z); // Now includes the y position adjusted by inclination
@@ -106,12 +106,8 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         // Check for a complete rotation
         if (localRef.current.rotation.y >= 2 * Math.PI && isPlanetSelected) {
           localRef.current.rotation.y %= 2 * Math.PI; // Reset rotation for next cycle
-          // updateRotationCount(name, 1); // Update rotation count in store for the planet
-          // if (name === "Earth") {
-          //   incrementDate(); // Increment the simulation date by one day
-          // }
         }
-        if (saturnRingRef.current) { // rotate saturns rings
+        if (saturnRingRef.current) { // rotate saturn's rings
           saturnRingRef.current.rotation.y += rotationIncrement;
         }
         if (cloudsRef.current) {
@@ -128,10 +124,11 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
       setShowTextures(distance < textureDisplayDistance);
 
       // Calculate orbit path opacity based on distance
-      const maxDistance = scaledRadius * 50; // full opacity
-      const minDistance = scaledRadius * 3; // zero opacity
+      const maxDistance = scaledRadius * 100; // Example max distance for full opacity
+      const minDistance = scaledRadius * 10; // Example min distance for zero opacity
       const opacity = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
       setOrbitPathOpacity(opacity);
+
       if (textSize.current) {
         textSize.current = distance * 0.02;
       }
@@ -213,11 +210,6 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
     setIsHovered(false);
   };
 
-
-  // texture for saturn rings
-  const ringTexture = useLoader(THREE.TextureLoader, "../assets/saturn/saturn-rings.png");
-  ringTexture.wrapS = THREE.RepeatWrapping;
-  ringTexture.wrapT = THREE.ClampToEdgeWrapping;
 
   // get moons data
   const moons = moonsData[name] || [];
@@ -303,9 +295,9 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
         {/* Saturns rings */}
         {name === "Saturn" && (
-          <group ref={saturnRingRef} rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} >
-            <Torus args={[scaledRadius * 1.7, scaledRadius * 0.5, 2, 100]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
-              <meshBasicMaterial map={ringTexture} />
+          <group rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} >
+            <Torus args={[scaledRadius * 1.9, scaledRadius * .6, 2, 90]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
+              <meshBasicMaterial map={textures?.ringTexture} transparent />
             </Torus>
           </group>
         )}
@@ -341,9 +333,22 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
 
         {/* Render moons */}
-        {isPlanetSelected && moons.map((moon, index) => (
-          <Moon key={`${name}-moon-${index}`} moonData={moon} planetPosition={localRef.current?.position} planetScale={scale} />
-        ))}
+        {isPlanetSelected && moons.map((moon, index) => {
+          const shouldAlignWithTilt = ["Saturn", "Uranus"].includes(name);  // List planets whose moons should align with the axial tilt
+
+          return (
+            <group key={`${name}-moon-group-${index}`} rotation={shouldAlignWithTilt ? [THREE.MathUtils.degToRad(axialTilt), 0, 0] : [0, 0, 0]}>
+              <Moon
+                key={`${name}-moon-${index}`}
+                moonData={moon}
+                planetPosition={localRef.current?.position}
+                planetScale={scale}
+                planetAxialTilt={axialTilt}
+              />
+            </group>
+          );
+        })}
+
 
       </group >
       {orbitPaths && (
