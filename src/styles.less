@@ -500,6 +500,21 @@ body {
     position: relative;
   }
 }
+.menu-wrapper .backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 400;
+}
+.menu-wrapper.disabled {
+  pointer-events: none;
+  & .planet-details .btn {
+    pointer-events: none;
+  }
+}
 
 // RESET MODAL
 .reset-modal-wrapper {
@@ -511,7 +526,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.75);
   z-index: 500;
 
   .content {
@@ -522,7 +536,16 @@ body {
     pointer-events: auto;
     color: #f19a00;
     font-size: 1.1rem;
-
+    .top-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      .warning-icon {
+        width: 40px;
+        height: 40px;
+      }
+    }
     .btn-con {
       display: flex;
       justify-content: space-evenly;

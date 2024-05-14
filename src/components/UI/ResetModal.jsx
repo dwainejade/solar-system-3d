@@ -29,7 +29,10 @@ function ResetModal({ type, handleResetAll }) {
     return (
         <div className='reset-modal-wrapper'>
             <div className="content">
-                <p>{description}</p>
+                <div className="top-section">
+                    <img src={"../assets/ui/icons/warning_icon.svg"} alt="warning" className="warning-icon" />
+                    <p>{description}</p>
+                </div>
 
                 <div className="btn-con">
                     <button onClick={handleReset} className='btn confirm-btn'>Yes</button>
