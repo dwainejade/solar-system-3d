@@ -9,16 +9,12 @@ import Sun from "@/components/Sun";
 import Planet from "@/components/PlanetBasic";
 import Stars from "@/components/Stars"
 import { useFrame } from "@react-three/fiber";
-import {
-  RepeatWrapping,
-  ClampToEdgeWrapping
-} from 'three';
-// import CameraPath from '@/components/CameraPath';
+import { RepeatWrapping, ClampToEdgeWrapping } from 'three';
 
 const SceneThree = () => {
-  const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed } = useStore();
+  const { sunSettings, simSpeed, setSimSpeed, setPrevSpeed } = useStore();
   const { planetPositions, selectedPlanet, setSelectedPlanet, moonPositions, selectedMoon, setSelectedMoon, planetsData } = usePlanetStore();
-  const { satelliteCamera, triggerReset, setTriggerReset, isCameraTransitioning, toggleCameraTransitioning, satelliteCameraState } = useCameraStore();
+  const { satelliteCamera, triggerReset, setTriggerReset, isCameraTransitioning, toggleCameraTransitioning } = useCameraStore();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
   const [moonsParent, setMoonsParent] = useState(null);
@@ -74,7 +70,7 @@ const SceneThree = () => {
       const moonPosition = moonPositions[selectedMoon.name];
       if (moonPosition) {
         const moonInfo = getMoonData(moonsParent, selectedMoon.name)
-        const scaledRadius = moonInfo.radius * moonSizeScaleFactor;
+        const scaledRadius = moonInfo?.radius * moonSizeScaleFactor;
         const optimalDistance = calculateOptimalDistance(scaledRadius);
         setMinDistance(optimalDistance / 2);
         cameraControlsRef.current.setTarget(moonPosition.x, moonPosition.y, moonPosition.z, true);
@@ -137,21 +133,16 @@ const SceneThree = () => {
   });
   const uranusTextures = useTexture({
     map: "../assets/uranus/2k_uranus.jpg",
+    ringTexture: "../assets/uranus/uranus-rings.png"
   });
   const neptuneTextures = useTexture({
     map: "../assets/neptune/2k_neptune.jpg",
   });
-  // const plutoTextures = useTexture({
-  //   map: "../assets/pluto/2k_pluto.jpg",
-  //   normal: "../assets/pluto/2k_pluto_bump.jpg",
-  // });
 
-  // texture for saturn rings
-  // saturnTextures.ringTexture.wrapS = RepeatWrapping;
-  // saturnTextures.ringTexture.wrapT = ClampToEdgeWrapping;
   saturnTextures.ringTexture.wrapS = RepeatWrapping;
   saturnTextures.ringTexture.wrapT = ClampToEdgeWrapping;
-  saturnTextures.ringTexture.repeat.set(1, 1);
+  uranusTextures.ringTexture.wrapS = RepeatWrapping;
+  uranusTextures.ringTexture.wrapT = ClampToEdgeWrapping;
 
   // camera settings
   const cameraConfig = {
@@ -186,7 +177,6 @@ const SceneThree = () => {
       <Planet name="Saturn" textures={saturnTextures} />
       <Planet name="Uranus" textures={uranusTextures} />
       <Planet name="Neptune" textures={neptuneTextures} />
-      {/* <Planet name="Pluto" textures={plutoTextures} /> */}
 
       {/* Render moons */}
       {/* {Object.entries(moonsData).map(([planetName]) => renderMoons(planetName))} */}
