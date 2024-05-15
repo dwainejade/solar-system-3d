@@ -10,8 +10,8 @@ import "../../styles.css";
 const SharedCanvas = ({ children }) => {
   const { fullscreen, isLoading, toggleLoading } = useStore();
   const { selectedPlanet } = usePlanetStore();
-  const { errors, loaded, total } = useProgress();
-
+  const { errors, loaded } = useProgress();
+  const total = 24
   const progressPercentage = (loaded / total) * 100;
 
   useEffect(() => {
@@ -23,17 +23,16 @@ const SharedCanvas = ({ children }) => {
     } else {
       toggleLoading(true);
     }
-    console.log(progressPercentage);
+
   }, [errors, progressPercentage, toggleLoading]);
 
   const Loader = () => {
-    const { progress } = useProgress();
     return (
       <Html as='div' fullscreen className='loading-screen'>
         <div className='loading-con'>
           <p>Loading...</p>
           <div className='loading-bar-container'>
-            <div className='loading-bar' style={{ width: `${progress}%` }}></div>
+            <div className='loading-bar' style={{ width: `${progressPercentage}%` }}></div>
           </div>
         </div>
       </Html>
@@ -55,7 +54,7 @@ const SharedCanvas = ({ children }) => {
         <Stats showPanel={2} />
 
         <Suspense fallback={<Loader />}>
-          <ambientLight intensity={0.04} />
+          <ambientLight intensity={0.05} />
           <pointLight color='#f6f3ea' intensity={2} position={[0, 0, 0]} key={selectedPlanet?.name || 'basic'} />
           {children}
         </Suspense>
