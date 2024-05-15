@@ -78,7 +78,7 @@ const DetailsMenu = () => {
         ...prev,
         [field]: value,
         orbitalPeriod: newOrbitalPeriod,
-        gravitationalAcceleration: newGravitationalPull.toFixed(3)
+        gravitationalAcceleration: newGravitationalPull.toFixed(7)
       }));
     } else if (field === 'rotationPeriod') {
       value = Math.min(9000000000, Math.max(0.01, value));
