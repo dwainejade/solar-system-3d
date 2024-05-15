@@ -139,10 +139,6 @@ const SceneThree = () => {
     map: "../assets/neptune/2k_neptune.jpg",
   });
 
-  saturnTextures.ringTexture.wrapS = RepeatWrapping;
-  saturnTextures.ringTexture.wrapT = ClampToEdgeWrapping;
-  uranusTextures.ringTexture.wrapS = RepeatWrapping;
-  uranusTextures.ringTexture.wrapT = ClampToEdgeWrapping;
 
   // camera settings
   const cameraConfig = {

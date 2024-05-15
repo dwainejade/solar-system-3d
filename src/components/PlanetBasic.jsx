@@ -12,6 +12,7 @@ import Moon from "./Moon";
 import Labels from "./Labels";
 import { moonsData } from "@/data/moonsData";
 import { earthAtmosphereShader } from "../shaders/atmosphere";
+import Rings from "./Rings";
 
 // default values
 const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
@@ -272,19 +273,11 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
         {/* Saturns rings */}
         {name === "Saturn" && showTextures && (
-          <group rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} >
-            <Torus args={[scaledRadius * 1.9, scaledRadius * .6, 2, detailLevel]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} >
-              <meshBasicMaterial map={textures?.ringTexture} transparent />
-            </Torus>
-          </group>
+          <Rings innerRadius={scaledRadius * 1.2} outerRadius={scaledRadius * 2} height={0} rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} texture={textures?.ringTexture} detail={detailLevel * 2} />
         )}
         {/* Uranus rings */}
         {name === "Uranus" && showTextures && (
-          <group rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} >
-            <Torus args={[scaledRadius * 1.4, scaledRadius * .2, 2, detailLevel]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} >
-              <meshBasicMaterial map={textures?.ringTexture} transparent />
-            </Torus>
-          </group>
+          <Rings innerRadius={scaledRadius * 1.5} outerRadius={scaledRadius * 1.9} height={0} texture={textures?.ringTexture} detail={detailLevel * 2} rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} />
         )}
 
         {/* Display planet names */}
