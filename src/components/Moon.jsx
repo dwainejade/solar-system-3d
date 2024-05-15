@@ -8,7 +8,7 @@ import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCamera";
 import Labels from "./Labels";
 
-const Moon = forwardRef(({ moonData, planetPosition, planetScale, planetAxialTilt }, ref) => {
+const Moon = forwardRef(({ moonData, planetPosition }, ref) => {
   const { simSpeed, orbitPaths } = useStore();
   const { selectedPlanet, selectedMoon, setSelectedMoon, updateMoonPosition, setSelectedPlanet, displayLabels } = usePlanetStore();
   const { satelliteCamera, toggleSatelliteCamera } = useCameraStore();
@@ -50,7 +50,7 @@ const Moon = forwardRef(({ moonData, planetPosition, planetScale, planetAxialTil
       localRef.current.position.set(moonX, moonY, moonZ);
       updateMoonPosition(name, { moonX, moonY, moonZ });
       // Point the moon towards the parent planet's position
-      localRef.current.lookAt(planetPosition);
+      // localRef.current.lookAt(planetPosition);
     }
   });
 
@@ -97,7 +97,7 @@ const Moon = forwardRef(({ moonData, planetPosition, planetScale, planetAxialTil
         <SatelliteCamera target={localRef.current} targetName={name} color={color} size={scaledRadius} satelliteCamera={satelliteCamera} toggleSatelliteCamera={toggleSatelliteCamera} />
       }
 
-      <group ref={localRef} onClick={handleClick}>
+      <group ref={localRef} >
         {/* Invisible mesh for interaction */}
         <mesh
           visible={false}
