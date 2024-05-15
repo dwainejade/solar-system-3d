@@ -260,29 +260,6 @@ body {
         top: 0;
         left: 0;
         padding: 8%;
-        // &::before {
-        //   content: "";
-        //   position: absolute;
-        //   top: 0%;
-        //   left: 0%;
-        //   width: 100%;
-        //   height: 100%;
-        //   background-image: linear-gradient(to right top, #201047, #271649, #2d1d4b, #33234d, #392a4f);
-        //   clip-path: polygon(100% 0, 100% 100%, 5% 100%, 0 95%, 0 5%, 5% 0);
-        //   z-index: -1;
-        // }
-
-        // &::after {
-        //   content: "";
-        //   position: absolute;
-        //   top: -1%;
-        //   right: 0%;
-        //   width: 103%;
-        //   height: 102%;
-        //   background-image: linear-gradient(to bottom, #5fe5ff, #74cbff, #bda6fc, #ef7cbc, #ef6866);
-        //   clip-path: polygon(2% 20%, 2% 5%, 7% 0, 100% 0, 100% 100%, 7% 100%, 2% 95%, 2% 50%, 0 45%, 0 25%);
-        //   z-index: -2;
-        // }
       }
 
       h2 {
@@ -293,15 +270,24 @@ body {
         margin-bottom: 4px;
         color: #e1cdaa;
       }
-      // .planet-details {
-      //   &.editing input,
-      //   .unit {
-      //     color: @text-color-2;
-      //   }
-      //   &.saved .unit {
-      //     color: #000;
-      //   }
-      // }
+      .planet-details {
+        &.saved {
+          input.value {
+            display: inline;
+            min-width: 0px;
+            width: min-content;
+            padding: 0;
+            color: #fff;
+            border-color: transparent;
+            background: transparent;
+          }
+        }
+        &.editing {
+          input.value {
+            color: #483939;
+          }
+        }
+      }
       .measurement-unit {
         margin-left: 5px;
       }
