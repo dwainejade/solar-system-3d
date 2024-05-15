@@ -1,8 +1,8 @@
 // Planet without surface camera
 
-import React, { useRef, forwardRef, useState, useEffect, cloneElement } from "react";
-import { useFrame, useLoader } from "@react-three/fiber";
-import { Billboard, Html, Line, Text, Torus } from "@react-three/drei";
+import React, { useRef, forwardRef, useState, useEffect } from "react";
+import { useFrame } from "@react-three/fiber";
+import { Html, Torus } from "@react-three/drei";
 import * as THREE from "three";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
@@ -271,24 +271,18 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
 
         {/* Saturns rings */}
-        {name === "Saturn" && (
+        {name === "Saturn" && showTextures && (
           <group rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} >
-            <Torus args={[scaledRadius * 1.9, scaledRadius * .6, 2, 90]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} >
-              <meshBasicMaterial alphaMap={textures?.ringTexture} transparent />
+            <Torus args={[scaledRadius * 1.9, scaledRadius * .6, 2, detailLevel]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} >
+              <meshBasicMaterial map={textures?.ringTexture} transparent />
             </Torus>
           </group>
         )}
         {/* Uranus rings */}
-        {name === "Uranus" && (
+        {name === "Uranus" && showTextures && (
           <group rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} >
-            <Torus args={[scaledRadius * 1.4, scaledRadius * .3, 2, 90]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} >
-              <meshBasicMaterial
-                alphaMap={textures?.ringTexture}
-                side={THREE.DoubleSide}
-                transparent
-                alphaTest={0.55}
-                color={color}
-              />
+            <Torus args={[scaledRadius * 1.4, scaledRadius * .2, 2, detailLevel]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} >
+              <meshBasicMaterial map={textures?.ringTexture} transparent />
             </Torus>
           </group>
         )}

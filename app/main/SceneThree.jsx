@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
-import { CameraControls, useTexture } from "@react-three/drei";
+import { AdaptiveDpr, CameraControls, useTexture } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "@/store/store";
 import { sizeScaleFactor } from "@/data/planetsData";
 import { moonsData, moonSizeScaleFactor } from "@/data/moonsData";
@@ -133,7 +133,7 @@ const SceneThree = () => {
   });
   const uranusTextures = useTexture({
     map: "../assets/uranus/2k_uranus.jpg",
-    ringTexture: "../assets/uranus/uranus-rings.png"
+    ringTexture: "../assets/uranus/uranus-rings-2.png"
   });
   const neptuneTextures = useTexture({
     map: "../assets/neptune/2k_neptune.jpg",
@@ -147,7 +147,7 @@ const SceneThree = () => {
   // camera settings
   const cameraConfig = {
     maxDistance: 90000,
-    smoothTime: 0.7,
+    smoothTime: 0.6,
     polarRotateSpeed: 0.5,
     azimuthRotateSpeed: 0.5,
     enableDamping: true,
@@ -168,6 +168,7 @@ const SceneThree = () => {
       )}
 
       <Stars />
+      <AdaptiveDpr pixelated />
 
       <Planet name="Earth" textures={earthTextures} />
       <Planet name="Mars" textures={marsTextures} />
