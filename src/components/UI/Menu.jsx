@@ -8,13 +8,13 @@ import FocusLock from 'react-focus-lock';
 const Menu = () => {
   const {
     simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, fullscreen, toggleFullscreen,
-    orbitPaths, toggleOrbitPaths, showDetailsMenu, toggleDetailsMenu
+    orbitPaths, toggleOrbitPaths, showDetailsMenu
   } = useStore();
   const {
     selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels, planetsData,
     resetPlanetsData, showResetPlanetModal, showResetAllModal, toggleResetAllModal
   } = usePlanetStore();
-  const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning, toggleCameraTransitioning } = useCameraStore();
+  const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning, satelliteCamera } = useCameraStore();
 
   const [isMenuOpen, setMenuOpen] = useState(false);
 
@@ -158,7 +158,7 @@ const Menu = () => {
       {/* Details menu */}
       <div
         className={`details-menu ${selectedPlanet &&
-          (!isCameraTransitioning && showDetailsMenu || selectedPlanet?.name === "Sun")
+          (!isCameraTransitioning && showDetailsMenu && satelliteCamera || selectedPlanet?.name === "Sun")
           ? "open"
           : "closed"
           }`}
