@@ -17,15 +17,13 @@ const Moon = forwardRef(({ moonData, planetPosition }, ref) => {
   const localAngleRef = useRef(0);
 
   const { name, orbitalRadius, radius, color, orbitalPeriod, orbitalInclination } = moonData;
-  const isMoonSelected = selectedMoon && selectedMoon.name === name; // clicked planet
+  const isMoonSelected = selectedMoon && selectedMoon.name === name;
 
   const moonTexture = name === 'Moon' ? useTexture('../assets/earth/moon/2k_moon.jpg') : null;
 
-  // Apply moon-specific scaling factors
   const scaledRadius = radius * moonSizeScaleFactor;
   const scaledOrbitalRadius = orbitalRadius * moonDistanceScaleFactor;
 
-  // Calculate the moon's orbital speed
   const orbitalSpeed = useMemo(() => {
     return (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60); // Orbital period in Earth days
   }, [orbitalPeriod]);
@@ -35,22 +33,21 @@ const Moon = forwardRef(({ moonData, planetPosition }, ref) => {
   }, []);
 
   useFrame((state, delta) => {
-    // Update the angle based on the simulation speed
     localAngleRef.current -= orbitalSpeed * simSpeed * delta;
 
-    // Calculate moon's position relative to its parent planet
     const angle = localAngleRef.current;
     const moonX = Math.cos(angle) * scaledOrbitalRadius;
     const moonZ = Math.sin(angle) * scaledOrbitalRadius;
     const inclination = orbitalInclination * (Math.PI / 180);
     const moonY = Math.sin(angle) * Math.sin(inclination) * scaledOrbitalRadius;
 
-    // Update the moon's position
     if (localRef.current) {
       localRef.current.position.set(moonX, moonY, moonZ);
       updateMoonPosition(name, { moonX, moonY, moonZ });
+
       // Point the moon towards the parent planet's position
-      // localRef.current.lookAt(planetPosition);
+      const planetPos = new Vector3(...planetPosition);
+      localRef.current.lookAt(planetPos);
     }
   });
 
@@ -73,7 +70,7 @@ const Moon = forwardRef(({ moonData, planetPosition }, ref) => {
     setIsHovered(false);
   };
 
-  const [scale, setScale] = useState(scaledRadius); // scaledRadius = 0.6
+  const [scale, setScale] = useState(scaledRadius);
   const [textSize, setTextSize] = useState(1);
   useFrame(({ camera }) => {
     if (!localRef.current) return;
@@ -87,9 +84,10 @@ const Moon = forwardRef(({ moonData, planetPosition }, ref) => {
       setScale(distance / 100);
     }
 
-    const textSizeFactor = 0.016; // Adjust this factor to scale text size for better legibility
+    const textSizeFactor = 0.016;
     setTextSize(textSizeFactor * distance);
   });
+
 
   return (
     <>
@@ -108,9 +106,9 @@ const Moon = forwardRef(({ moonData, planetPosition }, ref) => {
           <meshBasicMaterial color={color} wireframe />
         </mesh>
 
-        <mesh>
+        <mesh key={name + '-textured'} rotation={name === 'Moon' ? [0, Math.PI * 3.5, 0] : [0, 0, 0]} >
           <sphereGeometry args={[scaledRadius, 32, 16]} />
-          <meshStandardMaterial metalness={0.9} roughness={0.65} map={moonTexture || null} color={!moonTexture ? color : null} />
+          <meshBasicMaterial metalness={0.9} roughness={0.65} map={moonTexture || null} color={!moonTexture ? color : null} />
         </mesh>
 
         {(displayLabels || isHovered && !isMoonSelected) && simSpeed < 200000 && (
