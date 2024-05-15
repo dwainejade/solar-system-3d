@@ -82,6 +82,41 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
         [spherical, target.position, size, targetRadius]
     );
 
+    // Handle touch events
+    const handleStart = useCallback((event) => {
+        setIsDragging(true);
+        // Check if it's a touch event and prevent default behavior to avoid scrolling and zooming interfaces
+        if (event.touches) {
+            event.preventDefault();
+            setMouseDownPosition({ x: event.touches[0].clientX, y: event.touches[0].clientY });
+        } else {
+            setMouseDownPosition({ x: event.clientX, y: event.clientY });
+        }
+    }, []);
+    const handleMove = useCallback((event) => {
+        if (isDragging) {
+            handleUserInteraction();
+            const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+            const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+            const dx = clientX - mouseDownPosition.x;
+            const dy = clientY - mouseDownPosition.y;
+
+            setSpherical((prevSpherical) => {
+                const newSpherical = new THREE.Spherical(
+                    prevSpherical.radius,
+                    prevSpherical.phi - dy * 0.003,
+                    prevSpherical.theta - dx * 0.003
+                );
+                newSpherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, newSpherical.phi));
+                return newSpherical;
+            });
+
+            setMouseDownPosition({ x: clientX, y: clientY });
+        }
+    }, [isDragging, mouseDownPosition]);
+    const handleEnd = useCallback(() => {
+        setIsDragging(false);
+    }, []);
 
     useEffect(() => {
         const canvasElement = gl.domElement;
@@ -90,12 +125,21 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
         window.addEventListener('mousemove', handleMouseMove);
         window.addEventListener('mouseup', handleMouseUp);
         canvasElement.addEventListener('wheel', handleWheel, { passive: true });
+        // Touch events
+        canvasElement.addEventListener('touchstart', handleStart);
+        canvasElement.addEventListener('touchmove', handleMove);
+        canvasElement.addEventListener('touchend', handleEnd);
 
         return () => {
             canvasElement.removeEventListener('mousedown', handleMouseDown);
             window.removeEventListener('mousemove', handleMouseMove);
             window.removeEventListener('mouseup', handleMouseUp);
             canvasElement.removeEventListener('wheel', handleWheel);
+            // Touch events
+            canvasElement.removeEventListener('touchstart', handleStart);
+            canvasElement.removeEventListener('touchmove', handleMove);
+            canvasElement.removeEventListener('touchend', handleEnd);
+
         };
     }, [handleMouseDown, handleMouseMove, handleMouseUp, handleWheel, gl.domElement]);
 
