@@ -37,7 +37,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   } = mergedData;
 
 
-  const { simSpeed, updateRotationCount, incrementDate, orbitPaths, toggleDetailsMenu } = useStore();
+  const { simSpeed, orbitPaths, toggleDetailsMenu } = useStore();
   const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels, setSelectedMoon } = usePlanetStore();
   const { isSurfaceCameraActive, satelliteCamera, toggleSatelliteCamera } = useCameraStore();
   const localRef = ref || useRef();
@@ -111,7 +111,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
           saturnRingRef.current.rotation.y += rotationIncrement;
         }
         if (cloudsRef.current) {
-          cloudsRef.current.rotation.y += rotationIncrement * 1.2; // rotate faster than the planet
+          cloudsRef.current.rotation.y += rotationIncrement * 1.2; // rotate faster than planet
         }
       }
 
@@ -124,8 +124,8 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
       setShowTextures(distance < textureDisplayDistance);
 
       // Calculate orbit path opacity based on distance
-      const maxDistance = scaledRadius * 100; // Example max distance for full opacity
-      const minDistance = scaledRadius * 10; // Example min distance for zero opacity
+      const maxDistance = scaledRadius * 100;
+      const minDistance = scaledRadius * 10;
       const opacity = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
       setOrbitPathOpacity(opacity);
 
@@ -137,9 +137,8 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
 
   useEffect(() => {
-    // Set the axial tilt using Euler angles, aligning the rotation axis
     if (meshRef.current) {
-      meshRef.current.rotation.order = 'YXZ'; // This is critical to ensure the tilt is applied around the world Y, then rotation around local Y
+      meshRef.current.rotation.order = 'YXZ'; // to ensure the tilt is applied around the world Y, then rotation around local Y
       meshRef.current.rotation.y = 0; // Reset initial Y rotation
       meshRef.current.rotation.x = THREE.MathUtils.degToRad(axialTilt); // Apply axial tilt around the new local X after Y rotation reset
     }
@@ -265,39 +264,31 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
                     <meshStandardMaterial alphaMap={textures?.clouds} transparent />
                   </mesh>
                 </>}
-
-              {/* {name === "Venus" &&
-                <mesh key={`${name}-atmosphere`}>
-                  <sphereGeometry args={[scaledRadius * 1.05, detailLevel, detailLevel]} />
-                  <meshStandardMaterial map={textures?.clouds} transparent />
-                </mesh>
-              } */}
             </>
           }
 
-          {/* Display axial tilt */}
-          {/* {orbitPaths &&
-            <Line
-              key={name + '-line'}
-              points={[
-                [0, -scaledRadius * 1.2, 0],
-                [0, scaledRadius * 1.2, 0]
-              ]}
-              color={'white'}
-              lineWidth={2}
-              transparent
-              opacity={0.5}
-              rotation={[0, 0, 0]}
-            />
-          } */}
         </mesh>
 
 
         {/* Saturns rings */}
         {name === "Saturn" && (
           <group rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} >
-            <Torus args={[scaledRadius * 1.9, scaledRadius * .6, 2, 90]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
-              <meshBasicMaterial map={textures?.ringTexture} transparent />
+            <Torus args={[scaledRadius * 1.9, scaledRadius * .6, 2, 90]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} >
+              <meshBasicMaterial alphaMap={textures?.ringTexture} transparent />
+            </Torus>
+          </group>
+        )}
+        {/* Uranus rings */}
+        {name === "Uranus" && (
+          <group rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} >
+            <Torus args={[scaledRadius * 1.4, scaledRadius * .3, 2, 90]} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} >
+              <meshBasicMaterial
+                alphaMap={textures?.ringTexture}
+                side={THREE.DoubleSide}
+                transparent
+                alphaTest={0.55}
+                color={color}
+              />
             </Torus>
           </group>
         )}
@@ -306,6 +297,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         {(displayLabels && !isPlanetSelected || isHovered && !isPlanetSelected) && (
           <Labels key={name} text={name} size={textSize?.current} position={[0, scale * 1.2 + textSize?.current, 0]} color={color} handleClick={handleClick} font={'../assets/fonts/Termina_Black.ttf'} />
         )}
+
         {/* Display planet names */}
         {(displayLabels && isPlanetSelected) && (
           <Html
@@ -342,8 +334,6 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
                 key={`${name}-moon-${index}`}
                 moonData={moon}
                 planetPosition={localRef.current?.position}
-                planetScale={scale}
-                planetAxialTilt={axialTilt}
               />
             </group>
           );
