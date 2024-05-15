@@ -72,9 +72,7 @@ body {
   justify-content: center;
   align-items: center;
   height: 100%;
-  max-height: 520px;
   width: 100%;
-  max-width: 900px;
   background-color: rgba(0, 0, 0, 0.85);
   color: white;
 }
@@ -96,9 +94,9 @@ body {
   transition: width 2s ease;
 }
 .Main .loading-screen .loading-bar-container .orbit-icon {
-  width: 60px;
+  width: 200px;
   /* Adjust the size as needed */
-  height: 60px;
+  height: 200px;
   margin: 0 auto 20px;
   /* Centers the icon and adds space below */
   animation: spin 2s linear infinite;
@@ -134,9 +132,10 @@ body {
   flex-direction: row;
   justify-content: space-evenly;
   align-items: center;
-  height: 100px;
+  height: 110px;
   width: 100%;
   max-width: 540px;
+  min-width: 415px;
   color: #f19a00;
   margin: auto auto 0 auto;
   pointer-events: auto;
@@ -211,9 +210,14 @@ body {
   justify-content: center;
   border-radius: 6px 0 0 6px;
   pointer-events: auto;
-  transition: all 0.3s ease-out;
   background: url("../public/assets/ui/side_panel_bg.png") no-repeat center center;
   background-size: 100% 100%;
+  opacity: 0;
+}
+.Main .menu-wrapper .details-menu.open {
+  right: 0;
+  opacity: 1;
+  transition: right 0.3s ease-out;
 }
 .Main .menu-wrapper .details-menu .details-menu-inner {
   position: relative;
@@ -222,9 +226,6 @@ body {
   top: 0;
   left: 0;
   padding: 8%;
-}
-.Main .menu-wrapper .details-menu.open {
-  right: 0;
 }
 .Main .menu-wrapper .details-menu h2 {
   font-family: "Termina-Black";
@@ -460,4 +461,16 @@ body {
   color: #fff;
   font-size: 1rem;
   font-weight: 600;
+}
+#planetSelection,
+#simSpeedSelect {
+  background-color: #fff5e6;
+  color: #717171;
+  font-weight: bold;
+  border: none;
+  width: 120px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border-radius: 0;
 }
