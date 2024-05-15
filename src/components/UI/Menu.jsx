@@ -78,6 +78,7 @@ const Menu = () => {
   }, []);
 
   return (
+
     <div className={`menu-wrapper ${showResetAllModal || showResetPlanetModal ? "disabled" : "enabled"}`}>
       {/* Reset button */}
       <button className="reset-all-btn btn" onClick={handleResetBtn} />
@@ -96,6 +97,7 @@ const Menu = () => {
               id="planetSelection"
               onChange={handlePlanetChange}
               value={selectedPlanet?.name || "Select a Planet"}
+              disabled={!isMenuOpen}
             >
               <option value="reset-camera">Solar System</option>
               {Object.keys(planetsData).map((planetName) => (
@@ -112,7 +114,7 @@ const Menu = () => {
               id="simSpeedSelect"
               onChange={handleSpeedChange}
               value={isCameraTransitioning ? prevSpeed : simSpeed}
-              disabled={isCameraTransitioning}
+              disabled={isCameraTransitioning || !isMenuOpen}
             >
               {speedOptions.map((option, index) => (
                 <option key={index} value={option.value}>
@@ -127,7 +129,7 @@ const Menu = () => {
         <div className="right-con">
           <div className="menu-item">
             <label htmlFor="orbitPathToggle">Orbit Paths</label>
-            <div className="switch" onClick={() => toggleOrbitPaths(!orbitPaths)}>
+            <div className="switch" onClick={() => toggleOrbitPaths(!orbitPaths)} disabled={!isMenuOpen}>
               <input
                 id="orbitPathToggle"
                 type="checkbox"
@@ -141,7 +143,7 @@ const Menu = () => {
 
           <div className="menu-item">
             <label htmlFor="labelToggle">Labels</label>
-            <div className="switch" onClick={() => toggleDisplayLabels(!displayLabels)}>
+            <div className="switch" onClick={() => toggleDisplayLabels(!displayLabels)} disabled={!isMenuOpen}>
               <input
                 id="labelToggle"
                 type="checkbox"

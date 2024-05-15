@@ -235,6 +235,18 @@ body {
   margin-bottom: 4px;
   color: #e1cdaa;
 }
+.Main .menu-wrapper .details-menu .planet-details.saved input.value {
+  display: inline;
+  min-width: 0px;
+  width: min-content;
+  padding: 0;
+  color: #fff;
+  border-color: transparent;
+  background: transparent;
+}
+.Main .menu-wrapper .details-menu .planet-details.editing input.value {
+  color: #483939;
+}
 .Main .menu-wrapper .details-menu .measurement-unit {
   margin-left: 5px;
 }

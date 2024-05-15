@@ -34,10 +34,9 @@ const formatScientificNotation = (num) => {
 };
 
 
-
 const DetailsMenu = () => {
   const { isEditing, setIsEditing, showDetailsMenu, toggleDetailsMenu } = useStore();
-  const { selectedPlanet, updatePlanetData, planetsData, setSelectedPlanet, resetSinglePlanetData, toggleResetPlanetModal } = usePlanetStore();
+  const { selectedPlanet, updatePlanetData, planetsData, setSelectedPlanet, showResetPlanetModal, showResetAllModal, toggleResetPlanetModal } = usePlanetStore();
   const [editablePlanet, setEditablePlanet] = useState({});
   const [gravitationalPull, setGravitationalPull] = useState(0)
 
@@ -119,27 +118,29 @@ const DetailsMenu = () => {
         <div className={`planet-details ${isEditing ? 'editing' : 'saved'}`}>
           <div className="item w1">
             <label htmlFor="mass">Mass:</label>
-            <span>{formatScientificNotation(editablePlanet.mass)} kg</span>
+            <span className="value">{formatScientificNotation(editablePlanet.mass)} kg</span>
           </div>
           <div className="item w1">
             <label htmlFor="radius">Radius:</label>
-            <span>{formatScientificNotation(editablePlanet.radius)} km</span>
+            <span className="value">{formatScientificNotation(editablePlanet.radius)} km</span>
           </div>
 
           {selectedPlanet?.name !== 'Sun' &&
             <div className="item w2">
               <label htmlFor="orbitalRadius">Orbit Radius:</label>
-              <input
-                type="text"
-                id="orbitalRadius"
-                value={formatScientificNotation(editablePlanet.orbitalRadius)}
-                onChange={handleChange('orbitalRadius')}
-                onBlur={() => handleBlur('orbitalRadius')}
-                disabled={!isEditing}
-                min="9000000"
-                max="9000000000"
-                className="input"
-              />
+              {!isEditing ? <span className="value">{formatScientificNotation(editablePlanet.orbitalRadius)}</span>
+                : <input
+                  type="text"
+                  id="orbitalRadius"
+                  value={formatScientificNotation(editablePlanet.orbitalRadius)}
+                  onChange={handleChange('orbitalRadius')}
+                  onBlur={() => handleBlur('orbitalRadius')}
+                  disabled={showResetPlanetModal || showResetAllModal}
+                  min="9000000"
+                  max="9000000000"
+                  className="input value"
+                />
+              }
               <span className="measurement-unit">km</span>
             </div>
           }
@@ -147,23 +148,25 @@ const DetailsMenu = () => {
           {selectedPlanet?.name !== 'Sun' &&
             <div className="item w2">
               <label htmlFor="orbitalPeriod">Orbital Period:</label>
-              <span>{formatScientificNotation(editablePlanet.orbitalPeriod)} days</span>
+              <span className="value">{formatScientificNotation(editablePlanet.orbitalPeriod)} days</span>
             </div>
           }
 
           {selectedPlanet?.name !== 'Sun' &&
             <div className="item w2">
               <label htmlFor="rotationPeriod">Day Length:</label>
-              <input
-                type="text"
-                value={formatScientificNotation(editablePlanet.rotationPeriod)}
-                onChange={handleChange('rotationPeriod')}
-                onBlur={() => handleBlur('rotationPeriod')}
-                disabled={!isEditing}
-                min="0.01"
-                max="9000000000"
-                className="input"
-              />
+              {!isEditing ? <span className="value">{formatScientificNotation(editablePlanet.rotationPeriod)}</span>
+                : <input
+                  type="text"
+                  value={formatScientificNotation(editablePlanet.rotationPeriod)}
+                  onChange={handleChange('rotationPeriod')}
+                  onBlur={() => handleBlur('rotationPeriod')}
+                  disabled={!isEditing || showResetPlanetModal || showResetAllModal}
+                  min="0.01"
+                  max="9000000000"
+                  className="input value"
+                />
+              }
               <span className="measurement-unit">hours</span>
             </div>
           }

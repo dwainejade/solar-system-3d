@@ -40,7 +40,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
   const { simSpeed, orbitPaths, toggleDetailsMenu } = useStore();
   const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels, setSelectedMoon } = usePlanetStore();
-  const { isSurfaceCameraActive, satelliteCamera, toggleSatelliteCamera } = useCameraStore();
+  const { isSurfaceCameraActive, satelliteCamera, toggleSatelliteCamera, setAutoRotate, autoRotate } = useCameraStore();
   const localRef = ref || useRef();
   const localAngleRef = useRef(planetAngles[name] || 0); // Initialize with saved angle or 0
   const cloudsRef = useRef();
@@ -210,6 +210,10 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
     setIsHovered(false);
   };
 
+  const handleDoubleClick = e => {
+    e.stopPropagation();
+    setAutoRotate(!autoRotate);
+  };
 
   // get moons data
   const moons = moonsData[name] || [];
@@ -231,6 +235,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
           onPointerUp={handlePointerUp}
           onPointerOver={handlePointerOver}
           onPointerOut={handlePointerOut}
+          onDoubleClick={handleDoubleClick}
         >
           {isPlanetSelected
             ? <sphereGeometry args={[scaledRadius, 16, 16]} />

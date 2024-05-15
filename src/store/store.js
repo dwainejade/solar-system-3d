@@ -184,6 +184,9 @@ const useCameraStore = create((set) => ({
     isCameraTransitioning: false,
     toggleCameraTransitioning: (newState) => set(() => ({ isCameraTransitioning: newState })),
 
+    autoRotate: false,
+    setAutoRotate: (newState) => set(() => ({ autoRotate: newState })),
+
     surfacePoint: null,
     setSurfacePoint: (surfacePoint) => set({ surfacePoint }),
     surfaceNormal: [0, 1, 0],

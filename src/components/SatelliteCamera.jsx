@@ -6,7 +6,7 @@ import useStore, { useCameraStore } from '../store/store';
 
 
 const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera, targetName }) => {
-    const { toggleCameraTransitioning, setSatelliteCameraState } = useCameraStore();
+    const { toggleCameraTransitioning, setAutoRotate, autoRotate } = useCameraStore();
     const { prevSpeed, simSpeed, setSimSpeed } = useStore();
 
     const { camera, gl } = useThree();
@@ -17,7 +17,6 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
     const [spherical, setSpherical] = useState(new THREE.Spherical());
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [lastInteractionTime, setLastInteractionTime] = useState(null);
-    const [autoRotate, setAutoRotate] = useState(false);
 
     const [targetRadius, setTargetRadius] = useState(size * 5.5);
     const lerpFactor = 0.18; // Adjust this value to control the smoothness of the transition
@@ -213,20 +212,6 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
     useFrame((state, delta) => {
 
     });
-
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            if (!lastInteractionTime) return;
-            if (Date.now() - lastInteractionTime > 8000 && !autoRotate && !isTransitioning) {
-                setAutoRotate(true);
-            }
-        }, 1000);
-
-        if (autoRotate) clearInterval(interval);
-
-        return () => clearInterval(interval);
-    }, [lastInteractionTime, isTransitioning]);
 
 
 
