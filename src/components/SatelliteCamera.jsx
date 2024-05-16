@@ -7,7 +7,7 @@ import useStore, { useCameraStore } from '../store/store';
 
 const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera, targetName }) => {
     const { toggleCameraTransitioning, setAutoRotate, autoRotate, toggleOrbitCamera, setSatelliteCameraState } = useCameraStore();
-    const { prevSpeed, simSpeed, setSimSpeed } = useStore();
+    const { prevSpeed, setSimSpeed } = useStore();
 
     const { gl } = useThree();
     const cameraRef = useRef();
@@ -172,6 +172,7 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
             spherical.theta += rotationSpeed;
         }
     });
+
     useFrame(({ camera }) => {
         if (cameraRef.current && target) {
             const newPosition = new THREE.Vector3().setFromSpherical(spherical);
@@ -191,7 +192,6 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
                 }
             }
         }
-
     });
 
     function switchCamera(camera) {
