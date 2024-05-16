@@ -181,6 +181,9 @@ const usePlanetStore = create(
 const useCameraStore = create((set) => ({
     satelliteCamera: false,
     toggleSatelliteCamera: (newState) => set(() => ({ satelliteCamera: newState })),
+    orbitCamera: true,
+    toggleOrbitCamera: (newState) => set(() => ({ orbitCamera: newState })),
+
     isCameraTransitioning: false,
     toggleCameraTransitioning: (newState) => set(() => ({ isCameraTransitioning: newState })),
 
@@ -204,10 +207,11 @@ const useCameraStore = create((set) => ({
     setCameraTarget: (target) => set({ cameraTarget: target }),
 
     satelliteCameraState: {
-        position: new THREE.Vector3(),
-        target: new THREE.Vector3()
+        position: null,
+        rotation: null,
+        targetPosition: null
     },
-    setSatelliteCameraState: (position, target) => set({ satelliteCameraState: { position, target } }),
+    setSatelliteCameraState: (position, rotation, targetPosition) => set({ satelliteCameraState: { position, rotation, targetPosition } }),
 
     triggerReset: null, // Placeholder for a function to reset the camera
     setTriggerReset: (newState) => set({ triggerReset: newState }),
