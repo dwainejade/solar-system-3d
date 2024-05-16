@@ -44,10 +44,11 @@ const Moon = forwardRef(({ moonData, planetPosition }, ref) => {
     if (localRef.current) {
       localRef.current.position.set(moonX, moonY, moonZ);
       updateMoonPosition(name, { moonX, moonY, moonZ });
-
-      // Point the moon towards the parent planet's position
-      const planetPos = new Vector3(...planetPosition);
-      localRef.current.lookAt(planetPos);
+      if (name === 'Moon' && planetPosition) {
+        // Point the moon towards the parent planet's position
+        const planetPos = new Vector3(...planetPosition);
+        localRef.current.lookAt(planetPos);
+      }
     }
   });
 
