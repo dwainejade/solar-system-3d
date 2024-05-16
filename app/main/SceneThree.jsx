@@ -11,7 +11,7 @@ import Stars from "@/components/Stars"
 import { useFrame } from "@react-three/fiber";
 
 const SceneThree = () => {
-  const { sunSettings, simSpeed, setSimSpeed, setPrevSpeed } = useStore();
+  const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed } = useStore();
   const { planetPositions, selectedPlanet, setSelectedPlanet, moonPositions, selectedMoon, setSelectedMoon, planetsData } = usePlanetStore();
   const { satelliteCamera, triggerReset, setTriggerReset, isCameraTransitioning, toggleCameraTransitioning } = useCameraStore();
   const cameraControlsRef = useRef();
@@ -106,6 +106,8 @@ const SceneThree = () => {
     }
     if (!selectedPlanet) {
       setCanInteract(false)
+      setSimSpeed(prevSpeed);
+      toggleCameraTransitioning(false);
     }
     cameraControlsRef.current?.camera.updateProjectionMatrix()
   }, [selectedPlanet, selectedMoon]);

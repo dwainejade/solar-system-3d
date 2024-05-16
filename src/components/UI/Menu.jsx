@@ -59,6 +59,7 @@ const Menu = () => {
   const handleSpeedChange = (event) => {
     const newSpeed = parseInt(event.target.value, 10);
     setSimSpeed(newSpeed);
+    setPrevSpeed(newSpeed);
   };
 
   const handlePlanetChange = (e) => {
