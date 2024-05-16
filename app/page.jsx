@@ -5,11 +5,8 @@ const Home = () => {
     <div className='main-page'>
       <h1>Scene Selector</h1>
       <nav>
-        <ul>
-          <li>
-            <Link href='/main/'>Main</Link>
-          </li>
-        </ul>
+        <Link href='/main/'>Main</Link>
+
       </nav>
     </div>
   );

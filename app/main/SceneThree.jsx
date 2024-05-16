@@ -9,7 +9,6 @@ import Sun from "@/components/Sun";
 import Planet from "@/components/PlanetBasic";
 import Stars from "@/components/Stars"
 import { useFrame } from "@react-three/fiber";
-import { RepeatWrapping, ClampToEdgeWrapping } from 'three';
 
 const SceneThree = () => {
   const { sunSettings, simSpeed, setSimSpeed, setPrevSpeed } = useStore();
@@ -52,6 +51,7 @@ const SceneThree = () => {
         setMinDistance(optimalDistance / 2);
         cameraControlsRef.current.setTarget(planetPosition.x, planetPosition.y, planetPosition.z, true);
         cameraControlsRef.current.dollyTo(optimalDistance, true);
+        // console.log(cameraControlsRef.current);
       }
       if (selectedPlanet.name === "Sun") {
         setMinDistance(200);
@@ -60,9 +60,11 @@ const SceneThree = () => {
       }
     }
   });
+
   const getMoonData = (planetName, moonName) => {
     const moons = moonsData[planetName];
     const moon = moons.find(m => m.name === moonName);
+    console.log(moon);
     return moon;
   };
   useFrame(() => {
@@ -88,7 +90,6 @@ const SceneThree = () => {
   }, [triggerReset]);
 
   useEffect(() => {
-
     if (selectedPlanet && selectedPlanet.name !== "Sun" && !isCameraTransitioning) {
       setPrevSpeed(simSpeed);
       setSimSpeed(0); // Pause the simulation
@@ -143,9 +144,7 @@ const SceneThree = () => {
   // camera settings
   const cameraConfig = {
     maxDistance: 90000,
-    smoothTime: 0.6,
-    polarRotateSpeed: 0.5,
-    azimuthRotateSpeed: 0.5,
+    smoothTime: 0.8,
     enableDamping: true,
     near: 0.001,
     far: 1000000
