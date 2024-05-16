@@ -10,7 +10,7 @@ import { EffectComposer, GodRays } from "@react-three/postprocessing";
 const Sun = ({ position, resetCamera, textures }) => {
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
-  const { selectedPlanet, setSelectedPlanet, planetsData } = usePlanetStore();
+  const { setSelectedPlanet, planetsData } = usePlanetStore();
   const { simSpeed } = useStore();
   const { radius, name, rotationPeriod } = planetsData.Sun
   const sunRadius = radius * sizeScaleFactor
@@ -19,14 +19,7 @@ const Sun = ({ position, resetCamera, textures }) => {
   const handleClick = e => {
     e.stopPropagation();
     if (!isDragging) {
-      // Your original click handling logic
-      // This now only triggers if the mesh wasn't dragged
-      if (selectedPlanet && selectedPlanet.name === "Sun") {
-        setSelectedPlanet(null);
-        resetCamera();
-      } else {
-        setSelectedPlanet(planetsData.Sun);
-      }
+      setSelectedPlanet(planetsData.Sun);
     }
   };
 

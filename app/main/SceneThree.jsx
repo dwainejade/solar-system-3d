@@ -40,7 +40,7 @@ const SceneThree = () => {
     };
     cameraControlsRef.current.setPosition(isometricPosition.x, isometricPosition.y, isometricPosition.z, true);
   };
-
+  const [canInteract, setCanInteract] = useState(false)
   // Handle camera adjustments when a planet is selected
   useFrame(() => {
     if (selectedPlanet && cameraControlsRef.current) {
@@ -51,15 +51,18 @@ const SceneThree = () => {
         setMinDistance(optimalDistance / 2);
         cameraControlsRef.current.setTarget(planetPosition.x, planetPosition.y, planetPosition.z, true);
         cameraControlsRef.current.dollyTo(optimalDistance, true);
-        // console.log(cameraControlsRef.current);
+        setCanInteract(false)
+        console.log(canInteract)
       }
-      if (selectedPlanet.name === "Sun") {
+      if (selectedPlanet.name === "Sun" && !canInteract) {
         setMinDistance(200);
         cameraControlsRef.current.setTarget(0, 0, 0, true);
+        if (cameraControlsRef.current.distance < 210) setCanInteract(true)
         cameraControlsRef.current.dollyTo(200, true);
       }
     }
   });
+
 
   const getMoonData = (planetName, moonName) => {
     const moons = moonsData[planetName];
@@ -100,6 +103,9 @@ const SceneThree = () => {
       setPrevSpeed(simSpeed);
       setSimSpeed(0);
       toggleCameraTransitioning(true);
+    }
+    if (!selectedPlanet) {
+      setCanInteract(false)
     }
     cameraControlsRef.current?.camera.updateProjectionMatrix()
   }, [selectedPlanet, selectedMoon]);
@@ -144,7 +150,7 @@ const SceneThree = () => {
   // camera settings
   const cameraConfig = {
     maxDistance: 90000,
-    smoothTime: 0.8,
+    smoothTime: 0.65,
     enableDamping: true,
     near: 0.001,
     far: 1000000
