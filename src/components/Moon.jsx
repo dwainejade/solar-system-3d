@@ -9,8 +9,8 @@ import SatelliteCamera from "./SatelliteCamera";
 import Labels from "./Labels";
 
 const Moon = forwardRef(({ moonData, planetPosition }, ref) => {
-  const { simSpeed, orbitPaths } = useStore();
-  const { selectedPlanet, selectedMoon, setSelectedMoon, updateMoonPosition, setSelectedPlanet, displayLabels } = usePlanetStore();
+  const { simSpeed } = useStore();
+  const { selectedPlanet, selectedMoon, setSelectedMoon, updateMoonPosition, setSelectedPlanet, displayLabels, orbitPaths } = usePlanetStore();
   const { satelliteCamera, toggleSatelliteCamera } = useCameraStore();
 
   const localRef = ref || useRef();

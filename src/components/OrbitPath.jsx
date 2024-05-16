@@ -11,7 +11,7 @@ const OrbitPath = forwardRef(
       const pathPoints = [];
       const resolution = hiRes ? Math.min(Math.max(radius / 2, Math.PI * 80), 2500) : Math.PI * 80;
 
-      for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / resolution) {
+      for (let angle = 0; angle <= Math.PI * 2; angle += Math.PI / resolution) {
         const x = radius * Math.cos(angle);
         const y = Math.sin(inclination) * radius * Math.sin(angle);
         const z = radius * Math.sin(angle);

@@ -38,9 +38,6 @@ const useStore = create(
         isEditing: false, // allow user to edit planet data
         setIsEditing: (newState) => set({ isEditing: newState }),
 
-        orbitPaths: true,
-        toggleOrbitPaths: () => set(state => ({ orbitPaths: !state.orbitPaths })),
-
         showConstellations: false,
         toggleConstellations: () => set(state => ({ showConstellations: !state.showConstellations })),
 
@@ -99,16 +96,16 @@ export default useStore;
 const usePlanetStore = create(
     persist(
         immer((set, get) => ({
+            orbitPaths: true,
+            toggleOrbitPaths: () => set(state => ({ orbitPaths: !state.orbitPaths })),
+            displayLabels: false, // render planet names in scene
+            toggleDisplayLabels: () => set((state) => ({ displayLabels: !state.displayLabels })),
+
             showResetPlanetModal: false,
             toggleResetPlanetModal: (newState) => set({ showResetPlanetModal: newState }),
 
             showResetAllModal: false,
             toggleResetAllModal: (newState) => set({ showResetAllModal: newState }),
-
-            // Existing store properties and methods
-            displayLabels: false, // render planet names in scene
-            toggleDisplayLabels: () => set((state) => ({ displayLabels: !state.displayLabels })),
-            // TODO: move orbit lines here
 
             planetPositions: {},
             updatePlanetPosition: (name, position) =>
@@ -172,9 +169,9 @@ const usePlanetStore = create(
                 planetPositions: state.planetPositions,
                 planetAngles: state.planetAngles,
                 moonPositions: state.moonPositions,
-                displayLabels: state.displayLabels
+                displayLabels: state.displayLabels,
+                orbitPaths: state.orbitPaths,
             }),
-
         },
     ));
 

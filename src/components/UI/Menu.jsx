@@ -8,11 +8,11 @@ import FocusLock from 'react-focus-lock';
 const Menu = () => {
   const {
     simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, fullscreen, toggleFullscreen,
-    orbitPaths, toggleOrbitPaths, showDetailsMenu
+    showDetailsMenu
   } = useStore();
   const {
     selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels, planetsData,
-    resetPlanetsData, showResetPlanetModal, showResetAllModal, toggleResetAllModal
+    resetPlanetsData, showResetPlanetModal, showResetAllModal, toggleResetAllModal, orbitPaths, toggleOrbitPaths,
   } = usePlanetStore();
   const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning, satelliteCamera } = useCameraStore();
 

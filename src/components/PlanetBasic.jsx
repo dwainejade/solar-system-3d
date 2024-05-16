@@ -38,8 +38,8 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   } = mergedData;
 
 
-  const { simSpeed, orbitPaths, toggleDetailsMenu } = useStore();
-  const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels, setSelectedMoon } = usePlanetStore();
+  const { simSpeed, toggleDetailsMenu } = useStore();
+  const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels, setSelectedMoon, orbitPaths } = usePlanetStore();
   const { isSurfaceCameraActive, satelliteCamera, toggleSatelliteCamera, setAutoRotate, autoRotate } = useCameraStore();
   const localRef = ref || useRef();
   const localAngleRef = useRef(planetAngles[name] || 0); // Initialize with saved angle or 0
