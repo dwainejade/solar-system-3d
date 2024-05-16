@@ -261,7 +261,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
               {name === "Earth" &&
                 <>
                   <mesh key={`${name}-atmosphere`}>
-                    <sphereGeometry args={[scaledRadius * 1.05, detailLevel, detailLevel]} />
+                    <sphereGeometry args={[scaledRadius * 1.035, detailLevel, detailLevel]} />
                     <shaderMaterial args={[earthAtmosphereShader]} />
                   </mesh>
 
