@@ -128,6 +128,11 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
         canvasElement.addEventListener('touchstart', handleStart);
         canvasElement.addEventListener('touchmove', handleMove);
         canvasElement.addEventListener('touchend', handleEnd);
+        // add event listener for panning with right mouse button
+        canvasElement.addEventListener('contextmenu', (event) => {
+            event.preventDefault();
+        });
+
 
         return () => {
             canvasElement.removeEventListener('mousedown', handleMouseDown);
@@ -138,6 +143,10 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
             canvasElement.removeEventListener('touchstart', handleStart);
             canvasElement.removeEventListener('touchmove', handleMove);
             canvasElement.removeEventListener('touchend', handleEnd);
+
+            canvasElement.removeEventListener('contextmenu', (event) => {
+                event.preventDefault();
+            });
 
         };
     }, [handleMouseDown, handleMouseMove, handleMouseUp, handleWheel, gl.domElement]);
@@ -221,7 +230,6 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
             fov={50}
             near={0.01}
             far={1000000}
-            enablePan={true}
         />
     );
 };
