@@ -159,6 +159,16 @@ const usePlanetStore = create(
                 set((state) => ({
                     moonPositions: { ...state.moonPositions, [name]: position },
                 })),
+            moonWorldPositions: {},
+            updateMoonWorldPosition: (name, position) =>
+                set((state) => ({
+                    moonWorldPositions: { ...state.moonWorldPositions, [name]: position },
+                })),
+            moonAngles: {},
+            updateMoonAngle: (name, angle) =>
+                set((state) => ({
+                    moonAngles: { ...state.moonAngles, [name]: angle },
+                })),
         })),
         // storage:
         {
@@ -169,6 +179,8 @@ const usePlanetStore = create(
                 planetPositions: state.planetPositions,
                 planetAngles: state.planetAngles,
                 moonPositions: state.moonPositions,
+                moonWorldPositions: state.moonWorldPositions,
+                moonAngles: state.moonAngles,
                 displayLabels: state.displayLabels,
                 orbitPaths: state.orbitPaths,
             }),
@@ -180,6 +192,9 @@ const useCameraStore = create((set) => ({
     toggleSatelliteCamera: (newState) => set(() => ({ satelliteCamera: newState })),
     orbitCamera: true,
     toggleOrbitCamera: (newState) => set(() => ({ orbitCamera: newState })),
+
+    selectedMoonCameraActive: false,
+    setSelectedMoonCameraActive: (newState) => set(() => ({ selectedMoonCameraActive: newState })),
 
     isCameraTransitioning: false,
     toggleCameraTransitioning: (newState) => set(() => ({ isCameraTransitioning: newState })),

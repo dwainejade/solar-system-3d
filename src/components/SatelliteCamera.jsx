@@ -15,7 +15,6 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
     const [isDragging, setIsDragging] = useState(false);
     const [mouseDownPosition, setMouseDownPosition] = useState({ x: 0, y: 0 });
     const [spherical, setSpherical] = useState(new THREE.Spherical());
-    const [isTransitioning, setIsTransitioning] = useState(false);
 
     const [targetRadius, setTargetRadius] = useState(size * 5.5);
     const lerpFactor = 0.18; // Adjust this value to control the smoothness of the transition
@@ -151,7 +150,7 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
                 toggleOrbitCamera(true);
             }
         };
-    }, [satelliteCamera, toggleSatelliteCamera]);
+    }, [satelliteCamera]);
 
 
     // Lerp the spherical radius towards the target radius
@@ -160,11 +159,11 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
             const newRadius = THREE.MathUtils.lerp(spherical.radius, targetRadius, lerpFactor);
             setSpherical((prevSpherical) => new THREE.Spherical(newRadius, prevSpherical.phi, prevSpherical.theta));
 
-            setSatelliteCameraState({
-                position: cameraRef.current.position.clone(),
-                rotation: cameraRef.current.rotation.clone(),
-                targetPosition: target.position.clone(),
-            });
+            // setSatelliteCameraState({
+            //     position: cameraRef.current.position.clone(),
+            //     rotation: cameraRef.current.rotation.clone(),
+            //     targetPosition: target.position.clone(),
+            // });
 
         }
         if (autoRotate && cameraRef.current && target) {
@@ -181,12 +180,11 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
                 newPosition.y + target.position.y,
                 newPosition.z + target.position.z
             );
-            cameraRef.current.lookAt(target.position);
+            cameraRef.current.lookAt(target.position); // need world position if moon
             cameraRef.current.updateMatrixWorld();
 
-            const distance = camera.position.distanceTo(target.position);
-
-            if (distance <= size * 5.5) {
+            const distance = camera.position.distanceTo(target.position); // need world position if moon
+            if (distance <= size * 5.4) {
                 if (!satelliteCamera) {
                     switchCamera(camera);
                 }
@@ -205,7 +203,6 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
         toggleSatelliteCamera(true);
         toggleCameraTransitioning(false);
         setSimSpeed(prevSpeed);
-        setIsTransitioning(false);
     };
 
     function convertVectorToSpherical(vector) {
@@ -218,8 +215,9 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
     return (
         <PerspectiveCamera
             ref={cameraRef}
-            name='satellite-camera'
-            makeDefault={satelliteCamera && !isTransitioning}
+            name={'satellite-camera-' + targetName}
+            key={targetName}
+            makeDefault={satelliteCamera}
             fov={50}
             near={0.01}
             far={1000000}
