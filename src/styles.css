@@ -486,3 +486,29 @@ body {
   -moz-appearance: none;
   border-radius: 0;
 }
+.auto-rotate-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  color: white;
+  transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+  opacity: 0;
+  transform: translateY(-20px);
+  /* Start position for slide-in effect */
+}
+.slideIn {
+  opacity: 1;
+  transform: translateY(10px);
+  /* End position for slide-in effect */
+}
+.slideOut {
+  opacity: 0;
+  transform: translateY(-20px);
+  /* Start position for slide-out effect */
+}

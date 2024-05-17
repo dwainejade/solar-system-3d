@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import useStore, { usePlanetStore, useCameraStore } from "../../store/store";
 import DetailsMenu from "./DetailsMenu";
 import ResetModal from "./ResetModal";
@@ -14,9 +14,11 @@ const Menu = () => {
     selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels, planetsData,
     resetPlanetsData, showResetPlanetModal, showResetAllModal, toggleResetAllModal, orbitPaths, toggleOrbitPaths,
   } = usePlanetStore();
-  const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning, satelliteCamera } = useCameraStore();
+  const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning, satelliteCamera, autoRotate } = useCameraStore();
 
   const [isMenuOpen, setMenuOpen] = useState(false);
+  const [textClass, setTextClass] = useState('');
+  const [displayText, setDisplayText] = useState('');
 
   const toggleMenu = () => {
     setMenuOpen(!isMenuOpen);
@@ -78,9 +80,30 @@ const Menu = () => {
     setSimSpeed(1);
   }, []);
 
-  return (
+  useEffect(() => {
+    setTextClass('slideIn');
+    setDisplayText(`Auto-Rotate ${autoRotate ? "On" : "Off"}`);
+    const timer1 = setTimeout(() => {
+      setTextClass('slideOut');
+    }, 2000); // Duration for staying visible after slide in
 
+    const timer2 = setTimeout(() => {
+      setDisplayText('');
+    }, 3000); // Total duration for the text effect
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, [autoRotate]);
+
+  return (
     <div className={`menu-wrapper ${showResetAllModal || showResetPlanetModal ? "disabled" : "enabled"}`}>
+
+      {/* Text that slides and fades in/out */}
+      <div className={`auto-rotate-text ${textClass}`}>
+        {displayText}
+      </div>
       {/* Reset button */}
       <button className="reset-all-btn btn" onClick={handleResetBtn} />
       {/* Fullscreen button */}
