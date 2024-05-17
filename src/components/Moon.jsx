@@ -82,14 +82,16 @@ const Moon = forwardRef(({ moonData, planetPosition }, ref) => {
     const worldPosition = localRef.current.getWorldPosition(new Vector3());
     const distance = worldPosition.distanceTo(camera.position);
     updateMoonWorldPosition(name, { x: worldPosition.x, y: worldPosition.y, z: worldPosition.z });
+    const textSizeFactor = 0.016;
     if (distance / 100 <= scaledRadius) {
       setScale(scaledRadius);
     } else {
       setScale(distance / 100);
     }
+    if (distance < 4500) {
+      setTextSize(textSizeFactor * distance);
+    }
 
-    const textSizeFactor = 0.016;
-    setTextSize(textSizeFactor * distance);
   });
 
   // convert localRef.current.position to world position
