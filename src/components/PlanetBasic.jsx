@@ -1,8 +1,6 @@
-// Planet without surface camera
-
-import React, { useRef, forwardRef, useState, useEffect } from "react";
+import React, { useRef, forwardRef, useState, useEffect, Suspense } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Html, Torus } from "@react-three/drei";
+import { Html } from "@react-three/drei";
 import * as THREE from "three";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
@@ -13,10 +11,10 @@ import Labels from "./Labels";
 import { moonsData } from "@/data/moonsData";
 import { earthAtmosphereShader } from "../shaders/atmosphere";
 import Rings from "./Rings";
+// import SatelliteModel from "@/components/models/Satellite";
 
-// default values
-const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
-  const { planetsData } = usePlanetStore()
+const Planet = forwardRef(({ name = 'Earth', textures, shaderMaterial }, ref) => {
+  const { planetsData } = usePlanetStore();
   const bodyData = planetsData[name];
 
   const mergedData = { ...bodyData };
@@ -37,47 +35,43 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
     interestPoints
   } = mergedData;
 
-
   const { simSpeed, toggleDetailsMenu } = useStore();
-  const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels, setSelectedMoon, orbitPaths } = usePlanetStore();
+  const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels, selectedMoon, setSelectedMoon, orbitPaths } = usePlanetStore();
   const { isSurfaceCameraActive, satelliteCamera, toggleSatelliteCamera, setAutoRotate, autoRotate } = useCameraStore();
   const localRef = ref || useRef();
-  const localAngleRef = useRef(planetAngles[name] || 0); // Initialize with saved angle or 0
+  const localAngleRef = useRef(planetAngles[name] || 0);
   const cloudsRef = useRef();
 
   const [texturesLoaded, setTexturesLoaded] = useState(false);
-  // calculating scaled values
+
   const scaledOrbitalRadius = orbitalRadius * (isSurfaceCameraActive ? .0001 : distanceScaleFactor);
   const scaledRadius = radius * sizeScaleFactor;
-  // const scaledOrbitalSpeed = orbitalSpeed * simSpeed;
   let rotationSpeed = rotationPeriod ? (2 * Math.PI) / (rotationPeriod * 3600) : 0;
   rotationSpeed *= rotationSpeedScaleFactor;
 
-  const isPlanetSelected = selectedPlanet && selectedPlanet.name === name; // clicked planet
+  const isPlanetSelected = selectedPlanet && selectedPlanet.name === name;
   const detailLevel = isPlanetSelected ? 64 : 32;
 
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
-  const meshRef = useRef();
-  const saturnRingRef = useRef();
+  const meshRef = useRef(null);
+  const satelliteRef = useRef(null);
+  const satelliteAngleRef = useRef(0);
 
-  // scale planet size based on distance. Also use to toggle textures on/off
   const [scale, setScale] = useState(scaledRadius);
   const textSize = useRef(1);
   const [showTextures, setShowTextures] = useState(false);
   const textureDisplayDistance = 500;
   const [orbitPathOpacity, setOrbitPathOpacity] = useState(1);
+  // const [satelliteZRotation, setSatelliteZRotation] = useState(0);
 
   useFrame((state, delta) => {
-    // Adjust delta based on simulation speed (simSpeed)
     const adjustedDelta = delta * simSpeed;
 
-    // Update planet's orbital position
-    const planetOrbitalSpeed = (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60); // in Earth days
+    const planetOrbitalSpeed = (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60);
 
-    // Initialize the angle if it's the first frame
     if (localAngleRef.current === 0) {
-      localAngleRef.current = initialOrbitalAngle * (Math.PI / 180); // Convert to radians 
+      localAngleRef.current = initialOrbitalAngle * (Math.PI / 180);
     } else {
       localAngleRef.current -= planetOrbitalSpeed * adjustedDelta;
     }
@@ -85,36 +79,40 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
     const z = scaledOrbitalRadius * Math.sin(localAngleRef.current);
 
     if (localRef.current) {
-      // Calculate the orbital inclination effect
-      const planetInclination = axialTilt * (Math.PI / 180); // Convert to radians
-      const inclination = orbitalInclination * (Math.PI / 180); // Convert to radians
+      const planetInclination = axialTilt * (Math.PI / 180);
+      const inclination = orbitalInclination * (Math.PI / 180);
       const y = Math.sin(inclination) * scaledOrbitalRadius * Math.sin(localAngleRef.current);
 
-      localRef.current.position.set(x, y, z); // Now includes the y position adjusted by inclination
+      localRef.current.position.set(x, y, z);
       updatePlanetPosition(name, { x, y, z });
 
-      // Planet rotation on its own axis
       if (rotationPeriod) {
-        // Calculate rotation speed and increment
-        const rotationPeriodInSeconds = rotationPeriod * 3600; // Convert hours to seconds
-        const rotationSpeed = (2 * Math.PI) / rotationPeriodInSeconds; // radians per second
+        const rotationPeriodInSeconds = rotationPeriod * 3600;
+        const rotationSpeed = (2 * Math.PI) / rotationPeriodInSeconds;
         const rotationIncrement = rotationSpeed * adjustedDelta;
 
-        // Increment the rotation
         const yAxis = new THREE.Vector3(0, 1, 0);
         meshRef.current.rotateOnAxis(yAxis, rotationIncrement);
 
-        // Check for a complete rotation
         if (localRef.current.rotation.y >= 2 * Math.PI && isPlanetSelected) {
-          localRef.current.rotation.y %= 2 * Math.PI; // Reset rotation for next cycle
+          localRef.current.rotation.y %= 2 * Math.PI;
         }
-        if (saturnRingRef.current) { // rotate saturn's rings
-          saturnRingRef.current.rotation.y += rotationIncrement;
-        }
+
         if (cloudsRef.current) {
-          cloudsRef.current.rotation.y += rotationIncrement * 1.2; // rotate faster than planet
+          cloudsRef.current.rotation.y += rotationIncrement * 1.2;
         }
       }
+
+      // Update satellite position to orbit around the Earth
+      // if (satelliteRef.current) {
+      //   satelliteAngleRef.current += adjustedDelta * 0.002; // Decrementing the angle for opposite direction
+      //   const satelliteX = scaledRadius * 1.2 * Math.cos(satelliteAngleRef.current);
+      //   const satelliteZ = scaledRadius * 1.2 * Math.sin(satelliteAngleRef.current);
+      //   satelliteRef.current.position.set(-satelliteX, 0, -satelliteZ);
+      //   satelliteRef.current.lookAt(localRef.current.position); // Make the satellite face the Earth
+      //   const newZRotation = adjustedDelta * 0.01;
+      //   setSatelliteZRotation((prevZRotation) => prevZRotation + newZRotation);
+      // }
 
       const distance = localRef.current.position.distanceTo(state.camera.position);
       if (distance / 100 <= scaledRadius) {
@@ -124,7 +122,6 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
       }
       setShowTextures(distance < textureDisplayDistance);
 
-      // Calculate orbit path opacity based on distance
       const maxDistance = scaledRadius * 100;
       const minDistance = scaledRadius * 10;
       const opacity = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
@@ -136,12 +133,11 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
     }
   });
 
-
   useEffect(() => {
     if (meshRef.current) {
-      meshRef.current.rotation.order = 'YXZ'; // to ensure the tilt is applied around the world Y, then rotation around local Y
-      meshRef.current.rotation.y = 0; // Reset initial Y rotation
-      meshRef.current.rotation.x = THREE.MathUtils.degToRad(axialTilt); // Apply axial tilt around the new local X after Y rotation reset
+      meshRef.current.rotation.order = 'YXZ';
+      meshRef.current.rotation.y = 0;
+      meshRef.current.rotation.x = THREE.MathUtils.degToRad(axialTilt);
     }
   }, [axialTilt, selectedPlanet]);
 
@@ -163,38 +159,32 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
     }
   }, [rotationPeriod, axialTilt]);
 
-
-  // Modify the handleClick to account for dragging
   const handleClick = e => {
     e.stopPropagation();
     if (isDragging) return;
-
     toggleDetailsMenu(true);
-
-    if (isPlanetSelected) return
-    setSelectedPlanet(mergedData);
     setSelectedMoon(null);
+    if (isPlanetSelected) return;
+    setSelectedPlanet(mergedData);
   };
 
-  // New handler for pointer down
   const handlePointerDown = e => {
     e.stopPropagation();
-    setIsDragging(false); // Reset dragging state
-    initialClickPosition.current = { x: e.clientX, y: e.clientY }; // Record initial click position
+    setIsDragging(false);
+    initialClickPosition.current = { x: e.clientX, y: e.clientY };
   };
 
   const handlePointerMove = e => {
-    // Calculate the distance moved
     const distanceMoved = Math.sqrt(
       Math.pow(e.clientX - initialClickPosition.current.x, 2) + Math.pow(e.clientY - initialClickPosition.current.y, 2)
     );
-    if (distanceMoved > 5) { // Threshold to consider as a drag
+    if (distanceMoved > 5) {
       setIsDragging(true);
     }
   };
 
   const handlePointerUp = e => {
-    setIsDragging(false); // Reset dragging state
+    setIsDragging(false);
   };
   const [isHovered, setIsHovered] = useState(false);
 
@@ -215,18 +205,15 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
     setAutoRotate(!autoRotate);
   };
 
-  // get moons data
   const moons = moonsData[name] || [];
-
 
   return (
     <>
-      {isPlanetSelected && localRef.current &&
-        <SatelliteCamera target={localRef.current} targetName={name} color={color} size={scaledRadius} satelliteCamera={satelliteCamera} toggleSatelliteCamera={toggleSatelliteCamera} />
+      {isPlanetSelected && !selectedMoon && localRef.current &&
+        <SatelliteCamera target={localRef.current} targetName={name} size={scaledRadius} satelliteCamera={satelliteCamera} toggleSatelliteCamera={toggleSatelliteCamera} />
       }
 
       <group ref={localRef}>
-        {/* Invisible mesh for interaction */}
         <mesh
           visible={false}
           onClick={handleClick}
@@ -256,7 +243,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
                 metalness={0.6}
                 roughness={0.8}
                 map={textures?.map}
-                onBuild={() => setTexturesLoaded(true)}   // load textures first then swap to basic material. Trick for color issues
+                onBuild={() => setTexturesLoaded(true)}
               />
               {name === "Earth" &&
                 <>
@@ -267,30 +254,32 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
                   <mesh ref={cloudsRef} key={`${name}-cloud_texture`}>
                     <sphereGeometry args={[scaledRadius * 1.005, detailLevel, detailLevel]} />
-                    <meshStandardMaterial alphaMap={textures?.clouds} transparent />
+                    <meshPhysicalMaterial alphaMap={textures?.clouds} transparent opacity={1.5} />
                   </mesh>
                 </>}
             </>
           }
-
         </mesh>
 
-
-        {/* Saturns rings */}
         {name === "Saturn" && showTextures && (
           <Rings innerRadius={scaledRadius * 1.2} outerRadius={scaledRadius * 2} height={0} rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} texture={textures?.ringTexture} detail={detailLevel * 2} />
         )}
-        {/* Uranus rings */}
         {name === "Uranus" && showTextures && (
           <Rings innerRadius={scaledRadius * 1.5} outerRadius={scaledRadius * 1.9} height={0} texture={textures?.ringTexture} detail={detailLevel * 2} rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} />
         )}
 
-        {/* Display planet names */}
+        {/* {name === "Earth" && isPlanetSelected &&
+          <Suspense fallback={null}>
+            <group ref={satelliteRef} >
+              <SatelliteModel scale={scaledRadius * .001} zRotation={satelliteZRotation} />
+            </group>
+          </Suspense>
+        } */}
+
         {(displayLabels && !isPlanetSelected || isHovered && !isPlanetSelected) && (
-          <Labels key={name} text={name} size={textSize?.current} position={[0, scale * 1.2 + textSize?.current, 0]} color={color} handleClick={handleClick} font={'../assets/fonts/Termina_Black.ttf'} />
+          <Labels key={name} text={name} size={textSize?.current} position={[0, scale * 1.2 + textSize?.current, 0]} color={color} handleClick={handleClick} handlePointerDown={handlePointerDown} font={'../assets/fonts/Termina_Black.ttf'} />
         )}
 
-        {/* Display planet names */}
         {(displayLabels && isPlanetSelected) && (
           <Html
             as='span'
@@ -315,10 +304,8 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
           </Html>
         )}
 
-
-        {/* Render moons */}
         {isPlanetSelected && moons.map((moon, index) => {
-          const shouldAlignWithTilt = ["Saturn", "Uranus"].includes(name);  // List planets whose moons should align with the axial tilt
+          const shouldAlignWithTilt = ["Saturn", "Uranus"].includes(name);
 
           return (
             <group key={`${name}-moon-group-${index}`} rotation={shouldAlignWithTilt ? [THREE.MathUtils.degToRad(axialTilt), 0, 0] : [0, 0, 0]}>
@@ -330,9 +317,8 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
             </group>
           );
         })}
+      </group>
 
-
-      </group >
       {orbitPaths && (
         <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} opacity={isPlanetSelected ? orbitPathOpacity : .5} hiRes={isPlanetSelected} />
       )}

@@ -54,7 +54,7 @@ const SharedCanvas = ({ children }) => {
         <Stats showPanel={2} />
 
         <Suspense fallback={<Loader />}>
-          <ambientLight intensity={0.05} />
+          <ambientLight intensity={0.02} />
           <pointLight color='#f6f3ea' intensity={2} position={[0, 0, 0]} key={selectedPlanet?.name || 'basic'} />
           {children}
         </Suspense>
