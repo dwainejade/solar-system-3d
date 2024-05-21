@@ -66,8 +66,8 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   // const [satelliteZRotation, setSatelliteZRotation] = useState(0);
 
   const earthParameters = {}
-  earthParameters.atmosphereDayColor = '#00aaff'
-  earthParameters.atmosphereTwilightColor = '#ff6600'
+  earthParameters.atmosphereDayColor = '#0088FF'
+  earthParameters.atmosphereTwilightColor = '#FF9D00'
 
   const sunDirectionRef = useRef(new THREE.Vector3(0, 0, 1));
   const earthMaterial = new THREE.ShaderMaterial({
@@ -258,9 +258,9 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
                     attach='material'
                     args={[earthMaterial]}
                   />
-                  <mesh ref={cloudsRef} key={`${name}-cloud_texture`} renderOrder={100}>
+                  <mesh ref={cloudsRef} key={`${name}-cloud_texture`} >
                     <sphereGeometry args={[Math.min(scaledRadius * 1.01), detailLevel, detailLevel]} />
-                    <meshStandardMaterial alphaMap={textures?.clouds} transparent opacity={.8} />
+                    <meshStandardMaterial alphaMap={textures?.clouds} transparent opacity={1} />
                   </mesh>
                 </>
               }

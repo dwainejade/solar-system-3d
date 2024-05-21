@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useState, Suspense } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { AdaptiveDpr, CameraControls, useTexture } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "@/store/store";
 import { sizeScaleFactor } from "@/data/planetsData";
@@ -13,11 +13,10 @@ import * as THREE from 'three';
 
 const SceneThree = () => {
   const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed } = useStore();
-  const { planetPositions, selectedPlanet, setSelectedPlanet, moonPositions, moonWorldPositions, selectedMoon, setSelectedMoon, planetsData } = usePlanetStore();
-  const { satelliteCamera, triggerReset, setTriggerReset, isCameraTransitioning, toggleCameraTransitioning, selectedMoonCameraActive, setSelectedMoonCameraActive, isZoomingToSun, toggleZoomingToSun } = useCameraStore();
+  const { planetPositions, selectedPlanet, setSelectedPlanet, selectedMoon, setSelectedMoon, planetsData } = usePlanetStore();
+  const { satelliteCamera, triggerReset, setTriggerReset, isCameraTransitioning, toggleCameraTransitioning, isZoomingToSun, toggleZoomingToSun } = useCameraStore();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
-  const [moonsParent, setMoonsParent] = useState(null);
 
   // A simplistic approach to calculate optimal distance
   const calculateOptimalDistance = (planetRadius) => {
@@ -68,7 +67,7 @@ const SceneThree = () => {
   // Handle camera adjustments when a planet is selected
   useFrame(() => {
     if (selectedPlanet && !selectedMoon && cameraControlsRef.current) {
-      setMoonsParent(selectedPlanet.name);
+      // setMoonsParent(selectedPlanet.name);
       setSelectedMoon(null)
       const planetPosition = planetPositions[selectedPlanet.name];
       if (planetPosition) {
@@ -161,6 +160,7 @@ const SceneThree = () => {
   });
   earthTextures.map.colorSpace = THREE.SRGBColorSpace
   earthTextures.night.colorSpace = THREE.SRGBColorSpace
+  earthTextures.clouds.colorSpace = THREE.SRGBColorSpace
 
   // camera settings
   const cameraConfig = {
