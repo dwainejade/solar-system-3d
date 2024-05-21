@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import useStore, { usePlanetStore } from "../store/store";
+import useStore, { usePlanetStore, useCameraStore } from "../store/store";
 import { sizeScaleFactor } from "../data/planetsData";
 import { useFrame } from "@react-three/fiber";
 // import { Html } from "@react-three/drei";
@@ -8,9 +8,10 @@ import { EffectComposer, GodRays } from "@react-three/postprocessing";
 
 
 const Sun = ({ position, resetCamera, textures }) => {
+  const { selectedPlanet, setSelectedPlanet, planetsData } = usePlanetStore();
+  const { isZoomingToSun, toggleZoomingToSun } = useCameraStore();
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
-  const { setSelectedPlanet, planetsData } = usePlanetStore();
   const { simSpeed } = useStore();
   const { radius, name, rotationPeriod } = planetsData.Sun
   const sunRadius = radius * sizeScaleFactor
@@ -18,8 +19,12 @@ const Sun = ({ position, resetCamera, textures }) => {
   // Modify the handleClick to account for dragging
   const handleClick = e => {
     e.stopPropagation();
+    if (selectedPlanet?.name === name) {
+      return
+    }
     if (!isDragging) {
       setSelectedPlanet(planetsData.Sun);
+      toggleZoomingToSun(true);
     }
   };
 

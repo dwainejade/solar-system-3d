@@ -11,7 +11,7 @@ const SharedCanvas = ({ children }) => {
   const { fullscreen, isLoading, toggleLoading } = useStore();
   const { selectedPlanet } = usePlanetStore();
   const { errors, loaded } = useProgress();
-  const total = 24
+  const total = 19
   const progressPercentage = (loaded / total) * 100;
 
   useEffect(() => {
@@ -23,7 +23,6 @@ const SharedCanvas = ({ children }) => {
     } else {
       toggleLoading(true);
     }
-
   }, [errors, progressPercentage, toggleLoading]);
 
   const Loader = () => {
@@ -49,7 +48,7 @@ const SharedCanvas = ({ children }) => {
           alpha: false,
           logarithmicDepthBuffer: true,
         }}
-        camera={{ fov: 50, position: [5000, 5000, 5000], near: 0.1, far: 1000000 }}
+        camera={{ fov: 50, position: [20000, 20000, 20000], near: 0.1, far: 1000000 }}
       >
         <Stats showPanel={2} />
 
@@ -58,7 +57,7 @@ const SharedCanvas = ({ children }) => {
           <pointLight color='#f6f3ea' intensity={2} position={[0, 0, 0]} key={selectedPlanet?.name || 'basic'} />
           {children}
         </Suspense>
-        {/* <Preload all /> */}
+        <Preload all />
       </Canvas>
       {!isLoading && <Menu />}
     </div>

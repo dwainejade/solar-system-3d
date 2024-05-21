@@ -14,7 +14,7 @@ const Menu = () => {
     selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels, planetsData,
     resetPlanetsData, showResetPlanetModal, showResetAllModal, toggleResetAllModal, orbitPaths, toggleOrbitPaths,
   } = usePlanetStore();
-  const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning, satelliteCamera, autoRotate } = useCameraStore();
+  const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning, satelliteCamera, autoRotate, isZoomingToSun } = useCameraStore();
 
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [textClass, setTextClass] = useState('');
@@ -184,7 +184,7 @@ const Menu = () => {
       {/* Details menu */}
       <div
         className={`details-menu ${selectedPlanet &&
-          (!isCameraTransitioning && showDetailsMenu && satelliteCamera || selectedPlanet?.name === "Sun")
+          (!isCameraTransitioning && showDetailsMenu && satelliteCamera || selectedPlanet?.name === "Sun" && !isZoomingToSun)
           ? "open"
           : "closed"
           }`}

@@ -9,15 +9,15 @@ import Sun from "@/components/Sun";
 import Planet from "@/components/PlanetBasic";
 import Stars from "@/components/Stars"
 import { useFrame } from "@react-three/fiber";
+import * as THREE from 'three';
 
 const SceneThree = () => {
   const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed } = useStore();
   const { planetPositions, selectedPlanet, setSelectedPlanet, moonPositions, moonWorldPositions, selectedMoon, setSelectedMoon, planetsData } = usePlanetStore();
-  const { satelliteCamera, triggerReset, setTriggerReset, isCameraTransitioning, toggleCameraTransitioning, selectedMoonCameraActive, setSelectedMoonCameraActive } = useCameraStore();
+  const { satelliteCamera, triggerReset, setTriggerReset, isCameraTransitioning, toggleCameraTransitioning, selectedMoonCameraActive, setSelectedMoonCameraActive, isZoomingToSun, toggleZoomingToSun } = useCameraStore();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
   const [moonsParent, setMoonsParent] = useState(null);
-  const [canInteract, setCanInteract] = useState(false)
 
   // A simplistic approach to calculate optimal distance
   const calculateOptimalDistance = (planetRadius) => {
@@ -60,7 +60,7 @@ const SceneThree = () => {
   //       // Use worldPosition instead of moonObject.position
   //       cameraControlsRef.current.setTarget(moonPosition.x, moonPosition.y, moonPosition.z, true);
   //       cameraControlsRef.current.dollyTo(optimalDistance, true);
-  //       setCanInteract(false);
+  //       toggleZoomingToSun(false);
   //     }
   //   }
   // });
@@ -77,17 +77,17 @@ const SceneThree = () => {
         setMinDistance(optimalDistance / 2);
         cameraControlsRef.current.setTarget(planetPosition.x, planetPosition.y, planetPosition.z, true);
         cameraControlsRef.current.dollyTo(optimalDistance, true);
-        setCanInteract(false)
+        toggleZoomingToSun(false)
       }
-      if (selectedPlanet.name === "Sun" && !canInteract) {
+      if (selectedPlanet.name === "Sun" && isZoomingToSun) {
         setMinDistance(200);
         cameraControlsRef.current.setTarget(0, 0, 0, true);
-        if (cameraControlsRef.current.distance < 210) setCanInteract(true)
+        if (cameraControlsRef.current.distance < 800) toggleZoomingToSun(false)
         cameraControlsRef.current.dollyTo(200, true);
       }
     }
   });
-
+  console.log(isZoomingToSun)
   // Handle resetting the camera from state
   useEffect(() => {
     if (resetCamera) {
@@ -109,10 +109,18 @@ const SceneThree = () => {
     //   setSimSpeed(0);
     // }
     if (!selectedPlanet && !selectedMoon) {
-      setCanInteract(false)
+      toggleZoomingToSun(false)
       setSimSpeed(prevSpeed);
       toggleCameraTransitioning(false);
     }
+    if (selectedPlanet?.name === "Sun") {
+      toggleZoomingToSun(true)
+      if (simSpeed === 0) {
+        setSimSpeed(prevSpeed)
+        toggleCameraTransitioning(false);
+      }
+    }
+
     cameraControlsRef.current?.camera.updateProjectionMatrix()
   }, [selectedPlanet, selectedMoon]);
 
@@ -151,6 +159,10 @@ const SceneThree = () => {
   const neptuneTextures = useTexture({
     map: "../assets/neptune/2k_neptune.jpg",
   });
+  earthTextures.map.colorSpace = THREE.SRGBColorSpace
+  earthTextures.map.anisotropy = 2
+  earthTextures.night.colorSpace = THREE.SRGBColorSpace
+  earthTextures.night.anisotropy = 2
 
   // camera settings
   const cameraConfig = {
@@ -158,7 +170,8 @@ const SceneThree = () => {
     smoothTime: .65,
     enableDamping: true,
     near: 0.001,
-    far: 1000000
+    far: 1000000,
+    enablePanning: false
   };
 
 
@@ -170,6 +183,7 @@ const SceneThree = () => {
           makeDefault={!satelliteCamera}
           {...cameraConfig}
           minDistance={minDistance}
+          enablePanning={false}
         />
       )}
 

@@ -8,7 +8,9 @@ import initialPlanetsData from '../data/planetsData';
 const useStore = create(
     (set, get) => ({
         isLoading: true,
-        toggleLoading: (newSate) => set(state => ({ isLoading: newSate })),
+        toggleLoading: (newSate) => set({ isLoading: newSate }),
+        isBackgroundLoaded: false,
+        toggleBackgroundLoaded: (newSate) => set({ isBackgroundLoaded: newSate }),
 
         simSpeed: 1, // 1 is realtime speed
         setSimSpeed: (newSpeed) => set({ simSpeed: newSpeed }),
@@ -98,6 +100,7 @@ const usePlanetStore = create(
         immer((set, get) => ({
             orbitPaths: true,
             toggleOrbitPaths: () => set(state => ({ orbitPaths: !state.orbitPaths })),
+
             displayLabels: false, // render planet names in scene
             toggleDisplayLabels: () => set((state) => ({ displayLabels: !state.displayLabels })),
 
@@ -198,6 +201,9 @@ const useCameraStore = create((set) => ({
 
     isCameraTransitioning: false,
     toggleCameraTransitioning: (newState) => set(() => ({ isCameraTransitioning: newState })),
+
+    isZoomingToSun: false,
+    toggleZoomingToSun: (newState) => set(() => ({ isZoomingToSun: newState })),
 
     autoRotate: false,
     setAutoRotate: (newState) => set(() => ({ autoRotate: newState })),
