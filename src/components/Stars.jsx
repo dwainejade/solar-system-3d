@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useThree } from '@react-three/fiber';
 import { CubeTextureLoader } from 'three';
 import useStore from '../store/store';
 
 function SkyBox({ texture }) {
   const { scene } = useThree();
+  const { toggleBackgroundLoaded } = useStore();
 
   useEffect(() => {
     scene.background = texture;
+    toggleBackgroundLoaded(true);
   }, [texture]);
 
   return null;
@@ -28,29 +30,26 @@ const Stars = () => {
       '../assets/stars/stars-cube-map/nz.png',
     ]);
 
-    const constellationsTexture = loader.load([
-      '../assets/stars/constellations-cube-map/px.png',
-      '../assets/stars/constellations-cube-map/nx.png',
-      '../assets/stars/constellations-cube-map/py.png',
-      '../assets/stars/constellations-cube-map/ny.png',
-      '../assets/stars/constellations-cube-map/pz.png',
-      '../assets/stars/constellations-cube-map/nz.png',
-    ]);
+    // const constellationsTexture = loader.load([
+    //   '../assets/stars/constellations-cube-map/px.png',
+    //   '../assets/stars/constellations-cube-map/nx.png',
+    //   '../assets/stars/constellations-cube-map/py.png',
+    //   '../assets/stars/constellations-cube-map/ny.png',
+    //   '../assets/stars/constellations-cube-map/pz.png',
+    //   '../assets/stars/constellations-cube-map/nz.png',
+    // ]);
 
-    setStarsTexture(showConstellations ? constellationsTexture : texture);
+    setStarsTexture(texture);
 
     return () => {
       texture.dispose();
-      constellationsTexture.dispose();
     };
   }, [showConstellations]);
 
   return (
-    <>
-      <SkyBox
-        showConstellations={showConstellations}
-        texture={starsTexture} />
-    </>
+    <Suspense fallback={null}>
+      <SkyBox texture={starsTexture} />
+    </Suspense>
   );
 };
 

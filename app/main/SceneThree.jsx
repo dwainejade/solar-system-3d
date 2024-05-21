@@ -160,9 +160,7 @@ const SceneThree = () => {
     map: "../assets/neptune/2k_neptune.jpg",
   });
   earthTextures.map.colorSpace = THREE.SRGBColorSpace
-  earthTextures.map.anisotropy = 2
   earthTextures.night.colorSpace = THREE.SRGBColorSpace
-  earthTextures.night.anisotropy = 2
 
   // camera settings
   const cameraConfig = {

@@ -208,6 +208,7 @@ const SatelliteCamera = ({ target, size, satelliteCamera, toggleSatelliteCamera,
         );
         const sphericalPosition = convertVectorToSpherical(relativePosition)
         cameraRef.current.updateProjectionMatrix();
+
         setSpherical(sphericalPosition);
         toggleSatelliteCamera(true);
         toggleCameraTransitioning(false);

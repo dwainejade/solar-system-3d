@@ -12,8 +12,10 @@ import { moonsData } from "@/data/moonsData";
 import { earthAtmosphereShader } from "../shaders/atmosphere";
 import Rings from "./Rings";
 // import SatelliteModel from "@/components/models/Satellite";
+import earthVertexShader from '../shaders/earth/vertex.glsl';
+import earthFragmentShader from '../shaders/earth/fragment.glsl';
 
-const Planet = forwardRef(({ name = 'Earth', textures, shaderMaterial }, ref) => {
+const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   const { planetsData } = usePlanetStore();
   const bodyData = planetsData[name];
 
@@ -55,8 +57,6 @@ const Planet = forwardRef(({ name = 'Earth', textures, shaderMaterial }, ref) =>
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
   const meshRef = useRef(null);
-  const satelliteRef = useRef(null);
-  const satelliteAngleRef = useRef(0);
 
   const [scale, setScale] = useState(scaledRadius);
   const textSize = useRef(1);
@@ -64,6 +64,23 @@ const Planet = forwardRef(({ name = 'Earth', textures, shaderMaterial }, ref) =>
   const textureDisplayDistance = 500;
   const [orbitPathOpacity, setOrbitPathOpacity] = useState(1);
   // const [satelliteZRotation, setSatelliteZRotation] = useState(0);
+
+  const earthParameters = {}
+  earthParameters.atmosphereDayColor = '#00aaff'
+  earthParameters.atmosphereTwilightColor = '#ff6600'
+
+  const sunDirectionRef = useRef(new THREE.Vector3(0, 0, 1));
+  const earthMaterial = new THREE.ShaderMaterial({
+    vertexShader: earthVertexShader,
+    fragmentShader: earthFragmentShader,
+    uniforms: {
+      uDayTexture: new THREE.Uniform(textures.map),
+      uNightTexture: new THREE.Uniform(textures.night),
+      uSunDirection: { value: sunDirectionRef.current },
+      uAtmosphereDayColor: new THREE.Uniform(new THREE.Color(earthParameters.atmosphereDayColor)),
+      uAtmosphereTwilightColor: new THREE.Uniform(new THREE.Color(earthParameters.atmosphereTwilightColor))
+    }
+  });
 
   useFrame((state, delta) => {
     const adjustedDelta = delta * simSpeed;
@@ -79,7 +96,6 @@ const Planet = forwardRef(({ name = 'Earth', textures, shaderMaterial }, ref) =>
     const z = scaledOrbitalRadius * Math.sin(localAngleRef.current);
 
     if (localRef.current) {
-      const planetInclination = axialTilt * (Math.PI / 180);
       const inclination = orbitalInclination * (Math.PI / 180);
       const y = Math.sin(inclination) * scaledOrbitalRadius * Math.sin(localAngleRef.current);
 
@@ -103,16 +119,11 @@ const Planet = forwardRef(({ name = 'Earth', textures, shaderMaterial }, ref) =>
         }
       }
 
-      // Update satellite position to orbit around the Earth
-      // if (satelliteRef.current) {
-      //   satelliteAngleRef.current += adjustedDelta * 0.002; // Decrementing the angle for opposite direction
-      //   const satelliteX = scaledRadius * 1.2 * Math.cos(satelliteAngleRef.current);
-      //   const satelliteZ = scaledRadius * 1.2 * Math.sin(satelliteAngleRef.current);
-      //   satelliteRef.current.position.set(-satelliteX, 0, -satelliteZ);
-      //   satelliteRef.current.lookAt(localRef.current.position); // Make the satellite face the Earth
-      //   const newZRotation = adjustedDelta * 0.01;
-      //   setSatelliteZRotation((prevZRotation) => prevZRotation + newZRotation);
-      // }
+      // Update the sun direction
+      sunDirectionRef.current.set(0, 0, 0).sub(localRef.current.position).normalize();
+      if (name === "Earth" && meshRef.current.material.uniforms?.uSunDirection) {
+        meshRef.current.material.uniforms.uSunDirection.value.copy(sunDirectionRef.current);
+      }
 
       const distance = localRef.current.position.distanceTo(state.camera.position);
       if (distance / 100 <= scaledRadius) {
@@ -121,7 +132,9 @@ const Planet = forwardRef(({ name = 'Earth', textures, shaderMaterial }, ref) =>
         setScale(distance / 100);
       }
       setShowTextures(distance < textureDisplayDistance);
-
+      if (name === "Earth") {
+        console.log(distance)
+      }
       const maxDistance = scaledRadius * 100;
       const minDistance = scaledRadius * 10;
       const opacity = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
@@ -141,23 +154,23 @@ const Planet = forwardRef(({ name = 'Earth', textures, shaderMaterial }, ref) =>
     }
   }, [axialTilt, selectedPlanet]);
 
-  useEffect(() => {
-    const specificDate = new Date(2023, 0, 1, 1, 45, 30);
-    const hourOfDay = specificDate.getHours();
-    const minuteOfHour = specificDate.getMinutes();
-    const secondOfMinute = specificDate.getSeconds();
+  // useEffect(() => {
+  //   const specificDate = new Date(2023, 0, 1, 1, 45, 30);
+  //   const hourOfDay = specificDate.getHours();
+  //   const minuteOfHour = specificDate.getMinutes();
+  //   const secondOfMinute = specificDate.getSeconds();
 
-    const currentTimeOfDayInSeconds = hourOfDay * 3600 + minuteOfHour * 60 + secondOfMinute;
-    const rotationPeriodInSeconds = rotationPeriod * 3600;
-    const initialRotationFraction = currentTimeOfDayInSeconds / rotationPeriodInSeconds;
-    const initialRotationAngleRadians = initialRotationFraction * 2 * Math.PI;
+  //   const currentTimeOfDayInSeconds = hourOfDay * 3600 + minuteOfHour * 60 + secondOfMinute;
+  //   const rotationPeriodInSeconds = rotationPeriod * 3600;
+  //   const initialRotationFraction = currentTimeOfDayInSeconds / rotationPeriodInSeconds;
+  //   const initialRotationAngleRadians = initialRotationFraction * 2 * Math.PI;
 
-    if (meshRef.current) {
-      meshRef.current.rotation.order = 'YXZ';
-      meshRef.current.rotation.y = initialRotationAngleRadians;
-      meshRef.current.rotation.x = THREE.MathUtils.degToRad(axialTilt);
-    }
-  }, [rotationPeriod, axialTilt]);
+  //   if (meshRef.current) {
+  //     meshRef.current.rotation.order = 'YXZ';
+  //     meshRef.current.rotation.y = initialRotationAngleRadians;
+  //     meshRef.current.rotation.x = THREE.MathUtils.degToRad(axialTilt);
+  //   }
+  // }, [rotationPeriod, axialTilt]);
 
   const handleClick = e => {
     e.stopPropagation();
@@ -235,28 +248,35 @@ const Planet = forwardRef(({ name = 'Earth', textures, shaderMaterial }, ref) =>
           key={isPlanetSelected ? name + '-textured' : name + '-basic'}
         >
           <sphereGeometry args={[(isPlanetSelected ? scaledRadius : scale), detailLevel, detailLevel]} />
-          {(!isPlanetSelected && texturesLoaded && !showTextures) ?
+          {(!isPlanetSelected && texturesLoaded) ?
             <meshBasicMaterial color={color} />
             :
             <>
+              {name === "Earth" && isPlanetSelected &&
+                <>
+                  <shaderMaterial
+                    attach='material'
+                    args={[earthMaterial]}
+                  />
+                  <mesh ref={cloudsRef} key={`${name}-cloud_texture`} renderOrder={100}>
+                    <sphereGeometry args={[Math.min(scaledRadius * 1.01), detailLevel, detailLevel]} />
+                    <meshStandardMaterial alphaMap={textures?.clouds} transparent opacity={.8} />
+                  </mesh>
+                </>
+              }
               <meshStandardMaterial
                 metalness={0.6}
                 roughness={0.8}
                 map={textures?.map}
                 onBuild={() => setTexturesLoaded(true)}
               />
-              {name === "Earth" &&
+              {/* {name === "Earth" &&
                 <>
                   <mesh key={`${name}-atmosphere`}>
                     <sphereGeometry args={[scaledRadius * 1.035, detailLevel, detailLevel]} />
                     <shaderMaterial args={[earthAtmosphereShader]} />
                   </mesh>
-
-                  <mesh ref={cloudsRef} key={`${name}-cloud_texture`}>
-                    <sphereGeometry args={[scaledRadius * 1.005, detailLevel, detailLevel]} />
-                    <meshPhysicalMaterial alphaMap={textures?.clouds} transparent opacity={1.5} />
-                  </mesh>
-                </>}
+                </>} */}
             </>
           }
         </mesh>
@@ -269,12 +289,12 @@ const Planet = forwardRef(({ name = 'Earth', textures, shaderMaterial }, ref) =>
         )}
 
         {/* {name === "Earth" && isPlanetSelected &&
-          <Suspense fallback={null}>
-            <group ref={satelliteRef} >
-              <SatelliteModel scale={scaledRadius * .001} zRotation={satelliteZRotation} />
-            </group>
-          </Suspense>
-        } */}
+  <Suspense fallback={null}>
+    <group ref={satelliteRef} >
+      <SatelliteModel scale={scaledRadius * .001} zRotation={satelliteZRotation} />
+    </group>
+  </Suspense>
+} */}
 
         {(displayLabels && !isPlanetSelected || isHovered && !isPlanetSelected) && (
           <Labels key={name} text={name} size={textSize?.current} position={[0, scale * 1.2 + textSize?.current, 0]} color={color} handleClick={handleClick} handlePointerDown={handlePointerDown} font={'../assets/fonts/Termina_Black.ttf'} />
@@ -320,9 +340,10 @@ const Planet = forwardRef(({ name = 'Earth', textures, shaderMaterial }, ref) =>
       </group>
 
       {orbitPaths && (
-        <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name} opacity={isPlanetSelected ? orbitPathOpacity : .5} hiRes={isPlanetSelected} />
+        <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name + "-orbit-path"} opacity={isPlanetSelected ? orbitPathOpacity : .5} hiRes={isPlanetSelected} />
       )}
     </>
+
   );
 });
 

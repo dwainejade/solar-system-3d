@@ -46,9 +46,8 @@ const SharedCanvas = ({ children }) => {
         gl={{
           antialias: true,
           alpha: false,
-          logarithmicDepthBuffer: true,
         }}
-        camera={{ fov: 50, position: [20000, 20000, 20000], near: 0.1, far: 1000000 }}
+        camera={{ fov: 50, position: [20000, 20000, 20000], near: 1, far: 1000000 }}
       >
         <Stats showPanel={2} />
 
