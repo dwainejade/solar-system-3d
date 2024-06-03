@@ -278,7 +278,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
       </group>
 
       {orbitPaths && (
-        <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name + "-orbit-path"} opacity={isPlanetSelected ? orbitPathOpacity : .5} hiRes={isPlanetSelected} />
+        <OrbitPath origin={orbitalOrigin} radius={scaledOrbitalRadius} orbitalInclination={orbitalInclination} color={color} name={name + "-orbit-path"} opacity={(isPlanetSelected || !selectedPlanet) ? orbitPathOpacity : .4} hiRes={isPlanetSelected} />
       )}
     </>
 
