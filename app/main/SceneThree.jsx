@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
-import { AdaptiveDpr, CameraControls, useTexture } from "@react-three/drei";
+import { CameraControls, useTexture } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "@/store/store";
 import { sizeScaleFactor } from "@/data/planetsData";
 // import { moonsData, moonSizeScaleFactor } from "@/data/moonsData";
@@ -33,6 +33,7 @@ const SceneThree = () => {
     // Set the target to the sun's position
     cameraControlsRef.current.setTarget(sunSettings.position.x, sunSettings.position.y, sunSettings.position.z, true);
     // Define an isometric position for the camera
+    console.log(cameraControlsRef.current)
     const isometricPosition = {
       x: sunSettings.position.x + -2000,
       y: sunSettings.position.y + 1000,
@@ -86,6 +87,10 @@ const SceneThree = () => {
       }
     }
   });
+  useEffect(() => {
+    if (cameraControlsRef.current && cameraControlsRef.current.currentAction === 2) return
+    console.log(cameraControlsRef.current.currentAction)
+  }, [cameraControlsRef.current])
 
   // Handle resetting the camera from state
   useEffect(() => {
@@ -123,6 +128,19 @@ const SceneThree = () => {
     cameraControlsRef.current?.camera.updateProjectionMatrix()
   }, [selectedPlanet, selectedMoon]);
 
+  useEffect(() => {
+    const handleMouseDown = (event) => {
+      if (event.button === 1) { // 1 is the button code for the middle mouse button
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener('mousedown', handleMouseDown);
+
+    return () => {
+      window.removeEventListener('mousedown', handleMouseDown);
+    };
+  }, []);
 
   const earthTextures = useTexture({
     map: "../assets/earth/8k_earth_daymap.jpg",
@@ -162,7 +180,6 @@ const SceneThree = () => {
     enableDamping: true,
     near: 0.1,
     far: 1000000,
-    enablePanning: false
   };
 
 
@@ -174,12 +191,11 @@ const SceneThree = () => {
           makeDefault={!satelliteCamera}
           {...cameraConfig}
           minDistance={minDistance}
-          enablePanning={false}
+          maxZoom={10}
         />
       )}
 
       <Stars />
-      <AdaptiveDpr pixelated />
 
       <Planet name="Earth" textures={earthTextures} />
       <Planet name="Mars" textures={marsTextures} />

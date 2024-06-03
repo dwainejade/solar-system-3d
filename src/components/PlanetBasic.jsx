@@ -227,10 +227,10 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         </mesh>
 
         {name === "Saturn" && showTextures && (
-          <Rings innerRadius={scaledRadius * 1.2} outerRadius={scaledRadius * 2} height={0} rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} texture={textures?.ringTexture} detail={detailLevel} />
+          <Rings key={detailLevel + name + '-ring'} innerRadius={scaledRadius * 1.2} outerRadius={scaledRadius * 2} height={0} rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} texture={isPlanetSelected ? textures?.ringTexture : null} detail={Math.max(detailLevel, 32)} />
         )}
         {name === "Uranus" && showTextures && (
-          <Rings innerRadius={scaledRadius * 1.5} outerRadius={scaledRadius * 1.9} height={0} texture={textures?.ringTexture} detail={detailLevel} rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} />
+          <Rings key={detailLevel + name + '-ring'} innerRadius={scaledRadius * 1.5} outerRadius={scaledRadius * 1.9} height={0} texture={isPlanetSelected ? textures?.ringTexture : null} detail={Math.max(detailLevel, 32)} rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} />
         )}
 
         {(displayLabels && !isPlanetSelected || isHovered && !isPlanetSelected) && (
