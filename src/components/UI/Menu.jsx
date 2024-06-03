@@ -7,8 +7,8 @@ import FocusLock from 'react-focus-lock';
 
 const Menu = () => {
   const {
-    simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, fullscreen, toggleFullscreen,
-    showDetailsMenu
+    simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, toggleFullscreen,
+    showDetailsMenu, toggleDetailsMenu
   } = useStore();
   const {
     selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels, planetsData,
@@ -16,6 +16,7 @@ const Menu = () => {
   } = usePlanetStore();
   const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning, satelliteCamera, autoRotate, isZoomingToSun } = useCameraStore();
 
+  const [firstRender, setFirstRender] = useState(true);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [textClass, setTextClass] = useState('');
   const [displayText, setDisplayText] = useState('');
@@ -72,6 +73,7 @@ const Menu = () => {
     } else {
       const newSelectedPlanet = planetsData[newSelectedPlanetName];
       setSelectedPlanet(newSelectedPlanet);
+      toggleDetailsMenu(true);
     }
   };
 
@@ -81,21 +83,28 @@ const Menu = () => {
   }, []);
 
   useEffect(() => {
+    // do not show on initial render
+    if (firstRender) {
+      setFirstRender(false);
+      return
+    }
+
     setTextClass('slideIn');
     setDisplayText(`Auto-Rotate ${autoRotate ? "On" : "Off"}`);
     const timer1 = setTimeout(() => {
       setTextClass('slideOut');
-    }, 2000); // Duration for staying visible after slide in
+    }, 1500); // display text for 1.5 seconds
 
     const timer2 = setTimeout(() => {
       setDisplayText('');
-    }, 3000); // Total duration for the text effect
+    }, 2500); // Total duration
 
     return () => {
       clearTimeout(timer1);
       clearTimeout(timer2);
     };
   }, [autoRotate]);
+
 
   return (
     <div className={`menu-wrapper ${showResetAllModal || showResetPlanetModal ? "disabled" : "enabled"}`}>
@@ -191,7 +200,9 @@ const Menu = () => {
         key={selectedPlanet?.name}
       >
         <div className="details-menu-inner">
-          <DetailsMenu />
+          {selectedPlanet?.name &&
+            <DetailsMenu />
+          }
         </div>
       </div>
 

@@ -38,7 +38,7 @@ const DetailsMenu = () => {
   const { isEditing, setIsEditing, showDetailsMenu, toggleDetailsMenu } = useStore();
   const { selectedPlanet, updatePlanetData, planetsData, setSelectedPlanet, showResetPlanetModal, showResetAllModal, toggleResetPlanetModal } = usePlanetStore();
   const [editablePlanet, setEditablePlanet] = useState({});
-  const [gravitationalPull, setGravitationalPull] = useState(0)
+  // const [gravitationalPull, setGravitationalPull] = useState(0)
 
   useEffect(() => {
     // When selectedPlanet changes, update the local state to reflect the current data
