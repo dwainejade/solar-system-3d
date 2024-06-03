@@ -33,7 +33,6 @@ const SceneThree = () => {
     // Set the target to the sun's position
     cameraControlsRef.current.setTarget(sunSettings.position.x, sunSettings.position.y, sunSettings.position.z, true);
     // Define an isometric position for the camera
-    console.log(cameraControlsRef.current)
     const isometricPosition = {
       x: sunSettings.position.x + -2000,
       y: sunSettings.position.y + 1000,
@@ -87,10 +86,7 @@ const SceneThree = () => {
       }
     }
   });
-  useEffect(() => {
-    if (cameraControlsRef.current && cameraControlsRef.current.currentAction === 2) return
-    console.log(cameraControlsRef.current.currentAction)
-  }, [cameraControlsRef.current])
+
 
   // Handle resetting the camera from state
   useEffect(() => {
@@ -132,6 +128,9 @@ const SceneThree = () => {
     const handleMouseDown = (event) => {
       if (event.button === 1) { // 1 is the button code for the middle mouse button
         event.preventDefault();
+      }
+      if (cameraControlsRef.current) { // remove pannig
+        cameraControlsRef.current.mouseButtons.right = 1
       }
     };
 
