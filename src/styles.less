@@ -61,9 +61,11 @@ body {
 
 .Main {
   height: 100%;
-  max-height: 520px;
+  max-height: 550px;
   width: 100%;
-  max-width: 900px;
+  max-width: 1100px;
+  margin: 0 auto;
+
   display: flex;
   flex-direction: row;
   overflow: hidden;
@@ -94,9 +96,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100%;
-    max-height: 520px;
     width: 100%;
-    max-width: 900px;
     background-color: rgba(0, 0, 0, 0.85);
     color: white;
 
@@ -106,9 +106,6 @@ body {
     }
 
     .loading-bar-container {
-      // display: flex;
-      // justify-content: center;
-      // align-items: center;
       width: 100%;
       height: 20px;
       background-color: #444;
@@ -121,8 +118,8 @@ body {
         transition: width 2s ease;
       }
       .orbit-icon {
-        width: 60px; /* Adjust the size as needed */
-        height: 60px;
+        width: 200px; /* Adjust the size as needed */
+        height: 200px;
         // display: block;
         margin: 0 auto 20px; /* Centers the icon and adds space below */
         animation: spin 2s linear infinite;
@@ -148,7 +145,7 @@ body {
   }
 
   .menu-wrapper {
-    z-index: 999;
+    z-index: 300;
     position: absolute;
     left: 0;
     top: 0;
@@ -166,37 +163,20 @@ body {
       flex-direction: row;
       justify-content: space-evenly;
       align-items: center;
-      height: 100px;
+      height: 110px;
       width: 100%;
       max-width: 540px;
+      min-width: 415px;
+
       color: @label-color;
       margin: auto auto 0 auto;
       pointer-events: auto;
       padding: 1.5%;
       border-radius: 6px 6px 0 0;
       transition: bottom 0.3s ease-in-out;
-      &::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: radial-gradient(circle, #4a3c6f, #3e3161, #332654, #271b47, #1c113a);
-        clip-path: polygon(98% 0, 100% 12%, 100% 50%, 99% 60%, 99% 100%, 1% 100%, 1% 60%, 0 50%, 0 12%, 2% 0);
-        z-index: -1;
-      }
-      &::after {
-        content: "";
-        position: absolute;
-        top: -2%;
-        left: -0.5%;
-        width: 101%;
-        height: 102%;
-        background-color: #41cdec;
-        clip-path: polygon(98% 0, 100% 12%, 100% 50%, 99% 60%, 99% 100%, 1% 100%, 1% 60%, 0 50%, 0 12%, 2% 0);
-        z-index: -2;
-      }
+      background: url("../public/assets/ui/bottom_menu_bg.png") no-repeat center center;
+      background-size: 100% 100%;
+
       &.open {
         bottom: 0; /* Slide up */
 
@@ -212,7 +192,7 @@ body {
         height: 40px;
         border-radius: 20px;
         border: #4cddfb 2px solid;
-        background: url("../public/assets/icons/chevron.svg") no-repeat center center;
+        background: url("../public/assets/ui/icons/chevron.svg") no-repeat center center;
         background-size: 70%;
         background-color: #f46a68;
         transition: rotate ease 0.3s;
@@ -255,15 +235,23 @@ body {
       position: absolute;
       z-index: 200;
       height: fit-content;
-      width: 250px;
-      top: 15%;
+      width: 270px;
+      top: 10%;
       right: -100%;
       display: flex;
       flex-direction: column;
       justify-content: center;
       border-radius: 6px 0 0 6px;
       pointer-events: auto;
-      transition: all 0.3s ease-out;
+      background: url("../public/assets/ui/side_panel_bg.png") no-repeat center center;
+      background-size: 100% 100%;
+      opacity: 0;
+
+      &.open {
+        right: 0;
+        opacity: 1;
+        transition: right 0.3s ease-out;
+      }
 
       .details-menu-inner {
         position: relative;
@@ -271,34 +259,7 @@ body {
         height: 100%;
         top: 0;
         left: 0;
-        padding: 4%;
-        &::before {
-          content: "";
-          position: absolute;
-          top: 0%;
-          left: 0%;
-          width: 100%;
-          height: 100%;
-          background-image: linear-gradient(to right top, #201047, #271649, #2d1d4b, #33234d, #392a4f);
-          clip-path: polygon(100% 0, 100% 100%, 5% 100%, 0 95%, 0 5%, 5% 0);
-          z-index: -1;
-        }
-
-        &::after {
-          content: "";
-          position: absolute;
-          top: -1%;
-          right: 0%;
-          width: 103%;
-          height: 102%;
-          background-image: linear-gradient(to bottom, #5fe5ff, #74cbff, #bda6fc, #ef7cbc, #ef6866);
-          clip-path: polygon(2% 20%, 2% 5%, 7% 0, 100% 0, 100% 100%, 7% 100%, 2% 95%, 2% 50%, 0 45%, 0 25%);
-          z-index: -2;
-        }
-      }
-
-      &.open {
-        right: 0;
+        padding: 8%;
       }
 
       h2 {
@@ -309,15 +270,27 @@ body {
         margin-bottom: 4px;
         color: #e1cdaa;
       }
-      // .planet-details {
-      //   &.editing input,
-      //   .unit {
-      //     color: @text-color-2;
-      //   }
-      //   &.saved .unit {
-      //     color: #000;
-      //   }
-      // }
+      .planet-details {
+        &.saved {
+          input.value {
+            display: inline;
+            min-width: 0px;
+            width: min-content;
+            padding: 0;
+            color: #fff;
+            border-color: transparent;
+            background: transparent;
+          }
+        }
+        &.editing {
+          input.value {
+            color: #483939;
+          }
+        }
+      }
+      .measurement-unit {
+        margin-left: 5px;
+      }
 
       .item {
         position: relative;
@@ -397,12 +370,12 @@ body {
   }
   .reset-all-btn {
     left: 0;
-    background: url("../public/assets/icons/reset.svg") no-repeat center center;
+    background: url("../public/assets/ui/icons/reset_icon.svg") no-repeat center center;
     background-size: 70%;
   }
   .fullscreen-btn {
     right: 0;
-    background: url("../public/assets/icons/fullscreen.svg") no-repeat center center;
+    background: url("../public/assets/ui/icons/fullscreen_icon.svg") no-repeat center center;
     background-size: 80%;
   }
 
@@ -482,7 +455,7 @@ body {
   .planet-label {
     text-transform: uppercase;
     font-weight: 600;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-family: "Termina-Black", Verdana, Geneva, Tahoma, sans-serif;
     font-size: 0.8rem;
     width: 2px;
     height: 2px;
@@ -511,4 +484,113 @@ body {
     opacity: 1;
     position: relative;
   }
+}
+.menu-wrapper .backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 400;
+}
+.menu-wrapper.disabled {
+  pointer-events: none;
+  & .planet-details .btn {
+    pointer-events: none;
+  }
+}
+
+// RESET MODAL
+.reset-modal-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 500;
+
+  .content {
+    width: 400px;
+    background: url("../public/assets/ui/dialog_box_bg.png") no-repeat center center;
+    background-size: 100% 100%;
+    padding: 2%;
+    pointer-events: auto;
+    color: #f19a00;
+    font-size: 1.1rem;
+    .top-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      .warning-icon {
+        width: 40px;
+        height: 40px;
+      }
+    }
+    .btn-con {
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      gap: 4%;
+      .confirm-btn {
+        background-color: @btn-color-3;
+      }
+      .cancel-btn {
+        background-color: @btn-color-4;
+      }
+      .btn {
+        cursor: pointer;
+        width: 120px;
+        height: 38px;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// dropdown styling
+#planetSelection,
+#simSpeedSelect {
+  background-color: #fff5e6;
+  color: #717171;
+  font-weight: bold;
+  border: none;
+  width: 120px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border-radius: 0;
+}
+.auto-rotate-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  color: white;
+  transition:
+    opacity 0.4s ease-in-out,
+    transform 0.4s ease-in-out;
+  opacity: 0;
+  transform: translateY(-20px); /* Start position for slide-in effect */
+}
+
+.slideIn {
+  opacity: 1;
+  transform: translateY(10px); /* End position for slide-in effect */
+}
+
+.slideOut {
+  opacity: 0;
+  transform: translateY(-20px); /* Start position for slide-out effect */
 }

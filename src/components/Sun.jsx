@@ -1,26 +1,28 @@
 import React, { useState, useRef } from "react";
-import { usePlanetStore } from "../store/store";
+import useStore, { usePlanetStore, useCameraStore } from "../store/store";
 import { sizeScaleFactor } from "../data/planetsData";
-// import { Html } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
+import { sunOuterShader } from "../shaders/atmosphere";
 
-const Sun = ({ position, resetCamera, textures }) => {
+
+const Sun = ({ position, textures }) => {
+  const { selectedPlanet, setSelectedPlanet, planetsData } = usePlanetStore();
+  const { toggleZoomingToSun } = useCameraStore();
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
-  const { selectedPlanet, setSelectedPlanet, displayLabels, planetsData } = usePlanetStore();
-  const sunRadius = planetsData["Sun"].radius * sizeScaleFactor
+  const { simSpeed } = useStore();
+  const { radius, name, rotationPeriod } = planetsData.Sun
+  const sunRadius = radius * sizeScaleFactor
 
   // Modify the handleClick to account for dragging
   const handleClick = e => {
     e.stopPropagation();
+    if (selectedPlanet?.name === name) {
+      return
+    }
     if (!isDragging) {
-      // Your original click handling logic
-      // This now only triggers if the mesh wasn't dragged
-      if (selectedPlanet && selectedPlanet.name === "Sun") {
-        setSelectedPlanet(null);
-        resetCamera();
-      } else {
-        setSelectedPlanet(planetsData.Sun);
-      }
+      setSelectedPlanet(planetsData.Sun);
+      toggleZoomingToSun(true);
     }
   };
 
@@ -55,9 +57,32 @@ const Sun = ({ position, resetCamera, textures }) => {
     document.body.style.cursor = "auto";
   };
 
+  // scale planet size based on distance. Also use to toggle textures on/off
+  const localRef = useRef()
+  const [scale, setScale] = useState(sunRadius);
+  // const [shaderScale, setShaderScale] = useState(sunRadius * 1.08);
+  useFrame((state, delta) => {
+    const distance = localRef.current.position.distanceTo(state.camera.position);
+    if (distance / 100 <= sunRadius) {
+      setScale(sunRadius);
+    } else {
+      setScale(distance / 100);
+    }
+    // add rotation based on planetsData.Sun.rotationPeriod
+    const adjustedDelta = delta * simSpeed;
+    const rotationPeriodInSeconds = rotationPeriod * 3600; // Convert hours to seconds
+    const rotationSpeed = (2 * Math.PI) / rotationPeriodInSeconds; // radians per second
+    const rotationIncrement = rotationSpeed * adjustedDelta;
+    if (localRef.current) {
+      localRef.current.rotation.y += rotationIncrement;
+    }
+  });
+
+
   return (
     <group>
       <mesh
+        ref={localRef}
         position={position}
         onClick={handleClick}
         onPointerDown={handlePointerDown}
@@ -66,33 +91,19 @@ const Sun = ({ position, resetCamera, textures }) => {
         onPointerOver={handlePointerOver}
         onPointerOut={handlePointerOut}
       >
-        <sphereGeometry args={[sunRadius, 64, 64]} />
+        <sphereGeometry args={[scale, 32, 32]} />
         {textures ? (
-          <meshPhysicalMaterial map={textures.map} color={[10, 3, 0]} toneMapped={false} zIndexRange={[100 - 1]} />
+          <meshBasicMaterial map={textures.map} color={[10, 3, 0]} toneMapped={false} zIndexRange={[100 - 1]} />
         ) : (
-          <meshBasicMaterial color={[10, 3, 0]} toneMapped={false} />
+          <meshBasicMaterial color={[10, 4, 0]} toneMapped={false} />
         )}
       </mesh>
-      {/* Display planet names */}
-      {/* {displayLabels ? (
-        <Html as='div' center occlude position-y={60} zIndexRange={[100, 0]}>
-          <div
-            className='planet-label'
-            style={{ color: "rgb(255, 255, 0)" }}
-            onClick={handleClick}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerOver={handlePointerOver}
-            onPointerOut={handlePointerOut}
-          >
-            Sun
-          </div>
-        </Html>
-      ) : (
-        null
-      )} */}
+      <mesh key={`${name}-atmosphere`}>
+        <sphereGeometry args={[scale * 1.08, 32, 32]} />
+        <shaderMaterial args={[sunOuterShader]} />
+      </mesh>
     </group>
+
   );
 };
 

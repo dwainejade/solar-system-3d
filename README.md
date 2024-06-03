@@ -20,10 +20,9 @@ npm run preview
 
 - [x] Add labels to planets
 - [x] Match realtime orbit speeds
-- [x] Implement onclick interactions for detailed planet information
-- [ ] Angle orbit paths to reflect real orbital inclinations
+- [x] Implement onClick interactions for detailed planet information
+- [x] Ability to move forward and backward in time
+- [x] Angle orbit paths to reflect real orbital inclinations
 - [x] Save and manage planet positions
-- [ ] Integrate gravitational force
-- [ ] Change orbital paths to dynamic trails
-- [ ] Allow users to adjust the Moon's orbital radius
-- [ ] Incorporate data from the NASA API
+- [x] Add moons to planets
+- [x] Add stars and constellations

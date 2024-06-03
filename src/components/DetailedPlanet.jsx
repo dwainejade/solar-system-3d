@@ -31,8 +31,8 @@ const Planet = forwardRef(({ bodyData, textures }, ref) => {
 
   const { map, normal, specular } = textures
 
-  const { simSpeed, updateRotationCount, incrementDate, simulationDate, orbitPaths } = useStore();
-  const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels, setSelectedMoon } = usePlanetStore();
+  const { simSpeed, updateRotationCount, incrementDate, simulationDate } = useStore();
+  const { planetAngles, updatePlanetPosition, selectedPlanet, setSelectedPlanet, displayLabels, setSelectedMoon, orbitPaths } = usePlanetStore();
   const { setSurfacePoint, surfacePoint, setSurfaceNormal, surfaceNormal, setCameraSurfacePoint, isSurfaceCameraActive } = useCameraStore();
 
   const localRef = ref || useRef();

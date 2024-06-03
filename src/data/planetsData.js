@@ -12,7 +12,7 @@ const sunData = {
     orbitalPeriod: 0, // No orbital period
     initialOrbitalAngle: 0, // The sun can be ZERO since it does not move
     axialTilt: 7.25, // in degrees to the ecliptic plane
-    rotationPeriod: 609.12, // in hours (varies by latitude)
+    rotationPeriod: 700, // in hours (varies by latitude)
     surfaceTemp: 5505, // in Celsius (average effective temperature)
     color: "#FFFF00", // Bright yellow color
     gravity: 274, // in m/s² (surface gravity)
@@ -115,7 +115,7 @@ const jupiterData = {
     interestPoints: [
         {
             title: "Great Red Spot",
-            coordinates: [-5, 5, 0] // Example coordinates
+            coordinates: [-1, 1, 1] // Example coordinates
         }
     ]
 };
@@ -213,7 +213,7 @@ const planetsData = {
     Jupiter: jupiterData,
     Saturn: saturnData,
     Uranus: uranusData,
-    Neptune: neptuneData,
+    Neptune: neptuneData
 };
 export default planetsData;
 

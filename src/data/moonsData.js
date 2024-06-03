@@ -174,9 +174,8 @@ export const moonsData = {
             mass: 3.527e21,
             orbitalRadius: 436300, // Distance in kilometers
             radius: 788.9, // Radius in kilometers
-            color: "lightblue",
             orbitalPeriod: 8.706, // Orbital period in Earth days
-            orbitalInclination: 0.14,
+            orbitalInclination: 0.14, // Inclination in degrees
             color: "grey",
         },
         {
@@ -189,6 +188,7 @@ export const moonsData = {
             color: "grey",
         },
     ],
+
     Neptune: [
         {
             name: "Nereid",

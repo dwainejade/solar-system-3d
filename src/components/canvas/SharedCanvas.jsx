@@ -1,25 +1,29 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Html, Preload, Stats, useProgress } from "@react-three/drei";
-import useStore, { usePlanetStore } from "../../store/store";
+import { Html, PerformanceMonitor, useProgress } from "@react-three/drei";
+import useStore from "../../store/store";
 import Menu from "../UI/Menu";
-import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import "../../styles.css";
 
 const SharedCanvas = ({ children }) => {
-  const { fullscreen } = useStore();
-  const { selectedPlanet } = usePlanetStore();
+  const { fullscreen, isLoading, toggleLoading } = useStore();
   const { errors, loaded } = useProgress();
-  const totalAssets = 12;
-  const progressPercentage = (loaded / totalAssets) * 100;
+  const total = 17
+  const progressPercentage = (loaded / total) * 100;
+  const [dpr, setDpr] = useState(1);
 
   useEffect(() => {
     if (errors.length) {
       console.warn(errors);
     }
-  }, [errors]);
+    if (progressPercentage >= 100) {
+      toggleLoading(false);
+    } else {
+      toggleLoading(true);
+    }
+  }, [errors, progressPercentage, toggleLoading]);
 
   const Loader = () => {
     return (
@@ -38,22 +42,26 @@ const SharedCanvas = ({ children }) => {
     <div className={`Main ${fullscreen ? "fullscreen" : "minimized"}`}>
       <Canvas
         id='Canvas'
-        shadows dpr={[1, 2]}
-        gl={{ antialias: true, logarithmicDepthBuffer: true }}
-        camera={{ fov: 50, position: [5000, 5000, 5000], near: 0.01, far: 1000000 }}
+        shadows dpr={dpr}
+        gl={{
+          antialias: true,
+          alpha: false,
+          logarithmicDepthBuffer: true,
+        }}
+        camera={{ fov: 50, position: [20000, 20000, 20000], near: 0.1, far: 1000000 }}
+        frameloop="demand"
       >
+        {/* <Stats showPanel={2} /> */}
+        <PerformanceMonitor onIncline={() => setDpr(2)} onDecline={() => setDpr(1)} />
+
         <Suspense fallback={<Loader />}>
-          <Stats showPanel={2} />
-          <ambientLight intensity={0.04} />
-          <pointLight color='#f6f3ea' intensity={2} position={[0, 0, 0]} key={selectedPlanet?.name || 'basic'} />
-          <EffectComposer>
-            <Bloom mipmapBlur intensity={.6} luminanceThreshold={1} luminanceSmoothing={1.2} radius={.6} />
-          </EffectComposer>
+          <ambientLight intensity={0.02} />
+          <pointLight color='#f6f3ea' intensity={2} position={[0, 0, 0]} />
           {children}
         </Suspense>
-        <Preload all />
+        {/* <Preload all /> */}
       </Canvas>
-      <Menu />
+      {!isLoading && <Menu />}
     </div>
   );
 };
