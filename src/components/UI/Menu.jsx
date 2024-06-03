@@ -50,7 +50,7 @@ const Menu = () => {
     { label: "-1 day /s", value: -86400 },
     { label: "-1 hour /s", value: -3600 },
     { label: "-1 minute /s", value: -60 },
-    { label: "Realtime", value: 1 },
+    { label: "Real-time", value: 1 },
     { label: "1 minute /s", value: 60 },
     { label: "1 hour /s", value: 3600 },
     { label: "1 day /s", value: 86400 },
@@ -86,6 +86,7 @@ const Menu = () => {
     // do not show on initial render
     if (firstRender) {
       setFirstRender(false);
+      toggleMenu(true);
       return
     }
 
