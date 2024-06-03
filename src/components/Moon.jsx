@@ -113,12 +113,11 @@ const Moon = forwardRef(({ moonData, planetPosition }, ref) => {
           onClick={handleClick}
         >
           <sphereGeometry args={[(Math.max(scaledRadius, scale)) * 2, 8, 8]} />
-          <meshBasicMaterial color={color} />
         </mesh>
 
         <mesh key={name + '-textured'} rotation={name === 'Moon' ? [0, Math.PI * 3.5, 0] : [0, 0, 0]}>
-          <sphereGeometry args={[scaledRadius, 32, 16]} />
-          <meshStandardMaterial metalness={0.9} roughness={0.65} map={moonTexture || null} color={!moonTexture ? color : null} />
+          <sphereGeometry args={[scaledRadius, 14, 12]} />
+          <meshStandardMaterial metalness={0.5} roughness={0.5} map={moonTexture || null} color={!moonTexture ? color : null} />
         </mesh>
 
         {(displayLabels || isHovered && !isMoonSelected) && simSpeed < 200000 && (
@@ -136,7 +135,7 @@ const Moon = forwardRef(({ moonData, planetPosition }, ref) => {
             name={name + "-orbit-path"}
             hiRes={isMoonSelected}
             lineType={'solid'}
-            opacity={0.5}
+            opacity={0.3}
           />
         </group>
       )}

@@ -3,15 +3,14 @@
 import { Suspense, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Html, Preload, Stats, useProgress } from "@react-three/drei";
-import useStore, { usePlanetStore } from "../../store/store";
+import useStore from "../../store/store";
 import Menu from "../UI/Menu";
 import "../../styles.css";
 
 const SharedCanvas = ({ children }) => {
   const { fullscreen, isLoading, toggleLoading } = useStore();
-  const { selectedPlanet } = usePlanetStore();
   const { errors, loaded } = useProgress();
-  const total = 19
+  const total = 17
   const progressPercentage = (loaded / total) * 100;
 
   useEffect(() => {
@@ -46,6 +45,7 @@ const SharedCanvas = ({ children }) => {
         gl={{
           antialias: true,
           alpha: false,
+          logarithmicDepthBuffer: true,
         }}
         camera={{ fov: 50, position: [20000, 20000, 20000], near: 1, far: 1000000 }}
       >
@@ -53,10 +53,10 @@ const SharedCanvas = ({ children }) => {
 
         <Suspense fallback={<Loader />}>
           <ambientLight intensity={0.02} />
-          <pointLight color='#f6f3ea' intensity={2} position={[0, 0, 0]} key={selectedPlanet?.name || 'basic'} />
+          <pointLight color='#f6f3ea' intensity={2} position={[0, 0, 0]} />
           {children}
         </Suspense>
-        <Preload all />
+        {/* <Preload all /> */}
       </Canvas>
       {!isLoading && <Menu />}
     </div>

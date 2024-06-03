@@ -44,7 +44,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   rotationSpeed *= rotationSpeedScaleFactor;
 
   const isPlanetSelected = selectedPlanet && selectedPlanet.name === name;
-  const detailLevel = isPlanetSelected ? 64 : 32;
+  const detailLevel = isPlanetSelected ? 64 : 16;
 
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
@@ -187,10 +187,9 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
           onPointerUp={handlePointerUp}
           onPointerOver={handlePointerOver}
           onPointerOut={handlePointerOut}
-          onDoubleClick={handleDoubleClick}
         >
           {isPlanetSelected
-            ? <sphereGeometry args={[scaledRadius, 16, 16]} />
+            ? null
             : <sphereGeometry args={[scale * 3, 8, 8]} />
           }
         </mesh>
@@ -198,16 +197,17 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         <mesh
           ref={meshRef}
           key={isPlanetSelected ? name + '-textured' : name + '-basic'}
+          onDoubleClick={handleDoubleClick}
         >
-          <sphereGeometry args={[(isPlanetSelected ? scaledRadius : scale), detailLevel, detailLevel]} />
+          <sphereGeometry args={[(isPlanetSelected ? scaledRadius : scale), detailLevel, detailLevel / 2]} />
           {(!isPlanetSelected && texturesLoaded) ?
             <meshBasicMaterial color={color} />
             :
             <>
               {name === "Earth" && isPlanetSelected &&
                 <mesh ref={cloudsRef} key={`${name}-cloud_texture`} >
-                  <sphereGeometry args={[Math.min(scaledRadius * 1.008), detailLevel, detailLevel]} />
-                  <meshStandardMaterial alphaMap={textures?.clouds} transparent />
+                  <sphereGeometry args={[Math.min(scaledRadius * 1.008), detailLevel, detailLevel / 2]} />
+                  <meshStandardMaterial alphaMap={textures?.clouds} transparent opacity={0.8} />
                 </mesh>
               }
               <meshStandardMaterial
@@ -221,10 +221,10 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         </mesh>
 
         {name === "Saturn" && showTextures && (
-          <Rings innerRadius={scaledRadius * 1.2} outerRadius={scaledRadius * 2} height={0} rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} texture={textures?.ringTexture} detail={detailLevel * 2} />
+          <Rings innerRadius={scaledRadius * 1.2} outerRadius={scaledRadius * 2} height={0} rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} texture={textures?.ringTexture} detail={detailLevel} />
         )}
         {name === "Uranus" && showTextures && (
-          <Rings innerRadius={scaledRadius * 1.5} outerRadius={scaledRadius * 1.9} height={0} texture={textures?.ringTexture} detail={detailLevel * 2} rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} />
+          <Rings innerRadius={scaledRadius * 1.5} outerRadius={scaledRadius * 1.9} height={0} texture={textures?.ringTexture} detail={detailLevel} rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} />
         )}
 
         {(displayLabels && !isPlanetSelected || isHovered && !isPlanetSelected) && (
@@ -267,6 +267,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
               />
             </group>
           );
+
         })}
       </group>
 

@@ -9,7 +9,7 @@ import Sun from "@/components/Sun";
 import Planet from "@/components/PlanetBasic";
 import Stars from "@/components/Stars"
 import { useFrame } from "@react-three/fiber";
-import * as THREE from 'three';
+
 
 const SceneThree = () => {
   const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed } = useStore();
@@ -86,7 +86,7 @@ const SceneThree = () => {
       }
     }
   });
-  console.log(isZoomingToSun)
+
   // Handle resetting the camera from state
   useEffect(() => {
     if (resetCamera) {
@@ -126,17 +126,13 @@ const SceneThree = () => {
 
   const earthTextures = useTexture({
     map: "../assets/earth/8k_earth_daymap.jpg",
-    night: "../assets/earth/2k_earth_nightmap.jpg",
-    // normal: "../assets/earth/8k_earth_normal_map.png",
     clouds: "../assets/earth/8k_earth_clouds.jpg",
-    // specular: "../assets/earth/2k_earth_specular_map.png",
   });
   const sunTextures = useTexture({
     map: "../assets/sun/8k_sun.jpg",
   })
   const venusTextures = useTexture({
     map: "../assets/venus/2k_venus_surface.jpg",
-    // clouds: "../assets/venus/2k_venus_atmosphere.jpg",
   });
   const mercuryTextures = useTexture({
     map: "../assets/mercury/2k_mercury.jpg",
@@ -158,16 +154,13 @@ const SceneThree = () => {
   const neptuneTextures = useTexture({
     map: "../assets/neptune/2k_neptune.jpg",
   });
-  earthTextures.map.colorSpace = THREE.SRGBColorSpace
-  earthTextures.night.colorSpace = THREE.SRGBColorSpace
-  earthTextures.clouds.colorSpace = THREE.SRGBColorSpace
 
   // camera settings
   const cameraConfig = {
     maxDistance: 90000,
     smoothTime: .65,
     enableDamping: true,
-    near: 0.001,
+    near: 0.01,
     far: 1000000,
     enablePanning: false
   };
