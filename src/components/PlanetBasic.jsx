@@ -1,7 +1,7 @@
-import React, { useRef, forwardRef, useState, useEffect, Suspense } from "react";
+import React, { useRef, forwardRef, useState, useEffect } from "react";
+import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
-import * as THREE from "three";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 import OrbitPath from "./OrbitPath";
@@ -11,9 +11,6 @@ import Labels from "./Labels";
 import { moonsData } from "@/data/moonsData";
 import { earthAtmosphereShader } from "../shaders/atmosphere";
 import Rings from "./Rings";
-// import SatelliteModel from "@/components/models/Satellite";
-import earthVertexShader from '../shaders/earth/vertex.glsl';
-import earthFragmentShader from '../shaders/earth/fragment.glsl';
 
 const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   const { planetsData } = usePlanetStore();
@@ -21,20 +18,15 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
 
   const mergedData = { ...bodyData };
   const {
-    mass,
     radius,
     orbitalOrigin,
     orbitalRadius,
-    orbitalSpeed,
     orbitalPeriod,
     orbitalInclination,
     axialTilt,
     rotationPeriod,
-    surfaceTemp,
     color,
-    gravity,
     initialOrbitalAngle,
-    interestPoints
   } = mergedData;
 
   const { simSpeed, toggleDetailsMenu } = useStore();
@@ -69,19 +61,6 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
   earthParameters.atmosphereDayColor = '#0088FF'
   earthParameters.atmosphereTwilightColor = '#FF9D00'
 
-  const sunDirectionRef = useRef(new THREE.Vector3(0, 0, 1));
-  const earthMaterial = new THREE.ShaderMaterial({
-    vertexShader: earthVertexShader,
-    fragmentShader: earthFragmentShader,
-    uniforms: {
-      uDayTexture: new THREE.Uniform(textures.map),
-      uNightTexture: new THREE.Uniform(textures.night),
-      uSunDirection: { value: sunDirectionRef.current },
-      uAtmosphereDayColor: new THREE.Uniform(new THREE.Color(earthParameters.atmosphereDayColor)),
-      uAtmosphereTwilightColor: new THREE.Uniform(new THREE.Color(earthParameters.atmosphereTwilightColor))
-    }
-  });
-
   useFrame((state, delta) => {
     const adjustedDelta = delta * simSpeed;
 
@@ -115,14 +94,8 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         }
 
         if (cloudsRef.current) {
-          cloudsRef.current.rotation.y += rotationIncrement * 1.2;
+          cloudsRef.current.rotation.y += rotationIncrement * 1.1;
         }
-      }
-
-      // Update the sun direction
-      sunDirectionRef.current.set(0, 0, 0).sub(localRef.current.position).normalize();
-      if (name === "Earth" && meshRef.current.material.uniforms?.uSunDirection) {
-        meshRef.current.material.uniforms.uSunDirection.value.copy(sunDirectionRef.current);
       }
 
       const distance = localRef.current.position.distanceTo(state.camera.position);
@@ -132,9 +105,6 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         setScale(distance / 100);
       }
       setShowTextures(distance < textureDisplayDistance);
-      if (name === "Earth") {
-        console.log(distance)
-      }
       const maxDistance = scaledRadius * 100;
       const minDistance = scaledRadius * 10;
       const opacity = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
@@ -153,24 +123,6 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
       meshRef.current.rotation.x = THREE.MathUtils.degToRad(axialTilt);
     }
   }, [axialTilt, selectedPlanet]);
-
-  // useEffect(() => {
-  //   const specificDate = new Date(2023, 0, 1, 1, 45, 30);
-  //   const hourOfDay = specificDate.getHours();
-  //   const minuteOfHour = specificDate.getMinutes();
-  //   const secondOfMinute = specificDate.getSeconds();
-
-  //   const currentTimeOfDayInSeconds = hourOfDay * 3600 + minuteOfHour * 60 + secondOfMinute;
-  //   const rotationPeriodInSeconds = rotationPeriod * 3600;
-  //   const initialRotationFraction = currentTimeOfDayInSeconds / rotationPeriodInSeconds;
-  //   const initialRotationAngleRadians = initialRotationFraction * 2 * Math.PI;
-
-  //   if (meshRef.current) {
-  //     meshRef.current.rotation.order = 'YXZ';
-  //     meshRef.current.rotation.y = initialRotationAngleRadians;
-  //     meshRef.current.rotation.x = THREE.MathUtils.degToRad(axialTilt);
-  //   }
-  // }, [rotationPeriod, axialTilt]);
 
   const handleClick = e => {
     e.stopPropagation();
@@ -253,16 +205,10 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
             :
             <>
               {name === "Earth" && isPlanetSelected &&
-                <>
-                  <shaderMaterial
-                    attach='material'
-                    args={[earthMaterial]}
-                  />
-                  <mesh ref={cloudsRef} key={`${name}-cloud_texture`} >
-                    <sphereGeometry args={[Math.min(scaledRadius * 1.01), detailLevel, detailLevel]} />
-                    <meshStandardMaterial alphaMap={textures?.clouds} transparent opacity={1} />
-                  </mesh>
-                </>
+                <mesh ref={cloudsRef} key={`${name}-cloud_texture`} >
+                  <sphereGeometry args={[Math.min(scaledRadius * 1.008), detailLevel, detailLevel]} />
+                  <meshStandardMaterial alphaMap={textures?.clouds} transparent />
+                </mesh>
               }
               <meshStandardMaterial
                 metalness={0.6}
@@ -270,13 +216,6 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
                 map={textures?.map}
                 onBuild={() => setTexturesLoaded(true)}
               />
-              {/* {name === "Earth" &&
-                <>
-                  <mesh key={`${name}-atmosphere`}>
-                    <sphereGeometry args={[scaledRadius * 1.035, detailLevel, detailLevel]} />
-                    <shaderMaterial args={[earthAtmosphereShader]} />
-                  </mesh>
-                </>} */}
             </>
           }
         </mesh>
@@ -287,14 +226,6 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
         {name === "Uranus" && showTextures && (
           <Rings innerRadius={scaledRadius * 1.5} outerRadius={scaledRadius * 1.9} height={0} texture={textures?.ringTexture} detail={detailLevel * 2} rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]} />
         )}
-
-        {/* {name === "Earth" && isPlanetSelected &&
-  <Suspense fallback={null}>
-    <group ref={satelliteRef} >
-      <SatelliteModel scale={scaledRadius * .001} zRotation={satelliteZRotation} />
-    </group>
-  </Suspense>
-} */}
 
         {(displayLabels && !isPlanetSelected || isHovered && !isPlanetSelected) && (
           <Labels key={name} text={name} size={textSize?.current} position={[0, scale * 1.2 + textSize?.current, 0]} color={color} handleClick={handleClick} handlePointerDown={handlePointerDown} font={'../assets/fonts/Termina_Black.ttf'} />
