@@ -1,8 +1,8 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Html, Preload, Stats, useProgress } from "@react-three/drei";
+import { Html, PerformanceMonitor, Preload, Stats, useProgress } from "@react-three/drei";
 import useStore from "../../store/store";
 import Menu from "../UI/Menu";
 import "../../styles.css";
@@ -12,6 +12,7 @@ const SharedCanvas = ({ children }) => {
   const { errors, loaded } = useProgress();
   const total = 17
   const progressPercentage = (loaded / total) * 100;
+  const [dpr, setDpr] = useState(1);
 
   useEffect(() => {
     if (errors.length) {
@@ -41,15 +42,18 @@ const SharedCanvas = ({ children }) => {
     <div className={`Main ${fullscreen ? "fullscreen" : "minimized"}`}>
       <Canvas
         id='Canvas'
-        shadows dpr={[1, 2]}
+        shadows dpr={dpr}
         gl={{
           antialias: true,
           alpha: false,
           logarithmicDepthBuffer: true,
+
         }}
-        camera={{ fov: 50, position: [20000, 20000, 20000], near: 1, far: 1000000 }}
+        camera={{ fov: 50, position: [20000, 20000, 20000], near: 0.1, far: 1000000 }}
+        frameloop="demand"
       >
         <Stats showPanel={2} />
+        <PerformanceMonitor onIncline={() => setDpr(2)} onDecline={() => setDpr(1)} />
 
         <Suspense fallback={<Loader />}>
           <ambientLight intensity={0.02} />
