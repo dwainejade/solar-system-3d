@@ -160,7 +160,7 @@ const SceneThree = () => {
     maxDistance: 90000,
     smoothTime: .65,
     enableDamping: true,
-    near: 0.01,
+    near: 0.1,
     far: 1000000,
     enablePanning: false
   };
