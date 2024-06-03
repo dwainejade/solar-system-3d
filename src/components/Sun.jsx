@@ -2,14 +2,12 @@ import React, { useState, useRef } from "react";
 import useStore, { usePlanetStore, useCameraStore } from "../store/store";
 import { sizeScaleFactor } from "../data/planetsData";
 import { useFrame } from "@react-three/fiber";
-// import { Html } from "@react-three/drei";
 import { sunOuterShader } from "../shaders/atmosphere";
-import { EffectComposer, GodRays } from "@react-three/postprocessing";
 
 
-const Sun = ({ position, resetCamera, textures }) => {
+const Sun = ({ position, textures }) => {
   const { selectedPlanet, setSelectedPlanet, planetsData } = usePlanetStore();
-  const { isZoomingToSun, toggleZoomingToSun } = useCameraStore();
+  const { toggleZoomingToSun } = useCameraStore();
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
   const { simSpeed } = useStore();
@@ -100,10 +98,10 @@ const Sun = ({ position, resetCamera, textures }) => {
           <meshBasicMaterial color={[10, 4, 0]} toneMapped={false} />
         )}
       </mesh>
-      {/* <mesh key={`${name}-atmosphere`}>
-        <sphereGeometry args={[shaderScale, 32, 32]} />
+      <mesh key={`${name}-atmosphere`}>
+        <sphereGeometry args={[scale * 1.08, 32, 32]} />
         <shaderMaterial args={[sunOuterShader]} />
-      </mesh> */}
+      </mesh>
     </group>
 
   );

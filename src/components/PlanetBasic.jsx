@@ -205,10 +205,16 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
             :
             <>
               {name === "Earth" && isPlanetSelected &&
-                <mesh ref={cloudsRef} key={`${name}-cloud_texture`} >
-                  <sphereGeometry args={[Math.min(scaledRadius * 1.008), detailLevel, detailLevel / 2]} />
-                  <meshStandardMaterial alphaMap={textures?.clouds} transparent opacity={0.8} />
-                </mesh>
+                <>
+                  <mesh ref={cloudsRef} key={`${name}-cloud_texture`} >
+                    <sphereGeometry args={[Math.min(scaledRadius * 1.008), detailLevel, detailLevel / 2]} />
+                    <meshStandardMaterial alphaMap={textures?.clouds} transparent opacity={0.8} />
+                  </mesh>
+                  <mesh key={`${name}-atmosphere_texture`} >
+                    <sphereGeometry args={[Math.min(scaledRadius * 1.02), detailLevel, detailLevel / 2]} />
+                    <shaderMaterial args={[earthAtmosphereShader]} />
+                  </mesh>
+                </>
               }
               <meshStandardMaterial
                 metalness={0.6}
