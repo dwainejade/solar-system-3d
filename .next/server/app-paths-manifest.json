@@ -2,6 +2,6 @@
   "/_not-found/page": "app/_not-found/page.js",
   "/main/page": "app/main/page.js",
   "/page": "app/page.js",
-  "/scene-two/page": "app/scene-two/page.js",
-  "/scene-one/page": "app/scene-one/page.js"
+  "/scene-one/page": "app/scene-one/page.js",
+  "/scene-two/page": "app/scene-two/page.js"
 }
