@@ -61,6 +61,7 @@ body {
 
 .Main {
   height: 100%;
+  min-height: 500px;
   max-height: 550px;
   width: 100%;
   max-width: 1100px;
@@ -166,7 +167,7 @@ body {
       height: 110px;
       width: 100%;
       max-width: 540px;
-      min-width: 415px;
+      min-width: 280px;
 
       color: @label-color;
       margin: auto auto 0 auto;
@@ -196,6 +197,12 @@ body {
         background-size: 70%;
         background-color: #f46a68;
         transition: rotate ease 0.3s;
+
+        @media screen and (max-width: 420px) {
+          top: -15px;
+          width: 30px;
+          height: 30px;
+        }
       }
       .left-con,
       .right-con {
@@ -205,10 +212,18 @@ body {
         align-items: flex-start;
         padding: 4%;
         gap: 10px;
+
         label {
           font-family: "FranklinGothic-URW", "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
           font-size: 1rem;
           font-weight: bold;
+
+          @media screen and (max-width: 500px) {
+            font-size: 0.8rem;
+          }
+          @media screen and (max-width: 400px) {
+            font-size: 0.7rem;
+          }
         }
 
         .menu-item {
@@ -216,13 +231,25 @@ body {
           justify-content: space-between;
           align-items: center;
           width: 100%;
+
+          label {
+            flex: 1;
+          }
         }
       }
       .left-con {
         flex: 60%;
+
+        @media screen and (max-width: 420px) {
+          flex: 55%;
+        }
       }
       .right-con {
         flex: 40%;
+
+        @media screen and (max-width: 420px) {
+          flex: 45%;
+        }
       }
       .divider {
         height: 100%;
@@ -312,6 +339,13 @@ body {
           width: 100px;
           font-size: 1rem;
           color: @text-color-2;
+
+          @media screen and (max-width: 500px) {
+            font-size: 0.8rem;
+          }
+          @media screen and (max-width: 400px) {
+            font-size: 0.7rem;
+          }
         }
         input:disabled {
           color: @text-color-1;
@@ -386,6 +420,16 @@ body {
     width: 60px;
     height: 28px;
 
+    @media screen and (max-width: 420px) {
+      height: 24px;
+      width: 45px;
+    }
+
+    @media screen and (max-width: 320px) {
+      height: 22px;
+      width: 38px;
+    }
+
     input {
       opacity: 0;
       width: 0;
@@ -406,13 +450,26 @@ body {
       &:before {
         position: absolute;
         content: "";
-        height: 22px;
+        height: 20px;
         width: 22px;
         left: 4px;
         bottom: 3px;
         border-radius: 50%;
         background-color: white;
         transition: 0.3s;
+
+        @media screen and (max-width: 420px) {
+          left: 3px;
+          bottom: 3px;
+          height: 19px;
+          width: 19px;
+        }
+        @media screen and (max-width: 320px) {
+          left: 3px;
+          bottom: 3px;
+          height: 16px;
+          width: 16px;
+        }
       }
     }
 
@@ -426,6 +483,13 @@ body {
 
     input:checked + .slider:before {
       transform: translateX(30px);
+
+      @media screen and (max-width: 420px) {
+        transform: translateX(20px);
+      }
+      @media screen and (max-width: 320px) {
+        transform: translateX(16px);
+      }
     }
   }
 
@@ -442,6 +506,13 @@ body {
     background-repeat: no-repeat;
     background-position: right 10px center;
     border-radius: 0;
+
+    @media screen and (max-width: 500px) {
+      font-size: 0.8rem;
+    }
+    @media screen and (max-width: 400px) {
+      font-size: 0.7rem;
+    }
   }
   select option:checked {
     background-color: #add1d7;
@@ -566,6 +637,17 @@ body {
   -webkit-appearance: none;
   -moz-appearance: none;
   border-radius: 0;
+
+  @media screen and (max-width: 500px) {
+    width: 90px;
+  }
+
+  @media screen and (max-width: 400px) {
+    width: 80px;
+  }
+  @media screen and (max-width: 300px) {
+    width: 70px;
+  }
 }
 .auto-rotate-text {
   position: absolute;

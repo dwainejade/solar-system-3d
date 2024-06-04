@@ -41,6 +41,7 @@ body {
 }
 .Main {
   height: 100%;
+  min-height: 500px;
   max-height: 550px;
   width: 100%;
   max-width: 1100px;
@@ -135,7 +136,7 @@ body {
   height: 110px;
   width: 100%;
   max-width: 540px;
-  min-width: 415px;
+  min-width: 280px;
   color: #f19a00;
   margin: auto auto 0 auto;
   pointer-events: auto;
@@ -165,6 +166,13 @@ body {
   background-color: #f46a68;
   transition: rotate ease 0.3s;
 }
+@media screen and (max-width: 420px) {
+  .Main .menu-wrapper .bottom-menu .menu-toggle-btn {
+    top: -15px;
+    width: 30px;
+    height: 30px;
+  }
+}
 .Main .menu-wrapper .bottom-menu .left-con,
 .Main .menu-wrapper .bottom-menu .right-con {
   display: flex;
@@ -180,6 +188,18 @@ body {
   font-size: 1rem;
   font-weight: bold;
 }
+@media screen and (max-width: 500px) {
+  .Main .menu-wrapper .bottom-menu .left-con label,
+  .Main .menu-wrapper .bottom-menu .right-con label {
+    font-size: 0.8rem;
+  }
+}
+@media screen and (max-width: 400px) {
+  .Main .menu-wrapper .bottom-menu .left-con label,
+  .Main .menu-wrapper .bottom-menu .right-con label {
+    font-size: 0.7rem;
+  }
+}
 .Main .menu-wrapper .bottom-menu .left-con .menu-item,
 .Main .menu-wrapper .bottom-menu .right-con .menu-item {
   display: flex;
@@ -187,11 +207,25 @@ body {
   align-items: center;
   width: 100%;
 }
+.Main .menu-wrapper .bottom-menu .left-con .menu-item label,
+.Main .menu-wrapper .bottom-menu .right-con .menu-item label {
+  flex: 1;
+}
 .Main .menu-wrapper .bottom-menu .left-con {
   flex: 60%;
 }
+@media screen and (max-width: 420px) {
+  .Main .menu-wrapper .bottom-menu .left-con {
+    flex: 55%;
+  }
+}
 .Main .menu-wrapper .bottom-menu .right-con {
   flex: 40%;
+}
+@media screen and (max-width: 420px) {
+  .Main .menu-wrapper .bottom-menu .right-con {
+    flex: 45%;
+  }
 }
 .Main .menu-wrapper .bottom-menu .divider {
   height: 100%;
@@ -270,6 +304,16 @@ body {
   font-size: 1rem;
   color: #861b1d;
 }
+@media screen and (max-width: 500px) {
+  .Main .menu-wrapper .details-menu .item input {
+    font-size: 0.8rem;
+  }
+}
+@media screen and (max-width: 400px) {
+  .Main .menu-wrapper .details-menu .item input {
+    font-size: 0.7rem;
+  }
+}
 .Main .menu-wrapper .details-menu .item input:disabled {
   color: #463a39;
 }
@@ -322,6 +366,18 @@ body {
   width: 60px;
   height: 28px;
 }
+@media screen and (max-width: 420px) {
+  .Main .switch {
+    height: 24px;
+    width: 45px;
+  }
+}
+@media screen and (max-width: 320px) {
+  .Main .switch {
+    height: 22px;
+    width: 38px;
+  }
+}
 .Main .switch input {
   opacity: 0;
   width: 0;
@@ -341,13 +397,29 @@ body {
 .Main .switch .slider:before {
   position: absolute;
   content: "";
-  height: 22px;
+  height: 20px;
   width: 22px;
   left: 4px;
   bottom: 3px;
   border-radius: 50%;
   background-color: white;
   transition: 0.3s;
+}
+@media screen and (max-width: 420px) {
+  .Main .switch .slider:before {
+    left: 3px;
+    bottom: 3px;
+    height: 19px;
+    width: 19px;
+  }
+}
+@media screen and (max-width: 320px) {
+  .Main .switch .slider:before {
+    left: 3px;
+    bottom: 3px;
+    height: 16px;
+    width: 16px;
+  }
 }
 .Main .switch input:checked + .slider {
   background-color: #969b17;
@@ -357,6 +429,16 @@ body {
 }
 .Main .switch input:checked + .slider:before {
   transform: translateX(30px);
+}
+@media screen and (max-width: 420px) {
+  .Main .switch input:checked + .slider:before {
+    transform: translateX(20px);
+  }
+}
+@media screen and (max-width: 320px) {
+  .Main .switch input:checked + .slider:before {
+    transform: translateX(16px);
+  }
 }
 .Main select {
   background-color: #fdf5e8;
@@ -369,6 +451,16 @@ body {
   background-repeat: no-repeat;
   background-position: right 10px center;
   border-radius: 0;
+}
+@media screen and (max-width: 500px) {
+  .Main select {
+    font-size: 0.8rem;
+  }
+}
+@media screen and (max-width: 400px) {
+  .Main select {
+    font-size: 0.7rem;
+  }
 }
 .Main select option:checked {
   background-color: #add1d7;
@@ -485,6 +577,24 @@ body {
   -webkit-appearance: none;
   -moz-appearance: none;
   border-radius: 0;
+}
+@media screen and (max-width: 500px) {
+  #planetSelection,
+  #simSpeedSelect {
+    width: 90px;
+  }
+}
+@media screen and (max-width: 400px) {
+  #planetSelection,
+  #simSpeedSelect {
+    width: 80px;
+  }
+}
+@media screen and (max-width: 300px) {
+  #planetSelection,
+  #simSpeedSelect {
+    width: 70px;
+  }
 }
 .auto-rotate-text {
   position: absolute;
