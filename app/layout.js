@@ -8,6 +8,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <body>{children}</body>
       <Script
         key='https://code.jquery.com/jquery-3.2.1.slim.min.js'
         src='https://code.jquery.com/jquery-3.2.1.slim.min.js'
@@ -21,8 +22,6 @@ export default function RootLayout({ children }) {
         integrity='sha256-EH+7IdRixWtW5tdBwMkTXL+HvW5tAqV4of/HbAZ7nEc='
         crossOrigin='anonymous'
       />
-      
-      <body>{children}</body>
     </html>
   )
 }
