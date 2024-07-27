@@ -40,14 +40,3 @@ jobs:
           # Extra arguments that can be passed to `az storage blob upload-batch|sync`. Useful for passing flags like `--pattern` or `--destination-path`
           extra_args: "--destination ${{ env.REPONAME }}/"
 
-  velocity-checkin:
-    needs: build
-    uses: StrongMind/global-build/.github/workflows/velocityCheckin.yml@main
-    with:
-      sourceEnvironment: prod
-      sourceBranch: ${{ github.ref_name }}
-      sourceRevision: ${{ github.sha }}
-      sourceRepo: ${{ github.server_url }}/${{ github.repository }}
-      sourceVersion: ${{ github.run_id }}.${{ github.run_number }}.${{ github.run_attempt }}
-    secrets:
-      VELOCITY_DEPLOYMENT_TOKEN: ${{ secrets.VELOCITY_DEPLOYMENT_TOKEN }}
