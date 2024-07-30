@@ -40,3 +40,11 @@ jobs:
           # Extra arguments that can be passed to `az storage blob upload-batch|sync`. Useful for passing flags like `--pattern` or `--destination-path`
           extra_args: "--destination ${{ env.REPONAME }}/"
 
+  notify_deployment:
+    name: Notify Deployment
+    needs: build
+    uses: 
+      strongmind/public-reusable-workflows/.github/workflows/send-deployment-notification.yml@main
+    with:
+      repository_name: ${{ github.repository }}
+    secrets: inherit
