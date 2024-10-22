@@ -9,6 +9,7 @@ import Sun from "@/components/Sun";
 import Planet from "@/components/PlanetBasic";
 import Stars from "@/components/Stars"
 import { useFrame } from "@react-three/fiber";
+import AsteroidBelt from "@/components/AsteroidBelt";
 
 
 const SceneThree = () => {
@@ -193,7 +194,8 @@ const SceneThree = () => {
           maxZoom={10}
         />
       )}
-
+      {/* <axesHelper args={[400]} /> */}
+      {/* <gridHelper args={[20000, 200]} scale={4} colorGrid={"red"} /> */}
       <Stars />
 
       <Planet name="Earth" textures={earthTextures} />
@@ -204,6 +206,8 @@ const SceneThree = () => {
       <Planet name="Saturn" textures={saturnTextures} />
       <Planet name="Uranus" textures={uranusTextures} />
       <Planet name="Neptune" textures={neptuneTextures} />
+
+      <AsteroidBelt meshCount={200} pointCount={0} />
 
       {/* Render moons */}
       {/* {Object.entries(moonsData).map(([planetName]) => renderMoons(planetName))} */}
