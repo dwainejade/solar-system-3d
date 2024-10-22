@@ -8,10 +8,11 @@ export const moonsData = {
         {
             name: "Moon",
             mass: 7.342e22,
-            orbitalRadius: 384400, // Average distance from Earth in kilometers
-            radius: 1737.1, // Average radius of the Moon in kilometers
-            orbitalPeriod: 27.3, // Orbital period in Earth days
-            orbitalInclination: 5.145, // in degrees
+            orbitalRadius: 384400,
+            radius: 1737.1,
+            orbitalPeriod: 27.3,
+            orbitalInclination: 5.145,
+            eccentricity: 0.0549, // Moon's orbit is moderately eccentric
             color: "silver",
         },
     ],
@@ -19,59 +20,63 @@ export const moonsData = {
         {
             name: "Deimos",
             mass: 1.48e15,
-            orbitalRadius: 23460, // Distance in kilometers
-            radius: 6.2, // Average radius in kilometers
-            orbitalPeriod: 1.263, // Orbital period in Earth days
+            orbitalRadius: 23460,
+            radius: 6.2,
+            orbitalPeriod: 1.263,
             orbitalInclination: 1.79,
+            eccentricity: 0.00033, // Nearly circular orbit
             color: "lightgrey",
         },
         {
             name: "Phobos",
             mass: 1.066e16,
-            orbitalRadius: 9376, // Distance in kilometers
-            radius: 11.2677, // Average radius in kilometers
-            orbitalPeriod: 0.319, // Orbital period in Earth days
+            orbitalRadius: 9376,
+            radius: 11.2677,
+            orbitalPeriod: 0.319,
             orbitalInclination: 1.093,
+            eccentricity: 0.0151, // Slightly eccentric
             color: "darkgrey",
         },
     ],
     Jupiter: [
-        // Including only the four largest moons (Galilean moons)
         {
             name: "Callisto",
             mass: 1.0758e23,
-            orbitalRadius: 1882700, // Distance in kilometers
-            radius: 2410.3, // Radius in kilometers
-            orbitalPeriod: 16.689, // Orbital period in Earth days
+            orbitalRadius: 1882700,
+            radius: 2410.3,
+            orbitalPeriod: 16.689,
             orbitalInclination: 0.28,
+            eccentricity: 0.0074, // Nearly circular
             color: "darkgrey",
         },
         {
             name: "Europa",
             mass: 4.7998e22,
-            orbitalRadius: 671100, // Distance in kilometers
-            radius: 1560.8, // Radius in kilometers
-            orbitalPeriod: 3.551, // Orbital period in Earth days
+            orbitalRadius: 671100,
+            radius: 1560.8,
+            orbitalPeriod: 3.551,
             orbitalInclination: 0.47,
+            eccentricity: 0.009, // Nearly circular
             color: "white",
-
         },
         {
             name: "Ganymede",
             mass: 1.4819e23,
-            orbitalRadius: 1070400, // Distance in kilometers
-            radius: 2634.1, // Radius in kilometers
-            orbitalPeriod: 7.154, // Orbital period in Earth days
+            orbitalRadius: 1070400,
+            radius: 2634.1,
+            orbitalPeriod: 7.154,
             orbitalInclination: 0.2,
+            eccentricity: 0.0013, // Very circular
             color: "grey",
         },
         {
             name: "Io",
             mass: 8.9319e22,
-            orbitalRadius: 421700, // Distance in kilometers
-            radius: 1821.6, // Radius in kilometers
-            orbitalPeriod: 1.769, // Orbital period in Earth days
+            orbitalRadius: 421700,
+            radius: 1821.6,
+            orbitalPeriod: 1.769,
             orbitalInclination: 0.05,
+            eccentricity: 0.0041, // Nearly circular
             color: "yellow",
         },
     ],
@@ -79,65 +84,71 @@ export const moonsData = {
         {
             name: "Dione",
             mass: 1.095452e21,
-            orbitalRadius: 377396, // Distance from Saturn in kilometers
-            radius: 561.7, // Average radius in kilometers
-            orbitalPeriod: 2.737, // Orbital period in Earth days
-            orbitalInclination: 0.02, // Inclination in degrees
+            orbitalRadius: 377396,
+            radius: 561.7,
+            orbitalPeriod: 2.737,
+            orbitalInclination: 0.02,
+            eccentricity: 0.0022, // Very circular
             color: "#D9D9D9"
         },
         {
             name: "Enceladus",
             mass: 1.08022e20,
-            orbitalRadius: 237948, // Distance from Saturn in kilometers
-            radius: 252.1, // Average radius in kilometers
-            orbitalPeriod: 1.37, // Orbital period in Earth days
-            orbitalInclination: 0.02, // Inclination in degrees
+            orbitalRadius: 237948,
+            radius: 252.1,
+            orbitalPeriod: 1.37,
+            orbitalInclination: 0.02,
+            eccentricity: 0.0047, // Nearly circular
             color: "#FFFFFF",
-
         },
         {
             name: "Iapetus",
             mass: 1.805635e21,
-            orbitalRadius: 3560820, // Distance from Saturn in kilometers
-            radius: 734.5, // Average radius in kilometers
-            orbitalPeriod: 79.322, // Orbital period in Earth days
-            orbitalInclination: 7.52, // Inclination in degrees
+            orbitalRadius: 3560820,
+            radius: 734.5,
+            orbitalPeriod: 79.322,
+            orbitalInclination: 7.52,
+            eccentricity: 0.0286, // Moderately eccentric
             color: "#FFFFFF",
         },
         {
             name: "Mimas",
             mass: 3.7493e19,
-            orbitalRadius: 185539, // Distance from Saturn in kilometers
-            radius: 198.2, // Average radius in kilometers
-            orbitalPeriod: 0.942, // Orbital period in Earth days
-            orbitalInclination: 1.53, // Inclination in degrees
+            orbitalRadius: 185539,
+            radius: 198.2,
+            orbitalPeriod: 0.942,
+            orbitalInclination: 1.53,
+            eccentricity: 0.0196, // Slightly eccentric
             color: "#E0E0E0",
         },
         {
             name: "Rhea",
             mass: 2.306518e21,
-            orbitalRadius: 527108, // Distance from Saturn in kilometers
-            radius: 763.8, // Average radius in kilometers
-            orbitalPeriod: 4.518, // Orbital period in Earth days
-            orbitalInclination: 0.35, // Inclination in degrees
+            orbitalRadius: 527108,
+            radius: 763.8,
+            orbitalPeriod: 4.518,
+            orbitalInclination: 0.35,
+            eccentricity: 0.0012, // Very circular
             color: "#D3D3D3",
         },
         {
             name: "Tethys",
             mass: 6.17449e20,
-            orbitalRadius: 294619, // Distance from Saturn in kilometers
-            radius: 531.1, // Average radius in kilometers
-            orbitalPeriod: 1.888, // Orbital period in Earth days
-            orbitalInclination: 1.12, // Inclination in degrees
+            orbitalRadius: 294619,
+            radius: 531.1,
+            orbitalPeriod: 1.888,
+            orbitalInclination: 1.12,
+            eccentricity: 0.0001, // Almost perfectly circular
             color: "#F5F5F5",
         },
         {
             name: "Titan",
             mass: 1.3452e23,
-            orbitalRadius: 1221870, // Distance from Saturn in kilometers
-            radius: 2574.73, // Average radius in kilometers
-            orbitalPeriod: 15.945, // Orbital period in Earth days
-            orbitalInclination: 0.33, // Inclination in degrees
+            orbitalRadius: 1221870,
+            radius: 2574.73,
+            orbitalPeriod: 15.945,
+            orbitalInclination: 0.33,
+            eccentricity: 0.0288, // Moderately eccentric
             color: "#FFCC99",
         },
     ],
@@ -145,77 +156,74 @@ export const moonsData = {
         {
             name: "Ariel",
             mass: 1.353e21,
-            orbitalRadius: 191020, // Distance from Uranus in kilometers
-            radius: 578.9, // Average radius in kilometers
-            orbitalPeriod: 2.520, // Orbital period in Earth days
-            orbitalInclination: 0.26, // Inclination in degrees
+            orbitalRadius: 191020,
+            radius: 578.9,
+            orbitalPeriod: 2.520,
+            orbitalInclination: 0.26,
+            eccentricity: 0.0012, // Very circular
             color: "grey",
         },
         {
             name: "Miranda",
             mass: 6.59e19,
-            orbitalRadius: 129900, // Distance from Uranus in kilometers
-            radius: 235.8, // Average radius in kilometers
-            orbitalPeriod: 1.413, // Orbital period in Earth days
-            orbitalInclination: 4.34, // Inclination in degrees
+            orbitalRadius: 129900,
+            radius: 235.8,
+            orbitalPeriod: 1.413,
+            orbitalInclination: 4.34,
+            eccentricity: 0.0013, // Very circular
             color: "grey",
         },
         {
             name: "Oberon",
             mass: 3.014e21,
-            orbitalRadius: 583520, // Distance from Uranus in kilometers
-            radius: 761.4, // Average radius in kilometers
-            orbitalPeriod: 13.463, // Orbital period in Earth days
-            orbitalInclination: 0.10, // Inclination in degrees
+            orbitalRadius: 583520,
+            radius: 761.4,
+            orbitalPeriod: 13.463,
+            orbitalInclination: 0.10,
+            eccentricity: 0.0014, // Very circular
             color: "grey",
         },
         {
             name: "Titania",
             mass: 3.527e21,
-            orbitalRadius: 436300, // Distance in kilometers
-            radius: 788.9, // Radius in kilometers
-            orbitalPeriod: 8.706, // Orbital period in Earth days
-            orbitalInclination: 0.14, // Inclination in degrees
+            orbitalRadius: 436300,
+            radius: 788.9,
+            orbitalPeriod: 8.706,
+            orbitalInclination: 0.14,
+            eccentricity: 0.0011, // Very circular
             color: "grey",
         },
         {
             name: "Umbriel",
             mass: 1.172e21,
-            orbitalRadius: 266000, // Distance from Uranus in kilometers
-            radius: 584.7, // Average radius in kilometers
-            orbitalPeriod: 4.144, // Orbital period in Earth days
-            orbitalInclination: 0.36, // Inclination in degrees
+            orbitalRadius: 266000,
+            radius: 584.7,
+            orbitalPeriod: 4.144,
+            orbitalInclination: 0.36,
+            eccentricity: 0.0039, // Nearly circular
             color: "grey",
         },
     ],
-
     Neptune: [
         {
             name: "Nereid",
             mass: 3.1e20,
-            orbitalRadius: 5513800, // Distance from Neptune in kilometers
-            radius: 1737, // Average radius in kilometers
-            orbitalPeriod: 360.1362, // Orbital period in Earth days
-            orbitalInclination: 7.23, // Inclination in degrees
+            orbitalRadius: 5513800,
+            radius: 1737,
+            orbitalPeriod: 360.1362,
+            orbitalInclination: 7.23,
+            eccentricity: 0.7507, // Highly eccentric!
             color: "grey",
         },
         {
             name: "Triton",
             mass: 2.14e22,
-            orbitalRadius: 354800, // Distance in kilometers
-            radius: 353.4, // Radius in kilometers
-            orbitalPeriod: -5.877, // Orbital period in Earth days (retrograde orbit)
-            orbitalInclination: 0, // in degrees
+            orbitalRadius: 354800,
+            radius: 353.4,
+            orbitalPeriod: -5.877,
+            orbitalInclination: 156.885, // Updated for retrograde orbit
+            eccentricity: 0.000016, // Almost perfectly circular
             color: "lightblue",
         },
     ],
-    // Pluto: [
-    //     {
-    //         name: "Charon",
-    //         orbitalRadius: 19591, // Distance in kilometers
-    //         radius: 606, // Radius in kilometers
-    //         color: "grey",
-    //         orbitalPeriod: 6.387, // Orbital period in Earth days
-    //     },
-    // ],
-};  
+};
