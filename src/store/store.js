@@ -12,6 +12,9 @@ const useStore = create(
         isBackgroundLoaded: false,
         toggleBackgroundLoaded: (newSate) => set({ isBackgroundLoaded: newSate }),
 
+        viewOnlyMode: false,
+        setViewOnlyMode: (newState) => set({ viewOnlyMode: newState }),
+
         simSpeed: 1, // 1 is realtime speed
         setSimSpeed: (newSpeed) => set({ simSpeed: newSpeed }),
         prevSpeed: 1,
