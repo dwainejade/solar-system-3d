@@ -25,6 +25,7 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  overflow: hidden;
 }
 body {
   font-family: helvetica neue, helvetica, arial, sans-serif;
@@ -393,7 +394,7 @@ body {
   height: 20px;
   width: 22px;
   left: 4px;
-  bottom: 3px;
+  bottom: 4px;
   border-radius: 50%;
   background-color: white;
   transition: 0.3s;
