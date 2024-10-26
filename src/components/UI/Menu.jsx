@@ -8,7 +8,7 @@ import FocusLock from 'react-focus-lock';
 const Menu = () => {
   const {
     simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, toggleFullscreen,
-    showDetailsMenu, toggleDetailsMenu
+    showDetailsMenu, toggleDetailsMenu, viewOnlyMode
   } = useStore();
   const {
     selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels, planetsData,
@@ -192,27 +192,31 @@ const Menu = () => {
       </div>
 
       {/* Details menu */}
-      <div
-        className={`details-menu ${selectedPlanet &&
-          (!isCameraTransitioning && showDetailsMenu && satelliteCamera || selectedPlanet?.name === "Sun" && !isZoomingToSun)
-          ? "open"
-          : "closed"
-          }`}
-        key={selectedPlanet?.name}
-      >
-        <div className="details-menu-inner">
-          {selectedPlanet?.name &&
-            <DetailsMenu />
-          }
-        </div>
-      </div>
-
-      {(showResetPlanetModal || showResetAllModal) && (
+      {!viewOnlyMode && (
         <>
-          <div className="backdrop" />
-          <FocusLock>
-            <ResetModal type={showResetPlanetModal ? "single" : "all"} handleResetAll={handleResetAll} />
-          </FocusLock>
+          <div
+            className={`details-menu ${selectedPlanet &&
+              (!isCameraTransitioning && showDetailsMenu && satelliteCamera || selectedPlanet?.name === "Sun" && !isZoomingToSun)
+              ? "open"
+              : "closed"
+              }`}
+            key={selectedPlanet?.name}
+          >
+            <div className="details-menu-inner">
+              {selectedPlanet?.name &&
+                <DetailsMenu />
+              }
+            </div>
+          </div>
+
+          {(showResetPlanetModal || showResetAllModal) && (
+            <>
+              <div className="backdrop" />
+              <FocusLock>
+                <ResetModal type={showResetPlanetModal ? "single" : "all"} handleResetAll={handleResetAll} />
+              </FocusLock>
+            </>
+          )}
         </>
       )}
     </div>

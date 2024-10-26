@@ -2,8 +2,9 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Html, PerformanceMonitor, useProgress } from "@react-three/drei";
+import { Html, PerformanceMonitor, useProgress, Stats } from "@react-three/drei";
 import useStore from "../../store/store";
+import { useExperimentsStore } from "../../store/experiments";
 import Menu from "../UI/Menu";
 import "../../styles.css";
 
@@ -45,13 +46,13 @@ const SharedCanvas = ({ children }) => {
         shadows dpr={dpr}
         gl={{
           antialias: true,
-          alpha: false,
+          // alpha: false,
           logarithmicDepthBuffer: true,
         }}
         camera={{ fov: 50, position: [20000, 20000, 20000], near: 0.1, far: 1000000 }}
-        frameloop="demand"
+      // frameloop="demand"
       >
-        {/* <Stats showPanel={2} /> */}
+        <Stats />
         <PerformanceMonitor onIncline={() => setDpr(2)} onDecline={() => setDpr(1)} />
 
         <Suspense fallback={<Loader />}>

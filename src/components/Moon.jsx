@@ -182,7 +182,7 @@ const Moon = forwardRef(({ moonData, planetPosition }, ref) => {
           name={name + "-orbit-path"}
           hiRes={isMoonSelected}
           lineType={'solid'}
-          opacity={0.3}
+          lineWidth={isMoonSelected ? 1 : .4}
         />
       )}
     </>

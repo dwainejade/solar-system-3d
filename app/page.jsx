@@ -6,7 +6,8 @@ const Home = () => {
       <h1>Scene Selector</h1>
       <nav>
         <Link href='/main/'>Main</Link>
-
+        <br />
+        <Link href='/experiments/'>Experiments</Link>
       </nav>
     </div>
   );

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import * as THREE from "three";
 import { Line } from "@react-three/drei";
+// import * as THREE from "three";
 
 function OrbitPath({
   origin,
@@ -9,8 +9,8 @@ function OrbitPath({
   orbitalInclination,
   color,
   name,
+  lineWidth = 1,
   opacity = 1,
-  lineType = 'solid',
   hiRes = false
 }) {
   const points = useMemo(() => {
@@ -42,12 +42,12 @@ function OrbitPath({
 
   return (
     <Line
+      name={name}
       points={points}
       color={color}
-      lineWidth={2}
+      lineWidth={lineWidth}
       transparent
       opacity={opacity}
-      dashed={false}
     />
   );
 }

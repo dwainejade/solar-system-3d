@@ -1,12 +1,11 @@
 "use client";
-
 import React, { useRef, useEffect, useState } from "react";
 import { CameraControls, useTexture } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "@/store/store";
 import { sizeScaleFactor } from "@/data/planetsData";
 // import { moonsData, moonSizeScaleFactor } from "@/data/moonsData";
 import Sun from "@/components/Sun";
-import Planet from "@/components/PlanetBasic";
+import Planet from "@/components/Planet";
 import Stars from "@/components/Stars"
 import { useFrame } from "@react-three/fiber";
 import AsteroidBelt from "@/components/AsteroidBelt";
@@ -15,7 +14,7 @@ import AsteroidBelt from "@/components/AsteroidBelt";
 const SceneThree = () => {
   const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed } = useStore();
   const { planetPositions, selectedPlanet, setSelectedPlanet, selectedMoon, setSelectedMoon, planetsData } = usePlanetStore();
-  const { satelliteCamera, triggerReset, setTriggerReset, isCameraTransitioning, toggleCameraTransitioning, isZoomingToSun, toggleZoomingToSun } = useCameraStore();
+  const { satelliteCamera, triggerReset, setTriggerReset, isCameraTransitioning, toggleCameraTransitioning, isZoomingToSun, toggleZoomingToSun, activeCamera, switchToOrbitCamera, switchToPlanetCamera } = useCameraStore();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
 
@@ -31,6 +30,15 @@ const SceneThree = () => {
     setSelectedPlanet(null)
     setSelectedMoon(null)
     setMinDistance(200);
+    switchToOrbitCamera({
+      type: 'orbit',
+      name: 'Sun',
+      position: sunSettings.position,
+      lookAt: sunSettings.position,
+      radius: 10,
+      rotationPeriod: 0,
+      axialTilt: 0
+    });
     // Set the target to the sun's position
     cameraControlsRef.current.setTarget(sunSettings.position.x, sunSettings.position.y, sunSettings.position.z, true);
     // Define an isometric position for the camera
@@ -79,7 +87,7 @@ const SceneThree = () => {
         cameraControlsRef.current.dollyTo(optimalDistance, true);
         toggleZoomingToSun(false)
       }
-      if (selectedPlanet.name === "Sun" && isZoomingToSun) {
+      if (activeCamera.target?.name === "Sun" && isZoomingToSun) {
         setMinDistance(200);
         cameraControlsRef.current.setTarget(0, 0, 0, true);
         if (cameraControlsRef.current.distance < 800) toggleZoomingToSun(false)
@@ -98,7 +106,7 @@ const SceneThree = () => {
   }, [triggerReset]);
 
   useEffect(() => {
-    if (selectedPlanet && !selectedMoon && selectedPlanet.name !== "Sun" && !isCameraTransitioning) {
+    if (activeCamera.target?.name !== "Sun") {
       setSelectedMoon(null);
       toggleCameraTransitioning(true); // Start the camera transition
       setPrevSpeed(simSpeed);
@@ -109,12 +117,12 @@ const SceneThree = () => {
     //   setPrevSpeed(simSpeed);
     //   setSimSpeed(0);
     // }
-    if (!selectedPlanet && !selectedMoon) {
-      toggleZoomingToSun(false)
-      setSimSpeed(prevSpeed);
-      toggleCameraTransitioning(false);
-    }
-    if (selectedPlanet?.name === "Sun") {
+    // if (!selectedPlanet && !selectedMoon) {
+    //   toggleZoomingToSun(false)
+    //   setSimSpeed(prevSpeed);
+    //   toggleCameraTransitioning(false);
+    // }
+    if (activeCamera.target?.name === "Sun") {
       toggleZoomingToSun(true)
       if (simSpeed === 0) {
         setSimSpeed(prevSpeed)
@@ -123,7 +131,7 @@ const SceneThree = () => {
     }
 
     cameraControlsRef.current?.camera.updateProjectionMatrix()
-  }, [selectedPlanet, selectedMoon]);
+  }, [selectedPlanet, activeCamera]);
 
   useEffect(() => {
     const handleMouseDown = (event) => {
@@ -182,20 +190,19 @@ const SceneThree = () => {
     far: 1000000,
   };
 
-
+  console.log(activeCamera)
   return (
     <>
       {!satelliteCamera && (
         <CameraControls
           ref={cameraControlsRef}
-          makeDefault={!satelliteCamera}
+          makeDefault={activeCamera.type === 'orbit'}
           {...cameraConfig}
           minDistance={minDistance}
           maxZoom={10}
         />
       )}
-      {/* <axesHelper args={[400]} /> */}
-      {/* <gridHelper args={[20000, 200]} scale={4} colorGrid={"red"} /> */}
+
       <Stars />
 
       <Planet name="Earth" textures={earthTextures} />
@@ -215,24 +222,5 @@ const SceneThree = () => {
     </>
   );
 };
-
-// function ControlledCamera({ selectedPlanet, planetPositions, planetsData, sizeScaleFactor }) {
-//   const orbitRef = useRef();
-//   const { camera, gl } = useThree();
-
-//   useEffect(() => {
-//     if (selectedPlanet && orbitRef.current) {
-//       const position = planetPositions[selectedPlanet.name];
-//       const data = planetsData[selectedPlanet.name];
-//       const distance = data.radius * sizeScaleFactor * 4.2; // or any other logic to determine the distance
-
-//       orbitRef.current.target.set(position.x, position.y, position.z);
-//       camera.position.set(position.x + distance, position.y + distance, position.z + distance);
-//       orbitRef.current.update();
-//     }
-//   }, [selectedPlanet, planetPositions, planetsData, sizeScaleFactor, camera]);
-
-//   return <OrbitControls makeDefault ref={orbitRef} args={[camera, gl.domElement]} />;
-// }
 
 export default SceneThree;
