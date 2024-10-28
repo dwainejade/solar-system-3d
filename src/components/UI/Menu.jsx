@@ -14,7 +14,7 @@ const Menu = () => {
     selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels, planetsData,
     resetPlanetsData, showResetPlanetModal, showResetAllModal, toggleResetAllModal, orbitPaths, toggleOrbitPaths,
   } = usePlanetStore();
-  const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning, satelliteCamera, autoRotate, isZoomingToSun } = useCameraStore();
+  const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning, satelliteCamera, autoRotate, isZoomingToSun, activeCamera, switchToOrbitCamera, switchToPlanetCamera, switchToSunCamera, resetCameraActiveCamera } = useCameraStore();
 
   const [firstRender, setFirstRender] = useState(true);
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -70,10 +70,12 @@ const Menu = () => {
     if (newSelectedPlanetName === 'reset-camera') {
       resetCamera();
       setSelectedPlanet(null);
+      resetCameraActiveCamera();
     } else {
       const newSelectedPlanet = planetsData[newSelectedPlanetName];
       setSelectedPlanet(newSelectedPlanet);
       toggleDetailsMenu(true);
+      switchToPlanetCamera(newSelectedPlanetName);
     }
   };
 
