@@ -1,10 +1,10 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 import useStore, { useCameraStore } from '../store/store';
 
-const MoonSatelliteCamera = ({ target, size, targetName, parentTransform = null }) => {
+const MoonSatelliteCamera = ({ target, size, targetName }) => {
     const {
         toggleCameraTransitioning,
         setAutoRotate,
@@ -18,184 +18,96 @@ const MoonSatelliteCamera = ({ target, size, targetName, parentTransform = null 
     const cameraRef = useRef();
     const targetRef = useRef(new THREE.Vector3());
 
-    const [isDragging, setIsDragging] = useState(false);
-    const [mouseDownPosition, setMouseDownPosition] = useState({ x: 0, y: 0 });
-    const [spherical, setSpherical] = useState(
-        new THREE.Spherical(size * 6, Math.PI / 2, 0)
-    );
-
-    const lerpFactor = 0.18; // Adjust to control smoothness
+    // Replace state with refs
+    const isDraggingRef = useRef(false);
+    const mousePositionRef = useRef({ x: 0, y: 0 });
+    const sphericalRef = useRef(new THREE.Spherical(size * 6, Math.PI / 2, 0));
 
     const handleUserInteraction = useCallback(() => {
         setAutoRotate(false);
     }, [setAutoRotate]);
 
     const handleMouseDown = useCallback((event) => {
-        setIsDragging(true);
-        setMouseDownPosition({ x: event.clientX, y: event.clientY });
+        isDraggingRef.current = true;
+        mousePositionRef.current = { x: event.clientX, y: event.clientY };
     }, []);
 
     const handleMouseUp = useCallback(() => {
-        setIsDragging(false);
+        isDraggingRef.current = false;
     }, []);
 
-    const handleMouseMove = useCallback(
-        (event) => {
-            if (isDragging) {
-                handleUserInteraction();
-                const dx = event.clientX - mouseDownPosition.x;
-                const dy = event.clientY - mouseDownPosition.y;
+    const handleMouseMove = useCallback((event) => {
+        if (!isDraggingRef.current) return;
 
-                const dampingFactor = 0.4;
+        handleUserInteraction();
+        const dx = event.clientX - mousePositionRef.current.x;
+        const dy = event.clientY - mousePositionRef.current.y;
 
-                setSpherical((prevSpherical) => {
-                    const newSpherical = new THREE.Spherical(
-                        prevSpherical.radius,
-                        prevSpherical.phi - dy * dampingFactor * 0.01,
-                        prevSpherical.theta - dx * dampingFactor * 0.01
-                    );
-                    newSpherical.phi = Math.max(
-                        0.1,
-                        Math.min(Math.PI - 0.1, newSpherical.phi)
-                    );
+        const dampingFactor = 0.4;
 
-                    return newSpherical;
-                });
+        // Update spherical coordinates directly
+        const newPhi = sphericalRef.current.phi - dy * dampingFactor * 0.01;
+        const newTheta = sphericalRef.current.theta - dx * dampingFactor * 0.01;
 
-                setMouseDownPosition({ x: event.clientX, y: event.clientY });
-            }
-        },
-        [isDragging, mouseDownPosition, handleUserInteraction]
-    );
+        sphericalRef.current.phi = Math.max(0.1, Math.min(Math.PI - 0.1, newPhi));
+        sphericalRef.current.theta = newTheta;
 
-    const handleWheel = useCallback(
-        (event) => {
-            if (!satelliteCamera) return;
+        mousePositionRef.current = { x: event.clientX, y: event.clientY };
+    }, [handleUserInteraction]);
 
-            const zoomSpeed = 0.01;
-            const deltaRadius = event.deltaY * zoomSpeed;
-            setSpherical((prevSpherical) => {
-                const newRadius = THREE.MathUtils.clamp(
-                    prevSpherical.radius + deltaRadius,
-                    .04,
-                    500
-                );
-                return new THREE.Spherical(
-                    newRadius,
-                    prevSpherical.phi,
-                    prevSpherical.theta
-                );
-            });
-            handleUserInteraction();
-        },
-        [satelliteCamera, size, handleUserInteraction]
-    );
+    const handleWheel = useCallback((event) => {
+        if (!satelliteCamera) return;
 
-    // Touch events
+        const zoomSpeed = 0.01;
+        const deltaRadius = event.deltaY * zoomSpeed;
+
+        // Update radius directly
+        sphericalRef.current.radius = THREE.MathUtils.clamp(
+            sphericalRef.current.radius + deltaRadius,
+            0.04,
+            500
+        );
+
+        handleUserInteraction();
+    }, [satelliteCamera, handleUserInteraction]);
+
     const handleStart = useCallback((event) => {
-        setIsDragging(true);
+        isDraggingRef.current = true;
         if (event.touches) {
             event.preventDefault();
-            setMouseDownPosition({
+            mousePositionRef.current = {
                 x: event.touches[0].clientX,
                 y: event.touches[0].clientY,
-            });
+            };
         } else {
-            setMouseDownPosition({ x: event.clientX, y: event.clientY });
+            mousePositionRef.current = { x: event.clientX, y: event.clientY };
         }
     }, []);
 
-    const handleMove = useCallback(
-        (event) => {
-            if (isDragging) {
-                handleUserInteraction();
-                const clientX = event.touches ? event.touches[0].clientX : event.clientX;
-                const clientY = event.touches ? event.touches[0].clientY : event.clientY;
-                const dx = clientX - mouseDownPosition.x;
-                const dy = clientY - mouseDownPosition.y;
+    const handleMove = useCallback((event) => {
+        if (!isDraggingRef.current) return;
 
-                setSpherical((prevSpherical) => {
-                    const newSpherical = new THREE.Spherical(
-                        prevSpherical.radius,
-                        prevSpherical.phi - dy * 0.003,
-                        prevSpherical.theta - dx * 0.003
-                    );
-                    newSpherical.phi = Math.max(
-                        0.1,
-                        Math.min(Math.PI - 0.1, newSpherical.phi)
-                    );
-                    return newSpherical;
-                });
+        handleUserInteraction();
+        const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+        const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+        const dx = clientX - mousePositionRef.current.x;
+        const dy = clientY - mousePositionRef.current.y;
 
-                setMouseDownPosition({ x: clientX, y: clientY });
-            }
-        },
-        [isDragging, mouseDownPosition, handleUserInteraction]
-    );
+        const newPhi = sphericalRef.current.phi - dy * 0.003;
+        const newTheta = sphericalRef.current.theta - dx * 0.003;
 
-    const handleEnd = useCallback(() => {
-        setIsDragging(false);
-    }, []);
+        sphericalRef.current.phi = Math.max(0.1, Math.min(Math.PI - 0.1, newPhi));
+        sphericalRef.current.theta = newTheta;
 
-    useEffect(() => {
-        const canvasElement = gl.domElement;
-
-        canvasElement.addEventListener('mousedown', handleMouseDown);
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
-        canvasElement.addEventListener('wheel', handleWheel, { passive: true });
-
-        // Touch events
-        canvasElement.addEventListener('touchstart', handleStart);
-        canvasElement.addEventListener('touchmove', handleMove);
-        canvasElement.addEventListener('touchend', handleEnd);
-
-        canvasElement.addEventListener('contextmenu', (event) => {
-            event.preventDefault();
-        });
-
-        return () => {
-            canvasElement.removeEventListener('mousedown', handleMouseDown);
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
-            canvasElement.removeEventListener('wheel', handleWheel);
-
-            // Touch events
-            canvasElement.removeEventListener('touchstart', handleStart);
-            canvasElement.removeEventListener('touchmove', handleMove);
-            canvasElement.removeEventListener('touchend', handleEnd);
-
-            canvasElement.removeEventListener('contextmenu', (event) => {
-                event.preventDefault();
-            });
-        };
-    }, [
-        handleMouseDown,
-        handleMouseMove,
-        handleMouseUp,
-        handleWheel,
-        handleStart,
-        handleMove,
-        handleEnd,
-        gl.domElement,
-    ]);
-
-    useEffect(() => {
-        return () => {
-            if (satelliteCamera) {
-                toggleSatelliteCamera(false);
-            }
-        };
-    }, [satelliteCamera, toggleSatelliteCamera]);
+        mousePositionRef.current = { x: clientX, y: clientY };
+    }, [handleUserInteraction]);
 
     useFrame((state, delta) => {
         if (!cameraRef.current || !target) return;
 
-        // Get the target's world position for distance check
         const targetWorldPos = new THREE.Vector3();
         target.getWorldPosition(targetWorldPos);
 
-        // Check if camera should switch
         if (activeCamera.name === targetName && !satelliteCamera) {
             const distance = orbitCamera.position.distanceTo(targetWorldPos);
             const sizeThreshold = Math.max(size * 4.5, 0.04);
@@ -208,40 +120,25 @@ const MoonSatelliteCamera = ({ target, size, targetName, parentTransform = null 
 
         if (!satelliteCamera) return;
 
-        // Handle auto-rotation
         if (autoRotate) {
-            const rotationSpeed = 0.05 * delta;
-            setSpherical(prev => new THREE.Spherical(
-                prev.radius,
-                prev.phi,
-                prev.theta + rotationSpeed
-            ));
+            sphericalRef.current.theta += 0.05 * delta;
         }
 
-        const localPosition = new THREE.Vector3().setFromSpherical(spherical);
-
-        // Get moon's position in planet's local space
+        const localPosition = new THREE.Vector3().setFromSpherical(sphericalRef.current);
         const moonPosition = target.position;
 
-        // Position camera relative to moon in planet's local space
         cameraRef.current.position.copy(localPosition).add(moonPosition);
-        const worldPosition = new THREE.Vector3();
-        target.getWorldPosition(worldPosition);
-        targetRef.current.copy(moonPosition);
-        cameraRef.current.lookAt(worldPosition);
 
-        // Ensure camera's up vector stays aligned with planet's local space
-        // cameraRef.current.up.set(0, 1, 0);
+        target.getWorldPosition(targetRef.current);
+        cameraRef.current.lookAt(targetRef.current);
         cameraRef.current.updateMatrixWorld();
     });
 
-    const switchCamera = (orbitCamera) => {
-        // Get world positions
+    const switchCamera = useCallback((orbitCamera) => {
         const targetWorldPos = new THREE.Vector3();
         target.getWorldPosition(targetWorldPos);
         const orbitCameraWorldPos = orbitCamera.position.clone();
 
-        // Convert to parent space
         const parent = target.parent;
         if (parent) {
             parent.updateWorldMatrix(true, false);
@@ -249,18 +146,47 @@ const MoonSatelliteCamera = ({ target, size, targetName, parentTransform = null 
             orbitCameraWorldPos.applyMatrix4(parentMatrixInverse);
         }
 
-        // Calculate relative position to moon in parent space
         const moonLocalPos = target.position.clone();
         const relativePosition = orbitCameraWorldPos.sub(moonLocalPos);
 
-        // Convert to spherical coordinates
-        const newSpherical = new THREE.Spherical().setFromVector3(relativePosition);
-        setSpherical(newSpherical);
+        sphericalRef.current.setFromVector3(relativePosition);
 
         toggleSatelliteCamera(true);
         toggleCameraTransitioning(false);
         setSimSpeed(prevSpeed);
-    };
+    }, [target, toggleSatelliteCamera, toggleCameraTransitioning, setSimSpeed, prevSpeed]);
+
+    useEffect(() => {
+        const canvasElement = gl.domElement;
+
+        canvasElement.addEventListener('mousedown', handleMouseDown);
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+        canvasElement.addEventListener('wheel', handleWheel, { passive: true });
+        canvasElement.addEventListener('touchstart', handleStart);
+        canvasElement.addEventListener('touchmove', handleMove);
+        canvasElement.addEventListener('touchend', handleMouseUp);
+        canvasElement.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        return () => {
+            canvasElement.removeEventListener('mousedown', handleMouseDown);
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+            canvasElement.removeEventListener('wheel', handleWheel);
+            canvasElement.removeEventListener('touchstart', handleStart);
+            canvasElement.removeEventListener('touchmove', handleMove);
+            canvasElement.removeEventListener('touchend', handleMouseUp);
+            canvasElement.removeEventListener('contextmenu', (e) => e.preventDefault());
+
+            if (satelliteCamera) {
+                toggleSatelliteCamera(false);
+            }
+        };
+    }, [
+        handleMouseDown, handleMouseMove, handleMouseUp,
+        handleWheel, handleStart, handleMove,
+        gl.domElement, satelliteCamera, toggleSatelliteCamera
+    ]);
 
     return (
         <PerspectiveCamera
