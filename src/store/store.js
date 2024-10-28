@@ -3,6 +3,7 @@ import { immer } from 'zustand/middleware/immer'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import * as THREE from 'three';
 import initialPlanetsData from '../data/planetsData';
+import initialMoonsData from '../data/moonsData';
 
 // add persitance to store
 const useStore = create(
@@ -141,8 +142,19 @@ const usePlanetStore = create(
                     }
                 });
             },
+            moonsData: initialMoonsData,
+            updateMoonData: (moonName, updates) => {
+                set((state) => {
+                    if (state.moonsData[moonName]) {
+                        Object.keys(updates).forEach(key => {
+                            state.moonsData[moonName][key] = updates[key];
+                        });
+                    }
+                });
+            },
             // Action to reset all planetsData to initial state
             resetPlanetsData: () => {
+                // localStorage.removeItem('solar-system-planets');
                 set((state) => {
                     state.planetsData = initialPlanetsData;
                 });
@@ -193,43 +205,81 @@ const usePlanetStore = create(
         },
     ));
 
+// type CameraTarget = {
+//     type: 'planet' | 'moon' | 'asteroid' | 'custom' | 'orbit',
+//     name: string,
+//     position: Vector3,
+//     lookAt: Vector3,
+//     radius: number,
+//     rotationPeriod?: number,
+//     axialTilt?: number,
+//     custom?: any // for any special handling
+// }
+
 const useCameraStore = create((set, get) => ({
-    satelliteCamera: false,
-    isCameraTransitioning: false,
-
-    // New camera management states
     activeCamera: {
-        type: 'orbit', // 'orbit', 'satellite', 'custom'
-        target: null,  // { name, type, position, lookAt }
+        type: 'orbit',
+        name: 'default',
+        parentName: null,
+        position: new THREE.Vector3(0, 0, 0),
+        lookAt: new THREE.Vector3(2000, 0, 2000),
     },
+    isCameraTransitioning: false,
+    autoRotate: false,
 
-    // Camera actions
-    setActiveCamera: (cameraType, target) => set({
-        activeCamera: {
-            type: cameraType,
-            target: target
-        }
+    setActiveCamera: (type, name) => set({
+        activeCamera: { type, name }
+    }),
+    toggleCameraTransitioning: (newState) => set({
+        isCameraTransitioning: newState
+    }),
+    setAutoRotate: (newState) => set({
+        autoRotate: newState
     }),
 
-    switchToOrbitCamera: (target) => {
-        const { setActiveCamera, toggleCameraTransitioning } = get();
-        toggleCameraTransitioning(true);
-        setActiveCamera('orbit', target);
+    switchToSunCamera: () => {
+        set({
+            activeCamera: {
+                type: 'orbit',
+                name: 'Sun'
+            }
+        })
     },
 
-    switchToSatelliteCamera: (target) => {
-        const { setActiveCamera, toggleCameraTransitioning } = get();
-        toggleCameraTransitioning(true);
-        setActiveCamera('satellite', target);
+    switchToPlanetCamera: (name) => {
+        set({
+            activeCamera: {
+                type: 'planet',
+                name
+            },
+            isCameraTransitioning: true
+        })
     },
 
-    switchToCustomCamera: (target) => {
-        const { setActiveCamera, toggleCameraTransitioning } = get();
-        toggleCameraTransitioning(true);
-        setActiveCamera('custom', target);
+    switchToMoonCamera: (parentName, name) => {
+        set({
+            activeCamera: {
+                type: 'moon',
+                name,
+                parentName
+            },
+            isCameraTransitioning: true
+        })
     },
 
-    resetCamera: () => {
+    switchToCustomCamera: (position, target) => {
+        set({
+            activeCamera: {
+                type: 'custom',
+                name: 'customCamera',
+                position,
+                lookAt: target
+            },
+            isCameraTransitioning: true
+        })
+    },
+
+    resetCameraActiveCamera: () => {
         const { setActiveCamera, toggleCameraTransitioning } = get();
         toggleCameraTransitioning(true);
         setActiveCamera('orbit', {

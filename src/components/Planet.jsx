@@ -8,7 +8,7 @@ import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCamera";
 import Moon from "./Moon";
 import Labels from "./Labels";
-import { moonsData } from "@/data/moonsData";
+import moonsData from "@/data/moonsData";
 import { earthAtmosphereShader } from "../shaders/atmosphere";
 import Rings from "./Rings";
 
@@ -59,7 +59,7 @@ const Planet = ({ name = 'Earth', textures }) => {
     setAutoRotate,
     autoRotate,
     activeCamera,
-    switchToSatelliteCamera,
+    switchToPlanetCamera,
   } = useCameraStore();
 
   const localRef = useRef();
@@ -165,7 +165,7 @@ const Planet = ({ name = 'Earth', textures }) => {
       } else {
         setScale(distance / 100);
       }
-      setShowTextures(distance < textureDisplayDistance);
+      setShowTextures(activeCamera.type === 'moon' || distance < textureDisplayDistance);
       const maxDistance = scaledRadius * 100;
       const minDistance = scaledRadius * 10;
       const opacity = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
@@ -187,22 +187,13 @@ const Planet = ({ name = 'Earth', textures }) => {
 
   const handleClick = e => {
     e.stopPropagation();
-    if (isDragging) return;
+    if (isDragging || isPlanetSelected) return;
+
     toggleDetailsMenu(true);
     setSelectedMoon(null);
-    if (isPlanetSelected) return;
     setSelectedPlanet(mergedData);
 
-    const planetPosition = localRef.current.position.clone();
-    switchToSatelliteCamera({
-      type: 'planet',
-      name,
-      position: planetPosition,
-      lookAt: planetPosition,
-      radius: scaledRadius,
-      rotationPeriod,
-      axialTilt
-    });
+    switchToPlanetCamera(name);
   };
 
   const handlePointerDown = e => {
@@ -246,13 +237,11 @@ const Planet = ({ name = 'Earth', textures }) => {
 
   return (
     <>
-      {activeCamera.target?.name === name && localRef.current &&
+      {activeCamera?.name === name && localRef.current &&
         <SatelliteCamera
           target={localRef.current}
           targetName={name}
           size={scaledRadius}
-          satelliteCamera={satelliteCamera}
-          toggleSatelliteCamera={toggleSatelliteCamera}
         />
       }
 
@@ -376,6 +365,7 @@ const Planet = ({ name = 'Earth', textures }) => {
                 key={`${name}-moon-${index}`}
                 moonData={moon}
                 planetPosition={localRef.current?.position}
+                parentName={name}
               />
             </group>
           );

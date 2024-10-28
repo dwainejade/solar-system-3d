@@ -1,12 +1,13 @@
 export const moonDistanceScaleFactor = 0.0001;
 export const moonSizeScaleFactor = .00035;
 
-export const moonsData = {
-    Mercury: [], // Mercury has no moons
-    Venus: [], // Venus has no moons
+const moonsData = {
+    Mercury: [],
+    Venus: [],
     Earth: [
         {
             name: "Moon",
+            id: 'earth-moon',
             mass: 7.342e22,
             orbitalRadius: 384400,
             radius: 1737.1,
@@ -19,6 +20,7 @@ export const moonsData = {
     Mars: [
         {
             name: "Deimos",
+            id: 'earth-deimos',
             mass: 1.48e15,
             orbitalRadius: 23460,
             radius: 6.2,
@@ -29,6 +31,7 @@ export const moonsData = {
         },
         {
             name: "Phobos",
+            id: 'earth-phobos',
             mass: 1.066e16,
             orbitalRadius: 9376,
             radius: 11.2677,
@@ -41,6 +44,7 @@ export const moonsData = {
     Jupiter: [
         {
             name: "Callisto",
+            id: 'jupiter-callisto',
             mass: 1.0758e23,
             orbitalRadius: 1882700,
             radius: 2410.3,
@@ -51,6 +55,7 @@ export const moonsData = {
         },
         {
             name: "Europa",
+            id: 'jupiter-europa',
             mass: 4.7998e22,
             orbitalRadius: 671100,
             radius: 1560.8,
@@ -61,6 +66,7 @@ export const moonsData = {
         },
         {
             name: "Ganymede",
+            id: 'jupiter-ganymede',
             mass: 1.4819e23,
             orbitalRadius: 1070400,
             radius: 2634.1,
@@ -71,6 +77,7 @@ export const moonsData = {
         },
         {
             name: "Io",
+            id: 'jupiter-io',
             mass: 8.9319e22,
             orbitalRadius: 421700,
             radius: 1821.6,
@@ -83,6 +90,7 @@ export const moonsData = {
     Saturn: [
         {
             name: "Dione",
+            id: 'saturn-dione',
             mass: 1.095452e21,
             orbitalRadius: 377396,
             radius: 561.7,
@@ -93,6 +101,7 @@ export const moonsData = {
         },
         {
             name: "Enceladus",
+            id: 'saturn-enceladus',
             mass: 1.08022e20,
             orbitalRadius: 237948,
             radius: 252.1,
@@ -103,6 +112,7 @@ export const moonsData = {
         },
         {
             name: "Iapetus",
+            id: 'saturn-iapetus',
             mass: 1.805635e21,
             orbitalRadius: 3560820,
             radius: 734.5,
@@ -113,6 +123,7 @@ export const moonsData = {
         },
         {
             name: "Mimas",
+            id: 'saturn-mimas',
             mass: 3.7493e19,
             orbitalRadius: 185539,
             radius: 198.2,
@@ -123,6 +134,7 @@ export const moonsData = {
         },
         {
             name: "Rhea",
+            id: 'saturn-rhea',
             mass: 2.306518e21,
             orbitalRadius: 527108,
             radius: 763.8,
@@ -133,6 +145,7 @@ export const moonsData = {
         },
         {
             name: "Tethys",
+            id: 'saturn-tethys',
             mass: 6.17449e20,
             orbitalRadius: 294619,
             radius: 531.1,
@@ -143,6 +156,7 @@ export const moonsData = {
         },
         {
             name: "Titan",
+            id: 'saturn-titan',
             mass: 1.3452e23,
             orbitalRadius: 1221870,
             radius: 2574.73,
@@ -155,6 +169,7 @@ export const moonsData = {
     Uranus: [
         {
             name: "Ariel",
+            id: 'uranus-ariel',
             mass: 1.353e21,
             orbitalRadius: 191020,
             radius: 578.9,
@@ -165,6 +180,7 @@ export const moonsData = {
         },
         {
             name: "Miranda",
+            id: 'uranus-miranda',
             mass: 6.59e19,
             orbitalRadius: 129900,
             radius: 235.8,
@@ -175,6 +191,7 @@ export const moonsData = {
         },
         {
             name: "Oberon",
+            id: 'uranus-oberon',
             mass: 3.014e21,
             orbitalRadius: 583520,
             radius: 761.4,
@@ -185,6 +202,7 @@ export const moonsData = {
         },
         {
             name: "Titania",
+            id: 'uranus-titania',
             mass: 3.527e21,
             orbitalRadius: 436300,
             radius: 788.9,
@@ -195,6 +213,7 @@ export const moonsData = {
         },
         {
             name: "Umbriel",
+            id: 'uranus-umbriel',
             mass: 1.172e21,
             orbitalRadius: 266000,
             radius: 584.7,
@@ -207,6 +226,7 @@ export const moonsData = {
     Neptune: [
         {
             name: "Nereid",
+            id: 'neptune-nereid',
             mass: 3.1e20,
             orbitalRadius: 5513800,
             radius: 1737,
@@ -217,6 +237,7 @@ export const moonsData = {
         },
         {
             name: "Triton",
+            id: 'neptune-triton',
             mass: 2.14e22,
             orbitalRadius: 354800,
             radius: 353.4,
@@ -226,4 +247,29 @@ export const moonsData = {
             color: "lightblue",
         },
     ],
+};
+export default moonsData;
+
+// Find a moon by its name and parent planet name
+export const findMoonByName = (moonName, parentPlanetName) => {
+    // Check if the parent planet exists and has moons
+    const planetMoons = moonsData[parentPlanetName];
+    if (!planetMoons) return null;
+
+    // Find the specific moon
+    return planetMoons.find(moon => moon.name === moonName);
+};
+
+// Alternative method using Object.entries if you only have the moon name
+export const findMoonAndParent = (moonName) => {
+    for (const [planetName, moons] of Object.entries(moonsData)) {
+        const moon = moons.find(moon => moon.name === moonName);
+        if (moon) {
+            return {
+                moon,
+                parentPlanet: planetName
+            };
+        }
+    }
+    return null;
 };
