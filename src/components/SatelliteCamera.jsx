@@ -42,7 +42,7 @@ const SatelliteCamera = ({ target, size, targetName }) => {
         const dx = event.clientX - mousePositionRef.current.x;
         const dy = event.clientY - mousePositionRef.current.y;
 
-        const dampingFactor = 0.4;
+        const dampingFactor = 0.45;
 
         // Update spherical coordinates directly in the ref
         const newPhi = sphericalRef.current.phi - dy * dampingFactor * 0.01;

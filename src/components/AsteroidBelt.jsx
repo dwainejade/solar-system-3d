@@ -138,7 +138,7 @@ const AsteroidBelt = ({ meshCount = 200 }) => {
                             scale={asteroid.scale}
                         >
                             <dodecahedronGeometry args={[1, 0]} />
-                            <meshStandardMaterial
+                            <meshBasicMaterial
                                 color={asteroid.color}
                                 roughness={0.7}
                                 metalness={.5}

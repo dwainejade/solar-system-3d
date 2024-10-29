@@ -8,7 +8,7 @@ import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCamera";
 import Moon from "./Moon";
 import Labels from "./Labels";
-import { moonsData } from "@/data/moonsData";
+import moonsData from "@/data/moonsData";
 import { earthAtmosphereShader } from "../shaders/atmosphere";
 import Rings from "./Rings";
 
@@ -57,7 +57,8 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
     satelliteCamera,
     toggleSatelliteCamera,
     setAutoRotate,
-    autoRotate
+    autoRotate,
+    switchToPlanetCamera
   } = useCameraStore();
 
   const localRef = ref || useRef();
@@ -188,8 +189,14 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
     if (isDragging) return;
     toggleDetailsMenu(true);
     setSelectedMoon(null);
+
     if (isPlanetSelected) return;
     setSelectedPlanet(mergedData);
+
+    switchToPlanetCamera({
+      type: 'planet',
+      name
+    });
   };
 
   const handlePointerDown = e => {
@@ -377,7 +384,7 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
           orbitalInclination={orbitalInclination}
           color={color}
           name={name + "-orbit-path"}
-          opacity={.4}
+          opacity={orbitPathOpacity}
           hiRes={isPlanetSelected}
         />
       )}

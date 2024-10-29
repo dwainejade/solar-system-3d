@@ -9,6 +9,7 @@ import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCameraMoon";
 import Labels from "./Labels";
 
+
 const Moon = forwardRef(({ moonData, planetPosition, parentName }, ref) => {
   const {
     name,
@@ -121,7 +122,6 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName }, ref) => {
 
   const handleClick = e => {
     e.stopPropagation();
-    console.log(activeCamera)
     if (isMoonSelected) return;
     // setSelectedPlanet(null);
     toggleDetailsMenu(true);
@@ -142,8 +142,6 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName }, ref) => {
 
   const [scale, setScale] = useState(scaledRadius);
   const [textSize, setTextSize] = useState(1);
-  // console.log(activeCamera)
-  const parentGroupRef = useRef();
 
   return (
     <>
@@ -164,7 +162,7 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName }, ref) => {
           onPointerOut={handlePointerOut}
           onClick={handleClick}
         >
-          <sphereGeometry args={[scaledRadius, 14, 12]} />
+          <sphereGeometry args={[scaledRadius, (isMoonSelected ? 32 : 14), (isMoonSelected ? 16 : 12)]} />
           <meshStandardMaterial
             metalness={0.5}
             roughness={0.5}

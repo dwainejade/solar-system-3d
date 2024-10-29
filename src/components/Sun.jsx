@@ -7,7 +7,7 @@ import { sunOuterShader } from "../shaders/atmosphere";
 
 const Sun = ({ position, textures }) => {
   const { selectedPlanet, setSelectedPlanet, planetsData } = usePlanetStore();
-  const { toggleZoomingToSun, switchToOrbitCamera } = useCameraStore();
+  const { toggleZoomingToSun, switchToSunCamera } = useCameraStore();
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
   const { simSpeed } = useStore();
@@ -22,15 +22,7 @@ const Sun = ({ position, textures }) => {
     }
     if (!isDragging) {
       setSelectedPlanet(planetsData.Sun);
-      switchToOrbitCamera({
-        type: 'orbit',
-        name,
-        position,
-        lookAt: position,
-        radius: sunRadius,
-        rotationPeriod,
-        axialTilt: 0
-      })
+      switchToSunCamera();
       toggleZoomingToSun(true);
     }
   };

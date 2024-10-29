@@ -85,13 +85,13 @@ const useStore = create(
         previousCameraPosition: new THREE.Vector3(),
         setOrbitControls: (controls) => set({ orbitControls: controls }),
 
-        resetCamera: () => {
-            const { orbitControls } = get();
-            if (orbitControls) {
-                orbitControls.target.set(0, 0, 0); // Assuming the sun is at the origin
-                orbitControls.update();
-            }
-        },
+        // resetCamera: () => {
+        //     const { orbitControls } = get();
+        //     if (orbitControls) {
+        //         orbitControls.target.set(0, 0, 0); // Assuming the sun is at the origin
+        //         orbitControls.update();
+        //     }
+        // },
     }
 
     ));
@@ -216,26 +216,77 @@ const usePlanetStore = create(
 //     custom?: any // for any special handling
 // }
 
+const defaultCamera = {
+    type: 'orbit',
+    name: 'default',
+    parentName: null,
+    position: new THREE.Vector3(7000, 6000, -6000),
+    lookAt: new THREE.Vector3(0, 0, 0),
+}
+
 const useCameraStore = create((set, get) => ({
-    activeCamera: {
-        type: 'orbit',
-        name: 'default',
-        parentName: null,
-        position: new THREE.Vector3(0, 0, 0),
-        lookAt: new THREE.Vector3(2000, 0, 2000),
-    },
+    activeCamera: defaultCamera,
     isCameraTransitioning: false,
     autoRotate: false,
+    orbitControls: null,
 
     setActiveCamera: (type, name) => set({
         activeCamera: { type, name }
     }),
+
+    setOrbitControls: (controls) => set({
+        orbitControls: controls
+    }),
+
     toggleCameraTransitioning: (newState) => set({
         isCameraTransitioning: newState
     }),
+
     setAutoRotate: (newState) => set({
         autoRotate: newState
     }),
+
+    resetCamera: () => {
+        const { orbitControls } = get();
+
+        // Reset camera state
+        set({
+            activeCamera: defaultCamera,
+            isCameraTransitioning: true,
+            autoRotate: false,
+            satelliteCamera: false,
+            orbitCamera: true,
+            selectedMoonCameraActive: false,
+            isZoomingToSun: false,
+            isSurfaceCameraActive: false,
+            surfacePoint: null,
+            cameraSurfacePoint: null,
+            surfaceNormal: [0, 1, 0],
+            cameraSurfaceNormal: [0, 1, 0],
+            cameraTarget: defaultCamera.lookAt,
+            satelliteCameraState: {
+                position: null,
+                rotation: null,
+                targetPosition: null
+            }
+        });
+
+        // Reset orbit controls if they exist
+        if (orbitControls) {
+            orbitControls.target.set(0, 0, 0);
+            orbitControls.object.position.set(
+                defaultCamera.position.x,
+                defaultCamera.position.y,
+                defaultCamera.position.z
+            );
+            orbitControls.update();
+        }
+
+        // Reset selections in planet store
+        const { setSelectedPlanet, setSelectedMoon } = usePlanetStore.getState();
+        setSelectedPlanet(null);
+        setSelectedMoon(null);
+    },
 
     switchToSunCamera: () => {
         set({
@@ -243,7 +294,7 @@ const useCameraStore = create((set, get) => ({
                 type: 'orbit',
                 name: 'Sun'
             }
-        })
+        });
     },
 
     switchToPlanetCamera: (name) => {
@@ -253,7 +304,7 @@ const useCameraStore = create((set, get) => ({
                 name
             },
             isCameraTransitioning: true
-        })
+        });
     },
 
     switchToMoonCamera: (parentName, name) => {
@@ -264,76 +315,50 @@ const useCameraStore = create((set, get) => ({
                 parentName
             },
             isCameraTransitioning: true
-        })
+        });
     },
 
     switchToCustomCamera: (position, target) => {
         set({
             activeCamera: {
                 type: 'custom',
-                name: 'customCamera',
+                name: 'custom-camera',
                 position,
                 lookAt: target
             },
             isCameraTransitioning: true
-        })
-    },
-
-    resetCameraActiveCamera: () => {
-        const { setActiveCamera, toggleCameraTransitioning } = get();
-        toggleCameraTransitioning(true);
-        setActiveCamera('orbit', {
-            type: 'default',
-            position: new THREE.Vector3(-2000, 1000, 1000),
-            lookAt: new THREE.Vector3(0, 0, 0)
         });
     },
 
-    // old camera management states
-    // satelliteCamera: false,
+    // Legacy camera states - maintained for backward compatibility
+    satelliteCamera: false,
     toggleSatelliteCamera: (newState) => set(() => ({ satelliteCamera: newState })),
     orbitCamera: true,
     toggleOrbitCamera: (newState) => set(() => ({ orbitCamera: newState })),
-
     selectedMoonCameraActive: false,
     setSelectedMoonCameraActive: (newState) => set(() => ({ selectedMoonCameraActive: newState })),
-
-    // isCameraTransitioning: false,
-    toggleCameraTransitioning: (newState) => set(() => ({ isCameraTransitioning: newState })),
-
     isZoomingToSun: false,
     toggleZoomingToSun: (newState) => set(() => ({ isZoomingToSun: newState })),
-
-    autoRotate: false,
-    setAutoRotate: (newState) => set(() => ({ autoRotate: newState })),
-
     surfacePoint: null,
     setSurfacePoint: (surfacePoint) => set({ surfacePoint }),
     surfaceNormal: [0, 1, 0],
     setSurfaceNormal: (surfaceNormal) => set({ surfaceNormal }),
-
     cameraSurfacePoint: null,
     setCameraSurfacePoint: (cameraSurfacePoint) => set({ cameraSurfacePoint }),
     cameraSurfaceNormal: [0, 1, 0],
     setCameraSurfaceNormal: (cameraSurfaceNormal) => set({ cameraSurfaceNormal }),
-
     isSurfaceCameraActive: false,
     toggleSurfaceCamera: () => set((state) => ({ isSurfaceCameraActive: !state.isSurfaceCameraActive })),
-
     cameraTarget: new THREE.Vector3(),
     setCameraTarget: (target) => set({ cameraTarget: target }),
-
     satelliteCameraState: {
         position: null,
         rotation: null,
         targetPosition: null
     },
-    setSatelliteCameraState: (position, rotation, targetPosition) => set({ satelliteCameraState: { position, rotation, targetPosition } }),
-
-    triggerReset: null, // Placeholder for a function to reset the camera
-    setTriggerReset: (newState) => set({ triggerReset: newState }),
+    setSatelliteCameraState: (position, rotation, targetPosition) => set({
+        satelliteCameraState: { position, rotation, targetPosition }
+    }),
 }));
-
-
 
 export { usePlanetStore, useCameraStore }

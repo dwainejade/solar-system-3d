@@ -8,6 +8,7 @@ const moonsData = {
         {
             name: "Moon",
             id: 'earth-moon',
+            parentName: 'Earth',
             mass: 7.342e22,
             orbitalRadius: 384400,
             radius: 1737.1,
@@ -21,6 +22,7 @@ const moonsData = {
         {
             name: "Deimos",
             id: 'earth-deimos',
+            parentName: 'Mars',
             mass: 1.48e15,
             orbitalRadius: 23460,
             radius: 6.2,
@@ -32,6 +34,7 @@ const moonsData = {
         {
             name: "Phobos",
             id: 'earth-phobos',
+            parentName: 'Mars',
             mass: 1.066e16,
             orbitalRadius: 9376,
             radius: 11.2677,
@@ -45,6 +48,7 @@ const moonsData = {
         {
             name: "Callisto",
             id: 'jupiter-callisto',
+            parentName: 'Jupiter',
             mass: 1.0758e23,
             orbitalRadius: 1882700,
             radius: 2410.3,
@@ -56,6 +60,7 @@ const moonsData = {
         {
             name: "Europa",
             id: 'jupiter-europa',
+            parentName: 'Jupiter',
             mass: 4.7998e22,
             orbitalRadius: 671100,
             radius: 1560.8,
@@ -67,6 +72,7 @@ const moonsData = {
         {
             name: "Ganymede",
             id: 'jupiter-ganymede',
+            parentName: 'Jupiter',
             mass: 1.4819e23,
             orbitalRadius: 1070400,
             radius: 2634.1,
@@ -78,6 +84,7 @@ const moonsData = {
         {
             name: "Io",
             id: 'jupiter-io',
+            parentName: 'Jupiter',
             mass: 8.9319e22,
             orbitalRadius: 421700,
             radius: 1821.6,
@@ -91,6 +98,7 @@ const moonsData = {
         {
             name: "Dione",
             id: 'saturn-dione',
+            parentName: 'Saturn',
             mass: 1.095452e21,
             orbitalRadius: 377396,
             radius: 561.7,
@@ -102,6 +110,7 @@ const moonsData = {
         {
             name: "Enceladus",
             id: 'saturn-enceladus',
+            parentName: 'Saturn',
             mass: 1.08022e20,
             orbitalRadius: 237948,
             radius: 252.1,
@@ -113,6 +122,7 @@ const moonsData = {
         {
             name: "Iapetus",
             id: 'saturn-iapetus',
+            parentName: 'Saturn',
             mass: 1.805635e21,
             orbitalRadius: 3560820,
             radius: 734.5,
@@ -124,6 +134,7 @@ const moonsData = {
         {
             name: "Mimas",
             id: 'saturn-mimas',
+            parentName: 'Saturn',
             mass: 3.7493e19,
             orbitalRadius: 185539,
             radius: 198.2,
@@ -135,6 +146,7 @@ const moonsData = {
         {
             name: "Rhea",
             id: 'saturn-rhea',
+            parentName: 'Saturn',
             mass: 2.306518e21,
             orbitalRadius: 527108,
             radius: 763.8,
@@ -146,6 +158,7 @@ const moonsData = {
         {
             name: "Tethys",
             id: 'saturn-tethys',
+            parentName: 'Saturn',
             mass: 6.17449e20,
             orbitalRadius: 294619,
             radius: 531.1,
@@ -157,6 +170,7 @@ const moonsData = {
         {
             name: "Titan",
             id: 'saturn-titan',
+            parentName: 'Saturn',
             mass: 1.3452e23,
             orbitalRadius: 1221870,
             radius: 2574.73,
@@ -170,6 +184,7 @@ const moonsData = {
         {
             name: "Ariel",
             id: 'uranus-ariel',
+            parentName: 'Uranus',
             mass: 1.353e21,
             orbitalRadius: 191020,
             radius: 578.9,
@@ -181,6 +196,7 @@ const moonsData = {
         {
             name: "Miranda",
             id: 'uranus-miranda',
+            parentName: 'Uranus',
             mass: 6.59e19,
             orbitalRadius: 129900,
             radius: 235.8,
@@ -192,6 +208,7 @@ const moonsData = {
         {
             name: "Oberon",
             id: 'uranus-oberon',
+            parentName: 'Uranus',
             mass: 3.014e21,
             orbitalRadius: 583520,
             radius: 761.4,
@@ -203,6 +220,7 @@ const moonsData = {
         {
             name: "Titania",
             id: 'uranus-titania',
+            parentName: 'Uranus',
             mass: 3.527e21,
             orbitalRadius: 436300,
             radius: 788.9,
@@ -214,6 +232,7 @@ const moonsData = {
         {
             name: "Umbriel",
             id: 'uranus-umbriel',
+            parentName: 'Uranus',
             mass: 1.172e21,
             orbitalRadius: 266000,
             radius: 584.7,
@@ -227,6 +246,7 @@ const moonsData = {
         {
             name: "Nereid",
             id: 'neptune-nereid',
+            parentName: 'Neptune',
             mass: 3.1e20,
             orbitalRadius: 5513800,
             radius: 1737,
@@ -238,6 +258,7 @@ const moonsData = {
         {
             name: "Triton",
             id: 'neptune-triton',
+            parentName: 'Neptune',
             mass: 2.14e22,
             orbitalRadius: 354800,
             radius: 353.4,

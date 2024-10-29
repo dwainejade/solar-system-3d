@@ -1,6 +1,6 @@
 import React, { useRef, forwardRef, useState, useEffect } from "react";
 import * as THREE from "three";
-import { useFrame } from "@react-three/fiber";
+import { act, render, useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
@@ -30,15 +30,6 @@ const Planet = ({ name = 'Earth', textures }) => {
     initialOrbitalAngle,
     eccentricity,
   } = mergedData;
-
-  // Add debug logging
-  useEffect(() => {
-    console.log(`Planet ${name} data:`, {
-      eccentricity,
-      bodyData,
-      mergedData
-    });
-  }, [name, eccentricity, bodyData]);
 
   const { simSpeed, toggleDetailsMenu } = useStore();
   const {
@@ -78,7 +69,12 @@ const Planet = ({ name = 'Earth', textures }) => {
   rotationSpeed *= rotationSpeedScaleFactor;
 
   const isPlanetSelected = selectedPlanet && selectedPlanet.name === name;
-  const detailLevel = isPlanetSelected ? 64 : 16;
+  const renderMoons = () => {
+    if (isPlanetSelected) return true
+    else if (selectedMoon?.parentName === name) return true
+    return false
+  }
+  const detailLevel = (isPlanetSelected || renderMoons()) ? 64 : 16;
 
   const [scale, setScale] = useState(scaledRadius);
   const textSize = useRef(1);
@@ -160,14 +156,14 @@ const Planet = ({ name = 'Earth', textures }) => {
 
       // Handle scaling and visibility
       const distance = localRef.current.position.distanceTo(state.camera.position);
-      if (distance / 100 <= scaledRadius) {
+      if (distance / 1000 <= scaledRadius) {
         setScale(scaledRadius);
       } else {
-        setScale(distance / 100);
+        setScale(distance / 1000);
       }
       setShowTextures(activeCamera.type === 'moon' || distance < textureDisplayDistance);
       const maxDistance = scaledRadius * 100;
-      const minDistance = scaledRadius * 10;
+      const minDistance = scaledRadius * 1;
       const opacity = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
       setOrbitPathOpacity(opacity);
 
@@ -187,8 +183,8 @@ const Planet = ({ name = 'Earth', textures }) => {
 
   const handleClick = e => {
     e.stopPropagation();
-    if (isDragging || isPlanetSelected) return;
-
+    if (isDragging || activeCamera.name === name) return;
+    console.log(selectedMoon)
     toggleDetailsMenu(true);
     setSelectedMoon(null);
     setSelectedPlanet(mergedData);
@@ -235,6 +231,9 @@ const Planet = ({ name = 'Earth', textures }) => {
 
   const moons = moonsData[name] || [];
 
+
+
+
   return (
     <>
       {activeCamera?.name === name && localRef.current &&
@@ -255,9 +254,8 @@ const Planet = ({ name = 'Earth', textures }) => {
           onPointerOver={handlePointerOver}
           onPointerOut={handlePointerOut}
         >
-          {isPlanetSelected
-            ? null
-            : <sphereGeometry args={[scale * 3, 8, 8]} />
+          {activeCamera?.name !== name &&
+            <sphereGeometry args={[renderMoons() ? scaledRadius : scale * 8, 8, 8]} />
           }
         </mesh>
 
@@ -266,8 +264,8 @@ const Planet = ({ name = 'Earth', textures }) => {
           key={isPlanetSelected ? name + '-textured' : name + '-basic'}
           onDoubleClick={handleDoubleClick}
         >
-          <sphereGeometry args={[(isPlanetSelected ? scaledRadius : scale), detailLevel, detailLevel / 2]} />
-          {(!isPlanetSelected && texturesLoaded) ?
+          <sphereGeometry args={[(renderMoons() ? scaledRadius : scale * 8), detailLevel, detailLevel / 2]} />
+          {((!isPlanetSelected && !renderMoons()) && texturesLoaded) ?
             <meshBasicMaterial color={color} />
             :
             <>
@@ -354,7 +352,7 @@ const Planet = ({ name = 'Earth', textures }) => {
           </Html>
         )}
 
-        {isPlanetSelected && moons.map((moon, index) => {
+        {renderMoons() && moons.map((moon, index) => {
           const shouldAlignWithTilt = ["Saturn", "Uranus"].includes(name);
           return (
             <group

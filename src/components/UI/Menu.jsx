@@ -12,14 +12,18 @@ const Menu = () => {
   } = useStore();
   const {
     selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels, planetsData,
-    resetPlanetsData, showResetPlanetModal, showResetAllModal, toggleResetAllModal, orbitPaths, toggleOrbitPaths,
+    resetPlanetsData, showResetPlanetModal, showResetAllModal, toggleResetAllModal, orbitPaths, toggleOrbitPaths, moonsData, setSelectedMoon, selectedMoon
   } = usePlanetStore();
-  const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning, satelliteCamera, autoRotate, isZoomingToSun, activeCamera, switchToOrbitCamera, switchToPlanetCamera, switchToSunCamera, resetCameraActiveCamera } = useCameraStore();
+  const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning, satelliteCamera, autoRotate, isZoomingToSun, switchToMoonCamera, switchToOrbitCamera, switchToPlanetCamera, activeCamera, resetCamera } = useCameraStore();
 
   const [firstRender, setFirstRender] = useState(true);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [textClass, setTextClass] = useState('');
   const [displayText, setDisplayText] = useState('');
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [hoveredPlanetName, setHoveredPlanetName] = useState(null); // Track which planet's moons are displayed
+
 
   const toggleMenu = () => {
     setMenuOpen(!isMenuOpen);
@@ -33,10 +37,6 @@ const Menu = () => {
     setTriggerReset(true);
     resetPlanetsData();
     toggleSatelliteCamera(false);
-  };
-
-  const resetCamera = () => {
-    setTriggerReset(true);
   };
 
   const handleFullscreen = () => {
@@ -65,20 +65,33 @@ const Menu = () => {
     setPrevSpeed(newSpeed);
   };
 
-  const handlePlanetChange = (e) => {
-    const newSelectedPlanetName = e.target.value;
-    if (newSelectedPlanetName === 'reset-camera') {
-      resetCamera();
-      setSelectedPlanet(null);
-      resetCameraActiveCamera();
-    } else {
-      const newSelectedPlanet = planetsData[newSelectedPlanetName];
-      setSelectedPlanet(newSelectedPlanet);
-      toggleDetailsMenu(true);
-      switchToPlanetCamera(newSelectedPlanetName);
+  const handlePlanetSelect = (planetName) => {
+    const planet = planetsData[planetName];
+    setSelectedPlanet(planet);
+    setSelectedMoon(null);
+    toggleDetailsMenu(true);
+    switchToPlanetCamera(planetName);
+    setIsDropdownOpen(false); // Close dropdown after selection
+  };
+
+  const handleMoonSelect = (planetName, moonName) => {
+    const planet = planetsData[planetName];
+    const moon = moonsData[planetName]?.find((m) => m.name === moonName);
+    setSelectedMoon(moon);
+    switchToMoonCamera(hoveredPlanetName, moonName);
+    setIsDropdownOpen(false);
+    if (selectedPlanet && selectedPlanet.name !== planetName) {
+      setSelectedPlanet(planetName);
     }
   };
 
+  const handleSolarSystemSelect = () => {
+    setSelectedPlanet(null);
+    setSelectedMoon(null);
+    resetCamera();
+    setIsDropdownOpen(false);
+  };
+  // console.log({ selectedPlanet, selectedMoon })
   useLayoutEffect(() => {
     setPrevSpeed(1);
     setSimSpeed(1);
@@ -111,39 +124,62 @@ const Menu = () => {
 
   return (
     <div className={`menu-wrapper ${showResetAllModal || showResetPlanetModal ? "disabled" : "enabled"}`}>
-
-      {/* Text that slides and fades in/out */}
       <div className={`auto-rotate-text ${textClass}`}>
         {displayText}
       </div>
-      {/* Reset button */}
+
       <button className="reset-all-btn btn" onClick={handleResetBtn} />
-      {/* Fullscreen button */}
       <button className="fullscreen-btn btn" onClick={handleFullscreen} />
 
-      {/* Bottom menu */}
       <div className={`bottom-menu ${isMenuOpen ? "open" : "closed"}`}>
         <button onClick={toggleMenu} className="menu-toggle-btn btn" />
 
         <div className="left-con">
-          {/* Dropdown for selecting planets */}
           <div className="menu-item">
-            <label htmlFor="planetSelection">Select a Planet</label>
-            <select
-              id="planetSelection"
-              onChange={handlePlanetChange}
-              value={selectedPlanet?.name || "Select a Planet"}
-              disabled={!isMenuOpen}
-            >
-              <option value="reset-camera">Solar System</option>
-              {Object.keys(planetsData).map((planetName) => (
-                <option key={planetName} value={planetName}>
-                  {planetName}
-                </option>
-              ))}
-            </select>
+            <label>Select a Planet</label>
+            <div className="dropdown-container">
+              <button
+                className="dropdown-trigger"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                disabled={!isMenuOpen}
+              >
+                {activeCamera.name === 'default' ? "Solar System" : activeCamera.name}
+              </button>
+
+
+              <div className="item-wrapper">
+                {isDropdownOpen && (
+                  <ul className="dropdown-menu">
+                    <li onClick={handleSolarSystemSelect}>Solar System</li>
+                    {Object.keys(planetsData).map((planetName) => (
+                      <li key={planetName} className="dropdown-item"
+                        onClick={() => handlePlanetSelect(planetName)}
+                        onPointerOver={() => setHoveredPlanetName(hoveredPlanetName === planetName ? null : planetName)}
+                      // onPointerOut={() => setHoveredPlanetName(null)}
+                      >
+                        {planetName} {moonsData[planetName]?.length || null}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {/* Submenu for moons */}
+                {hoveredPlanetName && isDropdownOpen && (
+                  <ul className="submenu">
+                    {moonsData[hoveredPlanetName]?.map((moon) => (
+                      <li
+                        key={moon.name}
+                        className="submenu-item"
+                        onClick={() => handleMoonSelect(hoveredPlanetName, moon.name)}
+                      >
+                        {moon.name}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
           </div>
-          {/* Dropdown for sim speed */}
+
           <div className="menu-item">
             <label htmlFor="simSpeedSelect">Simulation Speed</label>
             <select
@@ -160,7 +196,7 @@ const Menu = () => {
             </select>
           </div>
         </div>
-        {/* Divider */}
+
         <div className="divider" />
         <div className="right-con">
           <div className="menu-item">
