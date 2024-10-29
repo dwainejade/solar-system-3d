@@ -234,3 +234,48 @@ export const rotationSpeedScaleFactor = 600000;
 // constants for formulas
 export const G = 6.67430e-11; // Gravitational constant in m^3 kg^-1 s^-2
 export const MASS_OF_SUN = 1.989e30; // kg
+
+export const asteroidBeltData = {
+    name: "Asteroid Belt",
+    mass: 2.39e21, // estimated mass of the entire belt in kg
+    // Using the average distance (2.7 AU) for the orbital radius
+    orbitalRadius: 2.7 * 149.6e6, // ~404 million km
+    orbitalOrigin: sunPosition,
+    // The belt spans from ~2.2 AU to ~3.2 AU
+    innerRadius: 2.2 * 149.6e6, // ~329 million km (near Mars' orbit)
+    outerRadius: 3.2 * 149.6e6, // ~479 million km (near Jupiter's orbit)
+    orbitalPeriod: 1642, // average orbital period in days (at 2.7 AU)
+    orbitalSpeed: 17.9, // average orbital speed in km/s
+    orbitalInclination: 20, // maximum inclination of most asteroids in degrees
+    color: "#8B7355", // brownish color representing rocky material
+    surfaceTemp: -73, // average temperature in Celsius
+    description: `The asteroid belt is a torus-shaped region between Mars and Jupiter, containing millions of solid, irregularly shaped bodies called asteroids or minor planets. Most of these range from the size of pebbles to objects about 1,000 kilometers in diameter. The largest object is Ceres, a dwarf planet that makes up about one-third of the belt's total mass. Despite its many objects, the total mass of the asteroid belt is only about 4% of Earth's Moon.`,
+    // Some notable objects in the belt
+    interestPoints: [
+        {
+            title: "Ceres",
+            type: "Dwarf Planet",
+            diameter: 940,
+        },
+        {
+            title: "Vesta",
+            type: "Proto-planet",
+            diameter: 525,
+        },
+        {
+            title: "Pallas",
+            type: "Asteroid",
+            diameter: 512,
+        }
+    ],
+    composition: {
+        rocky: "75%", // C-type (carbonaceous)
+        metallic: "17%", // S-type (silicaceous)
+        other: "8%" // Including M-type (metallic) and others
+    },
+    estimatedObjects: {
+        total: "1-2 million",
+        largerThan1km: "750,000",
+        identified: "500,000+"
+    }
+};

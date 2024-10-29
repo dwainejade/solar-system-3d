@@ -224,6 +224,14 @@ const defaultCamera = {
     lookAt: new THREE.Vector3(0, 0, 0),
 }
 
+const customCameraAngles = {
+    'Asteroid Belt': {
+        title: 'Asteroid Belt',
+        position: [5000, 1500, -5000],
+        target: [0, 0, 0]
+    }
+}
+
 const useCameraStore = create((set, get) => ({
     activeCamera: defaultCamera,
     isCameraTransitioning: false,
@@ -318,16 +326,21 @@ const useCameraStore = create((set, get) => ({
         });
     },
 
-    switchToCustomCamera: (position, target) => {
+    switchToCustomCamera: (id) => {
+        // Get custom camera data
+        const customCameraData = customCameraAngles[id];
+        if (!customCameraData) return;
+        const { position, target, title } = customCameraData;
         set({
             activeCamera: {
                 type: 'custom',
-                name: 'custom-camera',
-                position,
-                lookAt: target
+                name: title,
+                position: new THREE.Vector3(...position),
+                target: new THREE.Vector3(...target)
             },
             isCameraTransitioning: true
-        });
+        }
+        );
     },
 
     // Legacy camera states - maintained for backward compatibility

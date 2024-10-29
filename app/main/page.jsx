@@ -1,6 +1,6 @@
 "use client";
 import SharedCanvas from "@/components/canvas/SharedCanvas";
-import Scene from "./SceneThree";
+import Scene from "./SceneMain";
 
 const SceneOnePage = () => {
   return (

@@ -1,17 +1,19 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import useStore, { useCameraStore, usePlanetStore } from '../store/store';
 import { distanceScaleFactor, MASS_OF_SUN, G } from '../data/planetsData';
 import Labels from './Labels';
-import SatelliteCamera from './SatelliteCamera';
+import * as THREE from 'three';
 
 const AsteroidBelt = ({ meshCount = 200 }) => {
-    const { simSpeed, setPrevSpeed, setSimSpeed } = useStore();
-    const { toggleCameraTransitioning, setAutoRotate } = useCameraStore();
-    const { setSelectedPlanet, updatePlanetPosition, displayLabels } = usePlanetStore();
-    const [isHovered, setIsHovered] = useState(false);
-    const groupRef = useRef();
+    const { simSpeed } = useStore();
+    const { switchToCustomCamera, setAutoRotate, activeCamera } = useCameraStore();
+    const { displayLabels } = usePlanetStore();
+
     const asteroidGroupRef = useRef();
+    const isHoveredRef = useRef(false);
+    const textSizeRef = useRef(1);
+    const labelRef = useRef();
 
     // Real asteroid belt parameters (in km)
     const innerRadius = 2.2 * 149.6e6;
@@ -19,33 +21,25 @@ const AsteroidBelt = ({ meshCount = 200 }) => {
     const beltWidth = outerRadius - innerRadius;
     const averageRadius = ((innerRadius + outerRadius) / 2) * distanceScaleFactor;
 
-    const beltData = {
-        name: "AsteroidBelt",
-        radius: beltWidth * distanceScaleFactor * 0.5,
-    };
+    // Fixed position for the label
+    const labelPosition = new THREE.Vector3(averageRadius * 0.8, averageRadius * 0.01, 0);
 
     const handleClick = (e) => {
         e.stopPropagation();
-        updatePlanetPosition("AsteroidBelt", {
-            x: 2000,
-            y: 0,
-            z: 2000
-        });
-        setPrevSpeed(simSpeed);
-        setSimSpeed(0);
-        setSelectedPlanet(beltData);
-        setAutoRotate(false);
+        if (activeCamera.name === 'Asteroid Belt') return;
+        switchToCustomCamera('Asteroid Belt');
+        setAutoRotate(true);
     };
 
     const handlePointerOver = (e) => {
         e.stopPropagation();
-        setIsHovered(true);
+        isHoveredRef.current = true;
         document.body.style.cursor = "pointer";
     };
 
     const handlePointerOut = (e) => {
         e.stopPropagation();
-        setIsHovered(false);
+        isHoveredRef.current = false;
         document.body.style.cursor = "auto";
     };
 
@@ -84,13 +78,14 @@ const AsteroidBelt = ({ meshCount = 200 }) => {
     const meshRefs = useRef(asteroidMeshes.map(() => React.createRef()));
 
     useFrame((state, delta) => {
-        if (simSpeed === 0) return;
-        const deltaSpeed = delta * simSpeed;
+        const adjustedDelta = delta * simSpeed;
+        if (adjustedDelta === 0) return;
 
+        // Update asteroid positions and rotations
         meshRefs.current.forEach((meshRef, i) => {
             if (meshRef.current) {
                 const asteroid = asteroidMeshes[i];
-                asteroid.angle += asteroid.orbitalSpeed * deltaSpeed / 2;
+                asteroid.angle += asteroid.orbitalSpeed * adjustedDelta / 2;
 
                 const r = asteroid.semiMajorAxis * (1 - asteroid.eccentricity * asteroid.eccentricity) /
                     (1 + asteroid.eccentricity * Math.cos(asteroid.angle));
@@ -100,62 +95,55 @@ const AsteroidBelt = ({ meshCount = 200 }) => {
                 const z = r * Math.cos(asteroid.inclination) * Math.sin(asteroid.angle);
 
                 meshRef.current.position.set(x, y, z);
-                meshRef.current.rotation.x += asteroid.rotationSpeed * deltaSpeed;
-                meshRef.current.rotation.y += asteroid.rotationSpeed * deltaSpeed;
-                meshRef.current.rotation.z += asteroid.rotationSpeed * deltaSpeed * 0.5;
+                meshRef.current.rotation.x += asteroid.rotationSpeed * adjustedDelta;
+                meshRef.current.rotation.y += asteroid.rotationSpeed * adjustedDelta;
+                meshRef.current.rotation.z += asteroid.rotationSpeed * adjustedDelta * 0.5;
             }
         });
+
+        // Update text size based on distance from camera to label position
+        const distanceToLabel = state.camera.position.distanceTo(labelPosition);
+        textSizeRef.current = distanceToLabel * 0.02;
     });
 
     return (
         <>
-            {/* Fixed Label - outside the rotating group */}
-            {displayLabels &&
-                <group position={[3400, 140, 0]}>
+            {/* Fixed Label */}
+            {(displayLabels || isHoveredRef.current) && (
+                <group
+                    ref={labelRef}
+                    position={labelPosition}
+                >
                     <Labels
-                        key={'asteroid-belt-label'}
-                        text={'Asteroid Belt'}
-                        size={150}
-                        color={'orangered'}
+                        text="Asteroid Belt"
+                        size={textSizeRef.current}
+                        color="orangered"
                         handleClick={handleClick}
+                        handlePointerOver={handlePointerOver}
+                        handlePointerOut={handlePointerOut}
                     />
                 </group>
-            }
+            )}
 
-
-            {/* Rotating Asteroids */}
-            <group
-                ref={groupRef}
-                onClick={handleClick}
-                onPointerOver={handlePointerOver}
-                onPointerOut={handlePointerOut}
-            >
-                <group ref={asteroidGroupRef}>
-                    {asteroidMeshes.map((asteroid, index) => (
-                        <mesh
-                            key={index}
-                            ref={meshRefs.current[index]}
-                            scale={asteroid.scale}
-                        >
-                            <dodecahedronGeometry args={[1, 0]} />
-                            <meshBasicMaterial
-                                color={asteroid.color}
-                                roughness={0.7}
-                                metalness={.5}
-                            />
-                        </mesh>
-                    ))}
-                </group>
-
-                {/* {isAsteroidBeltSelected && localRef.current &&
-                    <SatelliteCamera
-                        target={localRef.current}
-                        targetName={beltData.name}
-                        size={scaledRadius}
-                        satelliteCamera={satelliteCamera}
-                        toggleSatelliteCamera={toggleSatelliteCamera}
-                    />
-                } */}
+            {/* Asteroids */}
+            <group ref={asteroidGroupRef}>
+                {asteroidMeshes.map((asteroid, index) => (
+                    <mesh
+                        key={index}
+                        ref={meshRefs.current[index]}
+                        scale={asteroid.scale}
+                        onClick={handleClick}
+                        onPointerOver={handlePointerOver}
+                        onPointerOut={handlePointerOut}
+                    >
+                        <dodecahedronGeometry args={[1, 0]} />
+                        <meshBasicMaterial
+                            color={asteroid.color}
+                            roughness={0.7}
+                            metalness={.5}
+                        />
+                    </mesh>
+                ))}
             </group>
         </>
     );

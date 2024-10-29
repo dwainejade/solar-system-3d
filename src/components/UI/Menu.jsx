@@ -14,7 +14,7 @@ const Menu = () => {
     selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels, planetsData,
     resetPlanetsData, showResetPlanetModal, showResetAllModal, toggleResetAllModal, orbitPaths, toggleOrbitPaths, moonsData, setSelectedMoon, selectedMoon
   } = usePlanetStore();
-  const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning, satelliteCamera, autoRotate, isZoomingToSun, switchToMoonCamera, switchToOrbitCamera, switchToPlanetCamera, activeCamera, resetCamera } = useCameraStore();
+  const { toggleSatelliteCamera, isCameraTransitioning, satelliteCamera, autoRotate, isZoomingToSun, switchToMoonCamera, switchToCustomCamera, switchToPlanetCamera, activeCamera, resetCamera } = useCameraStore();
 
   const [firstRender, setFirstRender] = useState(true);
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -34,7 +34,6 @@ const Menu = () => {
   };
 
   const handleResetAll = () => {
-    setTriggerReset(true);
     resetPlanetsData();
     toggleSatelliteCamera(false);
   };
@@ -91,6 +90,18 @@ const Menu = () => {
     resetCamera();
     setIsDropdownOpen(false);
   };
+
+  const handleAsteroidBeltSelect = () => {
+    setSelectedPlanet({
+      name: "Asteroid Belt",
+
+    });
+    setSelectedMoon(null);
+    toggleDetailsMenu(true);
+    switchToCustomCamera('Asteroid Belt');
+    setIsDropdownOpen(false);
+  };
+
   // console.log({ selectedPlanet, selectedMoon })
   useLayoutEffect(() => {
     setPrevSpeed(1);
@@ -121,6 +132,12 @@ const Menu = () => {
     };
   }, [autoRotate]);
 
+
+  const disableSpeedToggle = () => {
+    if (activeCamera.type === 'custom') return false;
+    else if (isCameraTransitioning || !isMenuOpen) return true;
+    return false;
+  };
 
   return (
     <div className={`menu-wrapper ${showResetAllModal || showResetPlanetModal ? "disabled" : "enabled"}`}>
@@ -160,6 +177,7 @@ const Menu = () => {
                         {planetName} {moonsData[planetName]?.length || null}
                       </li>
                     ))}
+                    <li onClick={handleAsteroidBeltSelect}>Asteroid Belt</li>
                   </ul>
                 )}
                 {/* Submenu for moons */}
@@ -186,7 +204,7 @@ const Menu = () => {
               id="simSpeedSelect"
               onChange={handleSpeedChange}
               value={isCameraTransitioning ? prevSpeed : simSpeed}
-              disabled={isCameraTransitioning || !isMenuOpen}
+              disabled={disableSpeedToggle()}
             >
               {speedOptions.map((option, index) => (
                 <option key={index} value={option.value}>

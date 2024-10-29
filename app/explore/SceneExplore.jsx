@@ -12,8 +12,8 @@ import * as THREE from "three";
 
 const SceneThree = () => {
   const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, setViewOnlyMode } = useStore();
-  const { planetPositions, selectedPlanet, setSelectedPlanet, selectedMoon, setSelectedMoon, planetsData, moonsData, moonPositions } = usePlanetStore();
-  const { satelliteCamera, triggerReset, setTriggerReset, isCameraTransitioning, toggleCameraTransitioning, isZoomingToSun, resetCamera, toggleZoomingToSun, activeCamera, switchToOrbitCamera, switchToPlanetCamera } = useCameraStore();
+  const { planetPositions, selectedPlanet, selectedMoon, setSelectedMoon, planetsData, moonsData, moonPositions } = usePlanetStore();
+  const { satelliteCamera, isCameraTransitioning, toggleCameraTransitioning, isZoomingToSun, resetCamera, toggleZoomingToSun, activeCamera } = useCameraStore();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -114,6 +114,12 @@ const SceneThree = () => {
       cameraControlsRef.current.dollyTo(200, true);
     }
 
+    if (activeCamera.type === 'custom') {
+      // Update camera position
+      cameraControlsRef.current.setPosition(activeCamera.position.x, activeCamera.position.y, activeCamera.position.z, true);
+      cameraControlsRef.current.setTarget(activeCamera.target.x, activeCamera.target.y, activeCamera.target.z, true);
+    }
+
     // Handle orbit camera transition
     if (activeCamera.type === 'orbit' && activeCamera.name === 'default' && isCameraTransitioning) {
       const targetPosition = activeCamera.position;
@@ -138,10 +144,8 @@ const SceneThree = () => {
           targetLookAt.z,
           true // enable smooth transition
         );
-      } else {
-        toggleCameraTransitioning(false);
       }
-
+      toggleCameraTransitioning(false);
       setMinDistance(200);
     }
 
@@ -163,7 +167,6 @@ const SceneThree = () => {
       // Animate to default position with a slight delay
       setTimeout(() => {
         resetCamera();
-        toggleCameraTransitioning(true);
         setHasInitialized(true);
       }, 100);
     }
@@ -178,7 +181,7 @@ const SceneThree = () => {
     }
 
     if (activeCamera.type === 'orbit' && activeCamera.name === 'default') {
-      toggleCameraTransitioning(true);
+      // toggleCameraTransitioning(true);
       if (simSpeed === 0) {
         setSimSpeed(prevSpeed);
       }
@@ -269,6 +272,7 @@ const SceneThree = () => {
           makeDefault={!satelliteCamera}
           {...cameraConfig}
           minDistance={minDistance}
+          autoRotate
         />
       )}
 
