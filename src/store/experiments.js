@@ -5,6 +5,7 @@ const initialState = {
     experimentMode: false,
     experiment: null,
     experimentData: null,
+    experimentsModal: false,
 };
 
 const useExperimentsStore = create(
@@ -14,6 +15,7 @@ const useExperimentsStore = create(
             setExperimentMode: (newState) => set({ experimentMode: newState }),
             setExperimentData: (newData) => set({ experimentData: newData }),
             resetExperiment: () => set({ ...initialState }),
+            toggleExperimentsModal: (newState) => set({ experimentsModal: newState }),
         }),
         {
             name: 'solar-system-experiments',

@@ -5,7 +5,7 @@ import { Canvas } from "@react-three/fiber";
 import { Html, PerformanceMonitor, useProgress, Stats } from "@react-three/drei";
 import useStore from "../../store/store";
 import Menu from "../UI/Menu";
-import ExperimentsMenu from "../UI/ExperimentsMenu";
+import ExperimentsMenu from "../UI/experiments/ExperimentsMenu";
 import "../../styles.css";
 
 const SharedCanvas = ({ children, mode = 'main' }) => {

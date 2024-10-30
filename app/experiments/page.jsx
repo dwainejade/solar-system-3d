@@ -3,7 +3,7 @@ import SharedCanvas from "@/components/canvas/SharedCanvas";
 import Scene from "./SceneExperiments";
 import "../../src/styles/Experiments.css";
 
-const SceneOnePage = () => {
+const SceneExperimentsPage = () => {
   return (
     <SharedCanvas mode='experiments'>
       <Scene />
@@ -11,4 +11,4 @@ const SceneOnePage = () => {
   );
 };
 
-export default SceneOnePage;
+export default SceneExperimentsPage;

@@ -1,13 +1,14 @@
 "use client";
 import React, { useState, useEffect, useLayoutEffect } from "react";
-import useStore, { usePlanetStore, useCameraStore } from "../../store/store";
-import useExperimentsStore from "../../store/experiments";
-import DetailsMenu from "./DetailsMenu";
-import ResetModal from "./ResetModal";
+import useStore, { usePlanetStore, useCameraStore } from "../../../store/store";
+import useExperimentsStore from "../../../store/experiments";
+import DetailsMenu from "../DetailsMenu";
+import ResetModal from "../ResetModal";
 import FocusLock from 'react-focus-lock';
+import ExperimentsModal from "./ExperimentsModal";
 
 const Menu = () => {
-  const { experimentMode, setExperimentMode } = useExperimentsStore();
+  const { toggleExperimentsModal, experimentsModal } = useExperimentsStore();
   const {
     simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, toggleFullscreen,
     showDetailsMenu, toggleDetailsMenu, viewOnlyMode, resetAllData,
@@ -107,7 +108,6 @@ const Menu = () => {
   useLayoutEffect(() => {
     setPrevSpeed(1);
     setSimSpeed(1);
-    setExperimentMode(true);
   }, []);
 
   useEffect(() => {
@@ -142,7 +142,7 @@ const Menu = () => {
   };
 
   const handleExperimentBtn = () => {
-    console.log('experiment mode')
+    toggleExperimentsModal(!experimentsModal);
   };
 
   return (
@@ -284,6 +284,9 @@ const Menu = () => {
           )}
         </>
       )}
+
+      <ExperimentsModal />
+
     </div>
   );
 };

@@ -1,4 +1,20 @@
-@text-color-1: #463a39;
+@import url("./variables.less");
+@title-color: #e1cdaa;
+
+// import fonts from fonts folder
+@font-face {
+  font-family: "Termina-Black";
+  src: url("../../src/fonts/Termina_Black.ttf"), format("truetype");
+  font-weight: 900;
+  font-style: normal;
+}
+@font-face {
+  font-family: "FranklinGothic-URW";
+  src: url("../../src/fonts/FranklinGothic_URW_Medium.ttf"), format("truetype");
+  font-weight: medium;
+  font-style: normal;
+}
+
 .left-button-con {
   display: flex;
   flex-direction: row;
@@ -17,9 +33,113 @@
 
   .experiment-btn {
     height: 30px;
-    // width: 100px;
     padding: 5px 20px;
     font-size: 1rem;
     font-weight: bold;
+    background-color: @label-color;
+    color: @text-color-1;
+    transition: all 0.05s ease-in-out;
+  }
+}
+
+.experiments-modal-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 100%;
+
+  button {
+    pointer-events: all;
+    cursor: pointer;
+  }
+
+  .modal {
+    position: absolute;
+    z-index: 500;
+    height: 370px;
+    width: 330px;
+    top: 10%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 6px 0 0 6px;
+    pointer-events: auto;
+    background: url("../../public/assets/ui/side_panel_bg.png") no-repeat center center;
+    background-size: 100% 100%;
+    transition: all 0.2s ease-out;
+
+    &.closed {
+      right: -100%;
+      opacity: 0;
+    }
+
+    &.open {
+      right: 0;
+      opacity: 1;
+    }
+
+    .close-modal {
+      position: absolute;
+      z-index: 200;
+      top: 0;
+      right: 0;
+      width: 30px;
+      height: 30px;
+      margin: 10px 8px 0 0;
+      border-radius: 20px;
+      border: 0;
+      background-color: @btn-color-4;
+      color: #000;
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: all 0.15s ease-in-out;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      &:hover {
+        background-color: cyan;
+        color: #fff;
+      }
+    }
+
+    .content {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      padding: 8%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      header {
+        color: @btn-color-4;
+        font-family: "Termina-Black";
+        font-size: 0.8rem;
+        margin: 0;
+        text-transform: uppercase;
+      }
+      h2 {
+        font-family: "Termina-Black";
+        text-transform: uppercase;
+        font-size: 1.1rem;
+        margin: 0;
+        margin-bottom: 4px;
+        color: #e1cdaa;
+      }
+
+      .newton-section {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .kepler-section {
+        display: flex;
+        flex-direction: column;
+      }
+    }
   }
 }

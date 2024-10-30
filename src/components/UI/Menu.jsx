@@ -274,6 +274,8 @@ const Menu = () => {
               </FocusLock>
             </>
           )}
+
+          <ExperimentsModal />
         </>
       )}
     </div>
