@@ -3,7 +3,7 @@ import { usePlanetStore } from '../../store/store';
 
 function ResetModal({ type, handleResetAll }) {
     const { showResetPlanetModal, toggleResetPlanetModal, ShowResetAllModal, toggleResetAllModal, resetSinglePlanetData, selectedPlanet } = usePlanetStore();
-    console.log(showResetPlanetModal)
+
     const description = type === 'all'
         ? 'Are you sure you want to reset all objects to their default values?'
         : 'Are you sure you want to reset this object to its default values?';

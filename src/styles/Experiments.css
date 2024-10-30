@@ -25,14 +25,9 @@
   width: 40px;
   position: relative;
 }
-.left-button-con .experiment-btn {
+.left-button-con .experiments-btn {
   height: 30px;
-  padding: 5px 20px;
-  font-size: 1rem;
-  font-weight: bold;
-  background-color: #f19a00;
-  color: #463a39;
-  transition: all 0.05s ease-in-out;
+  padding: 5px 12px;
 }
 .experiments-modal-wrapper {
   position: absolute;
@@ -40,6 +35,27 @@
   right: 0;
   width: 300px;
   height: 100%;
+}
+.experiments-modal-wrapper .btn {
+  border: none;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #463a39;
+  background-color: #f19a00;
+  text-align: left;
+  transition: all 0.05s ease-in-out;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 30px;
+}
+.experiments-modal-wrapper .btn:hover {
+  background-color: #be7900;
+}
+.experiments-modal-wrapper .btn:active {
+  scale: 0.95 !important;
 }
 .experiments-modal-wrapper button {
   pointer-events: all;
@@ -97,7 +113,7 @@
   height: 100%;
   top: 0;
   left: 0;
-  padding: 8%;
+  padding: 8% 4% 8% 8%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -117,6 +133,18 @@
   margin-bottom: 4px;
   color: #e1cdaa;
 }
+.experiments-modal-wrapper .modal .content .description-con {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  border: solid 1px #fff;
+  padding: 10px;
+}
+.experiments-modal-wrapper .modal .content .description-con p {
+  color: #fdf3e0;
+  margin: 0;
+}
 .experiments-modal-wrapper .modal .content .newton-section {
   display: flex;
   flex-direction: column;
@@ -130,19 +158,69 @@
   flex-direction: column;
   gap: 10px;
 }
-.experiments-modal-wrapper .modal .content .btn {
-  border: none;
-  padding: 6px 10px;
-  cursor: pointer;
-  color: #463a39;
-  font-size: 1rem;
-  font-weight: bold;
-  background-color: #f19a00;
-  text-align: left;
-  transition: all 0.05s ease-in-out;
+.experiments-modal-wrapper .modal .content .btn-con .btn {
+  padding: 5px 10px;
+}
+.experiments-modal-wrapper .experiment-footer {
+  display: flex;
+  justify-content: space-evenly;
+}
+.experiments-modal-wrapper .experiment-footer .btn {
+  padding: 8px;
+  font-size: 0.9rem;
+  color: #fff;
+  width: 135px;
+  white-space: nowrap;
+  justify-content: center;
+}
+.experiments-modal-wrapper .experiment-footer .btn.start-btn {
+  background-color: #969b17;
+}
+.experiments-modal-wrapper .experiment-footer .btn.start-btn:hover {
+  background-color: #6b6f10;
+}
+.experiments-modal-wrapper .experiment-footer .btn.reset-btn {
+  background-color: #f46a68;
+}
+.experiments-modal-wrapper .experiment-footer .btn.reset-btn:hover {
+  background-color: #f13b38;
+}
+.experiments-modal-wrapper .newton-section.kepler-1 {
+  /* Custom slider styling */
+  /* Numerical markers */
+}
+.experiments-modal-wrapper .newton-section.kepler-1 .slider-con {
+  display: flex;
+  flex-direction: column;
+}
+.experiments-modal-wrapper .newton-section.kepler-1 .slider-con .slider-control {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
-.experiments-modal-wrapper .modal .content .btn:hover {
-  background-color: #be7900;
+.experiments-modal-wrapper .newton-section.kepler-1 input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 1px;
+  background: white;
+  border-radius: 2px;
+  outline: none;
+}
+.experiments-modal-wrapper .newton-section.kepler-1 input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+  background: #ff6b6b;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.experiments-modal-wrapper .newton-section.kepler-1 input[type="range"]::-webkit-slider-thumb:hover {
+  background: #ff8585;
+}
+.experiments-modal-wrapper .newton-section.kepler-1 .slider-markers {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  color: #fff;
+  font-size: 14px;
 }

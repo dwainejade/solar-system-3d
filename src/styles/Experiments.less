@@ -31,14 +31,9 @@
     position: relative;
   }
 
-  .experiment-btn {
+  .experiments-btn {
     height: 30px;
-    padding: 5px 20px;
-    font-size: 1rem;
-    font-weight: bold;
-    background-color: @label-color;
-    color: @text-color-1;
-    transition: all 0.05s ease-in-out;
+    padding: 5px 12px;
   }
 }
 
@@ -48,6 +43,30 @@
   right: 0;
   width: 300px;
   height: 100%;
+
+  .btn {
+    border: none;
+    padding: 6px 10px;
+    cursor: pointer;
+    color: @text-color-1;
+    font-size: 1rem;
+    font-weight: bold;
+    color: @text-color-1;
+    background-color: @label-color;
+    text-align: left;
+    transition: all 0.05s ease-in-out;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 30px;
+
+    &:hover {
+      background-color: darken(@label-color, 10%);
+    }
+    &:active {
+      scale: 0.95 !important;
+    }
+  }
 
   button {
     pointer-events: all;
@@ -110,7 +129,7 @@
       height: 100%;
       top: 0;
       left: 0;
-      padding: 8%;
+      padding: 8% 4% 8% 8%;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -128,9 +147,21 @@
         font-size: 1.1rem;
         margin: 0;
         margin-bottom: 4px;
-        color: #e1cdaa;
+        color: @off-white-color;
       }
 
+      .description-con {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 20px;
+        border: solid 1px #fff;
+        padding: 10px;
+        p {
+          color: @bg-color-2;
+          margin: 0;
+        }
+      }
       .newton-section {
         display: flex;
         flex-direction: column;
@@ -145,25 +176,81 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
-      }
-
-      .btn {
-        border: none;
-        padding: 6px 10px;
-        cursor: pointer;
-        color: @text-color-1;
-        font-size: 1rem;
-        font-weight: bold;
-        background-color: @label-color;
-        text-align: left;
-        transition: all 0.05s ease-in-out;
-
-        &:hover {
-          background-color: darken(@label-color, 10%);
+        .btn {
+          padding: 5px 10px;
         }
+      }
+    }
+  }
+
+  .experiment-footer {
+    display: flex;
+    justify-content: space-evenly;
+
+    .btn {
+      padding: 8px;
+      font-size: 0.9rem;
+      color: #fff;
+      width: 135px;
+      white-space: nowrap;
+      justify-content: center;
+      &.start-btn {
+        background-color: @btn-color-3;
+        &:hover {
+          background-color: darken(@btn-color-3, 10%);
+        }
+      }
+      &.reset-btn {
+        background-color: @btn-color-4;
+        &:hover {
+          background-color: darken(@btn-color-4, 10%);
+        }
+      }
+    }
+  }
+
+  .newton-section.kepler-1 {
+    .slider-con {
+      display: flex;
+      flex-direction: column;
+
+      .slider-control {
         display: flex;
         justify-content: space-between;
+        align-items: center;
       }
+    }
+
+    /* Custom slider styling */
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 1px;
+      background: white;
+      border-radius: 2px;
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 10px;
+      height: 10px;
+      background: #ff6b6b;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: #ff8585;
+    }
+
+    /* Numerical markers */
+    .slider-markers {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      color: #fff;
+      font-size: 14px;
     }
   }
 }

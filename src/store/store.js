@@ -4,6 +4,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import * as THREE from 'three';
 import initialPlanetsData from '../data/planetsData';
 import initialMoonsData from '../data/moonsData';
+import useExperimentsStore from './experiments';
 
 const useStore = create((set, get) => ({
     isLoading: true,
@@ -78,7 +79,9 @@ const useStore = create((set, get) => ({
     setOrbitControls: (controls) => set({ orbitControls: controls }),
 
     resetAllData: () => {
-        console.log('resetting all data');
+        const { resetPlanetsData } = usePlanetStore.getState();
+        resetPlanetsData();
+
         set({
             planetsData: initialPlanetsData,
             moonsData: initialMoonsData,

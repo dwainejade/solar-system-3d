@@ -8,7 +8,7 @@ import FocusLock from 'react-focus-lock';
 import ExperimentsModal from "./ExperimentsModal";
 
 const Menu = () => {
-  const { toggleExperimentsModal, experimentsModal } = useExperimentsStore();
+  const { toggleExperimentsModal, experimentsModal, resetExperiments } = useExperimentsStore();
   const {
     simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, toggleFullscreen,
     showDetailsMenu, toggleDetailsMenu, viewOnlyMode, resetAllData,
@@ -34,11 +34,12 @@ const Menu = () => {
 
   const handleResetBtn = () => {
     toggleResetAllModal(true);
+    toggleExperimentsModal(false);
   };
 
   const handleResetAll = () => {
+    resetExperiments();
     resetAllData();
-    toggleSatelliteCamera(false);
   };
 
   const handleFullscreen = () => {
@@ -153,7 +154,7 @@ const Menu = () => {
 
       <div className="left-button-con">
         <button className="reset-all-btn btn" onClick={handleResetBtn} />
-        <button onClick={handleExperimentBtn} className="experiment-btn btn">Experiment</button>
+        <button onClick={handleExperimentBtn} className="experiments-btn btn">Experiments</button>
       </div>
       <button className="fullscreen-btn btn" onClick={handleFullscreen} />
 
