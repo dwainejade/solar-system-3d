@@ -1,100 +1,92 @@
 import { create } from 'zustand';
-import { immer } from 'zustand/middleware/immer'
-import { persist, createJSONStorage } from 'zustand/middleware'
+import { immer } from 'zustand/middleware/immer';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import * as THREE from 'three';
 import initialPlanetsData from '../data/planetsData';
 import initialMoonsData from '../data/moonsData';
 
-// add persitance to store
-const useStore = create(
-    (set, get) => ({
-        isLoading: true,
-        toggleLoading: (newSate) => set({ isLoading: newSate }),
-        isBackgroundLoaded: false,
-        toggleBackgroundLoaded: (newSate) => set({ isBackgroundLoaded: newSate }),
+const useStore = create((set, get) => ({
+    isLoading: true,
+    isBackgroundLoaded: false,
+    viewOnlyMode: false,
+    simSpeed: 1, // 1 is real-time speed
+    prevSpeed: 1,
+    fullscreen: false,
+    showDetailsMenu: false,
+    isEditing: false, // Allow user to edit planet data
+    showConstellations: false,
+    sunSettings: {
+        position: new THREE.Vector3(0, 0, 0),
+    },
+    earthPosition: new THREE.Vector3(10, 0, 0), // Initial position
+    rotationCounts: {}, // Tracks the number of rotations for each planet
+    simulationDate: new Date(2000, 0, 1), // Starting date
+    camera: new THREE.PerspectiveCamera(),
+    orbitControls: null,
+    previousCameraPosition: new THREE.Vector3(),
 
-        viewOnlyMode: false,
-        setViewOnlyMode: (newState) => set({ viewOnlyMode: newState }),
-
-        simSpeed: 1, // 1 is realtime speed
-        setSimSpeed: (newSpeed) => set({ simSpeed: newSpeed }),
-        prevSpeed: 1,
-        setPrevSpeed: (newSpeed) => set({ prevSpeed: newSpeed }),
-
-        fullscreen: false,
-        toggleFullscreen: () => {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch((e) => {
-                    console.error("Failed to enter full-screen mode:", e);
+    // Functions (actions)
+    toggleLoading: (newState) => set({ isLoading: newState }),
+    toggleBackgroundLoaded: (newState) => set({ isBackgroundLoaded: newState }),
+    setViewOnlyMode: (newState) => set({ viewOnlyMode: newState }),
+    setSimSpeed: (newSpeed) => set({ simSpeed: newSpeed }),
+    setPrevSpeed: (newSpeed) => set({ prevSpeed: newSpeed }),
+    toggleFullscreen: () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch((e) => {
+                console.error('Failed to enter full-screen mode:', e);
+            });
+            set({ fullscreen: true });
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen().catch((e) => {
+                    console.error('Failed to exit full-screen mode:', e);
                 });
-                set({ fullscreen: true });
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen().catch((e) => {
-                        console.error("Failed to exit full-screen mode:", e);
-                    });
-                    set({ fullscreen: false });
-                }
+                set({ fullscreen: false });
             }
-        },
+        }
+    },
+    toggleDetailsMenu: (newState) => set({ showDetailsMenu: newState }),
+    setIsEditing: (newState) => set({ isEditing: newState }),
+    toggleConstellations: () =>
+        set((state) => ({ showConstellations: !state.showConstellations })),
+    setEarthOrbit: (newSettings) =>
+        set((state) => ({
+            earthSettings: { ...state.earthSettings, ...newSettings },
+        })),
+    setEarthPosition: (position) => set({ earthPosition: position }),
+    setMoonOrbit: (newSettings) =>
+        set((state) => ({
+            moonSettings: { ...state.moonSettings, ...newSettings },
+        })),
+    updateRotationCount: (planetName, additionalCount) =>
+        set((state) => {
+            const currentCount = state.rotationCounts[planetName] || 0;
+            return {
+                rotationCounts: {
+                    ...state.rotationCounts,
+                    [planetName]: currentCount + additionalCount,
+                },
+            };
+        }),
+    incrementDate: () =>
+        set((state) => ({
+            simulationDate: new Date(
+                state.simulationDate.setDate(state.simulationDate.getDate() + 1)
+            ),
+        })),
+    setOrbitControls: (controls) => set({ orbitControls: controls }),
 
-        showDetailsMenu: false,
-        toggleDetailsMenu: (newState) => set(state => ({ showDetailsMenu: newState })),
-
-        isEditing: false, // allow user to edit planet data
-        setIsEditing: (newState) => set({ isEditing: newState }),
-
-        showConstellations: false,
-        toggleConstellations: () => set(state => ({ showConstellations: !state.showConstellations })),
-
-        sunSettings: {
-            position: new THREE.Vector3(0, 0, 0),
-        },
-
-        setEarthOrbit: newSettings =>
-            set(state => ({ earthSettings: { ...state.earthSettings, ...newSettings } })),
-        earthPosition: new THREE.Vector3(10, 0, 0), // Initial position
-        setEarthPosition: (position) => set({ earthPosition: position }),
-
-        setMoonOrbit: newSettings =>
-            set(state => ({ moonSettings: { ...state.moonSettings, ...newSettings } })),
-
-        rotationCounts: {},  // Tracks the number of rotations for each planet
-        simulationDate: new Date(2020, 0, 1),  // Starting date
-
-        // Function to update rotation count
-        updateRotationCount: (planetName, additionalCount) =>
-            set(state => {
-                const currentCount = state.rotationCounts[planetName] || 0;
-                return {
-                    rotationCounts: {
-                        ...state.rotationCounts,
-                        [planetName]: currentCount + additionalCount
-                    }
-                };
-            }),
-        // Increment the simulation date by one day
-        incrementDate: () =>
-            set((state) => ({
-                simulationDate: new Date(state.simulationDate.setDate(state.simulationDate.getDate() + 1)),
-            })),
-
-        // cameraTarget: new THREE.Vector3(0, 0, 0),
-        camera: new THREE.PerspectiveCamera(),
-        orbitControls: null,
-        previousCameraPosition: new THREE.Vector3(),
-        setOrbitControls: (controls) => set({ orbitControls: controls }),
-
-        // resetCamera: () => {
-        //     const { orbitControls } = get();
-        //     if (orbitControls) {
-        //         orbitControls.target.set(0, 0, 0); // Assuming the sun is at the origin
-        //         orbitControls.update();
-        //     }
-        // },
-    }
-
-    ));
+    resetAllData: () => {
+        console.log('resetting all data');
+        set({
+            planetsData: initialPlanetsData,
+            moonsData: initialMoonsData,
+            rotationCounts: {},
+            simulationDate: new Date(2000, 0, 1),
+        });
+    },
+}));
 
 export default useStore;
 
@@ -227,7 +219,7 @@ const defaultCamera = {
 const customCameraAngles = {
     'Asteroid Belt': {
         title: 'Asteroid Belt',
-        position: [5000, 1500, -5000],
+        position: [4500, 250, -100],
         target: [0, 0, 0]
     }
 }

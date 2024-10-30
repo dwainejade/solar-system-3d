@@ -4,11 +4,11 @@ import { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Html, PerformanceMonitor, useProgress, Stats } from "@react-three/drei";
 import useStore from "../../store/store";
-import { useExperimentsStore } from "../../store/experiments";
 import Menu from "../UI/Menu";
+import ExperimentsMenu from "../UI/ExperimentsMenu";
 import "../../styles.css";
 
-const SharedCanvas = ({ children }) => {
+const SharedCanvas = ({ children, mode = 'main' }) => {
   const { fullscreen, isLoading, toggleLoading } = useStore();
   const { errors, loaded } = useProgress();
   const total = 17
@@ -52,7 +52,7 @@ const SharedCanvas = ({ children }) => {
         camera={{ fov: 50, position: [20000, 20000, 20000], near: 0.1, far: 1000000 }}
       // frameloop="demand"
       >
-        <Stats />
+        {/* <Stats /> */}
         <PerformanceMonitor onIncline={() => setDpr(2)} onDecline={() => setDpr(1)} />
 
         <Suspense fallback={<Loader />}>
@@ -62,7 +62,8 @@ const SharedCanvas = ({ children }) => {
         </Suspense>
         {/* <Preload all /> */}
       </Canvas>
-      {!isLoading && <Menu />}
+      {!isLoading && mode === 'main' && <Menu />}
+      {!isLoading && mode === 'experiments' && <ExperimentsMenu />}
     </div>
   );
 };

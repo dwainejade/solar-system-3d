@@ -1,8 +1,8 @@
 import React, { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import useStore, { useCameraStore, usePlanetStore } from '../store/store';
-import { distanceScaleFactor, MASS_OF_SUN, G } from '../data/planetsData';
-import Labels from './Labels';
+import useStore, { useCameraStore, usePlanetStore } from '../../store/store';
+import { distanceScaleFactor, MASS_OF_SUN, G } from '../../data/planetsData';
+import Labels from '../Labels';
 import * as THREE from 'three';
 
 const AsteroidBelt = ({ meshCount = 200 }) => {
@@ -78,7 +78,7 @@ const AsteroidBelt = ({ meshCount = 200 }) => {
     const meshRefs = useRef(asteroidMeshes.map(() => React.createRef()));
 
     useFrame((state, delta) => {
-        const adjustedDelta = delta * simSpeed;
+        const adjustedDelta = - delta * simSpeed * 0.06;
         if (adjustedDelta === 0) return;
 
         // Update asteroid positions and rotations

@@ -1,12 +1,13 @@
 "use client";
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import useStore, { usePlanetStore, useCameraStore } from "../../store/store";
-import { useExperimentsStore } from "../../store/experiments";
+import useExperimentsStore from "../../store/experiments";
 import DetailsMenu from "./DetailsMenu";
 import ResetModal from "./ResetModal";
 import FocusLock from 'react-focus-lock';
 
 const Menu = () => {
+  const { experimentMode, setExperimentMode } = useExperimentsStore();
   const {
     simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, toggleFullscreen,
     showDetailsMenu, toggleDetailsMenu, viewOnlyMode, resetAllData,
@@ -103,10 +104,10 @@ const Menu = () => {
     setIsDropdownOpen(false);
   };
 
-  // console.log({ selectedPlanet, selectedMoon })
   useLayoutEffect(() => {
     setPrevSpeed(1);
     setSimSpeed(1);
+    setExperimentMode(true);
   }, []);
 
   useEffect(() => {
@@ -140,13 +141,20 @@ const Menu = () => {
     return false;
   };
 
+  const handleExperimentBtn = () => {
+    console.log('experiment mode')
+  };
+
   return (
     <div className={`menu-wrapper ${showResetAllModal || showResetPlanetModal ? "disabled" : "enabled"}`}>
       <div className={`auto-rotate-text ${textClass}`}>
         {displayText}
       </div>
 
-      <button className="reset-all-btn btn" onClick={handleResetBtn} />
+      <div className="left-button-con">
+        <button className="reset-all-btn btn" onClick={handleResetBtn} />
+        <button onClick={handleExperimentBtn} className="experiment-btn btn">Experiment</button>
+      </div>
       <button className="fullscreen-btn btn" onClick={handleFullscreen} />
 
       <div className={`bottom-menu ${isMenuOpen ? "open" : "closed"}`}>

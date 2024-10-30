@@ -1,0 +1,21 @@
+.left-button-con {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  gap: 10px;
+  padding: 5px;
+  position: absolute;
+  top: 0;
+}
+.left-button-con .reset-all-btn {
+  height: 40px;
+  width: 40px;
+  position: relative;
+}
+.left-button-con .experiment-btn {
+  height: 30px;
+  padding: 5px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+}

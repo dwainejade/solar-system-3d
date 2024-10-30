@@ -77,6 +77,9 @@ const Sun = ({ position, textures }) => {
     if (localRef.current) {
       localRef.current.rotation.y += rotationIncrement;
     }
+    if (localRef.current?.material?.uniforms?.time) {
+      localRef.current.material.uniforms.time.value += delta;
+    }
   });
 
 

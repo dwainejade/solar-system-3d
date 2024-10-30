@@ -10,7 +10,7 @@ import { useFrame } from "@react-three/fiber";
 import AsteroidBelt from "@/components/asteroids/AsteroidBeltShaders";
 import * as THREE from "three";
 
-const SceneThree = () => {
+const Scene = () => {
   const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, setViewOnlyMode } = useStore();
   const { planetPositions, selectedPlanet, selectedMoon, setSelectedMoon, planetsData, moonsData, moonPositions } = usePlanetStore();
   const { satelliteCamera, isCameraTransitioning, toggleCameraTransitioning, isZoomingToSun, resetCamera, toggleZoomingToSun, activeCamera } = useCameraStore();
@@ -206,7 +206,6 @@ const SceneThree = () => {
   }, [selectedPlanet, selectedMoon, activeCamera]);
 
   useEffect(() => {
-    setViewOnlyMode(true); // disable details menu
     const handleMouseDown = (event) => {
       if (event.button === 1) {
         event.preventDefault();
@@ -287,7 +286,7 @@ const SceneThree = () => {
       <Planet name="Uranus" textures={uranusTextures} />
       <Planet name="Neptune" textures={neptuneTextures} />
 
-      <AsteroidBelt particleCount={5000} />
+      <AsteroidBelt meshCount={500} />
 
       {/* <Planet bodyData={planetsData.Pluto} /> */}
       <Sun key={"Sun-plain"} textures={sunTextures} position={sunSettings.position} resetCamera={resetCamera} />
@@ -296,4 +295,4 @@ const SceneThree = () => {
   );
 };
 
-export default SceneThree;
+export default Scene;

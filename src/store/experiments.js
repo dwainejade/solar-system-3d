@@ -2,16 +2,16 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from 'zustand/middleware'
 
 const initialState = {
-    isExperimenting: false,
+    experimentMode: false,
     experiment: null,
     experimentData: null,
 };
 
-export const useExperimentsStore = create(
+const useExperimentsStore = create(
     persist(
         (set, get) => ({
             ...initialState,
-            setExperiment: (newState) => set({ experiment: newState }),
+            setExperimentMode: (newState) => set({ experimentMode: newState }),
             setExperimentData: (newData) => set({ experimentData: newData }),
             resetExperiment: () => set({ ...initialState }),
         }),
@@ -21,3 +21,5 @@ export const useExperimentsStore = create(
         }
     )
 );
+
+export default useExperimentsStore;
