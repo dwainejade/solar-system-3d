@@ -19,16 +19,16 @@ const Planet = ({ name = 'Earth', textures }) => {
 
   // Add eccentricity to the destructuring
   const {
-    radius,
+    radius = 1, // Provide default values to prevent null
     orbitalOrigin,
-    orbitalRadius,
-    orbitalPeriod,
-    orbitalInclination,
-    axialTilt,
-    rotationPeriod,
-    color,
-    initialOrbitalAngle,
-    eccentricity,
+    orbitalRadius = 1,
+    orbitalPeriod = 1,
+    orbitalInclination = 0,
+    axialTilt = 0,
+    rotationPeriod = 1,
+    color = '#ffffff',
+    initialOrbitalAngle = 0,
+    eccentricity = 0,
   } = mergedData;
 
   const { simSpeed, toggleDetailsMenu } = useStore();

@@ -1,4 +1,4 @@
-import React, { useRef, forwardRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import * as THREE from "three";
 import { act, render, useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
@@ -20,18 +20,17 @@ const Planet = ({ name = 'Earth', textures }) => {
   const bodyData = planetsData[name];
   const mergedData = { ...bodyData };
 
-  // Add eccentricity to the destructuring
   const {
-    radius,
+    radius = 1, // Provide default values to prevent null
     orbitalOrigin,
-    orbitalRadius,
-    orbitalPeriod,
-    orbitalInclination,
-    axialTilt,
-    rotationPeriod,
-    color,
+    orbitalRadius = 1,
+    orbitalPeriod = 1,
+    orbitalInclination = 0,
+    axialTilt = 0,
+    rotationPeriod = 1,
+    color = '#ffffff',
     initialOrbitalAngle = 0,
-    eccentricity,
+    eccentricity = 0,
   } = mergedData;
 
   const { simSpeed, toggleDetailsMenu } = useStore();
@@ -66,17 +65,18 @@ const Planet = ({ name = 'Earth', textures }) => {
   const [isHovered, setIsHovered] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
 
-  const scaledOrbitalRadius = orbitalRadius * (isSurfaceCameraActive ? .0001 : distanceScaleFactor);
-  const scaledRadius = radius * sizeScaleFactor;
+  // Ensure positive values for all scaled measurements
+  const scaledOrbitalRadius = Math.max(0.1, orbitalRadius * (isSurfaceCameraActive ? .0001 : distanceScaleFactor));
+  const scaledRadius = Math.max(0.1, radius * sizeScaleFactor);
   let rotationSpeed = rotationPeriod ? (2 * Math.PI) / (rotationPeriod * 3600) : 0;
   rotationSpeed *= rotationSpeedScaleFactor;
 
   const isPlanetSelected = selectedPlanet && selectedPlanet.name === name;
   const renderMoons = () => {
-    if (isPlanetSelected) return true
-    else if (selectedMoon?.parentName === name) return true
-    return false
-  }
+    if (isPlanetSelected) return true;
+    if (selectedMoon?.parentName === name) return true;
+    return false;
+  };
   const detailLevel = (isPlanetSelected || renderMoons()) ? 64 : 16;
 
   const [scale, setScale] = useState(scaledRadius);
@@ -85,18 +85,13 @@ const Planet = ({ name = 'Earth', textures }) => {
   const textureDisplayDistance = 500;
   const [orbitPathOpacity, setOrbitPathOpacity] = useState(1);
 
-  const earthParameters = {
-    atmosphereDayColor: '#0088FF',
-    atmosphereTwilightColor: '#FF9D00'
-  };
-
   useFrame((state, delta) => {
     const adjustedDelta = delta * simSpeed;
 
     // Calculate mean motion (n)
     const meanMotion = (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60);
 
-    // Update mean anomaly (M) - keep subtraction for counterclockwise motion
+    // Update mean anomaly (M)
     if (localAngleRef.current === 0) {
       localAngleRef.current = initialOrbitalAngle * (Math.PI / 180);
     } else {
@@ -108,7 +103,6 @@ const Planet = ({ name = 'Earth', textures }) => {
     const maxIterations = 10;
     const tolerance = 1e-6;
 
-    // Newton-Raphson iteration to solve Kepler's equation: M = E - e * sin(E)
     for (let i = 0; i < maxIterations; i++) {
       const deltaE = (E - eccentricity * Math.sin(E) - localAngleRef.current) /
         (1 - eccentricity * Math.cos(E));
@@ -116,22 +110,18 @@ const Planet = ({ name = 'Earth', textures }) => {
       if (Math.abs(deltaE) < tolerance) break;
     }
 
-    // Calculate true anomaly (ν) from eccentric anomaly (E)
     const trueAnomaly = 2 * Math.atan(
       Math.sqrt((1 + eccentricity) / (1 - eccentricity)) *
       Math.tan(E / 2)
     );
 
-    // Calculate radius vector (distance from focus)
     const r = (scaledOrbitalRadius * (1 - eccentricity * eccentricity)) /
       (1 + eccentricity * Math.cos(trueAnomaly));
 
-    // Calculate position - using negative trueAnomaly for counterclockwise motion
     const x = r * Math.cos(-trueAnomaly);
     const baseZ = r * Math.sin(-trueAnomaly);
 
     if (localRef.current) {
-      // Apply inclination
       const inclination = orbitalInclination * (Math.PI / 180);
       const y = Math.sin(inclination) * baseZ;
       const z = Math.cos(inclination) * baseZ;
@@ -139,8 +129,7 @@ const Planet = ({ name = 'Earth', textures }) => {
       localRef.current.position.set(x, y, z);
       updatePlanetPosition(name, { x, y, z });
 
-      // Handle rotation
-      if (rotationPeriod) {
+      if (rotationPeriod && meshRef.current) {
         const rotationPeriodInSeconds = rotationPeriod * 3600;
         const rotationSpeed = (2 * Math.PI) / rotationPeriodInSeconds;
         const rotationIncrement = rotationSpeed * adjustedDelta;
@@ -157,13 +146,11 @@ const Planet = ({ name = 'Earth', textures }) => {
         }
       }
 
-      // Handle scaling and visibility
       const distance = localRef.current.position.distanceTo(state.camera.position);
-      if (distance / 1000 <= scaledRadius) {
-        setScale(scaledRadius);
-      } else {
-        setScale(distance / 1000);
-      }
+      // Ensure scale never goes below minimum value
+      const newScale = Math.max(0.1, distance / 1000 <= scaledRadius ? scaledRadius : distance / 1000);
+      setScale(newScale);
+
       setShowTextures(activeCamera.type === 'moon' || distance < textureDisplayDistance);
       const maxDistance = scaledRadius * 100;
       const minDistance = scaledRadius * 1;
@@ -171,7 +158,7 @@ const Planet = ({ name = 'Earth', textures }) => {
       setOrbitPathOpacity(opacity);
 
       if (textSize.current) {
-        textSize.current = distance * 0.02;
+        textSize.current = Math.max(0.1, distance * 0.02);
       }
     }
   });
@@ -187,11 +174,9 @@ const Planet = ({ name = 'Earth', textures }) => {
   const handleClick = e => {
     e.stopPropagation();
     if (isDragging || activeCamera.name === name) return;
-    // console.log(selectedMoon)
     toggleDetailsMenu(true);
     setSelectedMoon(null);
     setSelectedPlanet(mergedData);
-
     switchToPlanetCamera(name);
   };
 
@@ -234,6 +219,12 @@ const Planet = ({ name = 'Earth', textures }) => {
 
   const moons = moonsData[name] || [];
 
+  // Calculate safe geometry values
+  const visibleSphereRadius = Math.max(0.1, renderMoons() ? scaledRadius : scale * 8);
+  const planetSphereRadius = Math.max(0.1, renderMoons() ? scaledRadius : scale * 8);
+  const cloudSphereRadius = Math.max(0.1, scaledRadius * 1.008);
+  const atmosphereSphereRadius = Math.max(0.1, scaledRadius * 1.02);
+
   return (
     <>
       {activeCamera?.name === name && localRef.current &&
@@ -244,7 +235,6 @@ const Planet = ({ name = 'Earth', textures }) => {
         />
       }
 
-      {/* Kepler 2nd Law Demo */}
       {experimentType === 'kepler-2' &&
         <KeplerTriangles
           planetRef={localRef}
@@ -266,7 +256,7 @@ const Planet = ({ name = 'Earth', textures }) => {
           onPointerOut={handlePointerOut}
         >
           {activeCamera?.name !== name &&
-            <sphereGeometry args={[renderMoons() ? scaledRadius : scale * 8, 8, 8]} />
+            <sphereGeometry args={[visibleSphereRadius, 8, 8]} />
           }
         </mesh>
 
@@ -275,7 +265,7 @@ const Planet = ({ name = 'Earth', textures }) => {
           key={isPlanetSelected ? name + '-textured' : name + '-basic'}
           onDoubleClick={handleDoubleClick}
         >
-          <sphereGeometry args={[(renderMoons() ? scaledRadius : scale * 8), detailLevel, detailLevel / 2]} />
+          <sphereGeometry args={[planetSphereRadius, detailLevel, detailLevel / 2]} />
           {((!isPlanetSelected && !renderMoons()) && texturesLoaded) ?
             <meshBasicMaterial color={color} />
             :
@@ -283,11 +273,11 @@ const Planet = ({ name = 'Earth', textures }) => {
               {name === "Earth" && isPlanetSelected &&
                 <>
                   <mesh ref={cloudsRef} key={`${name}-cloud_texture`}>
-                    <sphereGeometry args={[Math.min(scaledRadius * 1.008), detailLevel, detailLevel / 2]} />
+                    <sphereGeometry args={[cloudSphereRadius, detailLevel, detailLevel / 2]} />
                     <meshStandardMaterial alphaMap={textures?.clouds} transparent opacity={0.8} />
                   </mesh>
                   <mesh key={`${name}-atmosphere_texture`}>
-                    <sphereGeometry args={[Math.min(scaledRadius * 1.02), detailLevel, detailLevel / 2]} />
+                    <sphereGeometry args={[atmosphereSphereRadius, detailLevel, detailLevel / 2]} />
                     <shaderMaterial args={[earthAtmosphereShader]} />
                   </mesh>
                 </>
@@ -305,8 +295,8 @@ const Planet = ({ name = 'Earth', textures }) => {
         {name === "Saturn" && showTextures && (
           <Rings
             key={detailLevel + name + '-ring'}
-            innerRadius={scaledRadius * 1.2}
-            outerRadius={scaledRadius * 2}
+            innerRadius={Math.max(0.1, scaledRadius * 1.2)}
+            outerRadius={Math.max(0.1, scaledRadius * 2)}
             height={0}
             rotation={[THREE.MathUtils.degToRad(axialTilt), 0, 0]}
             texture={isPlanetSelected ? textures?.ringTexture : null}
@@ -317,8 +307,8 @@ const Planet = ({ name = 'Earth', textures }) => {
         {name === "Uranus" && showTextures && (
           <Rings
             key={detailLevel + name + '-ring'}
-            innerRadius={scaledRadius * 1.5}
-            outerRadius={scaledRadius * 1.9}
+            innerRadius={Math.max(0.1, scaledRadius * 1.5)}
+            outerRadius={Math.max(0.1, scaledRadius * 1.9)}
             height={0}
             texture={isPlanetSelected ? textures?.ringTexture : null}
             detail={Math.max(detailLevel, 32)}
@@ -384,12 +374,12 @@ const Planet = ({ name = 'Earth', textures }) => {
       {orbitPaths && (
         <OrbitPath
           origin={orbitalOrigin}
-          radius={scaledOrbitalRadius}  // This is your semi-major axis
+          radius={scaledOrbitalRadius}
           eccentricity={eccentricity}
           orbitalInclination={orbitalInclination}
           color={color}
           name={name + "-orbit-path"}
-          opacity={.4}
+          opacity={0.4}
           hiRes={isPlanetSelected}
         />
       )}

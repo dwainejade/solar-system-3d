@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import useStore, { usePlanetStore, useCameraStore } from "../store/store";
+import useExperimentsStore from "@/store/experiments";
 import { sizeScaleFactor } from "../data/planetsData";
 import { useFrame } from "@react-three/fiber";
 import { sunOuterShader } from "../shaders/atmosphere";
@@ -8,6 +9,7 @@ import { sunOuterShader } from "../shaders/atmosphere";
 const Sun = ({ position, textures }) => {
   const { selectedPlanet, setSelectedPlanet, planetsData } = usePlanetStore();
   const { toggleZoomingToSun, switchToSunCamera } = useCameraStore();
+  const { experimentMode, toggleExperimentMode } = useExperimentsStore();
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
   const { simSpeed } = useStore();
@@ -16,6 +18,7 @@ const Sun = ({ position, textures }) => {
 
   // Modify the handleClick to account for dragging
   const handleClick = e => {
+    if (experimentMode) return
     e.stopPropagation();
     if (selectedPlanet?.name === name) {
       return
