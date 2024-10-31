@@ -249,34 +249,34 @@ const Menu = () => {
       </div>
 
       {/* Details menu */}
-      {!viewOnlyMode && (
-        <>
-          <div
-            className={`details-menu ${selectedPlanet &&
-              (!isCameraTransitioning && showDetailsMenu && satelliteCamera || selectedPlanet?.name === "Sun" && !isZoomingToSun)
-              ? "open"
-              : "closed"
-              }`}
-            key={selectedPlanet?.name}
-          >
-            <div className="details-menu-inner">
-              {selectedPlanet?.name &&
-                <DetailsMenu />
-              }
-            </div>
+
+      <>
+        <div
+          className={`details-menu ${selectedPlanet &&
+            (!isCameraTransitioning && showDetailsMenu && satelliteCamera || selectedPlanet?.name === "Sun" && !isZoomingToSun)
+            ? "open"
+            : "closed"
+            }`}
+          key={selectedPlanet?.name}
+        >
+          <div className="details-menu-inner">
+            {selectedPlanet?.name &&
+              <DetailsMenu />
+            }
           </div>
+        </div>
 
-          {(showResetPlanetModal || showResetAllModal) && (
-            <>
-              <div className="backdrop" />
-              <FocusLock>
-                <ResetModal type={showResetPlanetModal ? "single" : "all"} handleResetAll={handleResetAll} />
-              </FocusLock>
-            </>
-          )}
+        {(showResetPlanetModal || showResetAllModal) && (
+          <>
+            <div className="backdrop" />
+            <FocusLock>
+              <ResetModal type={showResetPlanetModal ? "single" : "all"} handleResetAll={handleResetAll} />
+            </FocusLock>
+          </>
+        )}
 
-        </>
-      )}
+      </>
+
     </div>
   );
 };
