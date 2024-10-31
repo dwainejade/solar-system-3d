@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 import planetsData from "../data/planetsData";
 
 const initialState = {
+    experimentStatus: null,
     experiment: null,
     experimentType: null,
     experimentData: null,
@@ -23,6 +24,7 @@ const useExperimentsStore = create(
         (set, get) => ({
             ...initialState,
             experimentMode: false,
+            setExperimentStatus: (newStatus) => set({ experimentStatus: newStatus }),
 
             toggleExperimentMode: (newState) => set({ experimentMode: newState }),
 
