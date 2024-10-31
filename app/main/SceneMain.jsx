@@ -2,6 +2,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { CameraControls, useTexture } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "@/store/store";
+import useExperimentsStore from "@/store/experiments";
 import { sizeScaleFactor } from "@/data/planetsData";
 import Sun from "@/components/Sun";
 import Planet from "@/components/Planet";
@@ -12,8 +13,9 @@ import * as THREE from "three";
 
 const SceneThree = () => {
   const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, setViewOnlyMode } = useStore();
-  const { planetPositions, selectedPlanet, selectedMoon, setSelectedMoon, planetsData, moonsData, moonPositions } = usePlanetStore();
+  const { planetPositions, selectedPlanet, selectedMoon, setSelectedMoon, planetsData, moonsData, moonPositions, resetAllData } = usePlanetStore();
   const { satelliteCamera, isCameraTransitioning, toggleCameraTransitioning, isZoomingToSun, resetCamera, toggleZoomingToSun, activeCamera } = useCameraStore();
+  const { experimentMode, toggleExperimentMode } = useExperimentsStore();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -206,6 +208,8 @@ const SceneThree = () => {
   }, [selectedPlanet, selectedMoon, activeCamera]);
 
   useEffect(() => {
+    setViewOnlyMode(false)
+    toggleExperimentMode(false);
     const handleMouseDown = (event) => {
       if (event.button === 1) {
         event.preventDefault();
@@ -286,7 +290,7 @@ const SceneThree = () => {
       <Planet name="Uranus" textures={uranusTextures} />
       <Planet name="Neptune" textures={neptuneTextures} />
 
-      <AsteroidBelt meshCount={5000} />
+      <AsteroidBelt meshCount={2000} />
 
       {/* <Planet bodyData={planetsData.Pluto} /> */}
       <Sun key={"Sun-plain"} textures={sunTextures} position={sunSettings.position} resetCamera={resetCamera} />
