@@ -2,7 +2,7 @@ import React, { useMemo, useRef, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import useStore, { useCameraStore, usePlanetStore } from '../../store/store';
-import { distanceScaleFactor, MASS_OF_SUN, G } from '../../data/planetsData';
+import { distanceScaleFactor, MASS_OF_SUN, G, asteroidBeltData } from '../../data/planetsData';
 import Labels from '../Labels';
 
 const AsteroidBelt = ({ meshCount = 500 }) => {
@@ -16,10 +16,8 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
     const labelRef = useRef();
     const colorArray = useRef();
 
-    // Real asteroid belt parameters
-    const ASTRONOMICAL_UNIT = 149.6e6;
-    const innerRadius = 2.06 * ASTRONOMICAL_UNIT; // Real inner edge
-    const outerRadius = 3.27 * ASTRONOMICAL_UNIT; // Real outer edge
+    const innerRadius = asteroidBeltData.innerRadius; // Real inner edge
+    const outerRadius = asteroidBeltData.outerRadius; // Real outer edge
     const beltWidth = outerRadius - innerRadius;
     const averageRadius = ((innerRadius + outerRadius) / 2) * distanceScaleFactor;
 
@@ -86,8 +84,8 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
     const generateAsteroidSize = useCallback(() => {
         const randomValue = Math.random();
         // Most asteroids are very small, few are large
-        const minSize = 1;  // Minimum visible size
-        const maxSize = 20;   // Maximum size for large asteroids
+        const minSize = 4;  // Minimum visible size
+        const maxSize = 12;   // Maximum size for large asteroids
         // Power law distribution (roughly follows real asteroid size distribution)
         return minSize + (maxSize - minSize) * Math.pow(randomValue, 4);
     }, []);
@@ -235,8 +233,9 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
                 <meshStandardMaterial
                     vertexColors
                     roughness={0.7}
-                    metalness={0.4}
+                    metalness={0.5}
                     toneMapped={false}
+                // depthWrite={false}
                 />
             </instancedMesh>
         </group>
