@@ -275,7 +275,6 @@ const Menu = () => {
             </>
           )}
 
-          <ExperimentsModal />
         </>
       )}
     </div>

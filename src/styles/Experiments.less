@@ -209,11 +209,11 @@
     }
   }
 
-  .newton-section.kepler-1 {
+  .kepler-1 {
     .slider-con {
       display: flex;
       flex-direction: column;
-
+      margin: 30px 0;
       .slider-control {
         display: flex;
         justify-content: space-between;
@@ -221,36 +221,61 @@
       }
     }
 
-    /* Custom slider styling */
-    input[type="range"] {
-      -webkit-appearance: none;
-      width: 100%;
-      height: 1px;
-      background: white;
-      border-radius: 2px;
-      outline: none;
-    }
-
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 10px;
-      height: 10px;
-      background: #ff6b6b;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-
-    input[type="range"]::-webkit-slider-thumb:hover {
-      background: #ff8585;
-    }
-
-    /* Numerical markers */
-    .slider-markers {
+    .input-con {
       display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      color: #fff;
-      font-size: 14px;
+      flex-direction: column;
+      translate: 0 10px;
+      width: 96%;
+      margin: 0 4%;
+
+      /* slider styling */
+      input[type="range"] {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 1px;
+        background: white;
+        border-radius: 2px;
+        outline: none;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 10px;
+        height: 10px;
+        background: #ff6b6b;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      input[type="range"]::-webkit-slider-thumb:hover {
+        background: #ff8585;
+      }
+
+      .slider-markers {
+        margin-top: 5px;
+        display: flex;
+        justify-content: space-between;
+        color: #fff;
+      }
+    }
+    .increment-btn,
+    .decrement-btn {
+      width: 24px;
+      height: 20px;
+      border-radius: 20px;
+      border: 0;
+      background-color: @label-color;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.05s ease-in-out;
+      font-size: 1rem;
+      padding: 0;
+
+      &:hover {
+        background-color: lighten(@label-color, 10%);
+      }
     }
   }
 }

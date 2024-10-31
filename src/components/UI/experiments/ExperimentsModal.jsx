@@ -1,6 +1,7 @@
 import useExperimentsStore from "../../../store/experiments"
 import useStore, { usePlanetStore } from "../../../store/store";
 import KeplerOne from "./KeplerOne";
+import KeplerTwo from "./KeplerTwo";
 
 function ExperimentsModal() {
     const { experimentsModal, toggleExperimentsModal, experimentType, setExperimentType } = useExperimentsStore();
@@ -29,7 +30,7 @@ function ExperimentsModal() {
 
                     <div className="btn-con">
                         <button className="btn" onClick={() => handleExperiementType('kepler-1')}>First Law (Elliptical Orbits) <span>{'>'}</span></button>
-                        <button className="btn">Second Law (Equal Areas) <span>{'>'}</span></button>
+                        <button className="btn" onClick={() => handleExperiementType('kepler-2')}>Second Law (Equal Areas) <span>{'>'}</span></button>
                         <button className="btn">Third Law (Action Reaction) <span>{'>'}</span></button>
                     </div>
                 </div>
@@ -48,7 +49,8 @@ function ExperimentsModal() {
                     {!experimentType && defaultMenu()}
                     {experimentType === 'kepler-1' &&
                         <KeplerOne planetsData={planetsData} updaPlanetData={updatePlanetData} />}
-
+                    {experimentType === 'kepler-2' &&
+                        <KeplerTwo planetsData={planetsData} updaPlanetData={updatePlanetData} />}
                 </div>
             </div>
 

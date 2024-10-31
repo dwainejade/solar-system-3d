@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import useStore, { usePlanetStore } from '../../../store/store';
 import useExperimentsStore from '../../../store/experiments';
 
-function KeplerOne() {
-    const selectedPlanet = 'Mercury';
+function KeplerTwo() {
+    const selectedPlanet = 'Earth';
     const { planetsData, updatePlanetData } = usePlanetStore();
     const { setSimSpeed, simSpeed, prevSpeed } = useStore();
     const { experimentMode, toggleExperimentMode } = useExperimentsStore();
@@ -53,51 +53,21 @@ function KeplerOne() {
 
     return (
         <>
-            <header>Kepler's First Law</header>
-            <div className="newton-section kepler-1">
-                <h2 className="title">Saturn</h2>
+            <header>Kepler's Second Law</header>
+            <div className="newton-section kepler-2">
+                <h2 className="title">{selectedPlanet}</h2>
 
                 <div className="slider-con">
                     <div className="slider-control">
-                        <button
-                            className="increment-btn"
-                            disabled={eccentricity <= 0 || !experimentMode}
-                            onClick={handleDecrement}
-                        >
-                            -
-                        </button>
-
-                        <div className="input-con">
-                            <input
-                                type="range"
-                                min={0}
-                                max={0.9}
-                                step={0.001}
-                                value={eccentricity}
-                                onChange={handleSliderChange}
-                                disabled={!experimentMode}
-                            />
-                            <div className="slider-markers">
-                                <span>0</span>
-                                <span>.9</span>
-                            </div>
-
-                        </div>
-                        <button
-                            className="increment-btn"
-                            disabled={eccentricity >= 0.9 || !experimentMode}
-                            onClick={handleIncrement}
-                        >
-                            +
-                        </button>
+                        <label htmlFor="eccentricity">Eccentricity</label>
+                        <input type="text" />
                     </div>
                 </div>
 
                 <div className="description-con">
-                    <p>Planets orbit the Sun in an ellipse, with the Sun at one of the foci.</p>
-                    <p>Note that Saturn's normal eccentricity is {originalEccentricity}.</p>
+                    <p>Kepler's second law states that a planet sweeps out equal areas in equal times, moving faster when the planet is closer to the Sun and slower when it is farther away.</p>
                 </div>
-            </div>
+            </div >
             <footer className="experiment-footer">
                 <button
                     className={`btn start-btn ${experimentMode ? 'active' : ''}`}
@@ -117,4 +87,4 @@ function KeplerOne() {
     );
 }
 
-export default KeplerOne;
+export default KeplerTwo;

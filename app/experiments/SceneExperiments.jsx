@@ -4,7 +4,7 @@ import { CameraControls, useTexture } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "@/store/store";
 import { sizeScaleFactor } from "@/data/planetsData";
 import Sun from "@/components/Sun";
-import Planet from "@/components/Planet";
+import Planet from "@/components/PlanetExperiments";
 import Stars from "@/components/Stars"
 import { useFrame } from "@react-three/fiber";
 import AsteroidBelt from "@/components/asteroids/AsteroidBeltShaders";
@@ -277,19 +277,19 @@ const Scene = () => {
 
       <Stars />
 
-      <Planet name="Earth" textures={earthTextures} />
+      {/* <Planet name="Earth" textures={earthTextures} />
       <Planet name="Mars" textures={marsTextures} />
-      <Planet name="Venus" textures={venusTextures} />
+      <Planet name="Venus" textures={venusTextures} /> */}
       <Planet name="Mercury" textures={mercuryTextures} />
-      <Planet name="Jupiter" textures={jupiterTextures} />
+      {/* <Planet name="Jupiter" textures={jupiterTextures} />
       <Planet name="Saturn" textures={saturnTextures} />
       <Planet name="Uranus" textures={uranusTextures} />
-      <Planet name="Neptune" textures={neptuneTextures} />
+      <Planet name="Neptune" textures={neptuneTextures} /> */}
 
-      <AsteroidBelt meshCount={500} />
+      {/* <AsteroidBelt meshCount={500} /> */}
 
       {/* <Planet bodyData={planetsData.Pluto} /> */}
-      <Sun key={"Sun-plain"} textures={sunTextures} position={sunSettings.position} resetCamera={resetCamera} />
+      {/* <Sun key={"Sun-plain"} textures={sunTextures} position={sunSettings.position} resetCamera={resetCamera} /> */}
 
     </>
   );

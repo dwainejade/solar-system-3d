@@ -11,6 +11,7 @@ import Labels from "./Labels";
 import moonsData from "@/data/moonsData";
 import { earthAtmosphereShader } from "../shaders/atmosphere";
 import Rings from "./Rings";
+import KeplerTriangles from "./KeplerTriangles";
 
 const Planet = ({ name = 'Earth', textures }) => {
   const { planetsData } = usePlanetStore();
@@ -240,6 +241,19 @@ const Planet = ({ name = 'Earth', textures }) => {
           size={scaledRadius}
         />
       }
+
+
+      {orbitPaths && localRef.current && (
+        <KeplerTriangles
+          planetRef={localRef}
+          numTriangles={5}
+          radius={scaledOrbitalRadius}
+          eccentricity={eccentricity}
+          orbitalInclination={orbitalInclination}
+          color={color}
+        />
+      )}
+
 
       <group ref={localRef}>
         <mesh
