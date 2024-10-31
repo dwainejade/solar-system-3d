@@ -9,6 +9,7 @@ const initialState = {
     experimentData: null,
     experimentsModal: false,
     initialPlanetsData: planetsData,
+    experimentPlanet: 'Earth',
 };
 
 // const experimentCameraAngles = {
@@ -27,6 +28,8 @@ const useExperimentsStore = create(
             setExperimentStatus: (newStatus) => set({ experimentStatus: newStatus }),
 
             toggleExperimentMode: (newState) => set({ experimentMode: newState }),
+
+            setExperimentPlanet: (newPlanet) => set({ experimentPlanet: newPlanet }),
 
             setExperimentMode: (newState) => set({ experimentMode: newState }),
             setExperimentData: (newData) => set({ experimentData: newData }),

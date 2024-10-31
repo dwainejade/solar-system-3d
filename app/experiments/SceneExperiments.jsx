@@ -2,6 +2,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { CameraControls, useTexture } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "@/store/store";
+import useExperimentsStore from "@/store/experiments";
 import { sizeScaleFactor } from "@/data/planetsData";
 import Sun from "@/components/Sun";
 import Planet from "@/components/PlanetExperiments";
@@ -14,6 +15,7 @@ const Scene = () => {
   const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, setViewOnlyMode } = useStore();
   const { planetPositions, selectedPlanet, selectedMoon, setSelectedMoon, planetsData, moonsData, moonPositions } = usePlanetStore();
   const { satelliteCamera, isCameraTransitioning, toggleCameraTransitioning, isZoomingToSun, resetCamera, toggleZoomingToSun, activeCamera } = useCameraStore();
+  const { experimentMode, experimentType, experimentPlanet } = useExperimentsStore();
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -263,6 +265,30 @@ const Scene = () => {
   };
 
 
+  const renderPlanet = () => {
+    switch (experimentPlanet) {
+      case 'Earth':
+        return <Planet name="Earth" textures={earthTextures} />
+      case 'Mars':
+        return <Planet name="Mars" textures={marsTextures} />
+      case 'Venus':
+        return <Planet name="Venus" textures={venusTextures} />
+      case 'Mercury':
+        return <Planet name="Mercury" textures={mercuryTextures} />
+      case 'Jupiter':
+        return <Planet name="Jupiter" textures={jupiterTextures} />
+      case 'Saturn':
+        return <Planet name="Saturn" textures={saturnTextures} />
+      case 'Uranus':
+        return <Planet name="Uranus" textures={uranusTextures} />
+      case 'Neptune':
+        return <Planet name="Neptune" textures={neptuneTextures} />
+      default:
+        return <Planet name="Earth" textures={earthTextures} />
+    }
+  }
+
+
   return (
     <>
       {!satelliteCamera && (
@@ -277,14 +303,7 @@ const Scene = () => {
 
       <Stars />
 
-      <Planet name="Earth" textures={earthTextures} />
-      {/* <Planet name="Mars" textures={marsTextures} /> */}
-      {/* <Planet name="Venus" textures={venusTextures} /> */}
-      {/* <Planet name="Mercury" textures={mercuryTextures} /> */}
-      {/* <Planet name="Jupiter" textures={jupiterTextures} /> */}
-      {/* <Planet name="Saturn" textures={saturnTextures} /> */}
-      {/* <Planet name="Uranus" textures={uranusTextures} /> */}
-      {/* <Planet name="Neptune" textures={neptuneTextures} /> */}
+      {renderPlanet()}
 
       {/* <AsteroidBelt meshCount={500} /> */}
 

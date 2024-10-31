@@ -16,7 +16,7 @@ import KeplerTriangles from "./KeplerTriangles";
 
 const Planet = ({ name = 'Earth', textures }) => {
   const { planetsData } = usePlanetStore();
-  const { experimentType } = useExperimentsStore();
+  const { experimentType, experimentPlanet } = useExperimentsStore();
   const bodyData = planetsData[name];
   const mergedData = { ...bodyData };
 

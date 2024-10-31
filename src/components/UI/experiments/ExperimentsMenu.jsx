@@ -8,7 +8,7 @@ import FocusLock from 'react-focus-lock';
 import ExperimentsModal from "./ExperimentsModal";
 
 const Menu = () => {
-  const { toggleExperimentsModal, experimentsModal, resetExperiments } = useExperimentsStore();
+  const { toggleExperimentsModal, experimentsModal, resetExperiments, experimentPlanet, setExperimentPlanet } = useExperimentsStore();
   const {
     simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, toggleFullscreen,
     showDetailsMenu, toggleDetailsMenu, viewOnlyMode, resetAllData,
@@ -70,10 +70,11 @@ const Menu = () => {
 
   const handlePlanetSelect = (planetName) => {
     const planet = planetsData[planetName];
-    setSelectedPlanet(planet);
-    setSelectedMoon(null);
-    toggleDetailsMenu(true);
-    switchToPlanetCamera(planetName);
+    setExperimentPlanet(planetName);
+    // setSelectedPlanet(planet);
+    // setSelectedMoon(null);
+    // toggleDetailsMenu(true);
+    // switchToPlanetCamera(planetName);
     setIsDropdownOpen(false); // Close dropdown after selection
   };
 
@@ -170,24 +171,26 @@ const Menu = () => {
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 disabled={!isMenuOpen}
               >
-                {activeCamera.name === 'default' ? "Solar System" : activeCamera.name}
+                {experimentPlanet}
               </button>
 
 
               <div className="item-wrapper">
                 {isDropdownOpen && (
                   <ul className="dropdown-menu">
-                    <li onClick={handleSolarSystemSelect}>Solar System</li>
-                    {Object.keys(planetsData).map((planetName) => (
-                      <li key={planetName} className="dropdown-item"
-                        onClick={() => handlePlanetSelect(planetName)}
-                        onPointerOver={() => setHoveredPlanetName(hoveredPlanetName === planetName ? null : planetName)}
-                      // onPointerOut={() => setHoveredPlanetName(null)}
-                      >
-                        {planetName} {moonsData[planetName]?.length || null}
-                      </li>
-                    ))}
-                    <li onClick={handleAsteroidBeltSelect}>Asteroid Belt</li>
+                    {/* <li onClick={handleSolarSystemSelect}>Solar System</li> */}
+                    {Object.keys(planetsData)
+                      .filter((planetName) => planetName !== 'Sun')
+                      .map((planetName) => (
+                        <li
+                          key={planetName}
+                          className="dropdown-item"
+                          onClick={() => handlePlanetSelect(planetName)}
+                        >
+                          {planetName}
+                        </li>
+                      ))}
+                    {/* <li onClick={handleAsteroidBeltSelect}>Asteroid Belt</li> */}
                   </ul>
                 )}
                 {/* Submenu for moons */}
