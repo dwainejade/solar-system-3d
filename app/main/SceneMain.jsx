@@ -290,7 +290,7 @@ const SceneThree = () => {
       <Planet name="Uranus" textures={uranusTextures} />
       <Planet name="Neptune" textures={neptuneTextures} />
 
-      <AsteroidBelt meshCount={2000} />
+      <AsteroidBelt meshCount={2500} />
 
       {/* <Planet bodyData={planetsData.Pluto} /> */}
       <Sun key={"Sun-plain"} textures={sunTextures} position={sunSettings.position} resetCamera={resetCamera} />
