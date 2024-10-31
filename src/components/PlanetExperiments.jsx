@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { act, render, useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
+import useExperimentsStore from "../store/experiments";
 import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCamera";
@@ -15,6 +16,7 @@ import KeplerTriangles from "./KeplerTriangles";
 
 const Planet = ({ name = 'Earth', textures }) => {
   const { planetsData } = usePlanetStore();
+  const { experimentType } = useExperimentsStore();
   const bodyData = planetsData[name];
   const mergedData = { ...bodyData };
 
@@ -185,7 +187,7 @@ const Planet = ({ name = 'Earth', textures }) => {
   const handleClick = e => {
     e.stopPropagation();
     if (isDragging || activeCamera.name === name) return;
-    console.log(selectedMoon)
+    // console.log(selectedMoon)
     toggleDetailsMenu(true);
     setSelectedMoon(null);
     setSelectedPlanet(mergedData);
@@ -242,18 +244,16 @@ const Planet = ({ name = 'Earth', textures }) => {
         />
       }
 
-
-      {orbitPaths && localRef.current && (
+      {/* Kepler 2nd Law Demo */}
+      {experimentType === 'kepler-2' &&
         <KeplerTriangles
           planetRef={localRef}
           numTriangles={5}
           radius={scaledOrbitalRadius}
           eccentricity={eccentricity}
           orbitalInclination={orbitalInclination}
-          color={color}
         />
-      )}
-
+      }
 
       <group ref={localRef}>
         <mesh
