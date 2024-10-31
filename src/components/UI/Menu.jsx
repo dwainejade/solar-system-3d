@@ -146,7 +146,7 @@ const Menu = () => {
         {displayText}
       </div>
 
-      <button className="reset-all-btn btn" onClick={handleResetBtn} />
+      {!viewOnlyMode && <button className="reset-all-btn btn" onClick={handleResetBtn} />}
       <button className="fullscreen-btn btn" onClick={handleFullscreen} />
 
       <div className={`bottom-menu ${isMenuOpen ? "open" : "closed"}`}>
