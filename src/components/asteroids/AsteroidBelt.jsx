@@ -26,32 +26,32 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
         C: {
             baseHue: 0.083,
             hueVariation: 0.02,
-            saturation: [0.05, 0.15],
-            lightness: [0.15, 0.25]
+            saturation: [0.15, 0.25],  // Increased saturation
+            lightness: [0.25, 0.35]    // Increased lightness
         },
         S: {
             baseHue: 0.055,
             hueVariation: 0.015,
-            saturation: [0.15, 0.35],
-            lightness: [0.25, 0.35]
+            saturation: [0.25, 0.45],  // Increased saturation
+            lightness: [0.35, 0.45]    // Increased lightness
         },
         M: {
             baseHue: 0.1,
             hueVariation: 0.01,
-            saturation: [0.05, 0.2],
-            lightness: [0.3, 0.4]
+            saturation: [0.15, 0.3],   // Increased saturation
+            lightness: [0.4, 0.5]      // Increased lightness
         },
         D: {
             baseHue: 0.065,
             hueVariation: 0.01,
-            saturation: [0.05, 0.1],
-            lightness: [0.1, 0.15]
+            saturation: [0.15, 0.2],   // Increased saturation
+            lightness: [0.2, 0.25]     // Increased lightness
         },
         V: {
             baseHue: 0.03,
             hueVariation: 0.01,
-            saturation: [0.2, 0.4],
-            lightness: [0.2, 0.3]
+            saturation: [0.3, 0.5],    // Increased saturation
+            lightness: [0.3, 0.4]      // Increased lightness
         }
     };
 
@@ -73,18 +73,24 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
         const lightness = getRandomInRange(...specs.lightness);
         const noise = (Math.random() - 0.5) * 0.05;
 
-        return new THREE.Color().setHSL(
+        // Create and brighten the color
+        const color = new THREE.Color().setHSL(
             THREE.MathUtils.clamp(hue, 0, 1),
             THREE.MathUtils.clamp(saturation, 0, 1),
             THREE.MathUtils.clamp(lightness + noise, 0, 1)
         );
+
+        // Boost the color intensity slightly
+        color.multiplyScalar(1.2);
+
+        return color;
     }, []);
 
     // Updated size distribution based on real asteroid data
     const generateAsteroidSize = useCallback(() => {
         const randomValue = Math.random();
         // Most asteroids are very small, few are large
-        const minSize = 4;  // Minimum visible size
+        const minSize = 6;  // Minimum visible size
         const maxSize = 12;   // Maximum size for large asteroids
         // Power law distribution (roughly follows real asteroid size distribution)
         return minSize + (maxSize - minSize) * Math.pow(randomValue, 4);
@@ -187,6 +193,14 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
 
     return (
         <group>
+            {/* Add local lighting for the asteroid belt */}
+            {/* <ambientLight intensity={0.05}  /> */}
+            <hemisphereLight
+                intensity={.1}
+                color="#444"
+                groundColor="#222"
+            />
+
             {(displayLabels || isHoveredRef.current) && (
                 <group ref={labelRef} position={[averageRadius * 0.8, averageRadius * 0.01, 0]}>
                     <Labels
@@ -232,10 +246,13 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
             >
                 <meshStandardMaterial
                     vertexColors
-                    roughness={0.7}
-                    metalness={0.5}
-                    toneMapped={false}
-                // depthWrite={false}
+                    roughness={0.6}      // Reduced for more specular highlights
+                    metalness={0.4}      // Increased for more reflectivity
+                    emissive="#111111"   // Slight self-illumination
+                    emissiveIntensity={0.1}
+                    toneMapped={false}   // Preserve bright colors
+                    envMapIntensity={1.2} // Enhanced environment response
+                    flatShading={true}
                 />
             </instancedMesh>
         </group>
