@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import useStore, { usePlanetStore } from '../../../store/store';
+import planetsData from '../../../data/planetsData';
 import useExperimentsStore from '../../../store/experiments';
 
 function KeplerOne() {
-    const selectedPlanet = 'Earth';
-    const { planetsData, updatePlanetData } = usePlanetStore();
+    const { planetsData: newPlanetsData, updatePlanetData, resetSinglePlanetData } = usePlanetStore();
     const { setSimSpeed, simSpeed, prevSpeed } = useStore();
-    const { experimentMode, toggleExperimentMode } = useExperimentsStore();
+    const { experimentMode, experimentPlanet } = useExperimentsStore();
+
+    const selectedPlanet = experimentPlanet || 'Earth';
 
     // Initialize eccentricity from planet data
-    const [eccentricity, setEccentricity] = useState(planetsData[selectedPlanet].eccentricity);
-    const originalEccentricity = 0.054; // Saturn's original eccentricity
+    const [eccentricity, setEccentricity] = useState(newPlanetsData[selectedPlanet].eccentricity);
+    const originalEccentricity = planetsData[experimentPlanet].eccentricity; // Saturn's original eccentricity
 
     const handleIncrement = () => {
         const newValue = Math.min(0.9, eccentricity + 0.01);
@@ -47,15 +49,15 @@ function KeplerOne() {
     };
 
     // Update local eccentricity if planet data changes externally
-    useEffect(() => {
-        setEccentricity(planetsData[selectedPlanet].eccentricity);
-    }, [planetsData[selectedPlanet].eccentricity]);
+    // useEffect(() => {
+    //     setEccentricity(newPlanetsData[selectedPlanet].eccentricity);
+    // }, [newPlanetsData[selectedPlanet].eccentricity]);
 
     return (
         <>
             <header>Kepler's First Law</header>
             <div className="newton-section kepler-1">
-                <h2 className="title">Saturn</h2>
+                <h2 className="title">{selectedPlanet}</h2>
 
                 <div className="slider-con">
                     <div className="slider-control">

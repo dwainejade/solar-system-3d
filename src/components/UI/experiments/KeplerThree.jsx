@@ -1,65 +1,76 @@
 import React, { useState, useEffect } from 'react';
 import useStore, { usePlanetStore } from '../../../store/store';
 import useExperimentsStore from '../../../store/experiments';
-import planetsData, { distanceScaleFactor } from '../../../data/planetsData';
+import planetsData from '../../../data/planetsData';
 
 function KeplerThree() {
     const { planetsData: newPlanetsData, updatePlanetData, resetSinglePlanetData } = usePlanetStore();
-    const { setSimSpeed, simSpeed, prevSpeed } = useStore();
-    const { experimentMode, toggleExperimentMode } = useExperimentsStore();
+    const { experimentMode, experimentPlanet } = useExperimentsStore();
+    const { setSimSpeed } = useStore();
 
-    const selectedPlanet = 'Earth';
-    const originalOrbitalRadius = planetsData[selectedPlanet].orbitalRadius;
-    const earthsOrbitalRadius = planetsData['Earth'].orbitalRadius
-    const [AU, setAU] = useState(originalOrbitalRadius / earthsOrbitalRadius);
+    const selectedPlanet = experimentPlanet || 'Earth';
+    const earthsOrbitalRadius = planetsData['Earth'].orbitalRadius;
 
-    const originalOrbitalPeriod = planetsData[selectedPlanet].orbitalPeriod;
-    const earthsOrbitalPeriod = planetsData['Earth'].orbitalPeriod
-    // const [orbitalPeriod, setOrbitalPeriod] = useState(null);
+    // Use state for values that need to be updated when planet changes
+    const [originalOrbitalRadius, setOriginalOrbitalRadius] = useState(planetsData[selectedPlanet].orbitalRadius);
+    const [originalOrbitalPeriod, setOriginalOrbitalPeriod] = useState(planetsData[selectedPlanet].orbitalPeriod);
+    const [initialAU, setInitialAU] = useState(planetsData[selectedPlanet].orbitalRadius / earthsOrbitalRadius);
+    const [AU, setAU] = useState(planetsData[selectedPlanet].orbitalRadius / earthsOrbitalRadius);
 
-    // Calculate orbital period using Kepler's Third Law
-    const calculatePeriod = (au) => {
-        return Math.sqrt(Math.pow(au, 3));
+    // Update all relevant values when the selected planet changes
+    useEffect(() => {
+        const newOriginalRadius = planetsData[selectedPlanet].orbitalRadius;
+        const newOriginalPeriod = planetsData[selectedPlanet].orbitalPeriod;
+        const newInitialAU = newOriginalRadius / earthsOrbitalRadius;
+
+        setOriginalOrbitalRadius(newOriginalRadius);
+        setOriginalOrbitalPeriod(newOriginalPeriod);
+        setInitialAU(newInitialAU);
+        setAU(newInitialAU);
+
+        // Reset the planet data to its original state when switching planets
+        resetSinglePlanetData(selectedPlanet);
+    }, [selectedPlanet, earthsOrbitalRadius]);
+
+    // Calculate orbital period scaling based on AU change
+    const calculatePeriod = (currentAU) => {
+        // Calculate the ratio of orbital periods using Kepler's Third Law
+        // T₂/T₁ = √((r₂/r₁)³)
+        const periodRatio = Math.sqrt(Math.pow(currentAU / initialAU, 3));
+        // Scale the original orbital period by this ratio
+        return originalOrbitalPeriod * periodRatio / 365.25; // Convert to years
     };
 
-    const handleUpdatePlanetData = (newValue) => {
+    const handleUpdatePlanetData = (newAU) => {
+        const newPeriod = calculatePeriod(newAU) * 365.25; // Convert back to days for planet data
         updatePlanetData(selectedPlanet, {
-            orbitalRadius: originalOrbitalRadius * newValue,
-            orbitalPeriod: originalOrbitalPeriod * calculatePeriod(newValue)
+            orbitalRadius: originalOrbitalRadius * (newAU / initialAU),
+            orbitalPeriod: newPeriod
         });
-    }
+    };
 
     const handleIncrement = () => {
-        const newValue = Math.min(10, AU + 1);
+        const newValue = Math.min(40, AU + 0.1);
         setAU(newValue);
-        handleUpdatePlanetData(newValue)
+        handleUpdatePlanetData(newValue);
     };
 
     const handleDecrement = () => {
-        const newValue = Math.max(1, AU - 1);
+        const newValue = Math.max(0.1, AU - 0.1);
         setAU(newValue);
-        handleUpdatePlanetData(newValue)
+        handleUpdatePlanetData(newValue);
     };
 
     const handleSliderChange = (e) => {
         const newValue = parseFloat(e.target.value);
         setAU(newValue);
-        handleUpdatePlanetData(newValue)
-    };
-
-    const handleStartExperiment = () => {
-        setSimSpeed(100000); // Set to normal speed when starting
+        handleUpdatePlanetData(newValue);
     };
 
     const handleReset = () => {
-        setAU(originalOrbitalRadius / earthsOrbitalRadius);
+        setAU(initialAU);
         resetSinglePlanetData(selectedPlanet);
     };
-
-    // Update local data if planet data changes externally
-    // useEffect(() => {
-    //     setEccentricity(planetsData[selectedPlanet].orbitalPeriod);
-    // }, [planetsData[selectedPlanet].orbitalPeriod]);
 
     return (
         <>
@@ -71,7 +82,7 @@ function KeplerThree() {
                     <div className="slider-control">
                         <button
                             className="increment-btn"
-                            disabled={AU <= 0 || !experimentMode}
+                            disabled={AU <= 0.1}
                             onClick={handleDecrement}
                         >
                             -
@@ -80,20 +91,21 @@ function KeplerThree() {
                         <div className="input-con">
                             <input
                                 type="range"
-                                min={1}
-                                max={10}
-                                step={.1}
+                                min={0.1}
+                                max={40}
+                                step={0.1}
                                 value={AU}
                                 onChange={handleSliderChange}
                             />
                             <div className="slider-markers">
-                                <span>1</span>
-                                <span>10</span>
+                                <span>0.1</span>
+                                <span>40</span>
                             </div>
                         </div>
+
                         <button
                             className="increment-btn"
-                            disabled={AU >= 10 || !experimentMode}
+                            disabled={AU >= 40}
                             onClick={handleIncrement}
                         >
                             +
@@ -102,15 +114,17 @@ function KeplerThree() {
                 </div>
 
                 <div className="answer-con" style={{ color: 'white' }}>
-                    <p>AU: {AU}</p>
-                    <p>Orbital Period: {calculatePeriod(AU).toFixed(1)} years</p>
-                </div>
+                    <p>Current AU: {AU.toFixed(2)}</p>
+                    <p>Current Orbital Period: {calculatePeriod(AU).toFixed(2)} years</p>
 
+                    <p>Natural AU: {initialAU.toFixed(2)}</p>
+                    <p>Natural Period: {(originalOrbitalPeriod / 365.25).toFixed(2)} years</p>
+                </div>
             </div>
+
             <footer className="experiment-footer">
                 <button
                     className={`btn start-btn ${experimentMode ? 'active' : ''}`}
-                    onClick={handleStartExperiment}
                     disabled={experimentMode}
                 >
                     Start Experiment

@@ -30,7 +30,7 @@ const Planet = ({ name = 'Earth', textures }) => {
     axialTilt,
     rotationPeriod,
     color,
-    initialOrbitalAngle,
+    initialOrbitalAngle = 0,
     eccentricity,
   } = mergedData;
 
