@@ -1,7 +1,11 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useRef } from "react";
 import { Line } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+
+const normalizeAngle = (angle) => {
+    return ((angle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+};
 
 const AnimatedKeplerTriangles = ({
     planetRef,
@@ -15,15 +19,44 @@ const AnimatedKeplerTriangles = ({
     const [completedSlices, setCompletedSlices] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [lastAngle, setLastAngle] = useState(null);
+    const lastAngles = useRef([]);  // Keep track of last few angles for better reset detection
 
-    // Calculate angles for equal-area slices
+    const createSlicePoints = (startAngle, endAngle, steps = 100) => {  // Increased from 30 to 100
+        const points = [];
+        startAngle = normalizeAngle(startAngle);
+        endAngle = normalizeAngle(endAngle);
+
+        // Add more points at the center for better radius resolution
+        const centerPoints = 20;  // Number of points to add near center
+        for (let i = 0; i < centerPoints; i++) {
+            points.push([0, 0, 0]);
+        }
+
+        // Calculate arc length to distribute points more evenly
+        let angleDiff = endAngle - startAngle;
+        if (angleDiff < 0) angleDiff += 2 * Math.PI;
+
+        // Add more points along the arc
+        for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+            const angle = startAngle + t * angleDiff;
+            points.push(getPositionAtAngle(angle));
+        }
+
+        // Add more points at the end for better radius resolution
+        for (let i = 0; i < centerPoints; i++) {
+            points.push([0, 0, 0]);
+        }
+
+        return points;
+    };
+
     const equalAreaAngles = useMemo(() => {
         const angles = [];
         for (let i = 0; i <= numTriangles; i++) {
             const M = (i / numTriangles) * 2 * Math.PI;
             let E = M;
 
-            // Solve Kepler's equation
             for (let iter = 0; iter < 10; iter++) {
                 const dE = (E - eccentricity * Math.sin(E) - M) /
                     (1 - eccentricity * Math.cos(E));
@@ -31,18 +64,16 @@ const AnimatedKeplerTriangles = ({
                 if (Math.abs(dE) < 1e-6) break;
             }
 
-            // Calculate true anomaly
             const trueAnomaly = 2 * Math.atan(
                 Math.sqrt((1 + eccentricity) / (1 - eccentricity)) *
                 Math.tan(E / 2)
             );
 
-            angles.push(trueAnomaly);
+            angles.push(normalizeAngle(trueAnomaly)); // Normalize angles when we create them
         }
         return angles;
     }, [numTriangles, eccentricity]);
 
-    // Function to get position at a given angle
     const getPositionAtAngle = (angle) => {
         const r = (radius * (1 - eccentricity * eccentricity)) /
             (1 + eccentricity * Math.cos(angle));
@@ -57,27 +88,7 @@ const AnimatedKeplerTriangles = ({
         return [x, y, adjustedZ];
     };
 
-    // Create points for a slice between angles
-    const createSlicePoints = (startAngle, endAngle, steps = 30) => {
-        const points = [[0, 0, 0]];
 
-        for (let i = 0; i <= steps; i++) {
-            const angle = startAngle + (i / steps) * (endAngle - startAngle);
-            points.push(getPositionAtAngle(angle));
-        }
-
-        points.push([0, 0, 0]);
-        return points;
-    };
-
-    // Helper to normalize angle to [0, 2π]
-    const normalizeAngle = (angle) => {
-        while (angle < 0) angle += 2 * Math.PI;
-        while (angle >= 2 * Math.PI) angle -= 2 * Math.PI;
-        return angle;
-    };
-
-    // Helper to check if angle is between start and end angles
     const isAngleBetween = (angle, start, end) => {
         angle = normalizeAngle(angle);
         start = normalizeAngle(start);
@@ -93,51 +104,72 @@ const AnimatedKeplerTriangles = ({
     useFrame(() => {
         if (!planetRef.current) return;
 
-        // Calculate current planet angle
         const pos = planetRef.current.position;
-        let currentAngle = Math.atan2(pos.z, pos.x);
-        currentAngle = normalizeAngle(currentAngle);
+        let currentAngle = normalizeAngle(Math.atan2(pos.z, pos.x));
 
-        // Initialize lastAngle if needed
+        // Keep track of last few angles
+        lastAngles.current.push(currentAngle);
+        if (lastAngles.current.length > 3) {  // Keep last 3 angles
+            lastAngles.current.shift();
+        }
+
         if (lastAngle === null) {
             setLastAngle(currentAngle);
             return;
         }
 
-        // Detect orbit completion
-        if (lastAngle > 5 && currentAngle < 1) {
+        // Check for orbit completion with multiple angle checks
+        // This helps catch high-speed transitions
+        const angles = lastAngles.current;
+        const hasHighAngle = angles.some(angle => angle > 5);
+        const hasLowAngle = angles.some(angle => angle < 1);
+
+        if (hasHighAngle && hasLowAngle && currentAngle < lastAngle) {
+            console.log("=== ORBIT COMPLETE - RESETTING ===", {
+                angles: angles.map(a => (a * 180 / Math.PI).toFixed(1) + "°"),
+                currentAngle: (currentAngle * 180 / Math.PI).toFixed(1) + "°"
+            });
             setCompletedSlices([]);
             setCurrentIndex(0);
             setActiveSlice(null);
             setLastAngle(currentAngle);
+            lastAngles.current = [currentAngle];
             return;
         }
 
-        // Handle slice animation
         if (currentIndex < numTriangles) {
             const sliceStartAngle = equalAreaAngles[currentIndex];
             const sliceEndAngle = equalAreaAngles[currentIndex + 1];
 
-            // If no active slice, start one
             if (!activeSlice) {
+                console.log(`Starting new slice ${currentIndex}:`, {
+                    sliceStartAngle: (sliceStartAngle * 180 / Math.PI).toFixed(1) + "°",
+                    sliceEndAngle: (sliceEndAngle * 180 / Math.PI).toFixed(1) + "°",
+                    currentAngle: (currentAngle * 180 / Math.PI).toFixed(1) + "°"
+                });
+
                 setActiveSlice({
                     startAngle: sliceStartAngle,
                     endAngle: currentAngle,
                     color: `hsl(${(currentIndex * 360) / numTriangles}, 70%, 50%)`
                 });
             } else {
-                // Check if we've completed the current slice
                 const passedEndAngle = !isAngleBetween(currentAngle, sliceStartAngle, sliceEndAngle) &&
                     isAngleBetween(lastAngle, sliceStartAngle, sliceEndAngle);
 
                 if (passedEndAngle) {
-                    // Complete current slice
+                    console.log(`Completing slice ${currentIndex}:`, {
+                        sliceStartAngle: (sliceStartAngle * 180 / Math.PI).toFixed(1) + "°",
+                        sliceEndAngle: (sliceEndAngle * 180 / Math.PI).toFixed(1) + "°",
+                        currentAngle: (currentAngle * 180 / Math.PI).toFixed(1) + "°",
+                        lastAngle: (lastAngle * 180 / Math.PI).toFixed(1) + "°"
+                    });
+
                     setCompletedSlices(prev => [...prev, {
                         points: createSlicePoints(sliceStartAngle, sliceEndAngle),
                         color: activeSlice.color
                     }]);
 
-                    // Move to next slice if not at end
                     if (currentIndex < numTriangles - 1) {
                         setCurrentIndex(prev => prev + 1);
                         setActiveSlice({
@@ -149,7 +181,6 @@ const AnimatedKeplerTriangles = ({
                         setActiveSlice(null);
                     }
                 } else {
-                    // Update current slice
                     setActiveSlice(prev => ({
                         ...prev,
                         endAngle: currentAngle
@@ -161,28 +192,22 @@ const AnimatedKeplerTriangles = ({
         setLastAngle(currentAngle);
     });
 
+
     return (
         <group>
-            {/* Completed slices */}
             {completedSlices.map((slice, index) => (
                 <Line
                     key={`complete-${index}`}
                     points={slice.points}
                     color={slice.color}
-                    lineWidth={2}
-                    transparent
-                    opacity={0.5}
+                    lineWidth={3}
                 />
             ))}
-
-            {/* Active slice */}
             {activeSlice && (
                 <Line
                     points={createSlicePoints(activeSlice.startAngle, activeSlice.endAngle)}
                     color={activeSlice.color}
-                    lineWidth={2}
-                // transparent
-                // opacity={0.5}
+                    lineWidth={4}
                 />
             )}
         </group>

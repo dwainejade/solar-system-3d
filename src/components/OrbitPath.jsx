@@ -11,7 +11,8 @@ function OrbitPath({
   name,
   lineWidth = 1,
   opacity = 1,
-  hiRes = false
+  hiRes = false,
+  depthWrite = true
 }) {
   const points = useMemo(() => {
     const segments = hiRes ? 1000 : 128;

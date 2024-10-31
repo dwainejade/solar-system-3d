@@ -377,10 +377,12 @@ const Planet = ({ name = 'Earth', textures }) => {
           radius={scaledOrbitalRadius}
           eccentricity={eccentricity}
           orbitalInclination={orbitalInclination}
-          color={color}
+          color={'white'}
           name={name + "-orbit-path"}
-          opacity={0.4}
-          hiRes={isPlanetSelected}
+          opacity={1}
+          hiRes={true}
+          lineWidth={1}
+          depthWrite={false}
         />
       )}
     </>
