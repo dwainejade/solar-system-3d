@@ -35,7 +35,7 @@ const formatScientificNotation = (num) => {
 
 
 const DetailsMenu = () => {
-  const { isEditing, setIsEditing, showDetailsMenu, toggleDetailsMenu } = useStore();
+  const { isEditing, setIsEditing, showDetailsMenu, toggleDetailsMenu, viewOnlyMode } = useStore();
   const { selectedPlanet, updatePlanetData, planetsData, setSelectedPlanet, showResetPlanetModal, showResetAllModal, toggleResetPlanetModal } = usePlanetStore();
   const [editablePlanet, setEditablePlanet] = useState({});
   // const [gravitationalPull, setGravitationalPull] = useState(0)
@@ -50,7 +50,6 @@ const DetailsMenu = () => {
   const toggleEditing = () => {
     if (isEditing && selectedPlanet?.name) {
       updatePlanetData(selectedPlanet.name, editablePlanet);
-      // setSelectedPlanet({ ...selectedPlanet, ...editablePlanet });
       setIsEditing(false); // Exit editing mode
     } else {
       setIsEditing(!isEditing);
@@ -184,7 +183,7 @@ const DetailsMenu = () => {
             </div>
           }
 
-          {selectedPlanet?.name !== 'Sun' &&
+          {selectedPlanet?.name !== 'Sun' && !viewOnlyMode &&
             <div className='button-con'>
               <button onClick={isEditing ? handleSave : toggleEditing} className='edit-planet-btn btn'>
                 {isEditing ? "Save Values" : "Adjust Values"}
