@@ -3,7 +3,7 @@ import useStore, { usePlanetStore } from '../../../store/store';
 import useExperimentsStore from '../../../store/experiments';
 
 function KeplerOne() {
-    const selectedPlanet = 'Mercury';
+    const selectedPlanet = 'Earth';
     const { planetsData, updatePlanetData } = usePlanetStore();
     const { setSimSpeed, simSpeed, prevSpeed } = useStore();
     const { experimentMode, toggleExperimentMode } = useExperimentsStore();

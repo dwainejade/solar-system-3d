@@ -2,11 +2,16 @@ import useExperimentsStore from "../../../store/experiments"
 import useStore, { usePlanetStore } from "../../../store/store";
 import KeplerOne from "./KeplerOne";
 import KeplerTwo from "./KeplerTwo";
+import KeplerThree from "./KeplerThree";
 
 function ExperimentsModal() {
     const { experimentsModal, toggleExperimentsModal, experimentType, setExperimentType } = useExperimentsStore();
     const { updatePlanetData, planetsData } = usePlanetStore();
     const handleCloseModal = () => {
+        if (experimentType) {
+            setExperimentType(null);
+            return
+        }
         toggleExperimentsModal(false);
     }
 
@@ -31,7 +36,7 @@ function ExperimentsModal() {
                     <div className="btn-con">
                         <button className="btn" onClick={() => handleExperiementType('kepler-1')}>First Law (Elliptical Orbits) <span>{'>'}</span></button>
                         <button className="btn" onClick={() => handleExperiementType('kepler-2')}>Second Law (Equal Areas) <span>{'>'}</span></button>
-                        <button className="btn">Third Law (Action Reaction) <span>{'>'}</span></button>
+                        <button className="btn" onClick={() => handleExperiementType('kepler-3')}>Third Law (Distance & period rel) <span>{'>'}</span></button>
                     </div>
                 </div>
             </>
@@ -51,6 +56,8 @@ function ExperimentsModal() {
                         <KeplerOne planetsData={planetsData} updaPlanetData={updatePlanetData} />}
                     {experimentType === 'kepler-2' &&
                         <KeplerTwo planetsData={planetsData} updaPlanetData={updatePlanetData} />}
+                    {experimentType === 'kepler-3' &&
+                        <KeplerThree planetsData={planetsData} updaPlanetData={updatePlanetData} />}
                 </div>
             </div>
 

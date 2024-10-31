@@ -277,19 +277,19 @@ const Scene = () => {
 
       <Stars />
 
-      {/* <Planet name="Earth" textures={earthTextures} />
-      <Planet name="Mars" textures={marsTextures} />
-      <Planet name="Venus" textures={venusTextures} /> */}
-      <Planet name="Mercury" textures={mercuryTextures} />
-      {/* <Planet name="Jupiter" textures={jupiterTextures} />
-      <Planet name="Saturn" textures={saturnTextures} />
-      <Planet name="Uranus" textures={uranusTextures} />
-      <Planet name="Neptune" textures={neptuneTextures} /> */}
+      <Planet name="Earth" textures={earthTextures} />
+      {/* <Planet name="Mars" textures={marsTextures} /> */}
+      {/* <Planet name="Venus" textures={venusTextures} /> */}
+      {/* <Planet name="Mercury" textures={mercuryTextures} /> */}
+      {/* <Planet name="Jupiter" textures={jupiterTextures} /> */}
+      {/* <Planet name="Saturn" textures={saturnTextures} /> */}
+      {/* <Planet name="Uranus" textures={uranusTextures} /> */}
+      {/* <Planet name="Neptune" textures={neptuneTextures} /> */}
 
       {/* <AsteroidBelt meshCount={500} /> */}
 
       {/* <Planet bodyData={planetsData.Pluto} /> */}
-      {/* <Sun key={"Sun-plain"} textures={sunTextures} position={sunSettings.position} resetCamera={resetCamera} /> */}
+      <Sun key={"Sun-plain"} textures={sunTextures} position={sunSettings.position} resetCamera={resetCamera} />
 
     </>
   );

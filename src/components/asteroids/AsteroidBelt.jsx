@@ -1,11 +1,11 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
 import useStore, { useCameraStore, usePlanetStore } from '../../store/store';
 import { distanceScaleFactor, MASS_OF_SUN, G } from '../../data/planetsData';
 import Labels from '../Labels';
-import * as THREE from 'three';
 
-const AsteroidBelt = ({ meshCount = 200 }) => {
+const AsteroidBelt = ({ meshCount = 500 }) => {
     const { simSpeed } = useStore();
     const { switchToCustomCamera, setAutoRotate, activeCamera } = useCameraStore();
     const { displayLabels } = usePlanetStore();
@@ -14,138 +14,232 @@ const AsteroidBelt = ({ meshCount = 200 }) => {
     const isHoveredRef = useRef(false);
     const textSizeRef = useRef(1);
     const labelRef = useRef();
+    const colorArray = useRef();
 
-    // Real asteroid belt parameters (in km)
-    const innerRadius = 2.2 * 149.6e6;
-    const outerRadius = 3.2 * 149.6e6;
+    // Real asteroid belt parameters
+    const ASTRONOMICAL_UNIT = 149.6e6;
+    const innerRadius = 2.06 * ASTRONOMICAL_UNIT; // Real inner edge
+    const outerRadius = 3.27 * ASTRONOMICAL_UNIT; // Real outer edge
     const beltWidth = outerRadius - innerRadius;
     const averageRadius = ((innerRadius + outerRadius) / 2) * distanceScaleFactor;
 
-    // Fixed position for the label
-    const labelPosition = new THREE.Vector3(averageRadius * 0.8, averageRadius * 0.01, 0);
-
-    const handleClick = (e) => {
-        e.stopPropagation();
-        if (activeCamera.name === 'Asteroid Belt') return;
-        switchToCustomCamera('Asteroid Belt');
-        setAutoRotate(true);
-    };
-
-    const handlePointerOver = (e) => {
-        e.stopPropagation();
-        isHoveredRef.current = true;
-        document.body.style.cursor = "pointer";
-    };
-
-    const handlePointerOut = (e) => {
-        e.stopPropagation();
-        isHoveredRef.current = false;
-        document.body.style.cursor = "auto";
-    };
-
-    const calculateOrbitalSpeed = (radius) => {
-        return Math.sqrt(G * MASS_OF_SUN / (radius * 1000));
-    };
-
-    const asteroidMeshes = useMemo(() => {
-        const meshes = [];
-        for (let i = 0; i < meshCount; i++) {
-            const randRadius = Math.pow(Math.random(), 0.5);
-            const semiMajorAxis = innerRadius + (randRadius * beltWidth);
-            const eccentricity = Math.random() * 0.3;
-            const inclination = (Math.random() * 20) * (Math.PI / 275);
-            const orbitalSpeed = calculateOrbitalSpeed(semiMajorAxis);
-            const sizeScale = Math.pow(Math.random(), 2) * 30;
-
-            meshes.push({
-                semiMajorAxis: semiMajorAxis * distanceScaleFactor,
-                eccentricity,
-                orbitalSpeed: -orbitalSpeed * 0.0000000001,
-                angle: Math.random() * Math.PI * 2,
-                inclination,
-                scale: [sizeScale, sizeScale, sizeScale],
-                rotationSpeed: 0.00001 + (Math.random() * 0.00005),
-                color: Math.random() > 0.8
-                    ? '#8B7355'
-                    : Math.random() > 0.5
-                        ? '#4A4A4A'
-                        : '#A0522D'
-            });
+    // Spectral types remain the same as they're accurate
+    const spectralTypes = {
+        C: {
+            baseHue: 0.083,
+            hueVariation: 0.02,
+            saturation: [0.05, 0.15],
+            lightness: [0.15, 0.25]
+        },
+        S: {
+            baseHue: 0.055,
+            hueVariation: 0.015,
+            saturation: [0.15, 0.35],
+            lightness: [0.25, 0.35]
+        },
+        M: {
+            baseHue: 0.1,
+            hueVariation: 0.01,
+            saturation: [0.05, 0.2],
+            lightness: [0.3, 0.4]
+        },
+        D: {
+            baseHue: 0.065,
+            hueVariation: 0.01,
+            saturation: [0.05, 0.1],
+            lightness: [0.1, 0.15]
+        },
+        V: {
+            baseHue: 0.03,
+            hueVariation: 0.01,
+            saturation: [0.2, 0.4],
+            lightness: [0.2, 0.3]
         }
-        return meshes;
-    }, [meshCount]);
+    };
 
-    const meshRefs = useRef(asteroidMeshes.map(() => React.createRef()));
+    const getRandomInRange = (min, max) => min + Math.random() * (max - min);
+
+    const generateAsteroidColor = useCallback(() => {
+        const rand = Math.random();
+        let type;
+
+        if (rand < 0.75) type = 'C';
+        else if (rand < 0.92) type = 'S';
+        else if (rand < 0.97) type = 'M';
+        else if (rand < 0.99) type = 'D';
+        else type = 'V';
+
+        const specs = spectralTypes[type];
+        const hue = specs.baseHue + (Math.random() - 0.5) * specs.hueVariation;
+        const saturation = getRandomInRange(...specs.saturation);
+        const lightness = getRandomInRange(...specs.lightness);
+        const noise = (Math.random() - 0.5) * 0.05;
+
+        return new THREE.Color().setHSL(
+            THREE.MathUtils.clamp(hue, 0, 1),
+            THREE.MathUtils.clamp(saturation, 0, 1),
+            THREE.MathUtils.clamp(lightness + noise, 0, 1)
+        );
+    }, []);
+
+    // Updated size distribution based on real asteroid data
+    const generateAsteroidSize = useCallback(() => {
+        const randomValue = Math.random();
+        // Most asteroids are very small, few are large
+        const minSize = 1;  // Minimum visible size
+        const maxSize = 20;   // Maximum size for large asteroids
+        // Power law distribution (roughly follows real asteroid size distribution)
+        return minSize + (maxSize - minSize) * Math.pow(randomValue, 4);
+    }, []);
+
+    const generateOrbitalElements = useCallback((index) => {
+        // Generate semi-major axis with concentration in main belt
+        const randRadius = Math.pow(Math.random(), 0.7); // Slight bias towards inner belt
+        const semiMajorAxis = innerRadius + (randRadius * beltWidth);
+
+        // Real eccentricity distribution (mean ~0.15, max ~0.3)
+        const eccentricity = Math.min(0.3, Math.abs(0.15 + 0.07 * (Math.random() + Math.random() + Math.random() - 1.5)));
+
+        // Real inclination distribution (mean ~8.5°, max ~30°)
+        const inclination = Math.abs((8.5 + 6.2 * (Math.random() + Math.random() + Math.random() - 1.5))) * (Math.PI / 180);
+
+        const orbitalSpeed = Math.sqrt(G * MASS_OF_SUN / (semiMajorAxis * 1000));
+
+        return {
+            semiMajorAxis: semiMajorAxis * distanceScaleFactor,
+            eccentricity,
+            orbitalSpeed: -orbitalSpeed * 0.0000000001,
+            angle: Math.random() * Math.PI * 2,
+            inclination,
+            scale: generateAsteroidSize(),
+            rotationAxis: new THREE.Vector3(
+                Math.random() - 0.5,
+                Math.random() - 0.5,
+                Math.random() - 0.5
+            ).normalize(),
+            rotationSpeed: (0.1 + Math.random() * 0.9) * 0.00001,
+            color: generateAsteroidColor()
+        };
+    }, []);
+
+    // Rest of the component remains the same...
+    const asteroidData = useMemo(() => {
+        const data = Array.from({ length: meshCount }, (_, i) => generateOrbitalElements(i));
+        const colors = new Float32Array(meshCount * 3);
+        data.forEach((asteroid, i) => {
+            colors[i * 3] = asteroid.color.r;
+            colors[i * 3 + 1] = asteroid.color.g;
+            colors[i * 3 + 2] = asteroid.color.b;
+        });
+        colorArray.current = colors;
+        return data;
+    }, [meshCount, generateOrbitalElements]);
+
+    const instancedMeshRef = useRef();
+    const matrix = new THREE.Matrix4();
+    const position = new THREE.Vector3();
+    const quaternion = new THREE.Quaternion();
+    const scale = new THREE.Vector3();
 
     useFrame((state, delta) => {
-        const adjustedDelta = - delta * simSpeed * 0.06;
+        const adjustedDelta = -delta * simSpeed * 0.06;
         if (adjustedDelta === 0) return;
 
-        // Update asteroid positions and rotations
-        meshRefs.current.forEach((meshRef, i) => {
-            if (meshRef.current) {
-                const asteroid = asteroidMeshes[i];
-                asteroid.angle += asteroid.orbitalSpeed * adjustedDelta / 2;
+        for (let i = 0; i < meshCount; i++) {
+            const asteroid = asteroidData[i];
+            asteroid.angle += asteroid.orbitalSpeed * adjustedDelta;
 
-                const r = asteroid.semiMajorAxis * (1 - asteroid.eccentricity * asteroid.eccentricity) /
-                    (1 + asteroid.eccentricity * Math.cos(asteroid.angle));
+            const r = asteroid.semiMajorAxis * (1 - asteroid.eccentricity * asteroid.eccentricity) /
+                (1 + asteroid.eccentricity * Math.cos(asteroid.angle));
 
-                const x = r * Math.cos(asteroid.angle);
-                const y = r * Math.sin(asteroid.inclination) * Math.sin(asteroid.angle);
-                const z = r * Math.cos(asteroid.inclination) * Math.sin(asteroid.angle);
+            position.set(
+                r * Math.cos(asteroid.angle),
+                r * Math.sin(asteroid.inclination) * Math.sin(asteroid.angle),
+                r * Math.cos(asteroid.inclination) * Math.sin(asteroid.angle)
+            );
 
-                meshRef.current.position.set(x, y, z);
-                meshRef.current.rotation.x += asteroid.rotationSpeed * adjustedDelta;
-                meshRef.current.rotation.y += asteroid.rotationSpeed * adjustedDelta;
-                meshRef.current.rotation.z += asteroid.rotationSpeed * adjustedDelta * 0.5;
-            }
-        });
+            quaternion.setFromAxisAngle(
+                asteroid.rotationAxis,
+                state.clock.elapsedTime * asteroid.rotationSpeed
+            );
 
-        // Update text size based on distance from camera to label position
-        const distanceToLabel = state.camera.position.distanceTo(labelPosition);
-        textSizeRef.current = distanceToLabel * 0.02;
+            scale.setScalar(asteroid.scale);
+            matrix.compose(position, quaternion, scale);
+            instancedMeshRef.current.setMatrixAt(i, matrix);
+        }
+
+        instancedMeshRef.current.instanceMatrix.needsUpdate = true;
+
+        if (labelRef.current) {
+            const labelPos = new THREE.Vector3(averageRadius * 0.8, averageRadius * 0.01, 0);
+            textSizeRef.current = state.camera.position.distanceTo(labelPos) * 0.02;
+        }
     });
 
+    // Create geometry with color attribute
+    const geometry = useMemo(() => {
+        const baseGeometry = new THREE.DodecahedronGeometry(1, 1);
+        const instancedGeometry = new THREE.InstancedBufferGeometry().copy(baseGeometry);
+        instancedGeometry.setAttribute(
+            'color',
+            new THREE.InstancedBufferAttribute(colorArray.current, 3)
+        );
+        return instancedGeometry;
+    }, []);
+
     return (
-        <>
-            {/* Fixed Label */}
+        <group>
             {(displayLabels || isHoveredRef.current) && (
-                <group
-                    ref={labelRef}
-                    position={labelPosition}
-                >
+                <group ref={labelRef} position={[averageRadius * 0.8, averageRadius * 0.01, 0]}>
                     <Labels
                         text="Asteroid Belt"
                         size={textSizeRef.current}
-                        color="orangered"
-                        handleClick={handleClick}
-                        handlePointerOver={handlePointerOver}
-                        handlePointerOut={handlePointerOut}
+                        color="#FFA500"
+                        handleClick={() => {
+                            if (activeCamera.name !== 'Asteroid Belt') {
+                                switchToCustomCamera('Asteroid Belt');
+                                setAutoRotate(true);
+                            }
+                        }}
+                        handlePointerOver={() => {
+                            isHoveredRef.current = true;
+                            document.body.style.cursor = "pointer";
+                        }}
+                        handlePointerOut={() => {
+                            isHoveredRef.current = false;
+                            document.body.style.cursor = "auto";
+                        }}
                     />
                 </group>
             )}
 
-            {/* Asteroids */}
-            <group ref={asteroidGroupRef}>
-                {asteroidMeshes.map((asteroid, index) => (
-                    <mesh
-                        key={index}
-                        ref={meshRefs.current[index]}
-                        scale={asteroid.scale}
-                        onClick={handleClick}
-                        onPointerOver={handlePointerOver}
-                        onPointerOut={handlePointerOut}
-                    >
-                        <dodecahedronGeometry args={[1, 0]} />
-                        <meshBasicMaterial
-                            color={asteroid.color}
-                            roughness={0.7}
-                            metalness={.5}
-                        />
-                    </mesh>
-                ))}
-            </group>
-        </>
+            <instancedMesh
+                ref={instancedMeshRef}
+                args={[geometry, null, meshCount]}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    if (activeCamera.name !== 'Asteroid Belt') {
+                        switchToCustomCamera('Asteroid Belt');
+                        setAutoRotate(true);
+                    }
+                }}
+                onPointerOver={() => {
+                    isHoveredRef.current = true;
+                    document.body.style.cursor = "pointer";
+                }}
+                onPointerOut={() => {
+                    isHoveredRef.current = false;
+                    document.body.style.cursor = "auto";
+                }}
+            >
+                <meshStandardMaterial
+                    vertexColors
+                    roughness={0.7}
+                    metalness={0.4}
+                    toneMapped={false}
+                />
+            </instancedMesh>
+        </group>
     );
 };
 

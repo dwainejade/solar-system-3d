@@ -52,7 +52,7 @@ const SharedCanvas = ({ children, mode = 'main' }) => {
         camera={{ fov: 50, position: [20000, 20000, 20000], near: 0.1, far: 1000000 }}
       // frameloop="demand"
       >
-        {/* <Stats /> */}
+        <Stats />
         <PerformanceMonitor onIncline={() => setDpr(2)} onDecline={() => setDpr(1)} />
 
         <Suspense fallback={<Loader />}>
