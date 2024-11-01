@@ -1,5 +1,6 @@
-import React, { useMemo, useState, useRef } from "react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
 import { Line } from "@react-three/drei";
+import { usePlanetStore } from "../store/store";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -8,18 +9,44 @@ const normalizeAngle = (angle) => {
 };
 
 const AnimatedKeplerTriangles = ({
+    planetName = 'Earth',
     planetRef,
+    angleRef,
     numTriangles = 5,
     radius,
     eccentricity = 0,
     orbitalInclination,
-    color = "white"
 }) => {
+    const { planetsData, updatePlanetAngle, updatePlanetData } = usePlanetStore();
     const [activeSlice, setActiveSlice] = useState(null);
     const [completedSlices, setCompletedSlices] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [lastAngle, setLastAngle] = useState(null);
-    const lastAngles = useRef([]);  // Keep track of last few angles for better reset detection
+    const lastAngles = useRef([]);
+    const isInitialized = useRef(false);
+
+    // Reset visualization when planet data changes
+    // Reset visualization and planet position when planet data changes
+    useEffect(() => {
+        // console.log(`Resetting visualization for ${planetName}`);
+        // console.log(angleRef.current);
+
+        // Reset planet to 0 angle position
+        // updatePlanetData(planetName, {
+        //     initialOrbitalAngle: 360,
+        //     position: new THREE.Vector3(radius, 0, 0)
+        // });
+
+
+        // Reset visualization state
+        setCompletedSlices([]);
+        setCurrentIndex(0);
+        setActiveSlice(null);
+        setLastAngle(null);
+        lastAngles.current = [];
+        isInitialized.current = true;
+
+    }, [planetName, radius, planetsData[planetName].eccentricity, orbitalInclination, numTriangles, updatePlanetData]);
 
     const createSlicePoints = (startAngle, endAngle, steps = 100) => {  // Increased from 30 to 100
         const points = [];
@@ -125,10 +152,10 @@ const AnimatedKeplerTriangles = ({
         const hasLowAngle = angles.some(angle => angle < 1);
 
         if (hasHighAngle && hasLowAngle && currentAngle < lastAngle) {
-            console.log("=== ORBIT COMPLETE - RESETTING ===", {
-                angles: angles.map(a => (a * 180 / Math.PI).toFixed(1) + "°"),
-                currentAngle: (currentAngle * 180 / Math.PI).toFixed(1) + "°"
-            });
+            // console.log("=== ORBIT COMPLETE - RESETTING ===", {
+            //     angles: angles.map(a => (a * 180 / Math.PI).toFixed(1) + "°"),
+            //     currentAngle: (currentAngle * 180 / Math.PI).toFixed(1) + "°"
+            // });
             setCompletedSlices([]);
             setCurrentIndex(0);
             setActiveSlice(null);
@@ -142,11 +169,11 @@ const AnimatedKeplerTriangles = ({
             const sliceEndAngle = equalAreaAngles[currentIndex + 1];
 
             if (!activeSlice) {
-                console.log(`Starting new slice ${currentIndex}:`, {
-                    sliceStartAngle: (sliceStartAngle * 180 / Math.PI).toFixed(1) + "°",
-                    sliceEndAngle: (sliceEndAngle * 180 / Math.PI).toFixed(1) + "°",
-                    currentAngle: (currentAngle * 180 / Math.PI).toFixed(1) + "°"
-                });
+                // console.log(`Starting new slice ${currentIndex}:`, {
+                //     sliceStartAngle: (sliceStartAngle * 180 / Math.PI).toFixed(1) + "°",
+                //     sliceEndAngle: (sliceEndAngle * 180 / Math.PI).toFixed(1) + "°",
+                //     currentAngle: (currentAngle * 180 / Math.PI).toFixed(1) + "°"
+                // });
 
                 setActiveSlice({
                     startAngle: sliceStartAngle,
@@ -158,12 +185,12 @@ const AnimatedKeplerTriangles = ({
                     isAngleBetween(lastAngle, sliceStartAngle, sliceEndAngle);
 
                 if (passedEndAngle) {
-                    console.log(`Completing slice ${currentIndex}:`, {
-                        sliceStartAngle: (sliceStartAngle * 180 / Math.PI).toFixed(1) + "°",
-                        sliceEndAngle: (sliceEndAngle * 180 / Math.PI).toFixed(1) + "°",
-                        currentAngle: (currentAngle * 180 / Math.PI).toFixed(1) + "°",
-                        lastAngle: (lastAngle * 180 / Math.PI).toFixed(1) + "°"
-                    });
+                    // console.log(`Completing slice ${currentIndex}:`, {
+                    //     sliceStartAngle: (sliceStartAngle * 180 / Math.PI).toFixed(1) + "°",
+                    //     sliceEndAngle: (sliceEndAngle * 180 / Math.PI).toFixed(1) + "°",
+                    //     currentAngle: (currentAngle * 180 / Math.PI).toFixed(1) + "°",
+                    //     lastAngle: (lastAngle * 180 / Math.PI).toFixed(1) + "°"
+                    // });
 
                     setCompletedSlices(prev => [...prev, {
                         points: createSlicePoints(sliceStartAngle, sliceEndAngle),
@@ -194,7 +221,7 @@ const AnimatedKeplerTriangles = ({
 
 
     return (
-        <group>
+        <group key={planetName}>
             {completedSlices.map((slice, index) => (
                 <Line
                     key={`complete-${index}`}

@@ -55,8 +55,9 @@ const Planet = ({ name = 'Earth', textures }) => {
     switchToPlanetCamera,
   } = useCameraStore();
 
+  // In the Planet component, near the top where refs are defined:
   const localRef = useRef();
-  const localAngleRef = useRef(planetAngles[name] || 0);
+  const localAngleRef = useRef(0);
   const cloudsRef = useRef();
   const meshRef = useRef(null);
 
@@ -84,6 +85,7 @@ const Planet = ({ name = 'Earth', textures }) => {
   const [showTextures, setShowTextures] = useState(false);
   const textureDisplayDistance = 500;
   const [orbitPathOpacity, setOrbitPathOpacity] = useState(1);
+  const [daysElapsed, setDaysElapsed] = useState(0);
 
   useFrame((state, delta) => {
     const adjustedDelta = delta * simSpeed;
@@ -136,6 +138,13 @@ const Planet = ({ name = 'Earth', textures }) => {
 
         const yAxis = new THREE.Vector3(0, 1, 0);
         meshRef.current.rotateOnAxis(yAxis, rotationIncrement);
+
+        // Calculate days elapsed based on Earth's rotation
+        // if (name === 'Earth') {
+        // rotationPeriod is in hours, adjustedDelta in seconds
+        const daysIncrement = adjustedDelta / (24 * 3600); // Convert to days
+        setDaysElapsed(prev => prev + daysIncrement);
+        // }
 
         if (localRef.current.rotation.y >= 2 * Math.PI && isPlanetSelected) {
           localRef.current.rotation.y %= 2 * Math.PI;
@@ -235,16 +244,6 @@ const Planet = ({ name = 'Earth', textures }) => {
         />
       }
 
-      {experimentType === 'kepler-2' &&
-        <KeplerTriangles
-          planetRef={localRef}
-          numTriangles={5}
-          radius={scaledOrbitalRadius}
-          eccentricity={eccentricity}
-          orbitalInclination={orbitalInclination}
-        />
-      }
-
       <group ref={localRef}>
         <mesh
           visible={false}
@@ -319,7 +318,7 @@ const Planet = ({ name = 'Earth', textures }) => {
         {(displayLabels && !isPlanetSelected || isHovered && !isPlanetSelected) && (
           <Labels
             key={name}
-            text={name}
+            text={`${name} (${Math.floor(daysElapsed)} days)`}
             size={textSize?.current}
             position={[0, scale * 1.2 + textSize?.current, 0]}
             color={color}
@@ -385,6 +384,20 @@ const Planet = ({ name = 'Earth', textures }) => {
           depthWrite={false}
         />
       )}
+
+
+      {experimentType === 'kepler-2' &&
+        <KeplerTriangles
+          key={name}
+          planetName={name}
+          planetRef={localRef}
+          angleRef={localAngleRef}  // Pass the ref directly
+          numTriangles={12}
+          radius={scaledOrbitalRadius}
+          eccentricity={eccentricity}
+          orbitalInclination={orbitalInclination}
+        />
+      }
     </>
   );
 };
