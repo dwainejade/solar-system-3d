@@ -116,10 +116,25 @@ const SceneThree = () => {
       cameraControlsRef.current.dollyTo(200, true);
     }
 
-    if (activeCamera.type === 'custom') {
-      // Update camera position
-      cameraControlsRef.current.setPosition(activeCamera.position.x, activeCamera.position.y, activeCamera.position.z, true);
-      cameraControlsRef.current.setTarget(activeCamera.target.x, activeCamera.target.y, activeCamera.target.z, true);
+    if (activeCamera.name === 'Asteroid Belt') {
+      const beltDistance = 5000 // Fixed viewing distance
+
+      // Only move camera into position during transition
+      if (isCameraTransitioning) {
+        cameraControlsRef.current.setPosition(activeCamera.position.x, activeCamera.position.y, activeCamera.position.z, true)
+        cameraControlsRef.current.setTarget(0, 0, 0, true);
+        setMinDistance(beltDistance * .85); // Allow slight zoom in
+        cameraControlsRef.current.maxDistance = beltDistance * 1.5; // Allow slight zoom out
+
+        // Check if camera has reached target position
+        const currentPosition = new THREE.Vector3();
+        cameraControlsRef.current.getPosition(currentPosition);
+        const targetPosition = new THREE.Vector3(activeCamera.position.x, activeCamera.position.y, activeCamera.position.z);
+
+        if (currentPosition.distanceTo(targetPosition) < 100) {
+          toggleCameraTransitioning(false);
+        }
+      }
     }
 
     // Handle orbit camera transition
