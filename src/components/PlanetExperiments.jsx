@@ -13,6 +13,7 @@ import moonsData from "@/data/moonsData";
 import { earthAtmosphereShader } from "../shaders/atmosphere";
 import Rings from "./Rings";
 import KeplerTriangles from "./KeplerTriangles";
+import GravityVectors from "./GravityVectors";
 
 const Planet = ({ name = 'Earth', textures }) => {
   const { planetsData } = usePlanetStore();
@@ -228,6 +229,8 @@ const Planet = ({ name = 'Earth', textures }) => {
 
   const moons = moonsData[name] || [];
 
+
+
   // Calculate safe geometry values
   const visibleSphereRadius = Math.max(0.1, renderMoons() ? scaledRadius : scale * 8);
   const planetSphereRadius = Math.max(0.1, renderMoons() ? scaledRadius : scale * 8);
@@ -398,6 +401,12 @@ const Planet = ({ name = 'Earth', textures }) => {
           orbitalInclination={orbitalInclination}
         />
       }
+
+
+      {experimentType === 'newton-1' &&
+        <GravityVectors planetRef={localRef} />
+      }
+
     </>
   );
 };

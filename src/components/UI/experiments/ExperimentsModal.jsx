@@ -3,6 +3,7 @@ import useStore, { usePlanetStore } from "../../../store/store";
 import KeplerOne from "./KeplerOne";
 import KeplerTwo from "./KeplerTwo";
 import KeplerThree from "./KeplerThree";
+import NewtonOne from "./NewtonOne";
 
 function ExperimentsModal() {
     const { experimentsModal, toggleExperimentsModal, experimentType, setExperimentType } = useExperimentsStore();
@@ -27,7 +28,7 @@ function ExperimentsModal() {
                     <h2 className="title">Newton's Laws</h2>
 
                     <div className="btn-con">
-                        <button className="btn">Law of Universal Gravitation <span>{'>'}</span></button>
+                        <button className="btn" onClick={() => handleExperiementType('newton-1')}>Law of Universal Gravitation <span>{'>'}</span></button>
                     </div>
                 </div>
                 <div className="kepler-section">
@@ -52,12 +53,14 @@ function ExperimentsModal() {
                 <div className="content">
 
                     {!experimentType && defaultMenu()}
-                    {experimentType === 'kepler-1' &&
-                        <KeplerOne planetsData={planetsData} updaPlanetData={updatePlanetData} />}
-                    {experimentType === 'kepler-2' &&
-                        <KeplerTwo planetsData={planetsData} updaPlanetData={updatePlanetData} />}
-                    {experimentType === 'kepler-3' &&
-                        <KeplerThree planetsData={planetsData} updaPlanetData={updatePlanetData} />}
+
+                    {/* Newton's Laws */}
+                    {experimentType === 'newton-1' && <NewtonOne />}
+
+                    {/* Kepler's Laws */}
+                    {experimentType === 'kepler-1' && <KeplerOne />}
+                    {experimentType === 'kepler-2' && <KeplerTwo />}
+                    {experimentType === 'kepler-3' && <KeplerThree />}
                 </div>
             </div>
 

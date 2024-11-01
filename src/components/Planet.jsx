@@ -1,6 +1,6 @@
 import React, { useRef, forwardRef, useState, useEffect } from "react";
 import * as THREE from "three";
-import { act, render, useFrame } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
@@ -17,9 +17,8 @@ const Planet = ({ name = 'Earth', textures }) => {
   const bodyData = planetsData[name];
   const mergedData = { ...bodyData };
 
-  // Add eccentricity to the destructuring
   const {
-    radius = 1, // Provide default values to prevent null
+    radius = 1, // default values to prevent null
     orbitalOrigin,
     orbitalRadius = 1,
     orbitalPeriod = 1,
@@ -184,7 +183,6 @@ const Planet = ({ name = 'Earth', textures }) => {
   const handleClick = e => {
     e.stopPropagation();
     if (isDragging || activeCamera.name === name) return;
-    console.log(selectedMoon)
     toggleDetailsMenu(true);
     setSelectedMoon(null);
     setSelectedPlanet(mergedData);
