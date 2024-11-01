@@ -210,7 +210,6 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
                         handleClick={() => {
                             if (activeCamera.name !== 'Asteroid Belt') {
                                 switchToCustomCamera('Asteroid Belt');
-                                setAutoRotate(true);
                             }
                         }}
                         handlePointerOver={() => {
@@ -252,7 +251,6 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
                     emissiveIntensity={0.1}
                     toneMapped={false}   // Preserve bright colors
                     envMapIntensity={1.2} // Enhanced environment response
-                    flatShading={true}
                 />
             </instancedMesh>
         </group>
