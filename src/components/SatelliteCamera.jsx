@@ -1,17 +1,18 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 import useStore, { useCameraStore } from '../store/store';
 
-const SatelliteCamera = ({ target, size, targetName }) => {
+const SatelliteCamera = ({ target, size, targetName, bodyType = 'planet' }) => {
     const {
         toggleCameraTransitioning,
         setAutoRotate,
         autoRotate,
-        activeCamera,
         toggleSatelliteCamera,
         satelliteCamera,
+        activeCamera,
+        setSatelliteCameraState,
     } = useCameraStore();
     const { prevSpeed, setSimSpeed } = useStore();
     const { gl, camera: orbitCamera } = useThree();
@@ -61,7 +62,7 @@ const SatelliteCamera = ({ target, size, targetName }) => {
         const deltaRadius = event.deltaY * zoomSpeed;
         const newRadius = THREE.MathUtils.clamp(
             sphericalRef.current.radius + deltaRadius,
-            size * 2.5,
+            size * bodyType === 'moon' ? .04 : 2,
             500
         );
 
@@ -122,30 +123,42 @@ const SatelliteCamera = ({ target, size, targetName }) => {
         cameraRef.current.lookAt(targetLocalPos);
         cameraRef.current.updateMatrixWorld();
 
+        // Continuously save camera state
+        if (satelliteCamera) {
+            const worldPosition = new THREE.Vector3();
+            cameraRef.current.getWorldPosition(worldPosition);
+
+            const worldQuaternion = new THREE.Quaternion();
+            cameraRef.current.getWorldQuaternion(worldQuaternion);
+            const worldRotation = new THREE.Euler().setFromQuaternion(worldQuaternion);
+
+            setSatelliteCameraState(worldPosition, worldRotation, targetWorldPos);
+        }
+
         // Check for camera switch
         if (activeCamera.name === targetName && !satelliteCamera) {
             const distance = orbitCamera.position.distanceTo(targetWorldPos);
-            const sizeThreshold = Math.max(size * 4.3, 0.01);
+            const sizeThreshold = Math.max(size * 4.5, 0.1);
             if (distance <= sizeThreshold) {
-                switchCamera(orbitCamera, targetWorldPos);
+                switchToSatelliteCamera(orbitCamera, targetWorldPos);
             }
         }
     });
 
-    const switchCamera = useCallback((orbitCamera, targetWorldPos) => {
+    const switchToSatelliteCamera = useCallback((orbitCamera, targetWorldPos) => {
         const orbitCameraPosition = orbitCamera.position.clone();
         const planetMatrix = target.parent.matrixWorld.clone();
         const planetMatrixInverse = planetMatrix.invert();
         const orbitCameraLocal = orbitCameraPosition.applyMatrix4(planetMatrixInverse);
 
-        const moonLocalPos = target.position.clone();
-        const relativePosition = orbitCameraLocal.sub(moonLocalPos);
+        const targetLocalPos = target.position.clone();
+        const relativePosition = orbitCameraLocal.sub(targetLocalPos);
 
         // Update spherical ref directly
         sphericalRef.current.setFromVector3(relativePosition);
 
         cameraRef.current.position.copy(orbitCameraLocal);
-        cameraRef.current.lookAt(moonLocalPos);
+        cameraRef.current.lookAt(targetLocalPos);
 
         toggleSatelliteCamera(true);
         toggleCameraTransitioning(false);
@@ -193,7 +206,7 @@ const SatelliteCamera = ({ target, size, targetName }) => {
             makeDefault={satelliteCamera}
             fov={50}
             near={0.01}
-            far={1000000}
+            far={1200000}
         />
     );
 };

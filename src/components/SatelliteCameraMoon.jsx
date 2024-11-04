@@ -4,21 +4,23 @@ import { PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 import useStore, { useCameraStore } from '../store/store';
 
-const MoonSatelliteCamera = ({ target, size, targetName }) => {
+const MoonSatelliteCamera = ({ target, size, targetName, bodyType = 'moon' }) => {
     const {
         toggleCameraTransitioning,
+        isCameraTransitioning,
         setAutoRotate,
         autoRotate,
-        activeCamera,
         toggleSatelliteCamera,
         satelliteCamera,
+        activeCamera,
+        setSatelliteCameraState,
     } = useCameraStore();
     const { prevSpeed, setSimSpeed } = useStore();
     const { gl, camera: orbitCamera } = useThree();
     const cameraRef = useRef();
     const targetRef = useRef(new THREE.Vector3());
 
-    // Replace state with refs
+    // Use refs instead of state for frequently updating values
     const isDraggingRef = useRef(false);
     const mousePositionRef = useRef({ x: 0, y: 0 });
     const sphericalRef = useRef(new THREE.Spherical(size * 6, Math.PI / 2, 0));
@@ -43,9 +45,9 @@ const MoonSatelliteCamera = ({ target, size, targetName }) => {
         const dx = event.clientX - mousePositionRef.current.x;
         const dy = event.clientY - mousePositionRef.current.y;
 
-        const dampingFactor = 0.4;
+        const dampingFactor = 0.45;
 
-        // Update spherical coordinates directly
+        // Update spherical coordinates directly in the ref
         const newPhi = sphericalRef.current.phi - dy * dampingFactor * 0.01;
         const newTheta = sphericalRef.current.theta - dx * dampingFactor * 0.01;
 
@@ -60,17 +62,17 @@ const MoonSatelliteCamera = ({ target, size, targetName }) => {
 
         const zoomSpeed = 0.01;
         const deltaRadius = event.deltaY * zoomSpeed;
-
-        // Update radius directly
-        sphericalRef.current.radius = THREE.MathUtils.clamp(
+        const newRadius = THREE.MathUtils.clamp(
             sphericalRef.current.radius + deltaRadius,
-            0.04,
+            size * bodyType === 'moon' ? .04 : 2,
             500
         );
 
+        sphericalRef.current.radius = newRadius;
         handleUserInteraction();
-    }, [satelliteCamera, handleUserInteraction]);
+    }, [satelliteCamera, size, handleUserInteraction]);
 
+    // Touch events
     const handleStart = useCallback((event) => {
         isDraggingRef.current = true;
         if (event.touches) {
@@ -132,6 +134,15 @@ const MoonSatelliteCamera = ({ target, size, targetName }) => {
         target.getWorldPosition(targetRef.current);
         cameraRef.current.lookAt(targetRef.current);
         cameraRef.current.updateMatrixWorld();
+
+        // Save camera state
+        const worldPosition = new THREE.Vector3();
+        const worldQuaternion = new THREE.Quaternion();
+        cameraRef.current.getWorldPosition(worldPosition);
+
+        const worldRotation = new THREE.Euler().setFromQuaternion(worldQuaternion);
+
+        setSatelliteCameraState(worldPosition, worldRotation, targetRef.current.clone());
     });
 
     const switchCamera = useCallback((orbitCamera) => {
@@ -156,6 +167,7 @@ const MoonSatelliteCamera = ({ target, size, targetName }) => {
         setSimSpeed(prevSpeed);
     }, [target, toggleSatelliteCamera, toggleCameraTransitioning, setSimSpeed, prevSpeed]);
 
+    // Event listener setup...
     useEffect(() => {
         const canvasElement = gl.domElement;
 
@@ -193,10 +205,10 @@ const MoonSatelliteCamera = ({ target, size, targetName }) => {
             ref={cameraRef}
             name={'satellite-camera-' + targetName}
             key={targetName}
-            makeDefault={satelliteCamera && activeCamera.name === targetName}
+            makeDefault={satelliteCamera}
             fov={50}
             near={0.01}
-            far={1000000}
+            far={1200000}
         />
     );
 };

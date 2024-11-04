@@ -189,9 +189,11 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName }, ref) => {
     <>
       {activeCamera?.name === name && localRef.current &&
         <SatelliteCamera
+          key={name + '-satellite-camera'}
           target={localRef.current}
           targetName={name}
           size={scaledRadius}
+          bodyType={'moon'}
         />
       }
 

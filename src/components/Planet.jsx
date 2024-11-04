@@ -50,6 +50,7 @@ const Planet = ({ name = 'Earth', textures }) => {
     autoRotate,
     activeCamera,
     switchToPlanetCamera,
+    toggleCameraTransitioning
   } = useCameraStore();
 
   const localRef = useRef();
@@ -183,6 +184,7 @@ const Planet = ({ name = 'Earth', textures }) => {
   const handleClick = e => {
     e.stopPropagation();
     if (isDragging || activeCamera.name === name) return;
+    toggleCameraTransitioning(true);
     toggleDetailsMenu(true);
     setSelectedMoon(null);
     setSelectedPlanet(mergedData);
@@ -236,6 +238,7 @@ const Planet = ({ name = 'Earth', textures }) => {
           target={localRef.current}
           targetName={name}
           size={scaledRadius}
+          bodyType={'planet'}
         />
       }
 
