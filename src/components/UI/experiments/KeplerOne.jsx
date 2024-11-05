@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import useStore, { usePlanetStore } from '../../../store/store';
 import planetsData from '../../../data/planetsData';
 import useExperimentsStore from '../../../store/experiments';
+import { getSpeedValue } from '../../../helpers/utils';
 
 function KeplerOne() {
     const { planetsData: newPlanetsData, updatePlanetData, resetSinglePlanetData } = usePlanetStore();
     const { setSimSpeed, simSpeed, prevSpeed } = useStore();
-    const { experimentMode, experimentPlanet } = useExperimentsStore();
+    const { experimentMode, experimentPlanet, setExperimentStatus, experimentStatus } = useExperimentsStore();
 
     const selectedPlanet = experimentPlanet || 'Earth';
 
@@ -40,18 +41,23 @@ function KeplerOne() {
 
     const handleStartExperiment = () => {
         updatePlanetData(selectedPlanet, { eccentricity: eccentricity });
-        setSimSpeed(100000); // Set to normal speed when starting
+        const newSpeed = getSpeedValue('1 year /s');
+        setSimSpeed(newSpeed); // Set to normal speed when starting
+        setExperimentStatus("started");
     };
 
     const handleReset = () => {
         setEccentricity(originalEccentricity);
         updatePlanetData(selectedPlanet, { eccentricity: originalEccentricity });
+        setSimSpeed(1);
+        setExperimentStatus(null);
     };
 
-    // Update local eccentricity if planet data changes externally
-    // useEffect(() => {
-    //     setEccentricity(newPlanetsData[selectedPlanet].eccentricity);
-    // }, [newPlanetsData[selectedPlanet].eccentricity]);
+    useEffect(() => {
+        return () => {
+            handleReset();
+        }
+    }, [])
 
     return (
         <>
@@ -63,7 +69,7 @@ function KeplerOne() {
                     <div className="slider-control">
                         <button
                             className="increment-btn"
-                            disabled={eccentricity <= 0 || !experimentMode}
+                            disabled={eccentricity <= 0 || experimentStatus === 'started'}
                             onClick={handleDecrement}
                         >
                             -
@@ -77,7 +83,7 @@ function KeplerOne() {
                                 step={0.001}
                                 value={eccentricity}
                                 onChange={handleSliderChange}
-                                disabled={!experimentMode}
+                                disabled={experimentStatus === 'started'}
                             />
                             <div className="slider-markers">
                                 <span>0</span>
@@ -87,7 +93,7 @@ function KeplerOne() {
                         </div>
                         <button
                             className="increment-btn"
-                            disabled={eccentricity >= 0.9 || !experimentMode}
+                            disabled={eccentricity >= 0.9 || experimentStatus === 'started'}
                             onClick={handleIncrement}
                         >
                             +
@@ -97,14 +103,13 @@ function KeplerOne() {
 
                 <div className="description-con">
                     <p>Planets orbit the Sun in an ellipse, with the Sun at one of the foci.</p>
-                    <p>Note that Saturn's normal eccentricity is {originalEccentricity}.</p>
+                    <p>Note that {selectedPlanet}'s normal eccentricity is {originalEccentricity}.</p>
                 </div>
             </div>
             <footer className="experiment-footer">
                 <button
                     className={`btn start-btn ${experimentMode ? 'active' : ''}`}
                     onClick={handleStartExperiment}
-                    disabled={experimentMode}
                 >
                     Start Experiment
                 </button>

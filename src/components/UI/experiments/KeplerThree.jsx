@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import useStore, { usePlanetStore } from '../../../store/store';
 import useExperimentsStore from '../../../store/experiments';
 import planetsData from '../../../data/planetsData';
+import { getSpeedValue } from '../../../helpers/utils';
 
 function KeplerThree() {
     const { planetsData: newPlanetsData, updatePlanetData, resetSinglePlanetData } = usePlanetStore();
-    const { experimentMode, experimentPlanet } = useExperimentsStore();
+    const { experimentMode, experimentPlanet, setExperimentStatus, experimentStatus } = useExperimentsStore();
     const { setSimSpeed } = useStore();
 
     const selectedPlanet = experimentPlanet || 'Earth';
@@ -67,10 +68,24 @@ function KeplerThree() {
         handleUpdatePlanetData(newValue);
     };
 
+    const handleStartExperiment = () => {
+        const newSpeed = getSpeedValue('1 month /s');
+        setSimSpeed(newSpeed); // Set to normal speed when starting
+        setExperimentStatus("started");
+    };
+
     const handleReset = () => {
         setAU(initialAU);
         resetSinglePlanetData(selectedPlanet);
+        setSimSpeed(1);
+        setExperimentStatus(null);
     };
+
+    useEffect(() => {
+        return () => {
+            handleReset();
+        }
+    }, [])
 
     return (
         <>
@@ -124,8 +139,9 @@ function KeplerThree() {
 
             <footer className="experiment-footer">
                 <button
-                    className={`btn start-btn ${experimentMode ? 'active' : ''}`}
-                    disabled={experimentMode}
+                    className={`btn start-btn ${experimentStatus === 'started' ? 'active' : ''}`}
+                    onClick={handleStartExperiment}
+                    disabled={experimentStatus === 'started'}
                 >
                     Start Experiment
                 </button>

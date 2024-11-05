@@ -79,6 +79,7 @@ const Planet = ({ name = 'Earth', textures }) => {
     if (selectedMoon?.parentName === name) return true;
     return false;
   };
+
   const detailLevel = (isPlanetSelected || renderMoons()) ? 64 : 16;
 
   const [scale, setScale] = useState(scaledRadius);
@@ -231,6 +232,20 @@ const Planet = ({ name = 'Earth', textures }) => {
 
   const moons = moonsData[name] || [];
 
+  const getLabelText = () => {
+    switch (experimentType) {
+      case 'newton-1':
+        return name;
+      case 'kepler-1':
+        return name;
+      case 'kepler-2':
+        return name;
+      case 'kepler-3':
+        return `${name} ${(daysElapsed / 365).toFixed(2)} yrs`;
+      default:
+        return name;
+    }
+  }
 
 
   // Calculate safe geometry values
@@ -320,10 +335,10 @@ const Planet = ({ name = 'Earth', textures }) => {
           />
         )}
 
-        {(displayLabels && !isPlanetSelected || isHovered && !isPlanetSelected) && (
+        {/* {displayLabels && (
           <Labels
             key={name}
-            text={name}
+            text={getLabelText()}
             size={textSize?.current}
             position={[0, scale * 1.2 + textSize?.current, 0]}
             color={color}
@@ -331,7 +346,7 @@ const Planet = ({ name = 'Earth', textures }) => {
             handlePointerDown={handlePointerDown}
             font={'../assets/fonts/Termina_Black.ttf'}
           />
-        )}
+        )} */}
 
         {(displayLabels && isPlanetSelected) && (
           <Html
@@ -367,8 +382,9 @@ const Planet = ({ name = 'Earth', textures }) => {
               <Moon
                 key={`${name}-moon-${index}`}
                 moonData={moon}
-                planetPosition={localRef.current?.position}
+                planetRef={localRef}
                 parentName={name}
+                scaledPlanetRadius={scaledRadius}
               />
             </group>
           );
@@ -397,7 +413,7 @@ const Planet = ({ name = 'Earth', textures }) => {
           planetName={name}
           planetRef={localRef}
           angleRef={localAngleRef}  // Pass the ref directly
-          numTriangles={8}
+          numTriangles={6}
           radius={scaledOrbitalRadius}
           eccentricity={eccentricity}
           orbitalInclination={orbitalInclination}

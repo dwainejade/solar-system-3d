@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import useStore, { usePlanetStore } from '../../../store/store';
 import initialPlanetsData, { G } from '../../../data/planetsData';
 import useExperimentsStore from '../../../store/experiments';
+import { getSpeedValue } from '../../../helpers/utils';
+
 
 function NewtonGravity() {
     const { updatePlanetData, resetSinglePlanetData } = usePlanetStore();
@@ -56,12 +58,14 @@ function NewtonGravity() {
 
     const handleStartExperiment = () => {
         console.log('Starting experiment')
+        setSimSpeed(getSpeedValue('1 day /s'));
         setExperimentStatus('started');
     };
 
     const handleReset = () => {
         setMassScale(1);
         resetSinglePlanetData(selectedPlanet);
+        setSimSpeed(1);
         setExperimentStatus(null);
     };
 
@@ -75,7 +79,7 @@ function NewtonGravity() {
                     <div className="slider-control">
                         <button
                             className="increment-btn"
-                            disabled={massScale <= 0.5 || !experimentMode}
+                            disabled={massScale <= 0.5 || experimentStatus}
                             onClick={handleDecrement}
                         >
                             -
@@ -86,10 +90,10 @@ function NewtonGravity() {
                                 type="range"
                                 min={0.5}
                                 max={2}
-                                step={0.01}
+                                step={0.5}
                                 value={massScale}
                                 onChange={handleSliderChange}
-                                disabled={!experimentMode}
+                                disabled={experimentStatus}
                             />
                             <div className="slider-markers">
                                 <span>0.5x</span>
@@ -99,7 +103,7 @@ function NewtonGravity() {
 
                         <button
                             className="increment-btn"
-                            disabled={massScale >= 2 || !experimentMode}
+                            disabled={massScale >= 2 || experimentStatus}
                             onClick={handleIncrement}
                         >
                             +
@@ -115,8 +119,9 @@ function NewtonGravity() {
             </div>
             <footer className="experiment-footer">
                 <button
-                    className={`btn start-btn ${experimentMode ? 'active' : ''}`}
+                    className={`btn start-btn ${experimentStatus ? 'active' : ''}`}
                     onClick={handleStartExperiment}
+                    disabled={experimentStatus}
                 >
                     Start Experiment
                 </button>

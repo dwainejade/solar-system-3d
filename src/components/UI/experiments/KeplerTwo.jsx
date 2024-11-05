@@ -1,39 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import useStore, { usePlanetStore } from '../../../store/store';
 import useExperimentsStore from '../../../store/experiments';
-
-const getSpeedValue = (key) => {
-    switch (key) {
-        case "-1 year /s":
-            return -31557600;
-        case "-1 month /s":
-            return -2629800;
-        case "-1 week /s":
-            return -604800;
-        case "-1 day /s":
-            return -86400;
-        case "-1 hour /s":
-            return -3600;
-        case "-1 minute /s":
-            return -60;
-        case "Real-time":
-            return 1;
-        case "1 minute /s":
-            return 60;
-        case "1 hour /s":
-            return 3600;
-        case "1 day /s":
-            return 86400;
-        case "1 week /s":
-            return 604800;
-        case "1 month /s":
-            return 2629800;
-        case "1 year /s":
-            return 31557600;
-        default:
-            return 1;
-    }
-}
+import { getSpeedValue } from '../../../helpers/utils';
 
 
 function KeplerTwo() {
@@ -90,6 +58,9 @@ function KeplerTwo() {
 
     useEffect(() => {
         handleReset();
+        return () => {
+            handleReset();
+        }
     }, [selectedPlanet])
 
     return (
@@ -102,7 +73,7 @@ function KeplerTwo() {
                     <div className="slider-control">
                         <button
                             className="increment-btn"
-                            disabled={eccentricity <= 0 || !experimentMode}
+                            disabled={eccentricity <= 0 || experimentStatus}
                             onClick={handleDecrement}
                         >
                             -
@@ -116,7 +87,7 @@ function KeplerTwo() {
                                 step={0.001}
                                 value={eccentricity}
                                 onChange={handleSliderChange}
-                                disabled={!experimentMode}
+                                disabled={experimentStatus}
                             />
                             <div className="slider-markers">
                                 <span>0</span>
@@ -126,7 +97,7 @@ function KeplerTwo() {
                         </div>
                         <button
                             className="increment-btn"
-                            disabled={eccentricity >= 0.9 || !experimentMode}
+                            disabled={eccentricity >= 0.9 || experimentStatus}
                             onClick={handleIncrement}
                         >
                             +
@@ -140,8 +111,9 @@ function KeplerTwo() {
             </div >
             <footer className="experiment-footer">
                 <button
-                    className={`btn start-btn ${experimentMode ? 'active' : ''}`}
+                    className={`btn start-btn ${experimentStatus ? 'active' : ''}`}
                     onClick={handleStartExperiment}
+                    disabled={experimentStatus}
                 >
                     Start Experiment
                 </button>
