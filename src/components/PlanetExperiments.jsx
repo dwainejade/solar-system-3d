@@ -1,15 +1,15 @@
 import React, { useRef, useState, useEffect } from "react";
 import * as THREE from "three";
-import { act, render, useFrame } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import useExperimentsStore from "../store/experiments";
-import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
+import initialPlanetsData, { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
+import moonsData from "@/data/moonsData";
 import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCamera";
 import Moon from "./Moon";
 import Labels from "./Labels";
-import moonsData from "@/data/moonsData";
 import { earthAtmosphereShader } from "../shaders/atmosphere";
 import Rings from "./Rings";
 import KeplerTriangles from "./KeplerTriangles";
@@ -17,7 +17,7 @@ import GravityVectors from "./GravityVectors";
 
 const Planet = ({ name = 'Earth', textures }) => {
   const { planetsData } = usePlanetStore();
-  const { experimentType, experimentPlanet } = useExperimentsStore();
+  const { experimentType, experimentPlanet, experimentStatus } = useExperimentsStore();
   const bodyData = planetsData[name];
   const mergedData = { ...bodyData };
 
@@ -88,20 +88,22 @@ const Planet = ({ name = 'Earth', textures }) => {
   const [orbitPathOpacity, setOrbitPathOpacity] = useState(1);
   const [daysElapsed, setDaysElapsed] = useState(0);
 
+  useEffect(() => {
+    if (experimentStatus === null) {
+      localAngleRef.current = -0.000001;
+      setDaysElapsed(0);
+    }
+  }, [experimentStatus]);
+
   useFrame((state, delta) => {
     const adjustedDelta = delta * simSpeed;
+    if (experimentStatus === "completed") return;
 
     // Calculate mean motion (n)
     const meanMotion = (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60);
+    localAngleRef.current -= meanMotion * adjustedDelta;
 
-    // Update mean anomaly (M)
-    if (localAngleRef.current === 0) {
-      localAngleRef.current = initialOrbitalAngle * (Math.PI / 180);
-    } else {
-      localAngleRef.current -= meanMotion * adjustedDelta;
-    }
-
-    // Solve Kepler's Equation iteratively
+    //  Solve Kepler's Equation iteratively
     let E = localAngleRef.current;
     const maxIterations = 10;
     const tolerance = 1e-6;
@@ -321,7 +323,7 @@ const Planet = ({ name = 'Earth', textures }) => {
         {(displayLabels && !isPlanetSelected || isHovered && !isPlanetSelected) && (
           <Labels
             key={name}
-            text={`${name} (${Math.floor(daysElapsed)} days)`}
+            text={name}
             size={textSize?.current}
             position={[0, scale * 1.2 + textSize?.current, 0]}
             color={color}
@@ -381,7 +383,7 @@ const Planet = ({ name = 'Earth', textures }) => {
           orbitalInclination={orbitalInclination}
           color={'white'}
           name={name + "-orbit-path"}
-          opacity={1}
+          opacity={orbitPathOpacity}
           hiRes={true}
           lineWidth={1}
           depthWrite={false}
@@ -395,7 +397,7 @@ const Planet = ({ name = 'Earth', textures }) => {
           planetName={name}
           planetRef={localRef}
           angleRef={localAngleRef}  // Pass the ref directly
-          numTriangles={12}
+          numTriangles={8}
           radius={scaledOrbitalRadius}
           eccentricity={eccentricity}
           orbitalInclination={orbitalInclination}
