@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import useStore, { usePlanetStore } from '../../../store/store';
-import planetsData from '../../../data/planetsData';
+import initialPlanetsData, { G } from '../../../data/planetsData';
 import useExperimentsStore from '../../../store/experiments';
 
 function NewtonGravity() {
-    const { planetsData: newPlanetsData, updatePlanetData, resetSinglePlanetData } = usePlanetStore();
+    const { updatePlanetData, resetSinglePlanetData } = usePlanetStore();
     const { setSimSpeed, simSpeed, prevSpeed } = useStore();
-    const { experimentMode, experimentPlanet } = useExperimentsStore();
+    const { experimentMode, experimentPlanet, experimentStatus, setExperimentStatus } = useExperimentsStore();
 
     const selectedPlanet = experimentPlanet || 'Earth';
 
     // Initialize mass scale
     const [massScale, setMassScale] = useState(1);
-    const originalMass = planetsData[selectedPlanet].mass;
-    const G = 6.67430e-11; // Gravitational constant
+    const originalMass = initialPlanetsData[selectedPlanet].mass;
 
     const handleIncrement = () => {
         const newValue = Math.min(2, massScale + 0.01);
@@ -21,7 +20,7 @@ function NewtonGravity() {
         if (experimentMode) {
             updatePlanetData(selectedPlanet, {
                 mass: originalMass * newValue,
-                radius: planetsData[selectedPlanet].radius * newValue
+                radius: initialPlanetsData[selectedPlanet].radius * newValue
             });
         }
     };
@@ -32,7 +31,7 @@ function NewtonGravity() {
         if (experimentMode) {
             updatePlanetData(selectedPlanet, {
                 mass: originalMass * newValue,
-                radius: planetsData[selectedPlanet].radius * newValue
+                radius: initialPlanetsData[selectedPlanet].radius * newValue
             });
         }
     };
@@ -43,7 +42,7 @@ function NewtonGravity() {
         if (experimentMode) {
             updatePlanetData(selectedPlanet, {
                 mass: originalMass * newValue,
-                radius: planetsData[selectedPlanet].radius * newValue
+                radius: initialPlanetsData[selectedPlanet].radius * newValue
             });
         }
     };
@@ -56,16 +55,14 @@ function NewtonGravity() {
     };
 
     const handleStartExperiment = () => {
-        updatePlanetData(selectedPlanet, {
-            mass: originalMass * massScale,
-            radius: planetsData[selectedPlanet].radius * massScale
-        });
-        setSimSpeed(100000);
+        console.log('Starting experiment')
+        setExperimentStatus('started');
     };
 
     const handleReset = () => {
         setMassScale(1);
         resetSinglePlanetData(selectedPlanet);
+        setExperimentStatus(null);
     };
 
     return (
@@ -111,7 +108,7 @@ function NewtonGravity() {
                 </div>
 
                 <div className="description-con">
-                    <p>Gravitational force (F) = G * (m₁ * m₂) / r²</p>
+                    <p>(F) = G * (m₁ * m₂) / r²</p>
                     <p>Current Mass: {(originalMass * massScale / 1e24).toFixed(2)}e24 kg</p>
                     <p>Gravitational Force: {(calculateGravitationalForce() / 1e20).toFixed(2)}e20 N</p>
                 </div>
@@ -120,7 +117,6 @@ function NewtonGravity() {
                 <button
                     className={`btn start-btn ${experimentMode ? 'active' : ''}`}
                     onClick={handleStartExperiment}
-                    disabled={experimentMode}
                 >
                     Start Experiment
                 </button>
