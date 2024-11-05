@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import useStore, { usePlanetStore, useCameraStore } from "../../store/store";
-import { useExperimentsStore } from "../../store/experiments";
 import DetailsMenu from "./DetailsMenu";
 import ResetModal from "./ResetModal";
 import FocusLock from 'react-focus-lock';
@@ -43,6 +42,32 @@ const Menu = () => {
     toggleFullscreen();
   };
 
+
+  useEffect(() => {
+    setIsDropdownOpen(false);
+    if (activeCamera.type === 'planet') {
+      setSelectedPlanet(planetsData[activeCamera.name]);
+      setSelectedMoon(null);
+      toggleDetailsMenu(true);
+    }
+
+    if (activeCamera.type === 'moon') {
+      // setSelectedPlanet(null);
+      const moon = moonsData[activeCamera.parentName]?.find((m) => m.name === activeCamera.name);
+      setSelectedMoon(moon);
+      // console.log(moonsData[activeCamera.parentName])
+      toggleDetailsMenu(true);
+    }
+
+    if (activeCamera.name === 'Asteroid Belt') {
+      setSelectedPlanet(null);
+      setSelectedMoon(null);
+      toggleDetailsMenu(true);
+    }
+    // console.log(activeCamera)
+    // console.log(selectedMoon)
+  }, [activeCamera]);
+
   const speedOptions = [
     { label: "-1 year /s", value: -31557600 },
     { label: "-1 month /s", value: -2629800 },
@@ -67,36 +92,36 @@ const Menu = () => {
 
   const handlePlanetSelect = (planetName) => {
     const planet = planetsData[planetName];
-    setSelectedPlanet(planet);
-    setSelectedMoon(null);
-    toggleDetailsMenu(true);
+    // setSelectedPlanet(planet);
+    // setSelectedMoon(null);
+    // toggleDetailsMenu(true);
     switchToPlanetCamera(planetName);
-    setIsDropdownOpen(false); // Close dropdown after selection
+    // setIsDropdownOpen(false); // Close dropdown after selection
   };
 
   const handleMoonSelect = (planetName, moonName) => {
     const planet = planetsData[planetName];
     const moon = moonsData[planetName]?.find((m) => m.name === moonName);
-    setSelectedMoon(moon);
+    // setSelectedMoon(moon);
     switchToMoonCamera(hoveredPlanetName, moonName);
-    setIsDropdownOpen(false);
-    if (selectedPlanet && selectedPlanet.name !== planetName) {
-      setSelectedPlanet(planetName);
-    }
+    // setIsDropdownOpen(false);
+    // if (selectedPlanet && selectedPlanet.name !== planetName) {
+    //   setSelectedPlanet(planetName);
+    // }
   };
 
   const handleSolarSystemSelect = () => {
-    setSelectedPlanet(null);
-    setSelectedMoon(null);
+    // setSelectedPlanet(null);
+    // setSelectedMoon(null);
     resetCamera();
-    setIsDropdownOpen(false);
+    // setIsDropdownOpen(false);
   };
 
   const handleAsteroidBeltSelect = () => {
     setSelectedPlanet({
       name: "Asteroid Belt",
-
     });
+    setSelectedPlanet(null);
     setSelectedMoon(null);
     toggleDetailsMenu(true);
     switchToCustomCamera('Asteroid Belt');
@@ -204,8 +229,8 @@ const Menu = () => {
             <select
               id="simSpeedSelect"
               onChange={handleSpeedChange}
-              value={isCameraTransitioning ? prevSpeed : simSpeed}
-              disabled={disableSpeedToggle()}
+              value={simSpeed}
+            // disabled={disableSpeedToggle()}
             >
               {speedOptions.map((option, index) => (
                 <option key={index} value={option.value}>
@@ -249,7 +274,6 @@ const Menu = () => {
       </div>
 
       {/* Details menu */}
-
       <>
         <div
           className={`details-menu ${selectedPlanet &&
@@ -260,7 +284,7 @@ const Menu = () => {
           key={selectedPlanet?.name}
         >
           <div className="details-menu-inner">
-            {selectedPlanet?.name &&
+            {(activeCamera.type === 'planet' || activeCamera.type === 'moon' || activeCamera.name === 'Asteroid Belt' || activeCamera.name === 'Sun') &&
               <DetailsMenu />
             }
           </div>
