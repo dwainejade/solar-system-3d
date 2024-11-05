@@ -3,6 +3,7 @@ import { Line } from "@react-three/drei";
 import { usePlanetStore } from "../store/store";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import useExperimentsStore from "../store/experiments";
 
 const normalizeAngle = (angle) => {
     return ((angle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
@@ -18,6 +19,7 @@ const AnimatedKeplerTriangles = ({
     orbitalInclination,
 }) => {
     const { planetsData, updatePlanetAngle, updatePlanetData } = usePlanetStore();
+    const { experimentStatus } = useExperimentsStore();
     const [activeSlice, setActiveSlice] = useState(null);
     const [completedSlices, setCompletedSlices] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -26,27 +28,25 @@ const AnimatedKeplerTriangles = ({
     const isInitialized = useRef(false);
 
     // Reset visualization when planet data changes
-    // Reset visualization and planet position when planet data changes
     useEffect(() => {
-        // console.log(`Resetting visualization for ${planetName}`);
-        // console.log(angleRef.current);
-
-        // Reset planet to 0 angle position
-        // updatePlanetData(planetName, {
-        //     initialOrbitalAngle: 360,
-        //     position: new THREE.Vector3(radius, 0, 0)
-        // });
-
-
-        // Reset visualization state
         setCompletedSlices([]);
         setCurrentIndex(0);
         setActiveSlice(null);
         setLastAngle(null);
         lastAngles.current = [];
         isInitialized.current = true;
-
     }, [planetName, radius, planetsData[planetName].eccentricity, orbitalInclination, numTriangles, updatePlanetData]);
+
+    useEffect(() => {
+        if (experimentStatus === null) {
+            setCompletedSlices([]);
+            setCurrentIndex(0);
+            setActiveSlice(null);
+            setLastAngle(null);
+            lastAngles.current = [];
+            isInitialized.current = true;
+        }
+    }, [experimentStatus]);
 
     const createSlicePoints = (startAngle, endAngle, steps = 100) => {  // Increased from 30 to 100
         const points = [];
