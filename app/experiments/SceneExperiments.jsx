@@ -4,7 +4,7 @@ import { CameraControls, useTexture } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "@/store/store";
 import useExperimentsStore from "@/store/experiments";
 import { sizeScaleFactor } from "@/data/planetsData";
-import Sun from "@/components/SunExperiments";
+import Sun from "@/components/Sun";
 import Planet from "@/components/PlanetExperiments";
 import Stars from "@/components/Stars"
 import { useFrame } from "@react-three/fiber";
