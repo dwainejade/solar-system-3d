@@ -10,11 +10,14 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
     const { switchToCustomCamera, setAutoRotate, activeCamera } = useCameraStore();
     const { displayLabels } = usePlanetStore();
 
-    const asteroidGroupRef = useRef();
+    // const asteroidGroupRef = useRef();
     const isHoveredRef = useRef(false);
     const textSizeRef = useRef(1);
     const labelRef = useRef();
     const colorArray = useRef();
+
+    const opacity = ((activeCamera.type === 'planet' || activeCamera.type === 'moon') && activeCamera.name !== 'Sun') ? 0.3 : 1;
+
 
     const innerRadius = asteroidBeltData.innerRadius; // Real inner edge
     const outerRadius = asteroidBeltData.outerRadius; // Real outer edge
@@ -90,8 +93,8 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
     const generateAsteroidSize = useCallback(() => {
         const randomValue = Math.random();
         // Most asteroids are very small, few are large
-        const minSize = 6;  // Minimum visible size
-        const maxSize = 12;   // Maximum size for large asteroids
+        const minSize = 4;  // Minimum visible size
+        const maxSize = 10;   // Maximum size for large asteroids
         // Power law distribution (roughly follows real asteroid size distribution)
         return minSize + (maxSize - minSize) * Math.pow(randomValue, 4);
     }, []);
@@ -175,14 +178,14 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
         instancedMeshRef.current.instanceMatrix.needsUpdate = true;
 
         if (labelRef.current) {
-            const labelPos = new THREE.Vector3(averageRadius * 0.8, averageRadius * 0.01, 0);
+            const labelPos = labelRef.current.getWorldPosition(new THREE.Vector3());
             textSizeRef.current = state.camera.position.distanceTo(labelPos) * 0.02;
         }
     });
 
     // Create geometry with color attribute
     const geometry = useMemo(() => {
-        const baseGeometry = new THREE.DodecahedronGeometry(1, 1);
+        const baseGeometry = new THREE.IcosahedronGeometry(1, 1);
         const instancedGeometry = new THREE.InstancedBufferGeometry().copy(baseGeometry);
         instancedGeometry.setAttribute(
             'color',
@@ -191,18 +194,11 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
         return instancedGeometry;
     }, []);
 
+
     return (
         <group>
-            {/* Add local lighting for the asteroid belt */}
-            {/* <ambientLight intensity={0.05}  /> */}
-            <hemisphereLight
-                intensity={.1}
-                color="#444"
-                groundColor="#222"
-            />
-
             {(displayLabels || isHoveredRef.current) && (
-                <group ref={labelRef} position={[averageRadius * 0.8, averageRadius * 0.01, 0]}>
+                <group ref={labelRef} position={[-100, 400, 3600]}>
                     <Labels
                         text="Asteroid Belt"
                         size={textSizeRef.current}
@@ -223,6 +219,7 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
                     />
                 </group>
             )}
+
 
             <instancedMesh
                 ref={instancedMeshRef}
@@ -245,12 +242,13 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
             >
                 <meshStandardMaterial
                     vertexColors
-                    roughness={0.6}      // Reduced for more specular highlights
-                    metalness={0.4}      // Increased for more reflectivity
-                    emissive="#111111"   // Slight self-illumination
-                    emissiveIntensity={0.1}
+                    roughness={0.7}      // Reduced for more specular highlights
+                    metalness={0.5}      // Increased for more reflectivity
+                    emissive="silver"   // Slight self-illumination
+                    emissiveIntensity={activeCamera.type === 'planet' ? 0 : 0.1}
                     toneMapped={false}   // Preserve bright colors
-                    envMapIntensity={1.2} // Enhanced environment response
+                    transparent={true}
+                    opacity={opacity}
                 />
             </instancedMesh>
         </group>
