@@ -1,6 +1,14 @@
-import * as THREE from 'three';
+import { Vector3 } from 'three';
 
-const sunPosition = new THREE.Vector3(0, 0, 0);
+const sunPosition = new Vector3(0, 0, 0);
+
+export const distanceScaleFactor = 0.00001;
+export const sizeScaleFactor = 0.0001;
+export const rotationSpeedScaleFactor = 600000;
+
+// constants for formulas
+export const G = 6.67430e-11; // Gravitational constant in m^3 kg^-1 s^-2
+export const MASS_OF_SUN = 1.989e30; // kg
 
 const sunData = {
     name: "Sun",
@@ -96,7 +104,7 @@ const marsData = {
     interestPoints: [
         {
             title: "Olympus Mons",
-            coordinates: new THREE.Vector3(10, 15, 0)
+            coordinates: new Vector3(10, 15, 0)
         }
     ]
 };
@@ -146,7 +154,7 @@ const saturnData = {
     interestPoints: [
         {
             title: "Hexagon Storm",
-            coordinates: new THREE.Vector3(-10, 20, 0)
+            coordinates: new Vector3(-10, 20, 0)
         }
     ]
 };
@@ -190,7 +198,7 @@ const neptuneData = {
     interestPoints: [
         {
             title: "Great Dark Spot",
-            coordinates: new THREE.Vector3(-5, -5, 0)
+            coordinates: new Vector3(-5, -5, 0)
         }
     ]
 };
@@ -227,13 +235,6 @@ const planetsData = {
 
 export default planetsData;
 
-export const distanceScaleFactor = 0.00001;
-export const sizeScaleFactor = 0.0001;
-export const rotationSpeedScaleFactor = 600000;
-
-// constants for formulas
-export const G = 6.67430e-11; // Gravitational constant in m^3 kg^-1 s^-2
-export const MASS_OF_SUN = 1.989e30; // kg
 
 export const asteroidBeltData = {
     name: "Asteroid Belt",
