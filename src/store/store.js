@@ -19,7 +19,7 @@ const useStore = create((set, get) => ({
     sunSettings: {
         position: new THREE.Vector3(0, 0, 0),
     },
-    earthPosition: new THREE.Vector3(10, 0, 0), // Initial position
+    // earthPosition: new THREE.Vector3(10, 0, 0), // Initial position
     rotationCounts: {}, // Tracks the number of rotations for each planet
     simulationDate: new Date(2000, 0, 1), // Starting date
     camera: new THREE.PerspectiveCamera(),
@@ -222,7 +222,7 @@ const defaultCamera = {
 const customCameraAngles = {
     'Asteroid Belt': {
         title: 'Asteroid Belt',
-        position: [4500, 250, -100],
+        position: [-700, 2200, 6600],
         target: [0, 0, 0]
     }
 }
@@ -232,14 +232,90 @@ const useCameraStore = create((set, get) => ({
     isCameraTransitioning: false,
     autoRotate: false,
     orbitControls: null,
+    sceneCameras: [], // New state for actual camera instances/info
+    satelliteCameraState: null, // Stores camera state for satellite camera
 
-    setActiveCamera: (type, name) => set({
-        activeCamera: { type, name }
+    setSatelliteCameraState: (position, rotation, targetPosition) => set({
+        satelliteCameraState: {
+            position,
+            rotation,
+            targetPosition
+        }
     }),
 
-    setOrbitControls: (controls) => set({
-        orbitControls: controls
+    setSceneCameras: (cameras) => set({ sceneCameras: cameras }),
+
+    getCameraByName: (name) => {
+        const { sceneCameras } = get();
+        return sceneCameras.find(cam => cam.name === name);
+    },
+
+    getActiveCamera: () => {
+        const { sceneCameras } = get();
+        return sceneCameras.find(cam => cam.isDefault);
+    },
+
+    updateCameraState: (name, state) => {
+        const { sceneCameras } = get();
+        const updatedCameras = sceneCameras.map(cam =>
+            cam.name === name
+                ? { ...cam, ...state }
+                : cam
+        );
+        set({ sceneCameras: updatedCameras });
+    },
+    // Modified activeCamera handling to include camera references
+    setActiveCamera: (type, name, cameraRef = null) => set(state => {
+        const newActiveCamera = {
+            type,
+            name,
+            ref: cameraRef, // Store the actual camera reference
+            position: state.activeCamera.position,
+            lookAt: state.activeCamera.lookAt,
+        };
+
+        // Update sceneCameras if needed
+        if (cameraRef) {
+            const updatedCameras = state.sceneCameras.map(cam => ({
+                ...cam,
+                isDefault: cam.ref === cameraRef
+            }));
+            return {
+                activeCamera: newActiveCamera,
+                sceneCameras: updatedCameras
+            };
+        }
+
+        return { activeCamera: newActiveCamera };
     }),
+
+    // Modified switch functions to handle camera refs
+    switchToPlanetCamera: (name, cameraRef) => {
+        set({
+            activeCamera: {
+                type: 'planet',
+                name,
+                ref: cameraRef,
+            },
+            isCameraTransitioning: true
+        });
+    },
+
+    switchToMoonCamera: (parentName, name, cameraRef) => {
+        set({
+            activeCamera: {
+                type: 'moon',
+                name,
+                parentName,
+                ref: cameraRef,
+            },
+            isCameraTransitioning: true
+        });
+    },
+
+    // setOrbitControls: (controls) => set({
+    //     orbitControls: controls
+    // }),
 
     toggleCameraTransitioning: (newState) => set({
         isCameraTransitioning: newState
@@ -300,26 +376,26 @@ const useCameraStore = create((set, get) => ({
         });
     },
 
-    switchToPlanetCamera: (name) => {
-        set({
-            activeCamera: {
-                type: 'planet',
-                name
-            },
-            isCameraTransitioning: true
-        });
-    },
+    // switchToPlanetCamera: (name) => {
+    //     set({
+    //         activeCamera: {
+    //             type: 'planet',
+    //             name
+    //         },
+    //         isCameraTransitioning: true
+    //     });
+    // },
 
-    switchToMoonCamera: (parentName, name) => {
-        set({
-            activeCamera: {
-                type: 'moon',
-                name,
-                parentName
-            },
-            isCameraTransitioning: true
-        });
-    },
+    // switchToMoonCamera: (parentName, name) => {
+    //     set({
+    //         activeCamera: {
+    //             type: 'moon',
+    //             name,
+    //             parentName
+    //         },
+    //         isCameraTransitioning: true
+    //     });
+    // },
 
     switchToCustomCamera: (id) => {
         // Get custom camera data
