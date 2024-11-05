@@ -2,10 +2,44 @@ import React, { useState, useEffect } from 'react';
 import useStore, { usePlanetStore } from '../../../store/store';
 import useExperimentsStore from '../../../store/experiments';
 
+const getSpeedValue = (key) => {
+    switch (key) {
+        case "-1 year /s":
+            return -31557600;
+        case "-1 month /s":
+            return -2629800;
+        case "-1 week /s":
+            return -604800;
+        case "-1 day /s":
+            return -86400;
+        case "-1 hour /s":
+            return -3600;
+        case "-1 minute /s":
+            return -60;
+        case "Real-time":
+            return 1;
+        case "1 minute /s":
+            return 60;
+        case "1 hour /s":
+            return 3600;
+        case "1 day /s":
+            return 86400;
+        case "1 week /s":
+            return 604800;
+        case "1 month /s":
+            return 2629800;
+        case "1 year /s":
+            return 31557600;
+        default:
+            return 1;
+    }
+}
+
+
 function KeplerTwo() {
     const { planetsData, updatePlanetData } = usePlanetStore();
     const { setSimSpeed, simSpeed, prevSpeed } = useStore();
-    const { experimentMode, toggleExperimentMode, experimentPlanet } = useExperimentsStore();
+    const { experimentMode, experimentStatus, setExperimentStatus, experimentPlanet } = useExperimentsStore();
     const selectedPlanet = experimentPlanet
 
     // Initialize eccentricity from planet data
@@ -37,22 +71,26 @@ function KeplerTwo() {
     };
 
     const handleStartExperiment = () => {
+        setExperimentStatus("started");
         updatePlanetData(selectedPlanet, { eccentricity: eccentricity });
-        setSimSpeed(100000); // Set to normal speed when starting
+        const newSpeed = getSpeedValue('1 month /s');
+        setSimSpeed(newSpeed); // Set to normal speed when starting
     };
 
     const handleReset = () => {
         setSimSpeed(1);
-        setEccentricity(originalEccentricity);
-        updatePlanetData(selectedPlanet, { eccentricity: originalEccentricity });
-        // clear triangles from previous experiment
-        // reset planets angle to 0
+        updatePlanetData(selectedPlanet, { eccentricity: originalEccentricity, initialOrbitalAngle: 0 });
+        setExperimentStatus(null);
     };
-
+    // console.log(planetsData[selectedPlanet].initialOrbitalAngle)
     // Update local eccentricity if planet data changes externally
     useEffect(() => {
         setEccentricity(planetsData[selectedPlanet].eccentricity);
     }, [planetsData[selectedPlanet].eccentricity]);
+
+    useEffect(() => {
+        handleReset();
+    }, [selectedPlanet])
 
     return (
         <>
@@ -104,7 +142,6 @@ function KeplerTwo() {
                 <button
                     className={`btn start-btn ${experimentMode ? 'active' : ''}`}
                     onClick={handleStartExperiment}
-                    disabled={experimentMode}
                 >
                     Start Experiment
                 </button>
