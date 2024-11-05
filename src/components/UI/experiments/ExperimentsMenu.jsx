@@ -8,7 +8,7 @@ import FocusLock from 'react-focus-lock';
 import ExperimentsModal from "./ExperimentsModal";
 
 const Menu = () => {
-  const { toggleExperimentsModal, experimentsModal, resetExperiments, experimentPlanet, setExperimentPlanet } = useExperimentsStore();
+  const { toggleExperimentsModal, experimentsModal, resetExperiments, experimentPlanet, setExperimentPlanet, experimentMode, experimentStatus } = useExperimentsStore();
   const {
     simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, toggleFullscreen,
     showDetailsMenu, toggleDetailsMenu, viewOnlyMode, resetAllData,
@@ -139,6 +139,7 @@ const Menu = () => {
 
   const disableSpeedToggle = () => {
     if (activeCamera.type === 'custom') return false;
+    else if (experimentStatus === null) return true;
     else if (isCameraTransitioning || !isMenuOpen) return true;
     return false;
   };
@@ -261,7 +262,7 @@ const Menu = () => {
       </div>
 
       {/* Details menu */}
-      {!viewOnlyMode && (
+      {!viewOnlyMode && !experimentMode && (
         <>
           <div
             className={`details-menu ${selectedPlanet &&
