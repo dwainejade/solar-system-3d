@@ -47,12 +47,12 @@ const Menu = () => {
   };
 
   const speedOptions = [
-    { label: "-1 year /s", value: -31557600 },
-    { label: "-1 month /s", value: -2629800 },
-    { label: "-1 week /s", value: -604800 },
-    { label: "-1 day /s", value: -86400 },
-    { label: "-1 hour /s", value: -3600 },
-    { label: "-1 minute /s", value: -60 },
+    // { label: "-1 year /s", value: -31557600 },
+    // { label: "-1 month /s", value: -2629800 },
+    // { label: "-1 week /s", value: -604800 },
+    // { label: "-1 day /s", value: -86400 },
+    // { label: "-1 hour /s", value: -3600 },
+    // { label: "-1 minute /s", value: -60 },
     { label: "Real-time", value: 1 },
     { label: "1 minute /s", value: 60 },
     { label: "1 hour /s", value: 3600 },
@@ -170,7 +170,7 @@ const Menu = () => {
               <button
                 className="dropdown-trigger"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                disabled={!isMenuOpen}
+                disabled={!isMenuOpen || experimentStatus}
               >
                 {experimentPlanet}
               </button>
