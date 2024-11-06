@@ -101,8 +101,9 @@ const Menu = () => {
 
   const handleMoonSelect = (planetName, moonName) => {
     const planet = planetsData[planetName];
+    setSelectedPlanet(planet);
     const moon = moonsData[planetName]?.find((m) => m.name === moonName);
-    // setSelectedMoon(moon);
+    setSelectedMoon(moon);
     switchToMoonCamera(hoveredPlanetName, moonName);
     // setIsDropdownOpen(false);
     // if (selectedPlanet && selectedPlanet.name !== planetName) {
@@ -193,26 +194,26 @@ const Menu = () => {
               <div className="item-wrapper">
                 {isDropdownOpen && (
                   <ul className="dropdown-menu">
-                    <li onClick={handleSolarSystemSelect}>Solar System</li>
+                    <li onClick={handleSolarSystemSelect} className={`dropdown-item ${activeCamera?.name === 'default' ? 'selected' : ''}`}>Solar System</li>
                     {Object.keys(planetsData).map((planetName) => (
-                      <li key={planetName} className="dropdown-item"
+                      <li key={planetName} className={`dropdown-item planet-item ${planetName === selectedPlanet?.name ? 'selected' : ''}`}
                         onClick={() => handlePlanetSelect(planetName)}
                         onPointerOver={() => setHoveredPlanetName(hoveredPlanetName === planetName ? null : planetName)}
                       // onPointerOut={() => setHoveredPlanetName(null)}
                       >
-                        {planetName} {moonsData[planetName]?.length || null}
+                        {planetName} {moonsData[planetName]?.length > 0 ? '>' : ''}
                       </li>
                     ))}
-                    <li onClick={handleAsteroidBeltSelect}>Asteroid Belt</li>
+                    <li onClick={handleAsteroidBeltSelect} className={`dropdown-item planet-item ${activeCamera?.name === 'Asteroid Belt' ? 'selected' : ''}`}>Asteroid Belt</li>
                   </ul>
                 )}
                 {/* Submenu for moons */}
-                {hoveredPlanetName && isDropdownOpen && (
+                {hoveredPlanetName && isDropdownOpen && moonsData[hoveredPlanetName]?.length > 0 && (
                   <ul className="submenu">
                     {moonsData[hoveredPlanetName]?.map((moon) => (
                       <li
                         key={moon.name}
-                        className="submenu-item"
+                        className={`submenu-item moon-item ${moon.name === selectedMoon?.name ? 'selected' : ''}`}
                         onClick={() => handleMoonSelect(hoveredPlanetName, moon.name)}
                       >
                         {moon.name}
