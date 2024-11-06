@@ -230,8 +230,8 @@ const Menu = () => {
             <select
               id="simSpeedSelect"
               onChange={handleSpeedChange}
-              value={simSpeed}
-            // disabled={disableSpeedToggle()}
+              value={simSpeed === 0 ? prevSpeed : simSpeed}
+              disabled={disableSpeedToggle()}
             >
               {speedOptions.map((option, index) => (
                 <option key={index} value={option.value}>
