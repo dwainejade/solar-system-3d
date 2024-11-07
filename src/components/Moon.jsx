@@ -37,14 +37,17 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, visible }, ref)
   const { experimentType } = useExperimentsStore();
   const { satelliteCamera, toggleSatelliteCamera, activeCamera, switchToMoonCamera } = useCameraStore();
 
+  const scaledRadius = radius * moonSizeScaleFactor;
+  const scaledOrbitalRadius = orbitalRadius * moonDistanceScaleFactor;
+
   const localRef = ref || useRef();
   const localAngleRef = useRef(moonAngles[name] || Math.random() * 2 * Math.PI);
+  const [scale, setScale] = useState(scaledRadius);
+  const textSize = useRef(1);
 
   const isMoonSelected = selectedMoon && selectedMoon.name === name;
   const moonTexture = name === 'Moon' ? useTexture('../assets/earth/moon/2k_moon.jpg') : null;
 
-  const scaledRadius = radius * moonSizeScaleFactor;
-  const scaledOrbitalRadius = orbitalRadius * moonDistanceScaleFactor;
 
   // Calculate mean motion (n)
   const meanMotion = useMemo(() => {
@@ -100,26 +103,37 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, visible }, ref)
         localRef.current.lookAt(planetPos);
       }
 
-      // Update world position for camera and other calculations
-      const worldPosition = localRef.current.getWorldPosition(new Vector3());
-      updateMoonWorldPosition(name, {
-        x: worldPosition.x,
-        y: worldPosition.y,
-        z: worldPosition.z
-      });
+      // Get camera position in moon's local space
+      const cameraPosition = new THREE.Vector3();
+      state.camera.getWorldPosition(cameraPosition);
+      // Transform camera position to local space of the moon's parent
+      localRef.current.parent.worldToLocal(cameraPosition);
+
+      // Get moon's local position
+      const moonLocalPosition = localRef.current.position;
+
+      // Calculate distance in local space
+      const distance = moonLocalPosition.distanceTo(cameraPosition);
 
       // Handle scaling based on camera distance
-      const distance = worldPosition.distanceTo(state.camera.position);
       if (distance / 100 <= scaledRadius) {
         setScale(scaledRadius);
       } else {
         setScale(distance / 100);
       }
 
-      // Update text size
-      if (distance < 4500) {
-        setTextSize(0.016 * distance);
+      // Update text size using local distance
+      if (textSize.current) {
+        textSize.current = distance * 0.014;
       }
+
+      // Update world position for other calculations
+      const worldPosition = localRef.current.getWorldPosition(new Vector3());
+      updateMoonWorldPosition(name, {
+        x: worldPosition.x,
+        y: worldPosition.y,
+        z: worldPosition.z
+      });
     }
   });
 
@@ -143,8 +157,6 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, visible }, ref)
     setIsHovered(false);
   };
 
-  const [scale, setScale] = useState(scaledRadius);
-  const [textSize, setTextSize] = useState(1);
 
   return (
     <>
@@ -153,7 +165,6 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, visible }, ref)
           target={localRef.current}
           targetName={name}
           size={scaledRadius}
-
         />
       }
 
@@ -178,7 +189,7 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, visible }, ref)
           <Labels
             key={name + '-label'}
             text={name}
-            size={textSize}
+            size={textSize?.current}
             position={[0, scale * 1.5, 0]}
             color={color}
             font={'../assets/fonts/Termina_Heavy.ttf'}

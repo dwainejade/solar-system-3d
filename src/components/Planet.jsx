@@ -374,7 +374,7 @@ const Planet = ({ name = 'Earth', textures }) => {
           orbitalInclination={orbitalInclination}
           color={color}
           name={name + "-orbit-path"}
-          opacity={.4}
+          opacity={orbitPathOpacity}
           hiRes={isPlanetSelected}
         />
       )}
