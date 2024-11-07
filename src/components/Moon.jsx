@@ -11,7 +11,6 @@ import SatelliteCamera from "./SatelliteCameraMoon";
 import Labels from "./Labels";
 import GravityVectors from "./GravityVectors";
 
-
 const Moon = forwardRef(({ moonData, planetPosition, parentName, visible }, ref) => {
   const {
     name,
@@ -42,12 +41,11 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, visible }, ref)
 
   const localRef = ref || useRef();
   const localAngleRef = useRef(moonAngles[name] || Math.random() * 2 * Math.PI);
-  const [scale, setScale] = useState(scaledRadius);
+  const scaleRef = useRef(scaledRadius);
   const textSize = useRef(1);
 
   const isMoonSelected = selectedMoon && selectedMoon.name === name;
   const moonTexture = name === 'Moon' ? useTexture('../assets/earth/moon/2k_moon.jpg') : null;
-
 
   // Calculate mean motion (n)
   const meanMotion = useMemo(() => {
@@ -117,9 +115,9 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, visible }, ref)
 
       // Handle scaling based on camera distance
       if (distance / 100 <= scaledRadius) {
-        setScale(scaledRadius);
+        scaleRef.current = scaledRadius;
       } else {
-        setScale(distance / 100);
+        scaleRef.current = distance / 100;
       }
 
       // Update text size using local distance
@@ -140,7 +138,6 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, visible }, ref)
   const handleClick = e => {
     e.stopPropagation();
     if (isMoonSelected) return;
-    // setSelectedPlanet(null);
     toggleDetailsMenu(true);
     setSelectedMoon(moonData);
     switchToMoonCamera(parentName, name);
@@ -156,7 +153,6 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, visible }, ref)
     e.stopPropagation();
     setIsHovered(false);
   };
-
 
   return (
     <>
@@ -185,12 +181,12 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, visible }, ref)
           />
         </mesh>
 
-        {(displayLabels || isHovered && !isMoonSelected) && simSpeed < 200000 && (
+        {(displayLabels || isHovered && !isMoonSelected) && (
           <Labels
             key={name + '-label'}
             text={name}
             size={textSize?.current}
-            position={[0, scale * 1.5, 0]}
+            position={[0, scaleRef.current * 1.15, 0]}
             color={color}
             font={'../assets/fonts/Termina_Heavy.ttf'}
             handleClick={handleClick}
@@ -211,13 +207,6 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, visible }, ref)
           lineWidth={isMoonSelected ? 1 : .4}
         />
       )}
-
-      {/* {experimentType === 'newton-1' && localRef.current && (
-        <GravityVectors
-          moonRef={localRef}
-          planetPosition={planetPosition}
-        />
-      )} */}
     </>
   );
 });
