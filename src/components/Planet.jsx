@@ -76,7 +76,7 @@ const Planet = ({ name = 'Earth', textures }) => {
   }
   const detailLevel = (isPlanetSelected || renderMoons()) ? 64 : 16;
 
-  const [scale, setScale] = useState(scaledRadius);
+  const scale = useRef(scaledRadius);
   const textSize = useRef(1);
   const [showTextures, setShowTextures] = useState(false);
   const textureDisplayDistance = 500;
@@ -157,9 +157,9 @@ const Planet = ({ name = 'Earth', textures }) => {
       // Handle scaling and visibility
       const distance = localRef.current.position.distanceTo(state.camera.position);
       if (distance / 1000 <= scaledRadius) {
-        setScale(scaledRadius);
+        scale.current = scaledRadius;
       } else {
-        setScale(distance / 1000);
+        scale.current = distance / 1000;
       }
       setShowTextures(activeCamera.type === 'moon' || distance < textureDisplayDistance);
       const maxDistance = scaledRadius * 100;
@@ -251,7 +251,7 @@ const Planet = ({ name = 'Earth', textures }) => {
           onPointerOut={handlePointerOut}
         >
           {activeCamera?.name !== name &&
-            <sphereGeometry args={[renderMoons() ? scaledRadius : scale * 8, 8, 8]} />
+            <sphereGeometry args={[renderMoons() ? scaledRadius : scale.current * 8, 8, 8]} />
           }
         </mesh>
 
@@ -260,7 +260,7 @@ const Planet = ({ name = 'Earth', textures }) => {
           key={isPlanetSelected ? name + '-textured' : name + '-basic'}
           onDoubleClick={handleDoubleClick}
         >
-          <sphereGeometry args={[(renderMoons() ? scaledRadius : scale * 8), detailLevel, detailLevel / 2]} />
+          <sphereGeometry args={[(renderMoons() ? scaledRadius : scale.current * 8), detailLevel, detailLevel / 2]} />
           {((!isPlanetSelected && !renderMoons()) && texturesLoaded) ?
             <meshBasicMaterial color={color} />
             :
@@ -316,7 +316,7 @@ const Planet = ({ name = 'Earth', textures }) => {
             key={name}
             text={name}
             size={textSize?.current}
-            position={[0, scale * 1.2 + textSize?.current, 0]}
+            position={[0, scale.current * 1.2 + textSize?.current, 0]}
             color={color}
             handleClick={handleClick}
             handlePointerDown={handlePointerDown}
@@ -329,9 +329,8 @@ const Planet = ({ name = 'Earth', textures }) => {
             as='span'
             wrapperClass='label-wrapper'
             center
-            position-y={isPlanetSelected ? scale + scale * 0.25 : scale * 4}
+            position-y={isPlanetSelected ? scale.current + scale.current * 0.12 : scale.current * 4}
             zIndexRange={[100, 0]}
-            style={{ pointerEvents: 'none' }}
           >
             <span
               className='planet-label'
