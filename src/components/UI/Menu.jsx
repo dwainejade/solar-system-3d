@@ -91,31 +91,26 @@ const Menu = () => {
   };
 
   const handlePlanetSelect = (planetName) => {
-    const planet = planetsData[planetName];
-    // setSelectedPlanet(planet);
-    // setSelectedMoon(null);
-    // toggleDetailsMenu(true);
     switchToPlanetCamera(planetName);
-    // setIsDropdownOpen(false); // Close dropdown after selection
   };
 
-  const handleMoonSelect = (planetName, moonName) => {
+  const handleMoonSelect = async (planetName, moonName) => {
     const planet = planetsData[planetName];
-    setSelectedPlanet(planet);
     const moon = moonsData[planetName]?.find((m) => m.name === moonName);
+
+    // First set the selected moon to trigger rendering
+    setSelectedPlanet(planet);
     setSelectedMoon(moon);
+
+    // Add a small delay to allow the moon to render
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Then proceed with camera transition
     switchToMoonCamera(hoveredPlanetName, moonName);
-    // setIsDropdownOpen(false);
-    // if (selectedPlanet && selectedPlanet.name !== planetName) {
-    //   setSelectedPlanet(planetName);
-    // }
   };
 
   const handleSolarSystemSelect = () => {
-    // setSelectedPlanet(null);
-    // setSelectedMoon(null);
     resetCamera();
-    // setIsDropdownOpen(false);
   };
 
   const handleAsteroidBeltSelect = () => {

@@ -297,7 +297,7 @@ const Scene = () => {
   // camera settings
   const cameraConfig = {
     maxDistance: 120000,
-    minDistance: minDistance, // Use the state value
+    minDistance: minDistance,
     near: 0.01,
     far: 1500000,
     smoothTime: .6,
@@ -318,7 +318,6 @@ const Scene = () => {
         truckSpeed={1}
       />
 
-
       <Stars />
 
       <Planet name="Earth" textures={earthTextures} />
@@ -332,10 +331,6 @@ const Scene = () => {
 
       <AsteroidBelt meshCount={2500} />
 
-      {/* <Planet bodyData={planetsD   useEffect(() => {
-        console.log('All cameras:', scene);
-
-    }, []);ata.Pluto} /> */}
       <Sun key={"Sun-plain"} textures={sunTextures} position={sunSettings.position} resetCamera={resetCamera} />
 
     </>
