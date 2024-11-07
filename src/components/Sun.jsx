@@ -8,7 +8,7 @@ import { sunOuterShader } from "../shaders/atmosphere";
 
 const Sun = ({ position, textures }) => {
   const { selectedPlanet, setSelectedPlanet, planetsData } = usePlanetStore();
-  const { toggleZoomingToSun, switchToSunCamera } = useCameraStore();
+  const { toggleZoomingToSun, switchToSunCamera, switchToPlanetCamera } = useCameraStore();
   const { experimentMode } = useExperimentsStore();
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
@@ -26,7 +26,7 @@ const Sun = ({ position, textures }) => {
     if (!isDragging) {
       setSelectedPlanet(planetsData.Sun);
       switchToSunCamera();
-      toggleZoomingToSun(true);
+
     }
   };
 

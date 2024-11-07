@@ -94,7 +94,7 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
         const randomValue = Math.random();
         // Most asteroids are very small, few are large
         const minSize = 4;  // Minimum visible size
-        const maxSize = 10;   // Maximum size for large asteroids
+        const maxSize = 15;   // Maximum size for large asteroids
         // Power law distribution (roughly follows real asteroid size distribution)
         return minSize + (maxSize - minSize) * Math.pow(randomValue, 4);
     }, []);
@@ -244,7 +244,7 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
                     vertexColors
                     roughness={0.7}      // Reduced for more specular highlights
                     metalness={0.5}      // Increased for more reflectivity
-                    emissive="silver"   // Slight self-illumination
+                    emissive="#666"   // Slight self-illumination
                     emissiveIntensity={activeCamera.type === 'planet' ? 0 : 0.1}
                     toneMapped={false}   // Preserve bright colors
                     transparent={true}
