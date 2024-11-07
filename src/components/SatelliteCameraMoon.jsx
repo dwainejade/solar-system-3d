@@ -25,6 +25,10 @@ const MoonSatelliteCamera = ({ target, size, targetName, bodyType = 'moon' }) =>
     const mousePositionRef = useRef({ x: 0, y: 0 });
     const sphericalRef = useRef(new THREE.Spherical(size * 6, Math.PI / 2, 0));
 
+    const minZoom = size * 5;
+    const maxZoom = 300;
+    const zoomSpeed = 0.05;
+
     const handleUserInteraction = useCallback(() => {
         setAutoRotate(false);
     }, [setAutoRotate]);
@@ -60,12 +64,12 @@ const MoonSatelliteCamera = ({ target, size, targetName, bodyType = 'moon' }) =>
     const handleWheel = useCallback((event) => {
         if (!satelliteCamera) return;
 
-        const zoomSpeed = 0.01;
         const deltaRadius = event.deltaY * zoomSpeed;
+
         const newRadius = THREE.MathUtils.clamp(
             sphericalRef.current.radius + deltaRadius,
-            size * bodyType === 'moon' ? .04 : 2,
-            500
+            minZoom,
+            maxZoom
         );
 
         sphericalRef.current.radius = newRadius;
@@ -162,12 +166,17 @@ const MoonSatelliteCamera = ({ target, size, targetName, bodyType = 'moon' }) =>
 
         sphericalRef.current.setFromVector3(relativePosition);
 
+        sphericalRef.current.radius = THREE.MathUtils.clamp(
+            sphericalRef.current.radius,
+            minZoom,
+            maxZoom
+        );
+
         toggleSatelliteCamera(true);
         toggleCameraTransitioning(false);
         setSimSpeed(prevSpeed);
-    }, [target, toggleSatelliteCamera, toggleCameraTransitioning, setSimSpeed, prevSpeed]);
+    }, [target, size, toggleSatelliteCamera, toggleCameraTransitioning, setSimSpeed, prevSpeed]);
 
-    // Event listener setup...
     useEffect(() => {
         const canvasElement = gl.domElement;
 

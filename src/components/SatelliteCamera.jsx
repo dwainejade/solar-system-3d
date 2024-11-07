@@ -23,6 +23,10 @@ const SatelliteCamera = ({ target, size, targetName, bodyType = 'planet' }) => {
     const mousePositionRef = useRef({ x: 0, y: 0 });
     const sphericalRef = useRef(new THREE.Spherical(size * 6, Math.PI / 2, 0));
 
+    const minZoom = size * 2.8;
+    const maxZoom = 300;
+    const zoomSpeed = 0.1;
+
     const handleUserInteraction = useCallback(() => {
         setAutoRotate(false);
     }, [setAutoRotate]);
@@ -58,19 +62,19 @@ const SatelliteCamera = ({ target, size, targetName, bodyType = 'planet' }) => {
     const handleWheel = useCallback((event) => {
         if (!satelliteCamera) return;
 
-        const zoomSpeed = 0.01;
         const deltaRadius = event.deltaY * zoomSpeed;
+
         const newRadius = THREE.MathUtils.clamp(
             sphericalRef.current.radius + deltaRadius,
-            size * bodyType === 'moon' ? .04 : 2,
-            500
+            minZoom,
+            maxZoom
         );
 
         sphericalRef.current.radius = newRadius;
         handleUserInteraction();
-    }, [satelliteCamera, size, handleUserInteraction]);
+    }, [satelliteCamera, size, bodyType, handleUserInteraction]);
 
-    // Touch events
+    // Touch events with improved zoom handling
     const handleStart = useCallback((event) => {
         isDraggingRef.current = true;
         if (event.touches) {
@@ -135,10 +139,10 @@ const SatelliteCamera = ({ target, size, targetName, bodyType = 'planet' }) => {
             setSatelliteCameraState(worldPosition, worldRotation, targetWorldPos);
         }
 
-        // Check for camera switch
+        // Check for camera switch with improved threshold
         if (activeCamera.name === targetName && !satelliteCamera) {
             const distance = orbitCamera.position.distanceTo(targetWorldPos);
-            const sizeThreshold = Math.max(size * 4.5, 0.1);
+            const sizeThreshold = size * 4.5;
             if (distance <= sizeThreshold) {
                 switchToSatelliteCamera(orbitCamera, targetWorldPos);
             }
@@ -157,15 +161,20 @@ const SatelliteCamera = ({ target, size, targetName, bodyType = 'planet' }) => {
         // Update spherical ref directly
         sphericalRef.current.setFromVector3(relativePosition);
 
+        sphericalRef.current.radius = THREE.MathUtils.clamp(
+            sphericalRef.current.radius,
+            minZoom,
+            maxZoom
+        );
+
         cameraRef.current.position.copy(orbitCameraLocal);
         cameraRef.current.lookAt(targetLocalPos);
 
         toggleSatelliteCamera(true);
         toggleCameraTransitioning(false);
         setSimSpeed(prevSpeed);
-    }, [target, toggleSatelliteCamera, toggleCameraTransitioning, setSimSpeed, prevSpeed]);
+    }, [target, bodyType, size, toggleSatelliteCamera, toggleCameraTransitioning, setSimSpeed, prevSpeed]);
 
-    // Event listener setup...
     useEffect(() => {
         const canvasElement = gl.domElement;
 

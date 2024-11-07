@@ -42,7 +42,7 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, visible }, ref)
   const localRef = ref || useRef();
   const localAngleRef = useRef(moonAngles[name] || Math.random() * 2 * Math.PI);
   const scaleRef = useRef(scaledRadius);
-  const textSize = useRef(1);
+  const textSize = useRef(.1);
 
   const isMoonSelected = selectedMoon && selectedMoon.name === name;
   const moonTexture = name === 'Moon' ? useTexture('../assets/earth/moon/2k_moon.jpg') : null;
