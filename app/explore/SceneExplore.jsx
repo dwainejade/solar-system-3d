@@ -4,6 +4,7 @@ import { CameraControls, useTexture } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "@/store/store";
 import useExperimentsStore from "@/store/experiments";
 import { sizeScaleFactor } from "@/data/planetsData";
+import { moonSizeScaleFactor } from "@/data/moonsData";
 import Sun from "@/components/Sun";
 import Planet from "@/components/Planet";
 import Stars from "@/components/Stars"
@@ -25,6 +26,8 @@ const Scene = () => {
   const initialCameraPosition = [100000, 100000, 100000];
   const defaultCameraPosition = [20000, 20000, 20000];
   const initialTarget = [0, 0, 0];
+  const transitioning = useRef(false);
+
 
   useEffect(() => {
     if (cameraControlsRef.current && !hasInitialized) {
@@ -43,12 +46,6 @@ const Scene = () => {
 
   // Update the calculateOptimalDistance function to handle moons better
   const calculateOptimalDistance = (radius) => {
-    if (activeCamera.type === 'moon') {
-      // Use a larger base distance for moons
-      const baseDistance = .5;
-      return Math.max(radius * baseDistance, 0.01); //  minimum viewing distance
-    }
-    // Regular planet distance calculation
     const baseDistance = 4.2;
     return radius * baseDistance;
   };
@@ -110,11 +107,11 @@ const Scene = () => {
       const moon = findMoonByName(activeCamera.name, activeCamera.parentName);
       if (moonPosition && moon) {
         // Adjust scaling for better moon visibility
-        const scaledRadius = moon.radius * sizeScaleFactor;
+        const scaledRadius = moon.radius * moonSizeScaleFactor;
         const optimalDistance = calculateOptimalDistance(scaledRadius);
 
         // Set a reasonable minimum distance for viewing moons
-        setMinDistance(scaledRadius * 2);
+        setMinDistance(optimalDistance / 2);
 
         // Update camera target and distance
         cameraControlsRef.current.setTarget(
@@ -125,7 +122,7 @@ const Scene = () => {
         );
 
         // Adjust dollyTo distance for better moon viewing
-        cameraControlsRef.current.dollyTo(optimalDistance * 4, true);
+        cameraControlsRef.current.dollyTo(optimalDistance, true);
 
         // Track transition completion
         const currentTarget = new THREE.Vector3();
@@ -139,25 +136,40 @@ const Scene = () => {
       }
     }
 
-    if (activeCamera.name === 'Sun' && activeCamera.type === 'planet') {
-      setMinDistance(200);
-      cameraControlsRef.current.setTarget(0, 0, 0, true);
-      cameraControlsRef.current.maxDistance = 1000
-      toggleCameraTransitioning(false);
-      if (cameraControlsRef.current.distance > 300 && isZoomingToSun) {
-        cameraControlsRef.current.dollyTo(200, true);
+    if (activeCamera.name === 'Sun' && transitioning.current) {
+      const currentTarget = new THREE.Vector3();
+      const currentPosition = new THREE.Vector3();
+      cameraControlsRef.current.getTarget(currentTarget);
+      cameraControlsRef.current.getPosition(currentPosition);
+
+      const distanceToTarget = currentPosition.distanceTo(new THREE.Vector3(0, 0, 0));
+      const targetDistance = 500; // Desired distance for Sun view
+
+      if (Math.abs(distanceToTarget - targetDistance) < 10) {
+        transitioning.current = false;
+        toggleCameraTransitioning(false);
+        // Enable manual control
+        cameraControlsRef.current.enabled = true;
       } else {
-        toggleZoomingToSun(false);
+        cameraControlsRef.current.setTarget(0, 0, 0, true);
+        cameraControlsRef.current.dollyTo(targetDistance, true);
       }
     }
 
-    if (activeCamera.name === 'Asteroid Belt') {
-      const beltDistance = 5000; // Fixed viewing distance
-
-      // if (isCameraTransitioning) {
-      // Ensure activeCamera.position is a valid Vector3 or has x,y,z coordinates
+    if (activeCamera.name === 'Asteroid Belt' && transitioning.current) {
+      const currentPosition = new THREE.Vector3();
+      cameraControlsRef.current.getPosition(currentPosition);
       const targetPosition = activeCamera.position;
-      if (targetPosition && typeof targetPosition.x === 'number') {
+      const distanceToTarget = currentPosition.distanceTo(
+        new THREE.Vector3(targetPosition.x, targetPosition.y, targetPosition.z)
+      );
+
+      if (distanceToTarget < 100) {
+        transitioning.current = false;
+        toggleCameraTransitioning(false);
+        // Enable manual control
+        cameraControlsRef.current.enabled = true;
+      } else {
         cameraControlsRef.current.setPosition(
           targetPosition.x,
           targetPosition.y,
@@ -165,22 +177,6 @@ const Scene = () => {
           true
         );
         cameraControlsRef.current.setTarget(0, 0, 0, true);
-
-        // Set constraints
-        setMinDistance(beltDistance * 0.85);
-        cameraControlsRef.current.maxDistance = beltDistance * 1.8;
-
-        // Check transition completion
-        const currentPosition = new THREE.Vector3();
-        cameraControlsRef.current.getPosition(currentPosition);
-
-        if (currentPosition.distanceTo(new THREE.Vector3(
-          targetPosition.x,
-          targetPosition.y,
-          targetPosition.z
-        )) < 100) {
-          toggleCameraTransitioning(false);
-        }
       }
     }
 
@@ -218,60 +214,32 @@ const Scene = () => {
       cameraControlsRef.current.maxDistance = 160000
     }
   });
-  // console.log({ isCameraTransitioning })
+
+  // Handle camera mode changes
   useEffect(() => {
-    if (cameraControlsRef.current && !hasInitialized) {
-      // Set initial camera position
-      cameraControlsRef.current.setPosition(...initialCameraPosition, false);
-      cameraControlsRef.current.setTarget(...initialTarget, false);
+    if (activeCamera.name === 'Sun' || activeCamera.name === 'Asteroid Belt') {
+      transitioning.current = true;
+      // Temporarily disable manual control during transition
+      cameraControlsRef.current.enabled = false;
 
-      // Ensure controls are ready
-      cameraControlsRef.current.camera.updateProjectionMatrix();
-
-      // Animate to default position with a slight delay
-      setTimeout(() => {
-        resetCamera();
-        setHasInitialized(true);
-      }, 100);
-    }
-    // console.log(cameraControlsRef.current.position)
-  }, [cameraControlsRef.current]);
-
-  // Update useEffect to handle camera transitions
-  useEffect(() => {
-    if (activeCamera.name !== 'Sun') {
-      // toggleZoomingToSun(false);
+      if (activeCamera.name === 'Sun') {
+        setMinDistance(200);
+        cameraControlsRef.current.maxDistance = 1000;
+      } else if (activeCamera.name === 'Asteroid Belt') {
+        const beltDistance = 5000;
+        setMinDistance(beltDistance * 0.85);
+        cameraControlsRef.current.maxDistance = beltDistance * 1.8;
+      }
     }
 
     if ((activeCamera.type === "planet" || activeCamera.type === "moon")) {
-      console.log('Transitioning camera')
       toggleCameraTransitioning(true);
       setPrevSpeed(simSpeed);
       setSimSpeed(0);
     }
 
-    if (activeCamera.type === 'orbit' && activeCamera.name === 'default') {
-      if (simSpeed === 0) {
-        setSimSpeed(prevSpeed);
-      }
-    }
-
-    if (!selectedPlanet && !selectedMoon) {
-      if (simSpeed === 0) {
-        setSimSpeed(prevSpeed);
-      }
-    }
-
-    if (activeCamera.name === "Sun") {
-      toggleZoomingToSun(true);
-      if (simSpeed === 0) {
-        setSimSpeed(prevSpeed);
-        // toggleCameraTransitioning(false);
-      }
-    }
-
     cameraControlsRef.current?.camera.updateProjectionMatrix();
-  }, [selectedPlanet, selectedMoon, activeCamera]);
+  }, [activeCamera]);
 
   useEffect(() => {
     setViewOnlyMode(true); // disable details menu
@@ -292,11 +260,6 @@ const Scene = () => {
       window.removeEventListener('mousedown', handleMouseDown);
     };
   }, []);
-
-  /// Scene cameras //////////////////////////////////////////////////////////////////
-  useEffect(() => {
-    console.log({ isCameraTransitioning })
-  }, [isCameraTransitioning])
 
 
   const earthTextures = useTexture({
@@ -338,6 +301,10 @@ const Scene = () => {
     enableDamping: true,
     near: 0.01,
     far: 1500000,
+    draggingSmoothTime: 0.25, // Smooth drag movement
+    azimuthRotateSpeed: 0.6,     // Horizontal rotation speed
+    polarRotateSpeed: 0.6,       // Vertical rotation speed
+    dollySpeed: 0.1,
   };
 
   return (
@@ -345,12 +312,7 @@ const Scene = () => {
       <CameraControls
         ref={cameraControlsRef}
         makeDefault={!satelliteCamera}
-        maxDistance={cameraConfig.maxDistance}
-        minDistance={cameraConfig.minDistance}
-        smoothTime={cameraConfig.smoothTime}
-        enableDamping={cameraConfig.enableDamping}
-        near={cameraConfig.near}
-        far={cameraConfig.far}
+        {...cameraConfig}
         autoRotate
         enabled={!satelliteCamera}
       />
