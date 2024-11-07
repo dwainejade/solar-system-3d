@@ -233,6 +233,7 @@ const Scene = () => {
     }
 
     if ((activeCamera.type === "planet" || activeCamera.type === "moon")) {
+      if (simSpeed === 0) return
       toggleCameraTransitioning(true);
       setPrevSpeed(simSpeed);
       setSimSpeed(0);
@@ -295,16 +296,16 @@ const Scene = () => {
 
   // camera settings
   const cameraConfig = {
-    maxDistance: 1200000,
+    maxDistance: 120000,
     minDistance: minDistance, // Use the state value
-    smoothTime: 0.6,
-    enableDamping: true,
     near: 0.01,
     far: 1500000,
+    smoothTime: .6,
+    enableDamping: true,
     draggingSmoothTime: 0.25, // Smooth drag movement
-    azimuthRotateSpeed: 0.6,     // Horizontal rotation speed
-    polarRotateSpeed: 0.6,       // Vertical rotation speed
-    dollySpeed: 0.1,
+    azimuthRotateSpeed: 1,     // Horizontal rotation speed
+    polarRotateSpeed: 1,       // Vertical rotation speed
+    dollySpeed: .4,
   };
 
   return (
@@ -312,9 +313,9 @@ const Scene = () => {
       <CameraControls
         ref={cameraControlsRef}
         makeDefault={!satelliteCamera}
-        {...cameraConfig}
-        autoRotate
         enabled={!satelliteCamera}
+        {...cameraConfig}
+        truckSpeed={1}
       />
 
 
