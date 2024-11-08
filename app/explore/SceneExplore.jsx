@@ -62,7 +62,6 @@ const Scene = () => {
     if (!cameraControlsRef.current) return;
 
     if (satelliteCameraState?.position && isCameraTransitioning) {
-      // console.log("Transitioning to orbit camera with state:", satelliteCameraState);
 
       const { position, targetPosition } = satelliteCameraState;
 
@@ -92,7 +91,7 @@ const Scene = () => {
     if (activeCamera.type === 'planet' && activeCamera.name !== 'Sun') {
       const planetPosition = planetPositions[selectedPlanet.name];
 
-      setSelectedMoon(null);
+      // setSelectedMoon(null);
       if (planetPosition) {
         const scaledRadius = planetsData[selectedPlanet.name].radius * sizeScaleFactor;
         const optimalDistance = calculateOptimalDistance(scaledRadius);

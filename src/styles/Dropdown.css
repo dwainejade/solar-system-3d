@@ -1,0 +1,84 @@
+.planet-selector {
+  position: relative;
+  display: inline-block;
+  user-select: none;
+}
+.planet-selector-button {
+  background-color: #fdf5e8;
+  color: #333333;
+  border: 0;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+  width: 122px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  color: #717171;
+  padding: 4px 8px;
+}
+.planet-selector-menu {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  background-color: #fdf5e8;
+  color: #333333;
+  margin-bottom: 4px;
+  min-width: 140px;
+  z-index: 1000;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+}
+.planet-selector-item {
+  padding: 4px 8px;
+  font-size: 0.95rem;
+  color: #333333;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  background-color: transparent;
+  border: transparent 2px solid;
+  color: #717171;
+}
+.planet-selector-item.active {
+  background-color: #add1d7;
+}
+.planet-selector-item.active > span {
+  font-weight: bold;
+  color: #000;
+}
+.planet-selector-item-chevron {
+  margin-left: 8px;
+  font-size: 10px;
+  opacity: 0.7;
+}
+.planet-selector .highlight {
+  /* Add styles for highlighted parent planet */
+  background-color: #add1d740;
+  /* Similar to active but more subtle */
+}
+.planet-selector .hover {
+  /* Add styles for hovered parent planet */
+  background-color: #b3dfe6d1;
+}
+.planet-selector-submenu {
+  position: absolute;
+  left: 100%;
+  bottom: 0;
+  background-color: #fdf5e8;
+  border: 1px solid #333333;
+  min-width: 120px;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+  visibility: hidden;
+  opacity: 0;
+}
+.planet-selector-submenu .item {
+  font-weight: normal;
+}
+.planet-selector-submenu.visible {
+  visibility: visible;
+  opacity: 1;
+}

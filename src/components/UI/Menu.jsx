@@ -4,6 +4,7 @@ import useStore, { usePlanetStore, useCameraStore } from "../../store/store";
 import DetailsMenu from "./DetailsMenu";
 import ResetModal from "./ResetModal";
 import FocusLock from 'react-focus-lock';
+import PlanetSelector from "./PlanetSelector";
 
 const Menu = () => {
   const {
@@ -47,7 +48,7 @@ const Menu = () => {
     setIsDropdownOpen(false);
     if (activeCamera.type === 'planet') {
       setSelectedPlanet(planetsData[activeCamera.name]);
-      setSelectedMoon(null);
+      // setSelectedMoon(null);
       toggleDetailsMenu(true);
     }
 
@@ -55,17 +56,14 @@ const Menu = () => {
       // setSelectedPlanet(null);
       const moon = moonsData[activeCamera.parentName]?.find((m) => m.name === activeCamera.name);
       setSelectedMoon(moon);
-      // console.log(moonsData[activeCamera.parentName])
       toggleDetailsMenu(true);
     }
 
     if (activeCamera.name === 'Asteroid Belt') {
       setSelectedPlanet(null);
-      setSelectedMoon(null);
+      // setSelectedMoon(null);
       toggleDetailsMenu(true);
     }
-    // console.log(activeCamera)
-    // console.log(selectedMoon)
   }, [activeCamera]);
 
   const speedOptions = [
@@ -91,22 +89,17 @@ const Menu = () => {
   };
 
   const handlePlanetSelect = (planetName) => {
+    console.log('handlePlanetSelect', planetName)
     switchToPlanetCamera(planetName);
   };
 
-  const handleMoonSelect = async (planetName, moonName) => {
+
+  const handleMoonSelect = (planetName, moonName) => {
     const planet = planetsData[planetName];
-    const moon = moonsData[planetName]?.find((m) => m.name === moonName);
-
-    // First set the selected moon to trigger rendering
     setSelectedPlanet(planet);
-    setSelectedMoon(moon);
-
-    // Add a small delay to allow the moon to render
-    await new Promise(resolve => setTimeout(resolve, 100));
-
-    // Then proceed with camera transition
-    switchToMoonCamera(hoveredPlanetName, moonName);
+    setTimeout(() => {
+      switchToMoonCamera(planetName, moonName);
+    }, 100);
   };
 
   const handleSolarSystemSelect = () => {
@@ -124,7 +117,6 @@ const Menu = () => {
     setIsDropdownOpen(false);
   };
 
-  // console.log({ selectedPlanet, selectedMoon })
   useLayoutEffect(() => {
     setPrevSpeed(1);
     setSimSpeed(1);
@@ -176,48 +168,15 @@ const Menu = () => {
         <div className="left-con">
           <div className="menu-item">
             <label>Select a Planet</label>
-            <div className="dropdown-container">
-              <button
-                className="dropdown-trigger"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                disabled={!isMenuOpen}
-              >
-                {activeCamera.name === 'default' ? "Solar System" : activeCamera.name}
-              </button>
-
-
-              <div className="item-wrapper">
-                {isDropdownOpen && (
-                  <ul className="dropdown-menu">
-                    <li onClick={handleSolarSystemSelect} className={`dropdown-item ${activeCamera?.name === 'default' ? 'selected' : ''}`}>Solar System</li>
-                    {Object.keys(planetsData).map((planetName) => (
-                      <li key={planetName} className={`dropdown-item planet-item ${planetName === selectedPlanet?.name ? 'selected' : ''}`}
-                        onClick={() => handlePlanetSelect(planetName)}
-                        onPointerOver={() => setHoveredPlanetName(hoveredPlanetName === planetName ? null : planetName)}
-                      // onPointerOut={() => setHoveredPlanetName(null)}
-                      >
-                        {planetName} {moonsData[planetName]?.length > 0 ? '>' : ''}
-                      </li>
-                    ))}
-                    <li onClick={handleAsteroidBeltSelect} className={`dropdown-item planet-item ${activeCamera?.name === 'Asteroid Belt' ? 'selected' : ''}`}>Asteroid Belt</li>
-                  </ul>
-                )}
-                {/* Submenu for moons */}
-                {hoveredPlanetName && isDropdownOpen && moonsData[hoveredPlanetName]?.length > 0 && (
-                  <ul className="submenu">
-                    {moonsData[hoveredPlanetName]?.map((moon) => (
-                      <li
-                        key={moon.name}
-                        className={`submenu-item moon-item ${moon.name === selectedMoon?.name ? 'selected' : ''}`}
-                        onClick={() => handleMoonSelect(hoveredPlanetName, moon.name)}
-                      >
-                        {moon.name}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
+            <PlanetSelector
+              planetsData={planetsData}
+              moonsData={moonsData}
+              activeCamera={activeCamera}
+              onPlanetSelect={handlePlanetSelect}
+              onMoonSelect={handleMoonSelect}
+              onSolarSystemSelect={handleSolarSystemSelect}
+              onAsteroidBeltSelect={handleAsteroidBeltSelect}
+            />
           </div>
 
           <div className="menu-item">
