@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState } from "react";
 import { CameraControls, useTexture } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "@/store/store";
 import useExperimentsStore from "@/store/experiments";
@@ -19,6 +19,7 @@ const Scene = () => {
   const { experimentMode, toggleExperimentMode } = useExperimentsStore();
 
   const cameraControlsRef = useRef();
+  const maxDistance = 160000;
   const [minDistance, setMinDistance] = useState(200);
   const [hasInitialized, setHasInitialized] = useState(false);
 
@@ -211,7 +212,7 @@ const Scene = () => {
     // When in orbit mode but not transitioning, allow free movement
     if (activeCamera.type === 'orbit' && !isCameraTransitioning) {
       setMinDistance(200);
-      cameraControlsRef.current.maxDistance = 160000
+      cameraControlsRef.current.maxDistance = maxDistance
     }
   });
 
@@ -296,9 +297,9 @@ const Scene = () => {
 
   // camera settings
   const cameraConfig = {
-    maxDistance: 120000,
+    maxDistance: maxDistance,
     minDistance: minDistance,
-    near: 0.01,
+    near: 0.001,
     far: 1500000,
     smoothTime: .6,
     enableDamping: true,
@@ -315,7 +316,6 @@ const Scene = () => {
         makeDefault={!satelliteCamera}
         enabled={!satelliteCamera}
         {...cameraConfig}
-        truckSpeed={1}
       />
 
       <Stars />
