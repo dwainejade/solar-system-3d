@@ -80,14 +80,27 @@ function KeplerOne() {
                                 type="range"
                                 min={0}
                                 max={0.9}
-                                step={0.001}
+                                step={0.1}
                                 value={eccentricity}
                                 onChange={handleSliderChange}
                                 disabled={experimentStatus === 'started'}
+                                className='slider'
                             />
                             <div className="slider-markers">
                                 <span>0</span>
                                 <span>.9</span>
+                            </div>
+                            <div className="slider-ticks" >
+                                <span className="tick"></span>
+                                <span className="tick"></span>
+                                <span className="tick"></span>
+                                <span className="tick"></span>
+                                <span className="tick"></span>
+                                <span className="tick"></span>
+                                <span className="tick"></span>
+                                <span className="tick"></span>
+                                <span className="tick"></span>
+                                <span className="tick"></span>
                             </div>
 
                         </div>

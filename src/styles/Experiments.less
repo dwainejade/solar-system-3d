@@ -227,26 +227,34 @@
     }
 
     .input-con {
+      position: relative;
       display: flex;
       flex-direction: column;
       translate: 0 10px;
-      width: 96%;
+      width: 90%;
       margin: 0 4%;
 
       /* slider styling */
       input[type="range"] {
         -webkit-appearance: none;
         width: 100%;
-        height: 1px;
-        background: white;
-        border-radius: 2px;
+        height: 1.5px;
+        background: linear-gradient(
+          to right,
+          transparent 0%,
+          transparent 2.5%,
+          #dfcda7 2.5%,
+          #dfcda7 97.5%,
+          transparent 97.5%,
+          transparent 100%
+        );
         outline: none;
       }
 
       input[type="range"]::-webkit-slider-thumb {
         -webkit-appearance: none;
-        width: 10px;
-        height: 10px;
+        width: 11px;
+        height: 11px;
         background: #ff6b6b;
         border-radius: 50%;
         cursor: pointer;
@@ -257,10 +265,29 @@
       }
 
       .slider-markers {
-        margin-top: 5px;
+        margin-top: 10px;
         display: flex;
         justify-content: space-between;
-        color: #fff;
+        color: #dfcda7;
+      }
+
+      .slider-ticks {
+        position: absolute;
+        top: -20%;
+        left: 3%;
+        width: 95.5%;
+        height: 60%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        pointer-events: none;
+        z-index: -1;
+
+        .tick {
+          width: 1.5px;
+          height: 100%;
+          background-color: #dfcda7;
+        }
       }
     }
     .increment-btn,
