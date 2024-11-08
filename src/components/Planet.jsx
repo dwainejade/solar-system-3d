@@ -1,4 +1,4 @@
-import React, { useRef, forwardRef, useState, useEffect } from "react";
+import React, { useRef, forwardRef, useState, useEffect, useCallback, useMemo } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
@@ -11,6 +11,42 @@ import Labels from "./Labels";
 import moonsData from "@/data/moonsData";
 import { earthAtmosphereShader } from "../shaders/atmosphere";
 import Rings from "./Rings";
+
+// First, let's create these utilities outside the component
+const calculateTrueAnomaly = (E, eccentricity) => {
+  return 2 * Math.atan(
+    Math.sqrt((1 + eccentricity) / (1 - eccentricity)) *
+    Math.tan(E / 2)
+  );
+};
+
+const calculateKepler = (E, eccentricity, meanAnomaly, maxIterations = 10, tolerance = 1e-6) => {
+  let currentE = E;
+  for (let i = 0; i < maxIterations; i++) {
+    const deltaE = (currentE - eccentricity * Math.sin(currentE) - meanAnomaly) /
+      (1 - eccentricity * Math.cos(currentE));
+    currentE -= deltaE;
+    if (Math.abs(deltaE) < tolerance) break;
+  }
+  return currentE;
+};
+
+const calculateOrbitPosition = (meanAnomaly, eccentricity, radius) => {
+  // Solve Kepler's Equation
+  const E = calculateKepler(meanAnomaly, eccentricity, meanAnomaly);
+
+  // Calculate true anomaly
+  const trueAnomaly = calculateTrueAnomaly(E, eccentricity);
+
+  // Calculate radius vector (distance from focus)
+  const r = (radius * (1 - eccentricity * eccentricity)) /
+    (1 + eccentricity * Math.cos(trueAnomaly));
+
+  return {
+    x: r * Math.cos(-trueAnomaly),
+    baseZ: r * Math.sin(-trueAnomaly)
+  };
+};
 
 const Planet = ({ name = 'Earth', textures }) => {
   const { planetsData } = usePlanetStore();
@@ -63,81 +99,91 @@ const Planet = ({ name = 'Earth', textures }) => {
   const [isHovered, setIsHovered] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
 
-  const scaledOrbitalRadius = orbitalRadius * (isSurfaceCameraActive ? .0001 : distanceScaleFactor);
-  const scaledRadius = radius * sizeScaleFactor;
-  let rotationSpeed = rotationPeriod ? (2 * Math.PI) / (rotationPeriod * 3600) : 0;
-  rotationSpeed *= rotationSpeedScaleFactor;
-
   const isPlanetSelected = selectedPlanet && selectedPlanet.name === name;
+
+
   const renderMoons = () => {
     if (isPlanetSelected) return true
     else if (selectedMoon?.parentName === name) return true
     return false
   }
-  const detailLevel = (isPlanetSelected || renderMoons()) ? 64 : 16;
+  const renderPlanetLabels = () => {
+    // Only consider the planet's own selected state, not moon selection
+    if (isPlanetSelected) return false;
+    return displayLabels || (isHovered && !isPlanetSelected);
+  };
 
-  const scale = useRef(scaledRadius);
+  const computedValues = useMemo(() => ({
+    scaledOrbitalRadius: orbitalRadius * (isSurfaceCameraActive ? .0001 : distanceScaleFactor),
+    scaledRadius: radius * sizeScaleFactor,
+    rotationSpeed: rotationPeriod ? ((2 * Math.PI) / (rotationPeriod * 3600)) * rotationSpeedScaleFactor : 0,
+    detailLevel: (isPlanetSelected || renderMoons()) ? 64 : 16
+  }), [orbitalRadius, isSurfaceCameraActive, radius, rotationPeriod, isPlanetSelected, renderMoons()]);
+
+  const { scaledOrbitalRadius, scaledRadius, rotationSpeed, detailLevel } = computedValues;
+
+  const scaleRef = useRef(computedValues.scaledRadius);
   const textSize = useRef(1);
   const [showTextures, setShowTextures] = useState(false);
   const textureDisplayDistance = 500;
   const [orbitPathOpacity, setOrbitPathOpacity] = useState(1);
+
 
   const earthParameters = {
     atmosphereDayColor: '#0088FF',
     atmosphereTwilightColor: '#FF9D00'
   };
 
-  useFrame((state, delta) => {
+
+  useEffect(() => {
+    return () => {
+      // Cleanup any references, geometries, or textures
+      if (meshRef.current) {
+        const geometry = meshRef.current.geometry;
+        const material = meshRef.current.material;
+        geometry.dispose();
+        if (Array.isArray(material)) {
+          material.forEach(m => m.dispose());
+        } else if (material) {
+          material.dispose();
+        }
+      }
+    };
+  }, []);
+
+
+  const frameCallback = useCallback((state, delta) => {
     const adjustedDelta = delta * simSpeed;
 
     // Calculate mean motion (n)
     const meanMotion = (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60);
 
-    // Update mean anomaly (M) - keep subtraction for counterclockwise motion
+    // Update mean anomaly (M)
     if (localAngleRef.current === 0) {
       localAngleRef.current = initialOrbitalAngle * (Math.PI / 180);
     } else {
       localAngleRef.current -= meanMotion * adjustedDelta;
     }
 
-    // Solve Kepler's Equation iteratively
-    let E = localAngleRef.current;
-    const maxIterations = 10;
-    const tolerance = 1e-6;
-
-    // Newton-Raphson iteration to solve Kepler's equation: M = E - e * sin(E)
-    for (let i = 0; i < maxIterations; i++) {
-      const deltaE = (E - eccentricity * Math.sin(E) - localAngleRef.current) /
-        (1 - eccentricity * Math.cos(E));
-      E -= deltaE;
-      if (Math.abs(deltaE) < tolerance) break;
-    }
-
-    // Calculate true anomaly (ν) from eccentric anomaly (E)
-    const trueAnomaly = 2 * Math.atan(
-      Math.sqrt((1 + eccentricity) / (1 - eccentricity)) *
-      Math.tan(E / 2)
-    );
-
-    // Calculate radius vector (distance from focus)
-    const r = (scaledOrbitalRadius * (1 - eccentricity * eccentricity)) /
-      (1 + eccentricity * Math.cos(trueAnomaly));
-
-    // Calculate position - using negative trueAnomaly for counterclockwise motion
-    const x = r * Math.cos(-trueAnomaly);
-    const baseZ = r * Math.sin(-trueAnomaly);
-
     if (localRef.current) {
+      // Calculate orbital position
+      const { x, baseZ } = calculateOrbitPosition(
+        localAngleRef.current,
+        eccentricity,
+        scaledOrbitalRadius
+      );
+
       // Apply inclination
       const inclination = orbitalInclination * (Math.PI / 180);
       const y = Math.sin(inclination) * baseZ;
       const z = Math.cos(inclination) * baseZ;
 
+      // Update position
       localRef.current.position.set(x, y, z);
       updatePlanetPosition(name, { x, y, z });
 
       // Handle rotation
-      if (rotationPeriod) {
+      if (rotationPeriod && meshRef.current) {
         const rotationPeriodInSeconds = rotationPeriod * 3600;
         const rotationSpeed = (2 * Math.PI) / rotationPeriodInSeconds;
         const rotationIncrement = rotationSpeed * adjustedDelta;
@@ -156,22 +202,43 @@ const Planet = ({ name = 'Earth', textures }) => {
 
       // Handle scaling and visibility
       const distance = localRef.current.position.distanceTo(state.camera.position);
+
+      // Update scales based on distance
       if (distance / 1000 <= scaledRadius) {
-        scale.current = scaledRadius;
+        scaleRef.current = scaledRadius;
       } else {
-        scale.current = distance / 1000;
+        scaleRef.current = distance / 1000;
       }
-      setShowTextures(activeCamera.type === 'moon' || distance < textureDisplayDistance);
-      const maxDistance = scaledRadius * 100;
-      const minDistance = scaledRadius * 1;
-      const opacity = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
-      setOrbitPathOpacity(opacity);
 
       if (textSize.current) {
         textSize.current = distance * 0.02;
       }
+
+      // Update visibility flags
+      setShowTextures(activeCamera.type === 'moon' || distance < textureDisplayDistance);
+
+      // Update orbit path opacity
+      const maxDistance = scaledRadius * 100;
+      const minDistance = scaledRadius * 1;
+      const opacity = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
+      setOrbitPathOpacity(opacity);
     }
-  });
+  }, [
+    simSpeed,
+    orbitalPeriod,
+    initialOrbitalAngle,
+    eccentricity,
+    scaledOrbitalRadius,
+    orbitalInclination,
+    rotationPeriod,
+    name,
+    isPlanetSelected,
+    scaledRadius,
+    activeCamera.type,
+    textureDisplayDistance
+  ]);
+
+  useFrame(frameCallback);
 
   useEffect(() => {
     if (meshRef.current) {
@@ -181,14 +248,16 @@ const Planet = ({ name = 'Earth', textures }) => {
     }
   }, [axialTilt, selectedPlanet]);
 
-  const handleClick = e => {
+  const handleClick = useCallback((e) => {
     e.stopPropagation();
     if (isDragging || activeCamera.name === name) return;
     toggleDetailsMenu(true);
     setSelectedMoon(null);
     setSelectedPlanet(mergedData);
     switchToPlanetCamera(name);
-  };
+  }, [isDragging, activeCamera.name, name, mergedData]);
+
+  // Do the same for other handlers
 
   const handlePointerDown = e => {
     e.stopPropagation();
@@ -227,6 +296,7 @@ const Planet = ({ name = 'Earth', textures }) => {
     setAutoRotate(!autoRotate);
   };
 
+
   const moons = moonsData[name] || [];
 
   return (
@@ -251,7 +321,7 @@ const Planet = ({ name = 'Earth', textures }) => {
           onPointerOut={handlePointerOut}
         >
           {activeCamera?.name !== name &&
-            <sphereGeometry args={[renderMoons() ? scaledRadius : scale.current * 8, 8, 8]} />
+            <sphereGeometry args={[renderMoons() ? scaledRadius : scaleRef.current * 8, 8, 8]} />
           }
         </mesh>
 
@@ -260,7 +330,7 @@ const Planet = ({ name = 'Earth', textures }) => {
           key={isPlanetSelected ? name + '-textured' : name + '-basic'}
           onDoubleClick={handleDoubleClick}
         >
-          <sphereGeometry args={[(renderMoons() ? scaledRadius : scale.current * 8), detailLevel, detailLevel / 2]} />
+          <sphereGeometry args={[(renderMoons() ? scaledRadius : scaleRef.current * 8), detailLevel, detailLevel / 2]} />
           {((!isPlanetSelected && !renderMoons()) && texturesLoaded) ?
             <meshBasicMaterial color={color} />
             :
@@ -311,12 +381,12 @@ const Planet = ({ name = 'Earth', textures }) => {
           />
         )}
 
-        {(displayLabels && !isPlanetSelected || isHovered && !isPlanetSelected) && (
+        {renderPlanetLabels() && (
           <Labels
             key={name}
             text={name}
             size={textSize?.current}
-            position={[0, scale.current * 1.2 + textSize?.current, 0]}
+            position={[0, scaleRef.current * 1.2 + textSize?.current, 0]}
             color={color}
             handleClick={handleClick}
             handlePointerDown={handlePointerDown}
@@ -329,7 +399,7 @@ const Planet = ({ name = 'Earth', textures }) => {
             as='span'
             wrapperClass='label-wrapper'
             center
-            position-y={isPlanetSelected ? scale.current + scale.current * 0.12 : scale.current * 4}
+            position-y={scaledRadius * 1.12}
             zIndexRange={[100, 0]}
           >
             <span

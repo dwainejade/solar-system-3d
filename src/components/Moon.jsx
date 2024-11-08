@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import useExperimentsStore from "@/store/experiments";
-import { useTexture } from "@react-three/drei";
+import { Html, useTexture } from "@react-three/drei";
 import { Vector3 } from "three";
 import { moonDistanceScaleFactor, moonSizeScaleFactor } from "../data/moonsData";
 import OrbitPath from "./OrbitPath";
@@ -141,7 +141,9 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, visible }, ref)
     toggleDetailsMenu(true);
     setSelectedMoon(moonData);
     switchToMoonCamera(parentName, name);
+    // console.log('clicked moon', moonData)
   };
+  // if (selectedMoon?.name === name) console.log('setSelectedMoon to:', selectedMoon.name)
 
   const [isHovered, setIsHovered] = useState(false);
   const handlePointerOver = e => {
@@ -153,6 +155,7 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, visible }, ref)
     e.stopPropagation();
     setIsHovered(false);
   };
+
 
   return (
     <>
@@ -181,7 +184,7 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, visible }, ref)
           />
         </mesh>
 
-        {(displayLabels || isHovered && !isMoonSelected) && (
+        {!isMoonSelected && (displayLabels || isHovered) && (
           <Labels
             key={name + '-label'}
             text={name}
@@ -190,7 +193,32 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, visible }, ref)
             color={color}
             font={'../assets/fonts/Termina_Heavy.ttf'}
             handleClick={handleClick}
+            onPointerOver={handlePointerOver}
+            onPointerOut={handlePointerOut}
           />
+        )}
+
+        {(displayLabels && isMoonSelected) && (
+          <Html
+            as='span'
+            wrapperClass='label-wrapper'
+            center
+            position-y={scaledRadius * 1.12}
+            zIndexRange={[100, 0]}
+          >
+            <span
+              className='planet-label'
+              style={{ color }}
+              onClick={handleClick}
+              // onPointerDown={handlePointerDown}
+              // onPointerMove={handlePointerMove}
+              // onPointerUp={handlePointerUp}
+              onPointerOver={handlePointerOver}
+              onPointerOut={handlePointerOut}
+            >
+              {name}
+            </span>
+          </Html>
         )}
       </group>
 
