@@ -14,7 +14,7 @@ import * as THREE from "three";
 
 const Scene = () => {
   const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, setViewOnlyMode } = useStore();
-  const { planetPositions, selectedPlanet, selectedMoon, setSelectedMoon, planetsData, moonsData, moonPositions, resetPlanetsData } = usePlanetStore();
+  const { planetPositions, selectedPlanet, setSelectedPlanet, selectedMoon, setSelectedMoon, planetsData, moonsData, moonPositions, resetPlanetsData } = usePlanetStore();
   const { satelliteCamera, isCameraTransitioning, toggleCameraTransitioning, isZoomingToSun, resetCamera, toggleZoomingToSun, activeCamera, setActiveCamera, setSceneCameras, sceneCameras, satelliteCameraState, setSatelliteCameraState } = useCameraStore();
   const { experimentMode, toggleExperimentMode } = useExperimentsStore();
 
@@ -221,6 +221,8 @@ const Scene = () => {
       transitioning.current = true;
       // Temporarily disable manual control during transition
       cameraControlsRef.current.enabled = false;
+      setSelectedMoon(null);
+      setSelectedPlanet(null);
 
       if (activeCamera.name === 'Sun') {
         setMinDistance(200);
