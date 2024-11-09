@@ -27,7 +27,7 @@ const MoonSatelliteCamera = ({ target, size, targetName, bodyType = 'moon' }) =>
 
     const minZoom = size * 5;
     const maxZoom = 300;
-    const zoomSpeed = 0.05;
+    const zoomSpeed = 0.02;
 
     const handleUserInteraction = useCallback(() => {
         setAutoRotate(false);
@@ -216,7 +216,7 @@ const MoonSatelliteCamera = ({ target, size, targetName, bodyType = 'moon' }) =>
             key={targetName}
             makeDefault={satelliteCamera}
             fov={50}
-            near={0.01}
+            near={0.001}
             far={1200000}
         />
     );

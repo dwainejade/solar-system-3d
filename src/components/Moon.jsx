@@ -1,4 +1,4 @@
-import React, { useRef, forwardRef, useState, useMemo } from "react";
+import React, { useRef, forwardRef, useCallback, useMemo, useEffect, useState } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
@@ -43,6 +43,7 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, visible }, ref)
   const localAngleRef = useRef(moonAngles[name] || Math.random() * 2 * Math.PI);
   const scaleRef = useRef(scaledRadius);
   const textSize = useRef(.1);
+  const [isHovered, setIsHovered] = useState(false);
 
   const isMoonSelected = selectedMoon && selectedMoon.name === name;
   const moonTexture = name === 'Moon' ? useTexture('../assets/earth/moon/2k_moon.jpg') : null;
@@ -135,26 +136,83 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, visible }, ref)
     }
   });
 
-  const handleClick = e => {
+  // Add cleanup effect
+  useEffect(() => {
+    // Cleanup function that runs when component unmounts
+    return () => {
+      if (localRef.current) {
+        // Dispose of geometries
+        if (localRef.current.children) {
+          localRef.current.children.forEach(child => {
+            if (child.geometry) {
+              child.geometry.dispose();
+            }
+            if (child.material) {
+              if (Array.isArray(child.material)) {
+                child.material.forEach(material => material.dispose());
+              } else {
+                child.material.dispose();
+              }
+            }
+          });
+        }
+      }
+
+      // Cleanup texture
+      if (moonTexture) {
+        moonTexture.dispose();
+      }
+
+      // Clean up any world positions stored
+      updateMoonPosition(name, null);
+      updateMoonWorldPosition(name, null);
+    };
+  }, [name, moonTexture]);
+
+  // Optimize geometry creation
+  const moonGeometry = useMemo(() => {
+    return new THREE.SphereGeometry(
+      scaledRadius,
+      (isMoonSelected ? 32 : 14),
+      (isMoonSelected ? 16 : 12)
+    );
+  }, [scaledRadius, isMoonSelected]);
+
+  // Optimize material creation
+  const moonMaterial = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      metalness: 0.5,
+      roughness: 0.5,
+      map: moonTexture || null,
+      color: !moonTexture ? color : null
+    });
+  }, [moonTexture, color]);
+
+  // Handle visibility change
+  useEffect(() => {
+    if (localRef.current) {
+      localRef.current.visible = visible !== false;
+    }
+  }, [visible]);
+
+  // Optimize handlers with useCallback
+  const handleClick = useCallback(e => {
     e.stopPropagation();
     if (isMoonSelected) return;
     toggleDetailsMenu(true);
     setSelectedMoon(moonData);
     switchToMoonCamera(parentName, name);
-    // console.log('clicked moon', moonData)
-  };
-  // if (selectedMoon?.name === name) console.log('setSelectedMoon to:', selectedMoon.name)
+  }, [isMoonSelected, moonData, parentName, name]);
 
-  const [isHovered, setIsHovered] = useState(false);
-  const handlePointerOver = e => {
+  const handlePointerOver = useCallback(e => {
     e.stopPropagation();
     setIsHovered(true);
-  };
+  }, []);
 
-  const handlePointerOut = e => {
+  const handlePointerOut = useCallback(e => {
     e.stopPropagation();
     setIsHovered(false);
-  };
+  }, []);
 
 
   return (
@@ -175,13 +233,8 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, visible }, ref)
           onPointerOut={handlePointerOut}
           onClick={handleClick}
         >
-          <sphereGeometry args={[scaledRadius, (isMoonSelected ? 32 : 14), (isMoonSelected ? 16 : 12)]} />
-          <meshStandardMaterial
-            metalness={0.5}
-            roughness={0.5}
-            map={moonTexture || null}
-            color={!moonTexture ? color : null}
-          />
+          <primitive object={moonGeometry} />
+          <primitive object={moonMaterial} />
         </mesh>
 
         {!isMoonSelected && (displayLabels || isHovered) && (

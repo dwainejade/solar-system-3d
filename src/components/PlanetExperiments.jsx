@@ -8,7 +8,7 @@ import initialPlanetsData, { distanceScaleFactor, sizeScaleFactor, rotationSpeed
 import moonsData from "@/data/moonsData";
 import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCamera";
-import Moon from "./Moon";
+import Moon from "./MoonExperiments";
 import Labels from "./Labels";
 import { earthAtmosphereShader } from "../shaders/atmosphere";
 import Rings from "./Rings";
