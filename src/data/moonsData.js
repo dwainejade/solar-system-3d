@@ -135,6 +135,115 @@ const moonsData = {
             gravity: 1.796, // m/s^2
             gravitationalAcceleration: 1.796, // m/s^2
         },
+        // Additional
+        {
+            name: "Amalthea",
+            id: "jupiter-amalthea",
+            parentName: "Jupiter",
+            mass: 2.08e18,  // kg
+            orbitalRadius: 181366,  // km
+            radius: 83.5,  // km
+            orbitalPeriod: 0.498,  // days
+            orbitalInclination: 0.374,  // degrees
+            eccentricity: 0.003,
+            color: "#8B0000",  // dark red
+            orbitalSpeed: 26.57,  // km/s
+            axialTilt: 0,  // degrees
+            rotationPeriod: 0.498,  // days (synchronous)
+            surfaceTemp: -160,  // °C
+            gravity: 0.02,  // m/s²
+            gravitationalAcceleration: 0.02  // m/s²
+        },
+        {
+            name: "Thebe",
+            id: "jupiter-thebe",
+            parentName: "Jupiter",
+            mass: 7.77e17,  // kg
+            orbitalRadius: 221889,  // km
+            radius: 49.3,  // km
+            orbitalPeriod: 0.675,  // days
+            orbitalInclination: 1.076,  // degrees
+            eccentricity: 0.0175,
+            color: "#8B4513",  // reddish-brown
+            orbitalSpeed: 23.92,  // km/s
+            axialTilt: 0,  // degrees
+            rotationPeriod: 0.675,  // days (synchronous)
+            surfaceTemp: -160,  // °C
+            gravity: 0.01,  // m/s²
+            gravitationalAcceleration: 0.01  // m/s²
+        },
+        {
+            name: "Metis",
+            id: "jupiter-metis",
+            parentName: "Jupiter",
+            mass: 3.6e16,  // kg
+            orbitalRadius: 128852,  // km
+            radius: 21.5,  // km
+            orbitalPeriod: 0.295,  // days
+            orbitalInclination: 0.06,  // degrees
+            eccentricity: 0.0012,
+            color: "#8B4513",  // reddish-brown
+            orbitalSpeed: 31.5,  // km/s
+            axialTilt: 0,  // degrees
+            rotationPeriod: 0.295,  // days (synchronous)
+            surfaceTemp: -160,  // °C
+            gravity: 0.005,  // m/s²
+            gravitationalAcceleration: 0.005  // m/s²
+        },
+        {
+            name: "Himalia",
+            id: "jupiter-himalia",
+            parentName: "Jupiter",
+            mass: 6.7e18,  // kg
+            orbitalRadius: 11461000,  // km
+            radius: 85,  // km
+            orbitalPeriod: 250.56,  // days
+            orbitalInclination: 27.498,  // degrees
+            eccentricity: 0.162,
+            color: "#808080",  // grey
+            orbitalSpeed: 3.3,  // km/s
+            axialTilt: 0,  // degrees
+            rotationPeriod: 7.782,  // hours
+            surfaceTemp: -150,  // °C
+            gravity: 0.062,  // m/s²
+            gravitationalAcceleration: 0.062  // m/s²
+        },
+        {
+            name: "Elara",
+            id: "jupiter-elara",
+            parentName: "Jupiter",
+            mass: 8.7e17,  // kg
+            orbitalRadius: 11741000,  // km
+            radius: 43,  // km
+            orbitalPeriod: 259.64,  // days
+            orbitalInclination: 26.63,  // degrees
+            eccentricity: 0.217,
+            color: "#808080",  // grey
+            orbitalSpeed: 3.3,  // km/s
+            axialTilt: 0,  // degrees
+            rotationPeriod: 0.5,  // days (approximate)
+            surfaceTemp: -150,  // °C
+            gravity: 0.031,  // m/s²
+            gravitationalAcceleration: 0.031  // m/s²
+        },
+        {
+            name: "Pasiphae",
+            id: "jupiter-pasiphae",
+            parentName: "Jupiter",
+            mass: 1.91e17,  // kg
+            orbitalRadius: 23624000,  // km
+            radius: 30,  // km
+            orbitalPeriod: 743.63,  // days (retrograde)
+            orbitalInclination: 151.431,  // degrees (retrograde)
+            eccentricity: 0.409,
+            color: "#696969",  // dark grey
+            orbitalSpeed: 2.2,  // km/s
+            axialTilt: 0,  // degrees
+            rotationPeriod: 0.3,  // days (approximate)
+            surfaceTemp: -150,  // °C
+            gravity: 0.003,  // m/s²
+            gravitationalAcceleration: 0.003  // m/s²
+        }
     ],
     Saturn: [
         {
@@ -263,6 +372,115 @@ const moonsData = {
             gravity: 1.352, // m/s^2
             gravitationalAcceleration: 1.352, // m/s^2
         },
+        // Additional
+        {
+            name: "Hyperion",
+            id: "saturn-hyperion",
+            parentName: "Saturn",
+            mass: 5.6e18,  // kg
+            orbitalRadius: 1481100,  // km
+            radius: 135,  // km (average, irregular shape)
+            orbitalPeriod: 21.276,  // days
+            orbitalInclination: 0.43,  // degrees
+            eccentricity: 0.123,  // most eccentric of Saturn's regular moons
+            color: "#8B4513",  // reddish-brown
+            orbitalSpeed: 5.07,  // km/s
+            axialTilt: 61,  // degrees (chaotic rotation)
+            rotationPeriod: 13.8,  // days (non-synchronous, chaotic)
+            surfaceTemp: -180,  // °C
+            gravity: 0.017,  // m/s²
+            gravitationalAcceleration: 0.017  // m/s²
+        },
+        {
+            name: "Phoebe",
+            id: "saturn-phoebe",
+            parentName: "Saturn",
+            mass: 8.292e18,  // kg
+            orbitalRadius: 12952000,  // km
+            radius: 106.5,  // km
+            orbitalPeriod: 550.31,  // days (retrograde)
+            orbitalInclination: 175.3,  // degrees (retrograde)
+            eccentricity: 0.163,
+            color: "#4A4A4A",  // dark grey
+            orbitalSpeed: 1.71,  // km/s
+            axialTilt: 0,  // degrees
+            rotationPeriod: 9.274,  // hours
+            surfaceTemp: -193,  // °C
+            gravity: 0.049,  // m/s²
+            gravitationalAcceleration: 0.049  // m/s²
+        },
+        {
+            name: "Janus",
+            id: "saturn-janus",
+            parentName: "Saturn",
+            mass: 1.898e18,  // kg
+            orbitalRadius: 151472,  // km
+            radius: 89.5,  // km
+            orbitalPeriod: 0.695,  // days
+            orbitalInclination: 0.163,  // degrees
+            eccentricity: 0.0068,
+            color: "#C0C0C0",  // grey
+            orbitalSpeed: 15.75,  // km/s
+            axialTilt: 0,  // degrees
+            rotationPeriod: 0.695,  // days (synchronous)
+            surfaceTemp: -178,  // °C
+            gravity: 0.011,  // m/s²
+            gravitationalAcceleration: 0.011  // m/s²
+        },
+        {
+            name: "Epimetheus",
+            id: "saturn-epimetheus",
+            parentName: "Saturn",
+            mass: 5.266e17,  // kg
+            orbitalRadius: 151422,  // km
+            radius: 58.1,  // km
+            orbitalPeriod: 0.694,  // days
+            orbitalInclination: 0.351,  // degrees
+            eccentricity: 0.0098,
+            color: "#C0C0C0",  // grey
+            orbitalSpeed: 15.75,  // km/s
+            axialTilt: 0,  // degrees
+            rotationPeriod: 0.694,  // days (synchronous)
+            surfaceTemp: -178,  // °C
+            gravity: 0.007,  // m/s²
+            gravitationalAcceleration: 0.007  // m/s²
+        },
+        {
+            name: "Pan",
+            id: "saturn-pan",
+            parentName: "Saturn",
+            mass: 4.95e15,  // kg
+            orbitalRadius: 133584,  // km
+            radius: 14.1,  // km
+            orbitalPeriod: 0.575,  // days
+            orbitalInclination: 0,  // degrees
+            eccentricity: 0,
+            color: "#E5E5E5",  // light grey
+            orbitalSpeed: 16.9,  // km/s
+            axialTilt: 0,  // degrees
+            rotationPeriod: 0.575,  // days (synchronous)
+            surfaceTemp: -178,  // °C
+            gravity: 0.0014,  // m/s²
+            gravitationalAcceleration: 0.0014  // m/s²
+        },
+        {
+            name: "Atlas",
+            id: "saturn-atlas",
+            parentName: "Saturn",
+            mass: 6.6e15,  // kg
+            orbitalRadius: 137670,  // km
+            radius: 15.1,  // km
+            orbitalPeriod: 0.602,  // days
+            orbitalInclination: 0.003,  // degrees
+            eccentricity: 0.0012,
+            color: "#E5E5E5",  // light grey
+            orbitalSpeed: 16.6,  // km/s
+            axialTilt: 0,  // degrees
+            rotationPeriod: 0.602,  // days (synchronous)
+            surfaceTemp: -178,  // °C
+            gravity: 0.0015,  // m/s²
+            gravitationalAcceleration: 0.0015  // m/s²
+        }
     ],
     Uranus: [
         {
@@ -393,6 +611,115 @@ const moonsData = {
             gravity: 0.779, // m/s^2
             gravitationalAcceleration: 0.779, // m/s^2
         },
+        // Additional
+        {
+            name: "Proteus",
+            id: "neptune-proteus",
+            parentName: "Neptune",
+            mass: 4.4e19,  // kg
+            orbitalRadius: 117647,  // km
+            radius: 210,  // km
+            orbitalPeriod: 1.122,  // days
+            orbitalInclination: 0.524,  // degrees
+            eccentricity: 0.00053,
+            color: "grey",
+            orbitalSpeed: 7.62,  // km/s
+            axialTilt: 0.0,  // degrees
+            rotationPeriod: 1.122,  // days (synchronous)
+            surfaceTemp: -235,  // °C
+            gravity: 0.07,  // m/s²
+            gravitationalAcceleration: 0.07,  // m/s²
+        },
+        {
+            name: "Larissa",
+            id: "neptune-larissa",
+            parentName: "Neptune",
+            mass: 4.2e18,  // kg
+            orbitalRadius: 73548,  // km
+            radius: 97,  // km
+            orbitalPeriod: 0.555,  // days
+            orbitalInclination: 0.205,  // degrees
+            eccentricity: 0.00139,
+            color: "grey",
+            orbitalSpeed: 9.65,  // km/s
+            axialTilt: 0.0,  // degrees
+            rotationPeriod: 0.555,  // days (synchronous)
+            surfaceTemp: -235,  // °C
+            gravity: 0.03,  // m/s²
+            gravitationalAcceleration: 0.03,  // m/s²
+        },
+        {
+            name: "Galatea",
+            id: "neptune-galatea",
+            parentName: "Neptune",
+            mass: 2.12e18,  // kg
+            orbitalRadius: 61953,  // km
+            radius: 88,  // km
+            orbitalPeriod: 0.429,  // days
+            orbitalInclination: 0.054,  // degrees
+            eccentricity: 0.00022,
+            color: "grey",
+            orbitalSpeed: 10.51,  // km/s
+            axialTilt: 0.0,  // degrees
+            rotationPeriod: 0.429,  // days (synchronous)
+            surfaceTemp: -235,  // °C
+            gravity: 0.02,  // m/s²
+            gravitationalAcceleration: 0.02,  // m/s²
+        },
+        {
+            name: "Despina",
+            id: "neptune-despina",
+            parentName: "Neptune",
+            mass: 2.2e18,  // kg
+            orbitalRadius: 52526,  // km
+            radius: 75,  // km
+            orbitalPeriod: 0.335,  // days
+            orbitalInclination: 0.068,  // degrees
+            eccentricity: 0.00023,
+            color: "grey",
+            orbitalSpeed: 11.41,  // km/s
+            axialTilt: 0.0,  // degrees
+            rotationPeriod: 0.335,  // days (synchronous)
+            surfaceTemp: -235,  // °C
+            gravity: 0.02,  // m/s²
+            gravitationalAcceleration: 0.02,  // m/s²
+        },
+        {
+            name: "Thalassa",
+            id: "neptune-thalassa",
+            parentName: "Neptune",
+            mass: 3.5e17,  // kg
+            orbitalRadius: 50074,  // km
+            radius: 41,  // km
+            orbitalPeriod: 0.311,  // days
+            orbitalInclination: 0.135,  // degrees
+            eccentricity: 0.00018,
+            color: "grey",
+            orbitalSpeed: 11.69,  // km/s
+            axialTilt: 0.0,  // degrees
+            rotationPeriod: 0.311,  // days (synchronous)
+            surfaceTemp: -235,  // °C
+            gravity: 0.01,  // m/s²
+            gravitationalAcceleration: 0.01,  // m/s²
+        },
+        {
+            name: "Naiad",
+            id: "neptune-naiad",
+            parentName: "Neptune",
+            mass: 1.9e17,  // kg
+            orbitalRadius: 48227,  // km
+            radius: 33,  // km
+            orbitalPeriod: 0.294,  // days
+            orbitalInclination: 4.75,  // degrees
+            eccentricity: 0.00037,
+            color: "grey",
+            orbitalSpeed: 11.93,  // km/s
+            axialTilt: 0.0,  // degrees
+            rotationPeriod: 0.294,  // days (synchronous)
+            surfaceTemp: -235,  // °C
+            gravity: 0.01,  // m/s²
+            gravitationalAcceleration: 0.01,  // m/s²
+        }
     ],
 };
 
