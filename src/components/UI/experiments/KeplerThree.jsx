@@ -3,6 +3,7 @@ import useStore, { usePlanetStore } from '../../../store/store';
 import useExperimentsStore from '../../../store/experiments';
 import planetsData from '../../../data/planetsData';
 import { getSpeedValue } from '../../../helpers/utils';
+import Slider from '../../../components/UI/Slider';
 
 function KeplerThree() {
     const { planetsData: newPlanetsData, updatePlanetData, resetSinglePlanetData } = usePlanetStore();
@@ -93,40 +94,21 @@ function KeplerThree() {
             <div className="newton-section kepler-1">
                 <h2 className="title">{selectedPlanet}</h2>
 
-                <div className="slider-con">
-                    <div className="slider-control">
-                        <button
-                            className="increment-btn"
-                            disabled={AU <= 0.1}
-                            onClick={handleDecrement}
-                        >
-                            -
-                        </button>
-
-                        <div className="input-con">
-                            <input
-                                type="range"
-                                min={0.1}
-                                max={40}
-                                step={0.1}
-                                value={AU}
-                                onChange={handleSliderChange}
-                            />
-                            <div className="slider-markers">
-                                <span>0.1</span>
-                                <span>40</span>
-                            </div>
-                        </div>
-
-                        <button
-                            className="increment-btn"
-                            disabled={AU >= 40}
-                            onClick={handleIncrement}
-                        >
-                            +
-                        </button>
-                    </div>
-                </div>
+                <Slider
+                    name={'kepler-3-slider'}
+                    min={.5}
+                    max={40}
+                    markers={['.5', '40']}
+                    step={.1}
+                    onDecrement={handleDecrement}
+                    onIncrement={handleIncrement}
+                    onSliderChange={handleSliderChange}
+                    value={AU}
+                    disableSlider={experimentStatus === 'started'}
+                    disableIncrement={AU >= 40 || experimentStatus === 'started'}
+                    disableDecrement={AU <= 0 || experimentStatus === 'started'}
+                    amountOfTicks={10}
+                />
 
                 <div className="answer-con" style={{ color: 'white' }}>
                     <p>Current AU: {AU.toFixed(2)}</p>

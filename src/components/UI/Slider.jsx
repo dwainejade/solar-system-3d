@@ -1,6 +1,6 @@
 import React from 'react'
 
-function Slider({ onDecrement, onIncrement, onSliderChange, value, disableSlider, disableIncrement, disableDecrement, step = 0.1 }) {
+function Slider({ name, amountOfTicks = 10, min = 0, max = 10, markers = ['0', '10'], onDecrement, onIncrement, onSliderChange, value, disableSlider, disableIncrement, disableDecrement, step = 0.1 }) {
     const handleDecrement = () => {
         onDecrement()
     }
@@ -13,8 +13,10 @@ function Slider({ onDecrement, onIncrement, onSliderChange, value, disableSlider
         onSliderChange(e)
     }
 
+    const ticks = Array.from({ length: amountOfTicks }, (_, i) => i / (amountOfTicks - 1));
+
     return (
-        <div className="slider-con">
+        <div className={`slider-con ${name}`}>
             <div className="slider-control">
                 <button
                     className="increment-btn"
@@ -27,29 +29,23 @@ function Slider({ onDecrement, onIncrement, onSliderChange, value, disableSlider
                 <div className="input-con">
                     <input
                         type="range"
-                        min={0}
-                        max={0.9}
+                        min={min}
+                        max={max}
                         step={step}
                         value={value}
                         onChange={handleSliderChange}
                         disabled={disableSlider}
-                        className='slider'
+                        className={`slider ${disableSlider ? 'disabled' : ''}`}
                     />
                     <div className="slider-markers">
-                        <span>0</span>
-                        <span>.9</span>
+                        {markers.map((marker, index) => (
+                            <span key={index}>{marker}</span>
+                        ))}
                     </div>
                     <div className="slider-ticks" >
-                        <span className="tick"></span>
-                        <span className="tick"></span>
-                        <span className="tick"></span>
-                        <span className="tick"></span>
-                        <span className="tick"></span>
-                        <span className="tick"></span>
-                        <span className="tick"></span>
-                        <span className="tick"></span>
-                        <span className="tick"></span>
-                        <span className="tick"></span>
+                        {ticks.map((tick, index) => (
+                            <span key={index} className="tick"></span>
+                        ))}
                     </div>
 
                 </div>

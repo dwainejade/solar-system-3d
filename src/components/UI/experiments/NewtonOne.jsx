@@ -1,25 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import useStore, { usePlanetStore } from '../../../store/store';
 import initialPlanetsData, { G } from '../../../data/planetsData';
 import useExperimentsStore from '../../../store/experiments';
 import { getSpeedValue } from '../../../helpers/utils';
+import Slider from '../../../components/UI/Slider';
 
 
 function NewtonGravity() {
     const { updatePlanetData, resetSinglePlanetData } = usePlanetStore();
     const { setSimSpeed, simSpeed, prevSpeed } = useStore();
-    const { experimentMode, experimentPlanet, experimentStatus, setExperimentStatus } = useExperimentsStore();
+    const { experimentPlanet, experimentStatus, setExperimentStatus } = useExperimentsStore();
 
     const selectedPlanet = experimentPlanet || 'Earth';
 
     // Initialize mass scale
     const [massScale, setMassScale] = useState(1);
     const originalMass = initialPlanetsData[selectedPlanet].mass;
+    const sliderValues = [0.5, 1, 2];
+    const [sliderIndex, setSliderIndex] = useState(1);
 
     const handleIncrement = () => {
-        const newValue = Math.min(2, massScale + 0.01);
-        setMassScale(newValue);
-        if (experimentMode) {
+        // base on sliderValues array
+        if (massScale < sliderValues[sliderValues.length - 1]) {
+            const newIndex = sliderIndex + 1;
+            const newValue = sliderValues[newIndex];
+
+            setSliderIndex(newIndex);
+            setMassScale(newValue);
             updatePlanetData(selectedPlanet, {
                 mass: originalMass * newValue,
                 radius: initialPlanetsData[selectedPlanet].radius * newValue
@@ -28,9 +35,11 @@ function NewtonGravity() {
     };
 
     const handleDecrement = () => {
-        const newValue = Math.max(0.5, massScale - 0.01);
-        setMassScale(newValue);
-        if (experimentMode) {
+        if (massScale > sliderValues[0]) {
+            const newIndex = sliderIndex - 1;
+            const newValue = sliderValues[newIndex];
+            setSliderIndex(newIndex);
+            setMassScale(newValue);
             updatePlanetData(selectedPlanet, {
                 mass: originalMass * newValue,
                 radius: initialPlanetsData[selectedPlanet].radius * newValue
@@ -39,14 +48,13 @@ function NewtonGravity() {
     };
 
     const handleSliderChange = (e) => {
-        const newValue = parseFloat(e.target.value);
+        const value = parseFloat(e.target.value);
+        const newValue = value === 0 ? 0.5 : value;
         setMassScale(newValue);
-        if (experimentMode) {
-            updatePlanetData(selectedPlanet, {
-                mass: originalMass * newValue,
-                radius: initialPlanetsData[selectedPlanet].radius * newValue
-            });
-        }
+        updatePlanetData(selectedPlanet, {
+            mass: originalMass * newValue,
+            radius: initialPlanetsData[selectedPlanet].radius * newValue
+        });
     };
 
     const calculateGravitationalForce = () => {
@@ -57,7 +65,6 @@ function NewtonGravity() {
     };
 
     const handleStartExperiment = () => {
-        console.log('Starting experiment')
         setSimSpeed(getSpeedValue('1 day /s'));
         setExperimentStatus('started');
     };
@@ -75,41 +82,21 @@ function NewtonGravity() {
             <div className="newton-section kepler-1">
                 <h2 className="title">{selectedPlanet} Mass Scale</h2>
 
-                <div className="slider-con">
-                    <div className="slider-control">
-                        <button
-                            className="increment-btn"
-                            disabled={massScale <= 0.5 || experimentStatus}
-                            onClick={handleDecrement}
-                        >
-                            -
-                        </button>
-
-                        <div className="input-con">
-                            <input
-                                type="range"
-                                min={0.5}
-                                max={2}
-                                step={0.5}
-                                value={massScale}
-                                onChange={handleSliderChange}
-                                disabled={experimentStatus}
-                            />
-                            <div className="slider-markers">
-                                <span>0.5x</span>
-                                <span>2x</span>
-                            </div>
-                        </div>
-
-                        <button
-                            className="increment-btn"
-                            disabled={massScale >= 2 || experimentStatus}
-                            onClick={handleIncrement}
-                        >
-                            +
-                        </button>
-                    </div>
-                </div>
+                <Slider
+                    name={'newton-gravity-slider'}
+                    min={0}
+                    max={2}
+                    markers={['.5x', '1x', '2x']}
+                    step={1}
+                    onDecrement={handleDecrement}
+                    onIncrement={handleIncrement}
+                    onSliderChange={handleSliderChange}
+                    value={massScale === 0.5 ? 0 : massScale}
+                    disableSlider={experimentStatus === 'started'}
+                    disableIncrement={massScale >= 2 || experimentStatus === 'started'}
+                    disableDecrement={massScale <= 0 || experimentStatus === 'started'}
+                    amountOfTicks={3}
+                />
 
                 <div className="description-con">
                     <p>(F) = G * (m₁ * m₂) / r²</p>

@@ -190,17 +190,25 @@
 .experiments-modal-wrapper .experiment-footer .btn.reset-btn:hover {
   background-color: #f13b38;
 }
-.experiments-modal-wrapper .kepler-1 .slider-con {
+.experiments-modal-wrapper .kepler-1 .slider-con,
+.experiments-modal-wrapper .kepler-2 .slider-con {
   display: flex;
   flex-direction: column;
   margin: 30px 0;
 }
-.experiments-modal-wrapper .kepler-1 .slider-con .slider-control {
+.experiments-modal-wrapper .kepler-1 .slider-con .slider-control,
+.experiments-modal-wrapper .kepler-2 .slider-con .slider-control {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.experiments-modal-wrapper .kepler-1 .input-con {
+.experiments-modal-wrapper .kepler-1 .slider.disabled,
+.experiments-modal-wrapper .kepler-2 .slider.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+.experiments-modal-wrapper .kepler-1 .input-con,
+.experiments-modal-wrapper .kepler-2 .input-con {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -209,14 +217,16 @@
   margin: 0 4%;
   /* slider styling */
 }
-.experiments-modal-wrapper .kepler-1 .input-con input[type="range"] {
+.experiments-modal-wrapper .kepler-1 .input-con input[type="range"],
+.experiments-modal-wrapper .kepler-2 .input-con input[type="range"] {
   -webkit-appearance: none;
   width: 100%;
   height: 1.5px;
   background: linear-gradient(to right, transparent 0%, transparent 2.5%, #dfcda7 2.5%, #dfcda7 97.5%, transparent 97.5%, transparent 100%);
   outline: none;
 }
-.experiments-modal-wrapper .kepler-1 .input-con input[type="range"]::-webkit-slider-thumb {
+.experiments-modal-wrapper .kepler-1 .input-con input[type="range"]::-webkit-slider-thumb,
+.experiments-modal-wrapper .kepler-2 .input-con input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 11px;
   height: 11px;
@@ -224,16 +234,19 @@
   border-radius: 50%;
   cursor: pointer;
 }
-.experiments-modal-wrapper .kepler-1 .input-con input[type="range"]::-webkit-slider-thumb:hover {
+.experiments-modal-wrapper .kepler-1 .input-con input[type="range"]::-webkit-slider-thumb:hover,
+.experiments-modal-wrapper .kepler-2 .input-con input[type="range"]::-webkit-slider-thumb:hover {
   background: #ff8585;
 }
-.experiments-modal-wrapper .kepler-1 .input-con .slider-markers {
+.experiments-modal-wrapper .kepler-1 .input-con .slider-markers,
+.experiments-modal-wrapper .kepler-2 .input-con .slider-markers {
   margin-top: 10px;
   display: flex;
   justify-content: space-between;
   color: #dfcda7;
 }
-.experiments-modal-wrapper .kepler-1 .input-con .slider-ticks {
+.experiments-modal-wrapper .kepler-1 .input-con .slider-ticks,
+.experiments-modal-wrapper .kepler-2 .input-con .slider-ticks {
   position: absolute;
   top: -20%;
   left: 3%;
@@ -245,13 +258,16 @@
   pointer-events: none;
   z-index: -1;
 }
-.experiments-modal-wrapper .kepler-1 .input-con .slider-ticks .tick {
+.experiments-modal-wrapper .kepler-1 .input-con .slider-ticks .tick,
+.experiments-modal-wrapper .kepler-2 .input-con .slider-ticks .tick {
   width: 1.5px;
   height: 100%;
   background-color: #dfcda7;
 }
 .experiments-modal-wrapper .kepler-1 .increment-btn,
-.experiments-modal-wrapper .kepler-1 .decrement-btn {
+.experiments-modal-wrapper .kepler-2 .increment-btn,
+.experiments-modal-wrapper .kepler-1 .decrement-btn,
+.experiments-modal-wrapper .kepler-2 .decrement-btn {
   width: 24px;
   height: 20px;
   border-radius: 20px;
@@ -266,6 +282,8 @@
   padding: 0;
 }
 .experiments-modal-wrapper .kepler-1 .increment-btn:hover,
-.experiments-modal-wrapper .kepler-1 .decrement-btn:hover {
+.experiments-modal-wrapper .kepler-2 .increment-btn:hover,
+.experiments-modal-wrapper .kepler-1 .decrement-btn:hover,
+.experiments-modal-wrapper .kepler-2 .decrement-btn:hover {
   background-color: #ffb025;
 }

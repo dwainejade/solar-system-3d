@@ -214,7 +214,8 @@
     }
   }
 
-  .kepler-1 {
+  .kepler-1,
+  .kepler-2 {
     .slider-con {
       display: flex;
       flex-direction: column;
@@ -225,7 +226,10 @@
         align-items: center;
       }
     }
-
+    .slider.disabled {
+      opacity: 0.6;
+      pointer-events: none;
+    }
     .input-con {
       position: relative;
       display: flex;

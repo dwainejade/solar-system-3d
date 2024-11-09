@@ -67,6 +67,10 @@ function KeplerOne() {
                 <h2 className="title">{selectedPlanet}</h2>
 
                 <Slider
+                    name={'kepler-1-slider'}
+                    min={0}
+                    max={.9}
+                    markers={['0', '.9']}
                     onDecrement={handleDecrement}
                     onIncrement={handleIncrement}
                     onSliderChange={handleSliderChange}
@@ -74,6 +78,7 @@ function KeplerOne() {
                     disableSlider={experimentStatus === 'started'}
                     disableIncrement={eccentricity >= 0.9 || experimentStatus === 'started'}
                     disableDecrement={eccentricity <= 0 || experimentStatus === 'started'}
+                    amountOfTicks={10}
                 />
 
                 <div className="description-con">
