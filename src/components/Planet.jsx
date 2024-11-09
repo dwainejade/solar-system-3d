@@ -332,7 +332,7 @@ const Planet = ({ name = 'Earth', textures }) => {
         >
           <sphereGeometry args={[(renderMoons() ? scaledRadius : scaleRef.current * 8), detailLevel, detailLevel / 2]} />
           {((!isPlanetSelected && !renderMoons()) && texturesLoaded) ?
-            <meshBasicMaterial color={color} />
+            <meshBasicMaterial map={textures?.map} toneMapped={false} />
             :
             <>
               {name === "Earth" && isPlanetSelected &&
@@ -369,7 +369,7 @@ const Planet = ({ name = 'Earth', textures }) => {
           />
         )}
 
-        {name === "Uranus" && showTextures && (
+        {name === "Uranus" && (
           <Rings
             key={detailLevel + name + '-ring'}
             innerRadius={scaledRadius * 1.5}
@@ -438,13 +438,16 @@ const Planet = ({ name = 'Earth', textures }) => {
       {orbitPaths && (
         <OrbitPath
           origin={orbitalOrigin}
-          radius={scaledOrbitalRadius}  // This is your semi-major axis
+          radius={scaledOrbitalRadius}
           eccentricity={eccentricity}
           orbitalInclination={orbitalInclination}
           color={color}
           name={name + "-orbit-path"}
+          lineWidth={isPlanetSelected ? 2 : .5}
           opacity={orbitPathOpacity}
           hiRes={isPlanetSelected}
+          position={localRef.current?.position}
+          arcLength={2 * Math.PI}
         />
       )}
     </>
