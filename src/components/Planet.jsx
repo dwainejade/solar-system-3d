@@ -332,7 +332,7 @@ const Planet = ({ name = 'Earth', textures }) => {
         >
           <sphereGeometry args={[(renderMoons() ? scaledRadius : scaleRef.current * 8), detailLevel, detailLevel / 2]} />
           {((!isPlanetSelected && !renderMoons()) && texturesLoaded) ?
-            <meshBasicMaterial map={textures?.map} toneMapped={false} />
+            <meshBasicMaterial color={color} />
             :
             <>
               {name === "Earth" && isPlanetSelected &&
@@ -369,7 +369,7 @@ const Planet = ({ name = 'Earth', textures }) => {
           />
         )}
 
-        {name === "Uranus" && (
+        {name === "Uranus" && showTextures && (
           <Rings
             key={detailLevel + name + '-ring'}
             innerRadius={scaledRadius * 1.5}
@@ -401,6 +401,7 @@ const Planet = ({ name = 'Earth', textures }) => {
             center
             position-y={scaledRadius * 1.12}
             zIndexRange={[100, 0]}
+            style={isPlanetSelected ? { pointerEvents: 'none' } : {}}
           >
             <span
               className='planet-label'
@@ -447,7 +448,6 @@ const Planet = ({ name = 'Earth', textures }) => {
           opacity={orbitPathOpacity}
           hiRes={isPlanetSelected}
           position={localRef.current?.position}
-          arcLength={2 * Math.PI}
         />
       )}
     </>

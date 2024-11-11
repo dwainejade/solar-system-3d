@@ -131,18 +131,18 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName }, ref) => {
             position={[0, scaledValues.radius * 1.2, 0]}
             center
             zIndexRange={[100, 0]}
-            style={{
-              background: '#00000088',
-              padding: '4px 8px',
-              borderRadius: '4px',
-              color: color,
-              fontSize: isMoonSelected ? '14px' : '12px',
-              fontFamily: "'Termina', sans-serif",
-              userSelect: 'none',
-              whiteSpace: 'nowrap',
-            }}
+            occlude={simSpeed < 20000}
+            style={isMoonSelected ? { pointerEvents: 'none' } : {}}
           >
-            {name}
+            <span
+              className="planet-label"
+              onClick={handleClick}
+              style={{
+                color: color,
+                fontSize: isMoonSelected ? '14px' : '12px',
+                cursor: 'pointer',
+              }}
+            >{name}</span>
           </Html>
         )}
       </group>
@@ -159,7 +159,6 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName }, ref) => {
           lineType="solid"
           lineWidth={isMoonSelected ? 1 : 0.4}
           position={localRef.current?.position}
-          arcLength={2 * Math.PI}
         />
       )}
     </>
