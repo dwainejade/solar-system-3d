@@ -17,6 +17,15 @@ const MenuItem = ({
     isFocused = false,
     'aria-expanded': ariaExpanded
 }) => {
+    const handleItemMouseLeave = (e) => {
+        // If this is a submenu item, don't trigger the regular mouseleave
+        if (isSubmenuItem) {
+            e.stopPropagation();
+            return;
+        }
+        onMouseLeave?.(e);
+    };
+
     return (
         <div
             className={`planet-selector-item 
@@ -26,7 +35,7 @@ const MenuItem = ({
                        ${isFocused ? 'hover' : ''}`}
             onClick={onSelect}
             onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
+            onMouseLeave={handleItemMouseLeave}
             onKeyDown={onKeyDown}
             role="menuitem"
             tabIndex={tabIndex}
@@ -54,8 +63,8 @@ const PlanetSelector = ({
     activeCamera,
     onPlanetSelect,
     onMoonSelect,
-    onSolarSystemSelect,
-    onAsteroidBeltSelect
+    onAsteroidBeltSelect,
+    onSolarSystemSelect
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [activeSubmenu, setActiveSubmenu] = useState(null);
@@ -64,7 +73,14 @@ const PlanetSelector = ({
     const dropdownRef = useRef(null);
 
     const menuItems = [
-        { label: 'Solar System', onSelect: onSolarSystemSelect },
+        {
+            label: 'Solar System',
+            onSelect: () => {
+                onSolarSystemSelect();
+                setIsOpen(false);
+                setActiveSubmenu(null);
+            }
+        },
         ...Object.keys(planetsData).map(planetName => ({
             label: planetName,
             onSelect: () => handlePlanetClick(planetName),
@@ -74,10 +90,20 @@ const PlanetSelector = ({
                 onSelect: (e) => handleMoonClick(planetName, moon.name, e)
             }))
         })),
-        { label: 'Asteroid Belt', onSelect: onAsteroidBeltSelect }
+        {
+            label: 'Asteroid Belt',
+            onSelect: () => {
+                onAsteroidBeltSelect();
+                setIsOpen(false);
+                setActiveSubmenu(null);
+            }
+        }
     ];
 
+    // Modified to only find parent planet without setting submenu
     const findParentPlanet = () => {
+        if (!activeCamera || activeCamera.type !== 'moon') return null;
+
         for (const [planetName, moons] of Object.entries(moonsData)) {
             if (moons.some(moon => moon.name === activeCamera.name)) {
                 return planetName;
@@ -88,8 +114,8 @@ const PlanetSelector = ({
 
     // Find the index of the active item in the menu
     const findActiveItemIndex = () => {
-        if (activeCamera.name === 'default') return 0;
-        if (activeCamera.name === 'Asteroid Belt') return menuItems.length - 1;
+        if (activeCamera.type === 'orbit' && activeCamera.name === 'default') return 0;
+        if (activeCamera.type === 'asteroid' && activeCamera.name === 'Asteroid Belt') return menuItems.length - 1;
 
         const planetIndex = Object.keys(planetsData).findIndex(
             planetName => planetName === activeCamera.name
@@ -99,34 +125,40 @@ const PlanetSelector = ({
         return -1;
     };
 
-    // Find the index of the active moon in its submenu
-    const findActiveMoonIndex = (planetName) => {
-        if (!moonsData[planetName]) return -1;
-        return moonsData[planetName].findIndex(moon => moon.name === activeCamera.name);
-    };
-
     const parentPlanet = findParentPlanet();
 
     useEffect(() => {
         if (isOpen) {
-            if (parentPlanet) {
-                const planetIndex = Object.keys(planetsData).findIndex(
-                    name => name === parentPlanet
-                ) + 1;
-                setFocusedIndex(planetIndex);
-                setActiveSubmenu(parentPlanet);
-                const moonIndex = findActiveMoonIndex(parentPlanet);
-                setFocusedSubmenuIndex(moonIndex);
+            if (activeCamera.type === 'moon') {
+                // If a moon is selected, find its parent planet and open that submenu
+                const parentPlanet = findParentPlanet();
+                if (parentPlanet) {
+                    setActiveSubmenu(parentPlanet);
+                    const planetIndex = Object.keys(planetsData).findIndex(
+                        name => name === parentPlanet
+                    ) + 1; // Add 1 for Solar System offset
+                    setFocusedIndex(planetIndex);
+                    // Find and set the moon's index in the submenu
+                    const moonIndex = moonsData[parentPlanet]?.findIndex(
+                        moon => moon.name === activeCamera.name
+                    );
+                    if (moonIndex !== -1) {
+                        setFocusedSubmenuIndex(moonIndex);
+                    }
+                }
             } else {
+                // Regular active item handling for non-moon items
                 const activeIndex = findActiveItemIndex();
                 setFocusedIndex(activeIndex >= 0 ? activeIndex : 0);
                 setFocusedSubmenuIndex(-1);
+                setActiveSubmenu(null);
             }
         } else {
             setFocusedIndex(-1);
             setFocusedSubmenuIndex(-1);
+            setActiveSubmenu(null); // Reset active submenu when closing
         }
-    }, [isOpen, activeCamera.name]);
+    }, [isOpen, activeCamera]);
 
     const handleKeyDown = (event) => {
         if (!isOpen && event.key === 'Enter') {
@@ -209,30 +241,6 @@ const PlanetSelector = ({
         }
     };
 
-    const handlePlanetMouseEnter = (planetName) => {
-        if (moonsData[planetName]?.length > 0) {
-            setActiveSubmenu(planetName);
-        }
-    };
-
-    const handlePlanetMouseLeave = (event) => {
-        const submenu = event.currentTarget.querySelector('.planet-selector-submenu');
-        if (submenu) {
-            const submenuRect = submenu.getBoundingClientRect();
-            const mouseX = event.clientX;
-            const mouseY = event.clientY;
-
-            if (mouseX >= submenuRect.left && mouseX <= submenuRect.right &&
-                mouseY >= submenuRect.top && mouseY <= submenuRect.bottom) {
-                return;
-            }
-        }
-
-        if (parentPlanet !== event.currentTarget.textContent.trim()) {
-            setActiveSubmenu(parentPlanet);
-        }
-    };
-
     const handlePlanetClick = (planetName) => {
         onPlanetSelect(planetName);
         setIsOpen(false);
@@ -246,27 +254,50 @@ const PlanetSelector = ({
         setActiveSubmenu(null);
     };
 
-    const handleItemHover = (index, planetName = null) => {
-        setFocusedIndex(index);
-        if (planetName && moonsData[planetName]?.length > 0) {
-            setActiveSubmenu(planetName);
-            setFocusedSubmenuIndex(-1); // Reset submenu focus when hovering main menu
-        } else if (!planetName) {
-            setActiveSubmenu(null);
-            setFocusedSubmenuIndex(-1);
-        }
-    };
-
     const handleSubmenuItemHover = (moonIndex) => {
         setFocusedSubmenuIndex(moonIndex);
     };
 
-    const handleMouseLeave = () => {
-        // When mouse leaves an item, maintain the current focus for keyboard navigation
-        // Instead of setting to -1, we keep the current focus
-        if (parentPlanet) {
-            setActiveSubmenu(parentPlanet);
+    const handleMouseLeave = (event) => {
+        // Only remove active submenu if we're leaving the menu entirely
+        const menuElement = dropdownRef.current?.querySelector('.planet-selector-menu');
+        const submenuElement = dropdownRef.current?.querySelector('.planet-selector-submenu.visible');
+
+        if (menuElement) {
+            const menuRect = menuElement.getBoundingClientRect();
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+
+            // If still within menu bounds, don't close submenu
+            if (mouseX >= menuRect.left && mouseX <= menuRect.right &&
+                mouseY >= menuRect.top && mouseY <= menuRect.bottom) {
+
+                // If there's a visible submenu, check if we're within its bounds
+                if (submenuElement) {
+                    const submenuRect = submenuElement.getBoundingClientRect();
+                    if (mouseX >= submenuRect.left && mouseX <= submenuRect.right &&
+                        mouseY >= submenuRect.top && mouseY <= submenuRect.bottom) {
+                        return;
+                    }
+                }
+                return;
+            }
         }
+        setActiveSubmenu(null);
+    };
+
+
+    const handleItemHover = (index, planetName = null) => {
+        setFocusedIndex(index);
+        if (planetName && moonsData[planetName]?.length > 0) {
+            setActiveSubmenu(planetName);
+            setFocusedSubmenuIndex(-1);
+        }
+    }
+    const getActiveLabel = () => {
+        if (activeCamera.type === 'orbit' && activeCamera.name === 'default') return 'Solar System';
+        if (activeCamera.type === 'asteroid') return 'Asteroid Belt';
+        return activeCamera.name;
     };
 
     return (
@@ -281,7 +312,7 @@ const PlanetSelector = ({
                 aria-haspopup="true"
                 aria-expanded={isOpen}
             >
-                {activeCamera.name === 'default' ? 'Solar System' : activeCamera.name}
+                {getActiveLabel()}
             </button>
 
             {isOpen && (
@@ -293,7 +324,7 @@ const PlanetSelector = ({
                     <MenuItem
                         label="Solar System"
                         isActive={activeCamera.name === 'default'}
-                        onSelect={onSolarSystemSelect}
+                        onSelect={menuItems[0].onSelect}
                         onMouseEnter={() => handleItemHover(0)}
                         onMouseLeave={handleMouseLeave}
                         tabIndex={focusedIndex === 0 ? 0 : -1}
@@ -304,7 +335,7 @@ const PlanetSelector = ({
                         <MenuItem
                             key={planetName}
                             label={planetName}
-                            isActive={planetName === activeCamera.name}
+                            isActive={activeCamera.name === planetName}
                             isHighlighted={planetName === parentPlanet}
                             hasSubmenu={moonsData[planetName]?.length > 0}
                             onSelect={() => handlePlanetClick(planetName)}
@@ -319,7 +350,7 @@ const PlanetSelector = ({
                                 <MenuItem
                                     key={moon.name}
                                     label={moon.name}
-                                    isActive={moon.name === activeCamera.name}
+                                    isActive={activeCamera.type === 'moon' && moon.name === activeCamera.name}
                                     isSubmenuItem={true}
                                     onSelect={(e) => handleMoonClick(planetName, moon.name, e)}
                                     onMouseEnter={() => handleSubmenuItemHover(moonIndex)}
@@ -334,7 +365,7 @@ const PlanetSelector = ({
                     <MenuItem
                         label="Asteroid Belt"
                         isActive={activeCamera.name === 'Asteroid Belt'}
-                        onSelect={onAsteroidBeltSelect}
+                        onSelect={menuItems[menuItems.length - 1].onSelect}
                         onMouseEnter={() => handleItemHover(menuItems.length - 1)}
                         onMouseLeave={handleMouseLeave}
                         tabIndex={focusedIndex === menuItems.length - 1 ? 0 : -1}
