@@ -147,18 +147,20 @@ const PlanetSelector = ({
                     }
                 }
             } else {
-                // Regular active item handling for non-moon items
+                // Find the correct index based on the active camera
                 const activeIndex = findActiveItemIndex();
-                setFocusedIndex(activeIndex >= 0 ? activeIndex : 0);
+                if (activeIndex >= 0) {
+                    setFocusedIndex(activeIndex);
+                }
                 setFocusedSubmenuIndex(-1);
                 setActiveSubmenu(null);
             }
         } else {
             setFocusedIndex(-1);
             setFocusedSubmenuIndex(-1);
-            setActiveSubmenu(null); // Reset active submenu when closing
+            setActiveSubmenu(null);
         }
-    }, [isOpen, activeCamera]);
+    }, [isOpen, activeCamera, planetsData, moonsData]);
 
     const handleKeyDown = (event) => {
         if (!isOpen && event.key === 'Enter') {
