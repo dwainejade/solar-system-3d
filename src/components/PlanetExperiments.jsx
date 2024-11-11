@@ -9,6 +9,7 @@ import moonsData from "@/data/moonsData";
 import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCamera";
 import Moon from "./MoonExperiments";
+import MoonTwo from "./MoonExperimentsTwo";
 import Labels from "./Labels";
 import { earthAtmosphereShader } from "../shaders/atmosphere";
 import Rings from "./Rings";
@@ -32,6 +33,7 @@ const Planet = ({ name = 'Earth', textures }) => {
     color = '#ffffff',
     initialOrbitalAngle = 0,
     eccentricity = 0,
+    mass
   } = mergedData;
 
   const { simSpeed, toggleDetailsMenu } = useStore();
@@ -55,6 +57,9 @@ const Planet = ({ name = 'Earth', textures }) => {
     activeCamera,
     switchToPlanetCamera,
   } = useCameraStore();
+
+  const initialPlanetMass = initialPlanetsData[name].mass;
+  const massRatio = mass / initialPlanetMass;
 
   // In the Planet component, near the top where refs are defined:
   const localRef = useRef();
@@ -373,21 +378,25 @@ const Planet = ({ name = 'Earth', textures }) => {
         )}
 
         {renderMoons() && moons.map((moon, index) => {
-          const shouldAlignWithTilt = ["Saturn", "Uranus"].includes(name);
-          return (
-            <group
-              key={`${name}-moon-group-${index}`}
-              rotation={shouldAlignWithTilt ? [THREE.MathUtils.degToRad(axialTilt), 0, 0] : [0, 0, 0]}
-            >
-              <Moon
-                key={`${name}-moon-${index}`}
-                moonData={moon}
-                planetRef={localRef}
-                parentName={name}
-                scaledPlanetRadius={scaledRadius}
-              />
-            </group>
-          );
+          // Only render regular moons if we're not in an escape scenario
+          if (!(experimentStatus && massRatio <= 0.5)) {
+            const shouldAlignWithTilt = ["Saturn", "Uranus"].includes(name);
+            return (
+              <group
+                key={`${name}-moon-group-${index}`}
+                rotation={shouldAlignWithTilt ? [THREE.MathUtils.degToRad(axialTilt), 0, 0] : [0, 0, 0]}
+              >
+                <Moon
+                  key={`${name}-moon-${index}`}
+                  moonData={moon}
+                  planetRef={localRef}
+                  parentName={name}
+                  scaledPlanetRadius={scaledRadius}
+                />
+              </group>
+            );
+          }
+          return null;
         })}
       </group>
 
@@ -397,12 +406,12 @@ const Planet = ({ name = 'Earth', textures }) => {
           radius={scaledOrbitalRadius}
           eccentricity={eccentricity}
           orbitalInclination={orbitalInclination}
-          color={'white'}
+          color={color}
           name={name + "-orbit-path"}
-          opacity={orbitPathOpacity}
-          hiRes={true}
-          lineWidth={1}
-          depthWrite={false}
+          lineWidth={2}
+          opacity={.5}
+          hiRes={isPlanetSelected}
+          position={localRef.current?.position}
         />
       )}
 
@@ -420,11 +429,16 @@ const Planet = ({ name = 'Earth', textures }) => {
         />
       }
 
-
-      {experimentType === 'newton-1' &&
-        <GravityVectors planetRef={localRef} />
-      }
-
+      {/* Render MoonTwo outside of planet group when in escape scenario */}
+      {renderMoons() && experimentStatus && massRatio <= 0.5 && moons.map((moon, index) => (
+        <MoonTwo
+          key={`${name}-escaped-moon-${index}`}
+          moonData={moon}
+          planetRef={localRef}
+          parentName={name}
+          scaledPlanetRadius={scaledRadius}
+        />
+      ))}
     </>
   );
 };

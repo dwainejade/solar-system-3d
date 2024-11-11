@@ -1,6 +1,6 @@
 import { Billboard, Text } from '@react-three/drei'
 
-function Labels({ text, size = 1, position = [0, 3, 0], color, handleClick, handlePointerDown, font = '../assets/fonts/Termina_Black.ttf' }) {
+function Labels({ name, text, size = 1, position = [0, 3, 0], color, handleClick, handlePointerDown, font = '../assets/fonts/Termina_Black.ttf' }) {
     const handlePointerOver = () => {
         if (!handleClick) return
         document.body.style.cursor = 'pointer'
@@ -23,6 +23,8 @@ function Labels({ text, size = 1, position = [0, 3, 0], color, handleClick, hand
                 scale={size}
                 color={color}
                 font={font}
+                anchorX="center"
+                anchorY="middle"
             >
                 {text.toUpperCase()}
             </Text>

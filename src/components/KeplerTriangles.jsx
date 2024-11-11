@@ -227,7 +227,7 @@ const AnimatedKeplerTriangles = ({
                     key={`complete-${index}`}
                     points={slice.points}
                     color={slice.color}
-                    lineWidth={3}
+                    lineWidth={2.5}
                 />
             ))}
             {activeSlice && (

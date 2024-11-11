@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
-import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
+import initialPlanetsData, { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCamera";
 import Moon from "./Moon";
@@ -64,6 +64,7 @@ const Planet = ({ name = 'Earth', textures }) => {
     color = '#ffffff',
     initialOrbitalAngle = 0,
     eccentricity = 0,
+    mass
   } = mergedData;
 
   const { simSpeed, toggleDetailsMenu } = useStore();

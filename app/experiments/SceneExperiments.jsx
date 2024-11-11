@@ -290,36 +290,38 @@ const Scene = () => {
     };
   }, []);
 
+
   const earthTextures = useTexture({
-    map: "../assets/earth/8k_earth_daymap.jpg",
-    clouds: "../assets/earth/8k_earth_clouds.jpg",
+    map: "../assets/earth/earth_daymap.jpg",
+    clouds: "../assets/earth/earth_clouds.jpg",
   });
   const sunTextures = useTexture({
-    map: "../assets/sun/8k_sun.jpg",
+    map: "../assets/sun/sun.jpg",
   })
   const venusTextures = useTexture({
-    map: "../assets/venus/2k_venus_surface.jpg",
+    map: "../assets/venus/venus_surface.jpg",
   });
   const mercuryTextures = useTexture({
-    map: "../assets/mercury/2k_mercury.jpg",
+    map: "../assets/mercury/mercury.jpg",
   });
   const marsTextures = useTexture({
-    map: "../assets/mars/1k_mars.jpg",
+    map: "../assets/mars/mars.jpg",
   });
   const jupiterTextures = useTexture({
-    map: "../assets/jupiter/8k_jupiter.jpg",
+    map: "../assets/jupiter/jupiter.jpg",
   });
   const saturnTextures = useTexture({
-    map: "../assets/saturn/2k_saturn.jpg",
-    ringTexture: "../assets/saturn/saturn-rings.png"
+    map: "../assets/saturn/saturn.jpg",
+    ringTexture: "../assets/saturn/saturn-rings.png",
   });
   const uranusTextures = useTexture({
-    map: "../assets/uranus/2k_uranus.jpg",
-    ringTexture: "../assets/uranus/uranus-rings-2.png"
+    map: "../assets/uranus/uranus.jpg",
+    ringTexture: "../assets/uranus/uranus-rings.png",
   });
   const neptuneTextures = useTexture({
-    map: "../assets/neptune/2k_neptune.jpg",
+    map: "../assets/neptune/neptune.jpg",
   });
+
 
   const renderPlanet = () => {
     switch (experimentPlanet) {

@@ -1,9 +1,9 @@
-import React, { useRef, forwardRef, useState, useEffect, useMemo } from "react";
+import React, { useRef, forwardRef, useState, useEffect, useMemo, useCallback } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import useExperimentsStore from "@/store/experiments";
-import { useTexture, Trail, Line } from "@react-three/drei";
+import { useTexture, Trail, Line, Html } from "@react-three/drei";
 import { Vector3, } from "three";
 import { moonDistanceScaleFactor, moonSizeScaleFactor } from "../data/moonsData";
 import initialPlanetsData, { sizeScaleFactor } from "../data/planetsData";
@@ -14,7 +14,7 @@ import GravityVectors from "./GravityVectors";
 import Labels from "./Labels";
 import { calculateKeplerianOrbit, calculateModifiedKeplerianOrbit, calculateSpiralOrbit } from "../helpers/calculateOrbits";
 
-const Moon = forwardRef(({ moonData, planetRef, parentName, scaledPlanetRadius }, ref) => {
+const MoonExperiments = forwardRef(({ moonData, planetRef, parentName, scaledPlanetRadius }, ref) => {
   const {
     name,
     orbitalRadius,
@@ -38,12 +38,16 @@ const Moon = forwardRef(({ moonData, planetRef, parentName, scaledPlanetRadius }
     planetsData: newPlanetsData
   } = usePlanetStore();
   const { satelliteCamera, activeCamera, switchToMoonCamera } = useCameraStore();
-  const { experimentStatus, setExperimentStatus } = useExperimentsStore();
+  const { experimentStatus, setExperimentStatus, experimentType } = useExperimentsStore();
 
   // Constants
-  const scaledRadius = radius * moonSizeScaleFactor;
-  const scaledOrbitalRadius = orbitalRadius * moonDistanceScaleFactor;
-  const collisionDistance = scaledRadius + scaledPlanetRadius;
+  const scaledValues = useMemo(() => ({
+    radius: radius * moonSizeScaleFactor,
+    orbitalRadius: orbitalRadius * moonDistanceScaleFactor,
+    meanMotion: (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60)
+  }), [radius, orbitalRadius, orbitalPeriod]);
+
+  const collisionDistance = scaledValues.radius + scaledPlanetRadius;
 
   const originalPlanetMass = initialPlanetsData[parentName].mass;
   const planetMass = newPlanetsData[parentName].mass;
@@ -55,6 +59,7 @@ const Moon = forwardRef(({ moonData, planetRef, parentName, scaledPlanetRadius }
   const localAngleRef = useRef(moonAngles[name] || initialAngle);
   const startAngleRef = useRef(null);
   const meshRef = useRef();
+  const arrowHelperRef = useRef();
 
   // Create a ref for storing local positions
   const trailPointsRef = useRef([]);
@@ -64,16 +69,9 @@ const Moon = forwardRef(({ moonData, planetRef, parentName, scaledPlanetRadius }
 
 
   // States
-  const [scale, setScale] = useState(radius * moonSizeScaleFactor);
-  const [textSize, setTextSize] = useState(1);
-  const [isHovered, setIsHovered] = useState(false);
   const [hasCollided, setHasCollided] = useState(false);
   const isMoonSelected = selectedMoon && selectedMoon.name === name;
   const moonTexture = name === 'Moon' ? useTexture('../assets/earth/moon/2k_moon.jpg') : null;
-  // Calculate mean motion (n)
-  const meanMotion = useMemo(() => {
-    return (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60); // Convert orbital period to seconds
-  }, [orbitalPeriod]);
 
   const initialVelocityRef = useRef(null);
 
@@ -104,7 +102,7 @@ const Moon = forwardRef(({ moonData, planetRef, parentName, scaledPlanetRadius }
 
     if (experimentStatus !== "started") {
       if (localRef.current) {
-        localRef.current.position.set(scaledOrbitalRadius, 0, 0);
+        localRef.current.position.set(scaledValues.orbitalRadius, 0, 0);
       }
       return;
     }
@@ -129,7 +127,7 @@ const Moon = forwardRef(({ moonData, planetRef, parentName, scaledPlanetRadius }
         );
 
         // Calculate Moon's initial velocity relative to Earth
-        const moonSpeed = meanMotion * scaledOrbitalRadius;
+        const moonSpeed = scaledValues.meanMotion * scaledValues.orbitalRadius;
         const moonLocalVel = new THREE.Vector2(
           -moonSpeed * Math.sin(localAngleRef.current),
           moonSpeed * Math.cos(localAngleRef.current)
@@ -181,15 +179,15 @@ const Moon = forwardRef(({ moonData, planetRef, parentName, scaledPlanetRadius }
         localRef.current.position.copy(pos);
 
         const distanceFromOrigin = pos.length();
-        if (distanceFromOrigin > scaledOrbitalRadius * 3) {
+        if (distanceFromOrigin > scaledValues.orbitalRadius * 3) {
           setExperimentStatus("completed");
           return;
         }
       }
       else if (Math.abs(massRatio - 2) < 0.1) {
         const { position, angle } = calculateSpiralOrbit({
-          meanMotion,
-          orbitalRadius: scaledOrbitalRadius,
+          meanMotion: scaledValues.meanMotion,
+          orbitalRadius: scaledValues.orbitalRadius,
           currentAngle: localAngleRef.current,
           startAngle: startAngleRef.current,
           deltaTime: adjustedDelta
@@ -200,9 +198,9 @@ const Moon = forwardRef(({ moonData, planetRef, parentName, scaledPlanetRadius }
       }
       else if (Math.abs(massRatio - 1.5) < 0.1) {
         const { position, angle } = calculateModifiedKeplerianOrbit({
-          meanMotion,
+          meanMotion: scaledValues.meanMotion,
           eccentricity,
-          orbitalRadius: scaledOrbitalRadius,
+          orbitalRadius: scaledValues.orbitalRadius,
           orbitalInclination,
           currentAngle: localAngleRef.current,
           deltaTime: adjustedDelta,
@@ -215,9 +213,9 @@ const Moon = forwardRef(({ moonData, planetRef, parentName, scaledPlanetRadius }
       }
       else {
         const { position, angle } = calculateKeplerianOrbit({
-          meanMotion,
+          meanMotion: scaledValues.meanMotion,
           eccentricity,
-          orbitalRadius: scaledOrbitalRadius,
+          orbitalRadius: scaledValues.orbitalRadius,
           orbitalInclination,
           currentAngle: localAngleRef.current,
           deltaTime: adjustedDelta
@@ -247,24 +245,19 @@ const Moon = forwardRef(({ moonData, planetRef, parentName, scaledPlanetRadius }
         localRef.current.lookAt(new Vector3(0, 0, 0));
       }
 
+      // Get camera position in moon's local space
+      const cameraPosition = new THREE.Vector3();
+      state.camera.getWorldPosition(cameraPosition);
+      // Transform camera position to local space of the moon's parent
+      localRef.current.parent.worldToLocal(cameraPosition);
+
+      // Update world position for other calculations
       const worldPosition = localRef.current.getWorldPosition(new Vector3());
       updateMoonWorldPosition(name, {
         x: worldPosition.x,
         y: worldPosition.y,
         z: worldPosition.z
       });
-
-      // Update visual scaling based on camera distance
-      const distance = worldPosition.distanceTo(state.camera.position);
-      if (distance / 100 <= scaledRadius) {
-        setScale(scaledRadius);
-      } else {
-        setScale(distance / 100);
-      }
-
-      if (distance < 4500) {
-        setTextSize(0.016 * distance);
-      }
     }
   });
 
@@ -276,7 +269,6 @@ const Moon = forwardRef(({ moonData, planetRef, parentName, scaledPlanetRadius }
     switchToMoonCamera(parentName, name);
   };
 
-  // console.log(positionsRef.current)
 
   return (
     <>
@@ -285,39 +277,27 @@ const Moon = forwardRef(({ moonData, planetRef, parentName, scaledPlanetRadius }
           key={name + '-satellite-camera'}
           target={localRef.current}
           targetName={name}
-          size={scaledRadius}
+          size={scaledValues.radius}
           bodyType={'moon'}
         />
       }
 
-      {/* Render the Line representing the Moon's trail */}
-      {experimentStatus && trailPointsRef.current.length > 1 && (
-        <Line
-          points={trailPointsRef.current}
-          color={hasCollided ? "red" : "hotpink"}
-          lineWidth={2}
-          transparent
-          opacity={0.6}
-        />
-      )}
-
       <group ref={localRef}>
-
         <mesh
           ref={meshRef}
           key={name + '-textured'}
           rotation={name === 'Moon' ? [0, Math.PI * 3.5, 0] : [0, 0, 0]}
-          onPointerOver={(e) => {
-            e.stopPropagation();
-            setIsHovered(true);
-          }}
-          onPointerOut={(e) => {
-            e.stopPropagation();
-            setIsHovered(false);
-          }}
+          // onPointerOver={(e) => {
+          //   e.stopPropagation();
+          //   setIsHovered(true);
+          // }}
+          // onPointerOut={(e) => {
+          //   e.stopPropagation();
+          //   setIsHovered(false);
+          // }}
           onClick={handleClick}
         >
-          <sphereGeometry args={[scaledRadius, (isMoonSelected ? 38 : 24), (isMoonSelected ? 28 : 16)]} />
+          <sphereGeometry args={[scaledValues.radius, (isMoonSelected ? 38 : 24), (isMoonSelected ? 28 : 16)]} />
           <meshStandardMaterial
             metalness={hasCollided ? 0.8 : 0.5}
             roughness={hasCollided ? 0.2 : 0.5}
@@ -327,27 +307,51 @@ const Moon = forwardRef(({ moonData, planetRef, parentName, scaledPlanetRadius }
           />
         </mesh>
 
-        {(displayLabels || (isHovered && !isMoonSelected)) && (
-          <Labels
-            key={name + '-label'}
-            text={name}
-            size={textSize}
-            position={[0, scale * 1.5, 0]}
-            color={hasCollided ? 'red' : color}
-            font={'../assets/fonts/Termina_Heavy.ttf'}
-            handleClick={handleClick}
-          />
+        {(displayLabels || isMoonSelected) && (
+          <Html
+            position={[0, scaledValues.radius * 1.2, 0]}
+            center
+            zIndexRange={[100, 0]}
+            occlude={simSpeed < 20000}
+            style={isMoonSelected ? { pointerEvents: 'none' } : {}}
+          >
+            <span
+              className="planet-label"
+              onClick={handleClick}
+              style={{
+                color: color,
+                fontSize: isMoonSelected ? '14px' : '12px',
+                cursor: 'pointer',
+              }}
+            >{name}</span>
+          </Html>
         )}
       </group>
 
-      {experimentType === 'newton-1' && localRef.current && (
+      {orbitPaths && (
+        <OrbitPath
+          origin={[0, 0, 0]}
+          radius={scaledValues.orbitalRadius}
+          eccentricity={eccentricity}
+          orbitalInclination={orbitalInclination}
+          color={color}
+          name={`${name}-orbit-path`}
+          hiRes={true}
+          lineType="solid"
+          lineWidth={1}
+          position={localRef.current?.position}
+        />
+      )}
+
+      {localRef.current && experimentType === 'newton-1' && (
         <GravityVectors
           moonRef={localRef}
-          planetPosition={planetPosition}
+          planetPosition={planetRef?.current?.position}
+          length={scaledValues.radius * massRatio * 100 / (localRef.current.position.length() || 1)}
         />
       )}
     </>
   );
 });
 
-export default Moon;
+export default MoonExperiments;
