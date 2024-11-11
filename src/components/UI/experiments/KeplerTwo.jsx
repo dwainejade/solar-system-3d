@@ -51,7 +51,6 @@ function KeplerTwo() {
         updatePlanetData(selectedPlanet, { eccentricity: originalEccentricity, initialOrbitalAngle: 0 });
         setExperimentStatus(null);
     };
-    // console.log(planetsData[selectedPlanet].initialOrbitalAngle)
     // Update local eccentricity if planet data changes externally
     useEffect(() => {
         setEccentricity(planetsData[selectedPlanet].eccentricity);

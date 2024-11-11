@@ -7,7 +7,6 @@ const GravityVectors = ({ moonRef, planetPosition, length = 3 }) => {
 
     const moonPos = moonRef.current.position;
     const planetPos = new Vector3(0, 0, 0);
-    // console.log({ length })
 
     // Calculate direction vectors
     const towardsPlanet = new Vector3()

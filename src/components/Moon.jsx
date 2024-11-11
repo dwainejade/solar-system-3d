@@ -19,7 +19,7 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName }, ref) => {
     eccentricity
   } = moonData;
 
-  const moonTexture = name === 'Moon' ? useTexture('../assets/earth/moon/2k_moon.jpg') : null;
+  const moonTexture = name === 'Moon' ? useTexture('../assets/earth/moon/moon.jpg') : null;
 
   const localRef = ref || useRef();
   const localAngleRef = useRef(Math.random() * 2 * Math.PI);
@@ -31,16 +31,26 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName }, ref) => {
     meanMotion: (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60)
   }), [radius, orbitalRadius, orbitalPeriod]);
 
-  const simSpeed = useStore(state => state.simSpeed);
-  const toggleDetailsMenu = useStore(state => state.toggleDetailsMenu);
-  const selectedMoon = usePlanetStore(state => state.selectedMoon);
-  const setSelectedMoon = usePlanetStore(state => state.setSelectedMoon);
-  const displayLabels = usePlanetStore(state => state.displayLabels);
-  const orbitPaths = usePlanetStore(state => state.orbitPaths);
-  const updateMoonPosition = usePlanetStore(state => state.updateMoonPosition);
-  const updateMoonWorldPosition = usePlanetStore(state => state.updateMoonWorldPosition);
-  const activeCamera = useCameraStore(state => state.activeCamera);
-  const switchToMoonCamera = useCameraStore(state => state.switchToMoonCamera);
+  const {
+    isSurfaceCameraActive,
+    satelliteCamera,
+    toggleSatelliteCamera,
+    setAutoRotate,
+    autoRotate,
+    activeCamera,
+    switchToPlanetCamera,
+    toggleCameraTransitioning,
+    switchToMoonCamera
+  } = useCameraStore()
+  const { simSpeed, toggleDetailsMenu } = useStore();
+  const { selectedMoon, setSelectedMoon, displayLabels, orbitPaths, updateMoonPosition, updateMoonWorldPosition } = usePlanetStore();
+
+  // const selectedMoon = usePlanetStore(state => state.selectedMoon);
+  // const setSelectedMoon = usePlanetStore(state => state.setSelectedMoon);
+  // const displayLabels = usePlanetStore(state => state.displayLabels);
+  // const orbitPaths = usePlanetStore(state => state.orbitPaths);
+  // const updateMoonPosition = usePlanetStore(state => state.updateMoonPosition);
+  // const updateMoonWorldPosition = usePlanetStore(state => state.updateMoonWorldPosition);
 
   const isMoonSelected = selectedMoon?.name === name;
 
@@ -54,7 +64,7 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName }, ref) => {
     metalness: 0.5,
     roughness: 0.8,
     map: moonTexture || null,
-    color: !moonTexture ? color : null
+    color: !moonTexture ? color : null,
   }), [moonTexture, color]);
 
   const handleClick = useCallback(e => {
@@ -65,6 +75,11 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName }, ref) => {
       switchToMoonCamera(parentName, name);
     }
   }, [isMoonSelected, moonData, parentName, name]);
+
+  const handleDoubleClick = e => {
+    e.stopPropagation();
+    setAutoRotate(!autoRotate);
+  };
 
   useFrame((state, delta) => {
     if (!localRef.current) return;
@@ -120,6 +135,8 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName }, ref) => {
         <mesh
           ref={meshRef}
           onClick={handleClick}
+          onDoubleClick={handleDoubleClick}
+          key={name}
           rotation={name === 'Moon' ? [0, Math.PI * 3.5, 0] : [0, 0, 0]}
         >
           <primitive object={geometry} />

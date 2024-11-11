@@ -3,12 +3,12 @@ import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
-import initialPlanetsData, { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
+import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
 import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCamera";
 import Moon from "./Moon";
 import Labels from "./Labels";
-import moonsData from "@/data/moonsData";
+import initialMoonsData from "@/data/moonsData";
 import { earthAtmosphereShader } from "../shaders/atmosphere";
 import Rings from "./Rings";
 
@@ -49,7 +49,7 @@ const calculateOrbitPosition = (meanAnomaly, eccentricity, radius) => {
 };
 
 const Planet = ({ name = 'Earth', textures }) => {
-  const { planetsData } = usePlanetStore();
+  const { planetsData, moonsData } = usePlanetStore();
   const bodyData = planetsData[name];
   const mergedData = { ...bodyData };
 

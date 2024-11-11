@@ -49,7 +49,7 @@ const MoonExperimentsTwo = forwardRef(({ moonData, planetRef, parentName, scaled
   // States
   const [hasCollided, setHasCollided] = useState(false);
   const isMoonSelected = selectedMoon && selectedMoon.name === name;
-  const moonTexture = name === 'Moon' ? useTexture('../assets/earth/moon/2k_moon.jpg') : null;
+  const moonTexture = name === 'Moon' ? useTexture('../assets/earth/moon/moon.jpg') : null;
 
   // Set initial position and handle experiment start/reset
   useEffect(() => {
@@ -150,7 +150,6 @@ const MoonExperimentsTwo = forwardRef(({ moonData, planetRef, parentName, scaled
             transparent
             opacity={0.6}
           />
-          {console.log("Rendering Line with points:", trailPointsRef.current)}
         </>
       )}
 
@@ -167,7 +166,7 @@ const MoonExperimentsTwo = forwardRef(({ moonData, planetRef, parentName, scaled
             roughness={hasCollided ? 0.2 : 0.5}
             map={!hasCollided ? moonTexture : null}
             color={hasCollided ? 'red' : (!moonTexture ? color : null)}
-            emissive={hasCollided ? 'darkred' : 'black'}
+            emissive={hasCollided ? 'darkred' : null}
           />
         </mesh>
 

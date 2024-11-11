@@ -152,10 +152,6 @@ const AnimatedKeplerTriangles = ({
         const hasLowAngle = angles.some(angle => angle < 1);
 
         if (hasHighAngle && hasLowAngle && currentAngle < lastAngle) {
-            // console.log("=== ORBIT COMPLETE - RESETTING ===", {
-            //     angles: angles.map(a => (a * 180 / Math.PI).toFixed(1) + "°"),
-            //     currentAngle: (currentAngle * 180 / Math.PI).toFixed(1) + "°"
-            // });
             setCompletedSlices([]);
             setCurrentIndex(0);
             setActiveSlice(null);
@@ -169,11 +165,6 @@ const AnimatedKeplerTriangles = ({
             const sliceEndAngle = equalAreaAngles[currentIndex + 1];
 
             if (!activeSlice) {
-                // console.log(`Starting new slice ${currentIndex}:`, {
-                //     sliceStartAngle: (sliceStartAngle * 180 / Math.PI).toFixed(1) + "°",
-                //     sliceEndAngle: (sliceEndAngle * 180 / Math.PI).toFixed(1) + "°",
-                //     currentAngle: (currentAngle * 180 / Math.PI).toFixed(1) + "°"
-                // });
 
                 setActiveSlice({
                     startAngle: sliceStartAngle,
@@ -185,13 +176,6 @@ const AnimatedKeplerTriangles = ({
                     isAngleBetween(lastAngle, sliceStartAngle, sliceEndAngle);
 
                 if (passedEndAngle) {
-                    // console.log(`Completing slice ${currentIndex}:`, {
-                    //     sliceStartAngle: (sliceStartAngle * 180 / Math.PI).toFixed(1) + "°",
-                    //     sliceEndAngle: (sliceEndAngle * 180 / Math.PI).toFixed(1) + "°",
-                    //     currentAngle: (currentAngle * 180 / Math.PI).toFixed(1) + "°",
-                    //     lastAngle: (lastAngle * 180 / Math.PI).toFixed(1) + "°"
-                    // });
-
                     setCompletedSlices(prev => [...prev, {
                         points: createSlicePoints(sliceStartAngle, sliceEndAngle),
                         color: activeSlice.color

@@ -137,17 +137,6 @@ const usePlanetStore = create(
                     }
                 });
             },
-            moonsData: initialMoonsData,
-            updateMoonData: (moonName, updates) => {
-                set((state) => {
-                    if (state.moonsData[moonName]) {
-                        Object.keys(updates).forEach(key => {
-                            state.moonsData[moonName][key] = updates[key];
-                        });
-                    }
-                });
-            },
-            // Action to reset all planetsData to initial state
             resetPlanetsData: () => {
                 // localStorage.removeItem('solar-system-planets');
                 set((state) => {
@@ -161,6 +150,72 @@ const usePlanetStore = create(
                     }
                 });
             },
+
+            moonsData: initialMoonsData,
+            updateMoonData: (parentName, moonName, updates) => {
+                set((state) => {
+                    // Create a full copy of the moonsData structure to ensure immutability
+                    const newMoonsData = {
+                        ...state.moonsData,
+                        [parentName]: state.moonsData[parentName].map((moon) =>
+                            moon.name === moonName
+                                ? { ...moon, ...updates } // Update the specific moon with new data
+                                : moon // Keep other moons unchanged
+                        ),
+                    };
+
+                    // Return the full updated moonsData to avoid overwriting other parts
+                    return { moonsData: newMoonsData };
+                });
+            },
+            resetMoonData: (parentName, moonName) => {
+                set(state => {
+                    const parentMoons = initialMoonsData[parentName];
+                    if (parentMoons) {
+                        const moonIndex = state.moonsData[parentName].findIndex(
+                            moon => moon.name === moonName
+                        );
+                        const initialMoonIndex = parentMoons.findIndex(
+                            moon => moon.name === moonName
+                        );
+
+                        if (moonIndex !== -1 && initialMoonIndex !== -1) {
+                            state.moonsData[parentName][moonIndex] = {
+                                ...parentMoons[initialMoonIndex]
+                            };
+                        }
+                    }
+                });
+            },
+            resetAllMoonData: () => {
+                set(state => {
+                    state.moonsData = JSON.parse(JSON.stringify(initialMoonsData));
+                });
+            },
+
+
+            handleBodyReset: () => set((state) => {
+                const activeCamera = useCameraStore.getState().activeCamera;
+
+                if (activeCamera.type === 'planet') {
+                    if (state.planetsData[activeCamera.name] && initialPlanetsData[activeCamera.name]) {
+                        state.planetsData[activeCamera.name] = initialPlanetsData[activeCamera.name];
+                    }
+                } else if (activeCamera.type === 'moon') {
+                    if (state.moonsData[activeCamera.parentName]) {
+                        const initialMoonData = initialMoonsData[activeCamera.parentName]?.find(
+                            moon => moon.name === activeCamera.name
+                        );
+                        if (initialMoonData) {
+                            state.moonsData[activeCamera.parentName] = state.moonsData[activeCamera.parentName].map(
+                                moon => moon.name === activeCamera.name ? initialMoonData : moon
+                            );
+                        }
+                    }
+                }
+                state.showResetPlanetModal = true;
+                return state;
+            }),
 
             selectedMoon: null,
             setSelectedMoon: (moonData) =>

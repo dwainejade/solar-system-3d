@@ -31,14 +31,6 @@ const Planet = forwardRef(({ name = 'Earth', textures }, ref) => {
     eccentricity,
   } = mergedData;
 
-  // Add debug logging
-  useEffect(() => {
-    console.log(`Planet ${name} data:`, {
-      eccentricity,
-      bodyData,
-      mergedData
-    });
-  }, [name, eccentricity, bodyData]);
 
   const { simSpeed, toggleDetailsMenu } = useStore();
   const {

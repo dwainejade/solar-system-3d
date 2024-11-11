@@ -89,7 +89,6 @@ const Menu = () => {
   };
 
   const handlePlanetSelect = (planetName) => {
-    console.log('handlePlanetSelect', planetName)
     switchToPlanetCamera(planetName);
   };
 

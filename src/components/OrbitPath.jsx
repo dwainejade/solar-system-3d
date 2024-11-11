@@ -85,7 +85,7 @@ function OrbitPath({
       lineWidth={lineWidth}
       transparent
       opacity={opacity}
-      depthWrite={depthWrite}
+      depthWrite={false}
     />
   );
 }
