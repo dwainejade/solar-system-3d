@@ -244,7 +244,7 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
                     vertexColors
                     roughness={0.7}      // Reduced for more specular highlights
                     metalness={0.5}      // Increased for more reflectivity
-                    emissive="#666"   // Slight self-illumination
+                    emissive="#999"   // Slight self-illumination
                     emissiveIntensity={activeCamera.type === 'planet' ? 0 : 0.1}
                     toneMapped={false}   // Preserve bright colors
                     transparent={true}
