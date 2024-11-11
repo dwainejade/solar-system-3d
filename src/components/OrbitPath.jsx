@@ -1,5 +1,5 @@
 import { Line } from "@react-three/drei";
-import * as THREE from "three";
+import { useMemo } from "react";
 
 function OrbitPath({
   origin,
@@ -12,48 +12,75 @@ function OrbitPath({
   opacity = 1,
   hiRes = false,
   depthWrite = true,
-  arcLength = 1.6 * Math.PI,
+  arcLength = 'full',
   position
 }) {
-  if (!position) return null;
+  // Only check position for partial arcs
+  if (arcLength !== 'full' && !position) return null;
 
-  const segments = hiRes ? 512 : 64;
-  const pointsArray = [];
+  const segments = hiRes ? 2048 : 64;
 
-  // Calculate start angle from current position
-  const startAngle = Math.atan2(
-    position.z * Math.cos(orbitalInclination * (Math.PI / 180)),
-    position.x
-  );
+  const points = useMemo(() => {
+    const pointsArray = [];
 
-  // Generate points along the elliptical orbit
-  for (let i = 0; i <= segments; i++) {
-    // Calculate angle for this point
-    const theta = startAngle - (i / segments) * arcLength;
+    if (arcLength === 'full') {
+      // For full orbit, generate complete ellipse starting from 0
+      for (let i = 0; i <= segments; i++) {
+        const theta = (i / segments) * 2 * Math.PI;
 
-    // Calculate radius at this angle using the elliptical orbit equation
-    const r = (radius * (1 - eccentricity * eccentricity)) /
-      (1 + eccentricity * Math.cos(theta));
+        // Calculate radius at this angle using the elliptical orbit equation
+        const r = (radius * (1 - eccentricity * eccentricity)) /
+          (1 + eccentricity * Math.cos(theta));
 
-    // Convert to Cartesian coordinates
-    const x = r * Math.cos(theta);
-    const baseZ = r * Math.sin(theta);
+        // Convert to Cartesian coordinates
+        const x = r * Math.cos(theta);
+        const baseZ = r * Math.sin(theta);
 
-    // Apply inclination
-    const inclination = orbitalInclination * (Math.PI / 180);
-    const y = Math.sin(inclination) * baseZ;
-    const z = Math.cos(inclination) * baseZ;
+        // Apply inclination
+        const inclination = orbitalInclination * (Math.PI / 180);
+        const y = Math.sin(inclination) * baseZ;
+        const z = Math.cos(inclination) * baseZ;
 
-    pointsArray.push([x, y, z]);
-  }
+        pointsArray.push([x, y, z]);
+      }
 
-  // Ensure the first point exactly matches the current position
-  pointsArray[0] = [position.x, position.y, position.z];
+      // Close the loop by connecting back to the start
+      pointsArray.push(pointsArray[0]);
+    } else {
+      // Calculate start angle from current position for partial arc
+      const startAngle = Math.atan2(
+        position.z * Math.cos(orbitalInclination * (Math.PI / 180)),
+        position.x
+      );
+
+      // Generate points for partial arc
+      for (let i = 0; i <= segments; i++) {
+        const theta = startAngle - (i / segments) * arcLength;
+
+        const r = (radius * (1 - eccentricity * eccentricity)) /
+          (1 + eccentricity * Math.cos(theta));
+
+        const x = r * Math.cos(theta);
+        const baseZ = r * Math.sin(theta);
+
+        const inclination = orbitalInclination * (Math.PI / 180);
+        const y = Math.sin(inclination) * baseZ;
+        const z = Math.cos(inclination) * baseZ;
+
+        pointsArray.push([x, y, z]);
+      }
+
+      // For partial arc, ensure first point matches current position
+      pointsArray[0] = [position.x, position.y, position.z];
+    }
+
+    return pointsArray;
+  }, [radius, eccentricity, orbitalInclination, segments, arcLength, position]);
 
   return (
     <Line
       name={name}
-      points={pointsArray}
+      points={points}
       color={color}
       lineWidth={lineWidth}
       transparent
