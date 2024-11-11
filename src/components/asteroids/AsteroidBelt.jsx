@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import useStore, { useCameraStore, usePlanetStore } from '../../store/store';
 import { distanceScaleFactor, MASS_OF_SUN, G, asteroidBeltData } from '../../data/planetsData';
 import Labels from '../Labels';
+import { Html } from '@react-three/drei';
 
 const AsteroidBelt = ({ meshCount = 500 }) => {
     const { simSpeed } = useStore();
@@ -198,26 +199,32 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
     return (
         <group>
             {(displayLabels || isHoveredRef.current) && (
-                <group ref={labelRef} position={[-100, 400, 3600]}>
-                    <Labels
-                        text="Asteroid Belt"
-                        size={textSizeRef.current}
-                        color="#FFA500"
-                        handleClick={() => {
+                <Html
+                    position={[-100, 700, 3600]}
+                    as='div'
+                    wrapperClass='label-wrapper'
+                    center
+                    zIndexRange={[100, 0]}
+                >
+                    <span
+                        className="planet-label"
+                        style={{ color: "#FFA500", cursor: 'pointer', fontSize: '12px', textAlign: 'center', whiteSpace: 'nowrap' }}
+                        onClick={() => {
                             if (activeCamera.name !== 'Asteroid Belt') {
                                 switchToCustomCamera('Asteroid Belt');
                             }
+                            console.log('clicked')
                         }}
-                        handlePointerOver={() => {
+                        onMouseEnter={() => {
                             isHoveredRef.current = true;
                             document.body.style.cursor = "pointer";
                         }}
-                        handlePointerOut={() => {
+                        onMouseLeave={() => {
                             isHoveredRef.current = false;
                             document.body.style.cursor = "auto";
                         }}
-                    />
-                </group>
+                    >Asteroid Belt</span>
+                </Html>
             )}
 
 
@@ -251,6 +258,8 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
                     opacity={opacity}
                 />
             </instancedMesh>
+
+
         </group>
     );
 };
