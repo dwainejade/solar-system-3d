@@ -8,7 +8,7 @@ import { moonDistanceScaleFactor, moonSizeScaleFactor } from "../data/moonsData"
 import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCameraMoon";
 
-const Moon = forwardRef(({ moonData, planetPosition, parentName }, ref) => {
+const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }, ref) => {
   const {
     name,
     orbitalRadius,
@@ -61,10 +61,20 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName }, ref) => {
   ), [scaledValues.radius, isMoonSelected]);
 
   const material = useMemo(() => new THREE.MeshStandardMaterial({
-    metalness: 0.5,
-    roughness: 0.8,
+    metalness: 0.2,
+    roughness: .8,
     map: moonTexture || null,
     color: !moonTexture ? color : null,
+    onBeforeCompile: (shader) => {
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <map_fragment>',
+        `
+        #include <map_fragment>
+        diffuseColor.rgb *= .7; // Reduce overall brightness
+        diffuseColor.rgb = pow(diffuseColor.rgb, vec3(1.5)); // Adjust contrast
+        `
+      );
+    }
   }), [moonTexture, color]);
 
   const handleClick = useCallback(e => {
@@ -148,7 +158,11 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName }, ref) => {
             position={[0, scaledValues.radius * 1.2, 0]}
             center
             zIndexRange={[100, 0]}
-            occlude={simSpeed < 20000}
+            occlude={parentMeshRef ? [parentMeshRef] : undefined}
+            occludeOptions={{
+              threshold: 0.1,
+              recursive: false
+            }}
             style={isMoonSelected ? { pointerEvents: 'none' } : {}}
           >
             <span

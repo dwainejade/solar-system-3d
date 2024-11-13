@@ -444,6 +444,7 @@ const Planet = ({ name = 'Earth', textures }) => {
                 moonData={moon}
                 planetPosition={localRef.current?.position}
                 parentName={name}
+                parentMeshRef={meshRef} // Pass the mesh reference
               />
             </group>
           );
