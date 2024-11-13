@@ -105,10 +105,6 @@ const Sun = ({ position, textures }) => {
           <meshBasicMaterial color={[10, 4, 0]} toneMapped={false} />
         )}
       </mesh>
-      <mesh key={`${name}-atmosphere`}>
-        <sphereGeometry args={[scale * 1.08, 32, 32]} />
-        <shaderMaterial args={[sunOuterShader]} />
-      </mesh>
     </group>
 
   );
