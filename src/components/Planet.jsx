@@ -9,7 +9,7 @@ import SatelliteCamera from "./SatelliteCamera";
 import Moon from "./Moon";
 import Labels from "./Labels";
 import initialMoonsData from "@/data/moonsData";
-import { earthAtmosphereShader } from "../shaders/atmosphere";
+import { earthAtmosphereShader } from "../shaders/earth/atmosphere";
 import Rings from "./Rings";
 
 // First, let's create these utilities outside the component
@@ -336,18 +336,31 @@ const Planet = ({ name = 'Earth', textures }) => {
             <meshBasicMaterial color={color} />
             :
             <>
-              {name === "Earth" && isPlanetSelected &&
+              {name === "Earth" && isPlanetSelected && (
                 <>
                   <mesh ref={cloudsRef} key={`${name}-cloud_texture`}>
-                    <sphereGeometry args={[Math.min(scaledRadius * 1.008), detailLevel, detailLevel / 2]} />
-                    <meshStandardMaterial alphaMap={textures?.clouds} transparent opacity={0.8} />
+                    <sphereGeometry args={[scaledRadius * 1.005, detailLevel, detailLevel / 2]} />
+                    <meshStandardMaterial
+                      alphaMap={textures?.clouds}
+                      transparent
+                      opacity={0.8}
+                      depthWrite={false}
+                    />
                   </mesh>
                   <mesh key={`${name}-atmosphere_texture`}>
-                    <sphereGeometry args={[Math.min(scaledRadius * 1.02), detailLevel, detailLevel / 2]} />
-                    <shaderMaterial args={[earthAtmosphereShader]} />
+                    <sphereGeometry args={[scaledRadius * 1.01, detailLevel, detailLevel]} />
+                    <shaderMaterial
+                      args={[earthAtmosphereShader]}
+                      transparent
+                      opacity={.1}
+                      side={THREE.BackSide}
+                      // blending={THREE.AdditiveBlending}
+                      depthWrite={false}
+                      depthTest={true}
+                    />
                   </mesh>
                 </>
-              }
+              )}
               <meshStandardMaterial
                 metalness={0.6}
                 roughness={0.8}
