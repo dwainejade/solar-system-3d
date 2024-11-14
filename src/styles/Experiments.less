@@ -81,17 +81,22 @@
   .modal {
     position: absolute;
     z-index: 500;
-    height: 450px;
+    height: 370px;
     width: 330px;
     top: 10%;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    gap: 2%;
     border-radius: 6px 0 0 6px;
     pointer-events: auto;
     background: url("../../public/assets/ui/side_panel_bg.png") no-repeat center center;
     background-size: 100% 100%;
     transition: all 0.2s ease-out;
+
+    &.newton-1 {
+      height: 450px;
+    }
 
     &.closed {
       right: -100%;
@@ -139,6 +144,16 @@
       flex-direction: column;
       justify-content: space-between;
 
+      &.experiments {
+        padding: 8% 4% 8% 8%;
+
+        header {
+          h4 {
+            color: @btn-color-4;
+          }
+        }
+      }
+
       header {
         display: flex;
         justify-content: space-between;
@@ -151,10 +166,6 @@
           margin: 0;
           text-transform: uppercase;
           flex: 70%;
-
-          &.experiments {
-            color: @btn-color-4;
-          }
         }
       }
       h2 {

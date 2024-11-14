@@ -69,17 +69,21 @@
 .experiments-modal-wrapper .modal {
   position: absolute;
   z-index: 500;
-  height: 450px;
+  height: 370px;
   width: 330px;
   top: 10%;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  gap: 2%;
   border-radius: 6px 0 0 6px;
   pointer-events: auto;
   background: url("../../public/assets/ui/side_panel_bg.png") no-repeat center center;
   background-size: 100% 100%;
   transition: all 0.2s ease-out;
+}
+.experiments-modal-wrapper .modal.newton-1 {
+  height: 450px;
 }
 .experiments-modal-wrapper .modal.closed {
   right: -100%;
@@ -123,6 +127,12 @@
   flex-direction: column;
   justify-content: space-between;
 }
+.experiments-modal-wrapper .modal .content.experiments {
+  padding: 8% 4% 8% 8%;
+}
+.experiments-modal-wrapper .modal .content.experiments header h4 {
+  color: #f46a68;
+}
 .experiments-modal-wrapper .modal .content header {
   display: flex;
   justify-content: space-between;
@@ -135,9 +145,6 @@
   margin: 0;
   text-transform: uppercase;
   flex: 70%;
-}
-.experiments-modal-wrapper .modal .content header h4.experiments {
-  color: #f46a68;
 }
 .experiments-modal-wrapper .modal .content h2 {
   font-family: "Termina-Black";

@@ -63,10 +63,10 @@ function ExperimentsModal() {
 
   return (
     <div className='experiments-modal-wrapper'>
-      <div className={`modal ${experimentsModal ? "open" : "closed"}`}>
-        <div className='content'>
+      <div className={`modal ${experimentType === null ? "experiments" : experimentType} ${experimentsModal ? "open" : "closed"}`}>
+        <div className={`content ${experimentType === null ? "experiments" : experimentType}`}>
           <header>
-            <h4 className={`${experimentType === null ? "experiments" : experimentType} title`}>{experimentHeader[experimentType]}</h4>
+            <h4 className='title'>{experimentHeader[experimentType]}</h4>
 
             <div className='close-btn-container'>
               <button className='close-modal' onClick={handleCloseModal}>
