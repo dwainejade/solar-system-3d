@@ -9,6 +9,7 @@ function NewtonGravity() {
   const { updatePlanetData, resetSinglePlanetData } = usePlanetStore();
   const { setSimSpeed, simSpeed, prevSpeed } = useStore();
   const { experimentPlanet, experimentStatus, setExperimentStatus } = useExperimentsStore();
+  console.log("experiment", experimentStatus);
 
   const selectedPlanet = experimentPlanet || "Earth";
 
@@ -96,10 +97,17 @@ function NewtonGravity() {
           amountOfTicks={3}
         />
 
+        <div className='details-con'>
+          <p>
+            Mass: <span> {((originalMass * massScale) / 1e24).toFixed(2)}e24 kg</span>
+          </p>
+          <p>
+            Gravitational Force: <span>{(calculateGravitationalForce() / 1e20).toFixed(2)}e20 N</span>
+          </p>
+        </div>
+
         <div className='description-con'>
-          <p>(F) = G * (m₁ * m₂) / r²</p>
-          <p>Current Mass: {((originalMass * massScale) / 1e24).toFixed(2)}e24 kg</p>
-          <p>Gravitational Force: {(calculateGravitationalForce() / 1e20).toFixed(2)}e20 N</p>
+          <p>The increased gravitational force between the earth and the moon cause the moon to crash into the earth. Uh oh!</p>
         </div>
       </div>
       <footer className='experiment-footer'>
