@@ -89,14 +89,14 @@
   right: 0;
   opacity: 1;
 }
-.experiments-modal-wrapper .modal .close-modal {
-  position: absolute;
-  z-index: 200;
-  top: 0;
-  right: 0;
+.experiments-modal-wrapper .modal .close-btn-container {
+  flex: 30%;
+  display: flex;
+  justify-content: flex-end;
+}
+.experiments-modal-wrapper .modal .close-btn-container .close-modal {
   width: 30px;
   height: 30px;
-  margin: 10px 8px 0 0;
   border-radius: 20px;
   border: 0;
   background-color: #f46a68;
@@ -108,7 +108,7 @@
   justify-content: center;
   align-items: center;
 }
-.experiments-modal-wrapper .modal .close-modal:hover {
+.experiments-modal-wrapper .modal .close-btn-container .close-modal:hover {
   background-color: cyan;
   color: #fff;
 }
@@ -124,11 +124,20 @@
   justify-content: space-between;
 }
 .experiments-modal-wrapper .modal .content header {
-  color: #f46a68;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.experiments-modal-wrapper .modal .content header h4 {
+  color: #f19a00;
   font-family: "Termina-Black";
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   margin: 0;
   text-transform: uppercase;
+  flex: 70%;
+}
+.experiments-modal-wrapper .modal .content header h4.experiments {
+  color: #f46a68;
 }
 .experiments-modal-wrapper .modal .content h2 {
   font-family: "Termina-Black";
