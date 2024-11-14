@@ -20,7 +20,7 @@ const SpeedSelector = ({ speedOptions, onSpeedSelect, disable }) => {
       {isOpen && (
         <div className='speed-selector-dropdown'>
           {speedOptions.map((option, index) => (
-            <div key={index} value={option.value} onClick={() => handleOptionClick(option)}>
+            <div className='speed-selector-item' key={index} value={option.value} onClick={() => handleOptionClick(option)}>
               {option.label}
             </div>
           ))}

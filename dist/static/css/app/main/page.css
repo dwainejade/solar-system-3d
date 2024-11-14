@@ -26,7 +26,9 @@
   padding: 4px 8px;
 }
 .planet-selector-menu,
-.speed-selector-menu {
+.speed-selector-menu,
+.planet-selector-dropdown,
+.speed-selector-dropdown {
   position: absolute;
   bottom: 100%;
   right: 0;
@@ -97,38 +99,6 @@
 .speed-selector-submenu.visible {
   visibility: visible;
   opacity: 1;
-}
-.speed-selector {
-  position: relative;
-  display: inline-block;
-}
-.speed-selector-button {
-  padding: 10px;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.speed-selector-dropdown {
-  position: absolute;
-  bottom: 100%;
-  /* Position above the button */
-  left: 0;
-  transform: translateY(-10px);
-  /* Small offset above the button */
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  z-index: 1;
-}
-.speed-selector-dropdown div {
-  padding: 10px;
-  cursor: pointer;
-}
-.speed-selector-dropdown div:hover {
-  background-color: #f0f0f0;
 }
 
 /*!************************************************************************************************************************************************************************************************************************************************************!*\
