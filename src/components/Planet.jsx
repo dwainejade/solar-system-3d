@@ -48,6 +48,30 @@ const calculateOrbitPosition = (meanAnomaly, eccentricity, radius) => {
   };
 };
 
+const RingSystem = ({ radius, color, width = 2 }) => {
+  const ringCount = 20;
+  const spacing = width / ringCount;
+
+  return (
+    <group rotation={[Math.PI / 2, 0, 0]}>
+      {Array.from({ length: ringCount }).map((_, i) => (
+        <OrbitPath
+          key={`ring-${i}`}
+          origin={[0, 0, 0]}
+          radius={radius + (i * spacing)}
+          color={color}
+          lineWidth={0.2}
+          opacity={0.4}
+          hiRes={true}
+          eccentricity={0}
+          orbitalInclination={0}
+        />
+      ))}
+    </group>
+  );
+};
+
+
 const Planet = ({ name = 'Earth', textures }) => {
   const { planetsData, moonsData } = usePlanetStore();
   const bodyData = planetsData[name];
@@ -128,12 +152,6 @@ const Planet = ({ name = 'Earth', textures }) => {
   const [showTextures, setShowTextures] = useState(false);
   const textureDisplayDistance = 500;
   const [orbitPathOpacity, setOrbitPathOpacity] = useState(1);
-
-
-  const earthParameters = {
-    atmosphereDayColor: '#0088FF',
-    atmosphereTwilightColor: '#FF9D00'
-  };
 
 
   useEffect(() => {
@@ -330,6 +348,7 @@ const Planet = ({ name = 'Earth', textures }) => {
           ref={meshRef}
           key={isPlanetSelected ? name + '-textured' : name + '-basic'}
           onDoubleClick={handleDoubleClick}
+          castShadow
         >
           <sphereGeometry args={[(renderMoons() ? scaledRadius : scaleRef.current * 8), detailLevel, detailLevel / 2]} />
           {((!isPlanetSelected && !renderMoons()) && texturesLoaded) ?

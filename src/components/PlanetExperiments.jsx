@@ -11,7 +11,7 @@ import SatelliteCamera from "./SatelliteCamera";
 import Moon from "./MoonExperiments";
 import MoonTwo from "./MoonExperimentsTwo";
 import Labels from "./Labels";
-import { earthAtmosphereShader } from "../shaders/atmosphere";
+import { earthAtmosphereShader } from "../shaders/earth/atmosphere";
 import Rings from "./Rings";
 import KeplerTriangles from "./KeplerTriangles";
 import GravityVectors from "./GravityVectors";
@@ -85,7 +85,7 @@ const Planet = ({ name = 'Earth', textures }) => {
     return false;
   };
 
-  const detailLevel = (isPlanetSelected || renderMoons()) ? 64 : 16;
+  const detailLevel = (isPlanetSelected || renderMoons()) ? 128 : 32;
 
   const [scale, setScale] = useState(scaledRadius);
   const textSize = useRef(1);
@@ -256,8 +256,37 @@ const Planet = ({ name = 'Earth', textures }) => {
   // Calculate safe geometry values
   const visibleSphereRadius = Math.max(0.1, renderMoons() ? scaledRadius : scale * 8);
   const planetSphereRadius = Math.max(0.1, renderMoons() ? scaledRadius : scale * 8);
-  const cloudSphereRadius = Math.max(0.1, scaledRadius * 1.008);
-  const atmosphereSphereRadius = Math.max(0.1, scaledRadius * 1.02);
+  const cloudSphereRadius = Math.max(0.1, scaledRadius * 1.005);
+  const atmosphereSphereRadius = Math.max(0.1, scaledRadius * 1.008);
+
+  const orbitPathConfig = () => {
+    switch (experimentType) {
+      case 'kepler-2':
+        return {
+          lineWidth: 1,
+          color: '#fff',
+          opacity: .5,
+          hiRes: true,
+          transparent: true,
+        }
+      case 'kepler-3':
+        return {
+          lineWidth: 1,
+          color: '#fff',
+          opacity: .5,
+          hiRes: true,
+          transparent: true,
+        }
+      default:
+        return {
+          lineWidth: 2,
+          color: color,
+          opacity: 1,
+          transparent: true,
+          hiRes: true,
+        }
+    }
+  };
 
   return (
     <>
@@ -272,7 +301,7 @@ const Planet = ({ name = 'Earth', textures }) => {
       <group ref={localRef}>
         <mesh
           visible={false}
-          onClick={handleClick}
+          // onClick={handleClick}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
@@ -365,7 +394,7 @@ const Planet = ({ name = 'Earth', textures }) => {
             <span
               className='planet-label'
               style={{ color }}
-              onClick={handleClick}
+              // onClick={handleClick}
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
@@ -406,11 +435,9 @@ const Planet = ({ name = 'Earth', textures }) => {
           radius={scaledOrbitalRadius}
           eccentricity={eccentricity}
           orbitalInclination={orbitalInclination}
-          color={color}
+          color={'#fff'}
           name={name + "-orbit-path"}
-          lineWidth={2}
-          opacity={.5}
-          hiRes={isPlanetSelected}
+          {...orbitPathConfig()}
           position={localRef.current?.position}
         />
       )}

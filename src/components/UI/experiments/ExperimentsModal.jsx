@@ -1,13 +1,23 @@
 import useExperimentsStore from "../../../store/experiments"
-import useStore, { usePlanetStore } from "../../../store/store";
+import useStore, { usePlanetStore, useCameraStore } from "../../../store/store";
 import KeplerOne from "./KeplerOne";
 import KeplerTwo from "./KeplerTwo";
 import KeplerThree from "./KeplerThree";
 import NewtonOne from "./NewtonOne";
 
 function ExperimentsModal() {
-    const { experimentsModal, toggleExperimentsModal, experimentType, setExperimentType } = useExperimentsStore();
+    const { experimentsModal, toggleExperimentsModal, experimentType, setExperimentType, experimentPlanet } = useExperimentsStore();
     const { updatePlanetData, planetsData } = usePlanetStore();
+    const { switchToCustomCamera } = useCameraStore();
+
+    const handleExperiementType = (type) => {
+        setExperimentType(type);
+
+        // Switch camera for Kepler's Second Law
+        if (type === 'kepler-2') {
+            switchToCustomCamera('Kepler-2', planetsData[experimentPlanet]);
+        }
+    }
     const handleCloseModal = () => {
         if (experimentType) {
             setExperimentType(null);
@@ -16,9 +26,6 @@ function ExperimentsModal() {
         toggleExperimentsModal(false);
     }
 
-    const handleExperiementType = (type) => {
-        setExperimentType(type);
-    }
 
     const defaultMenu = () => {
         return (
@@ -46,7 +53,7 @@ function ExperimentsModal() {
 
 
     return (
-        <div className='experiments-modal-wrapper'>
+        <div className={`experiments-modal-wrapper ${experimentType ? experimentType : 'main'} `}>
             <div className={`modal ${experimentsModal ? "open" : "closed"}`}>
                 <button className="close-modal" onClick={handleCloseModal}>x</button>
 

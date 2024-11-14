@@ -19,41 +19,44 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
     eccentricity
   } = moonData;
 
-  const moonTexture = name === 'Moon' ? useTexture('../assets/earth/moon/moon.jpg') : null;
-
+  // Refs instead of state
   const localRef = ref || useRef();
   const localAngleRef = useRef(Math.random() * 2 * Math.PI);
   const meshRef = useRef();
+  const worldPositionRef = useRef(new Vector3());
+  const moonTexture = name === 'Moon' ? useTexture('../assets/earth/moon/moon.jpg') : null;
 
+  // Pre-calculate values that don't change
   const scaledValues = useMemo(() => ({
     radius: radius * moonSizeScaleFactor,
     orbitalRadius: orbitalRadius * moonDistanceScaleFactor,
-    meanMotion: (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60)
-  }), [radius, orbitalRadius, orbitalPeriod]);
+    meanMotion: (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60),
+    inclination: orbitalInclination * (Math.PI / 180)
+  }), [radius, orbitalRadius, orbitalPeriod, orbitalInclination]);
 
   const {
     isSurfaceCameraActive,
     satelliteCamera,
-    toggleSatelliteCamera,
+    activeCamera,
     setAutoRotate,
     autoRotate,
-    activeCamera,
-    switchToPlanetCamera,
-    toggleCameraTransitioning,
     switchToMoonCamera
   } = useCameraStore()
-  const { simSpeed, toggleDetailsMenu } = useStore();
-  const { selectedMoon, setSelectedMoon, displayLabels, orbitPaths, updateMoonPosition, updateMoonWorldPosition } = usePlanetStore();
 
-  // const selectedMoon = usePlanetStore(state => state.selectedMoon);
-  // const setSelectedMoon = usePlanetStore(state => state.setSelectedMoon);
-  // const displayLabels = usePlanetStore(state => state.displayLabels);
-  // const orbitPaths = usePlanetStore(state => state.orbitPaths);
-  // const updateMoonPosition = usePlanetStore(state => state.updateMoonPosition);
-  // const updateMoonWorldPosition = usePlanetStore(state => state.updateMoonWorldPosition);
+  const { simSpeed, toggleDetailsMenu } = useStore();
+  const {
+    selectedMoon,
+    setSelectedMoon,
+    displayLabels,
+    orbitPaths,
+    updateMoonPosition,
+    updateMoonWorldPosition
+  } = usePlanetStore();
 
   const isMoonSelected = selectedMoon?.name === name;
+  const isActiveMoon = name === activeCamera?.name;
 
+  // Memoize geometry and material
   const geometry = useMemo(() => new THREE.SphereGeometry(
     scaledValues.radius,
     isMoonSelected ? 32 : 14,
@@ -70,8 +73,8 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
         '#include <map_fragment>',
         `
         #include <map_fragment>
-        diffuseColor.rgb *= .7; // Reduce overall brightness
-        diffuseColor.rgb = pow(diffuseColor.rgb, vec3(1.5)); // Adjust contrast
+        diffuseColor.rgb *= .7;
+        diffuseColor.rgb = pow(diffuseColor.rgb, vec3(1.5));
         `
       );
     }
@@ -86,10 +89,14 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
     }
   }, [isMoonSelected, moonData, parentName, name]);
 
-  const handleDoubleClick = e => {
+  const handleDoubleClick = useCallback(e => {
     e.stopPropagation();
     setAutoRotate(!autoRotate);
-  };
+  }, [autoRotate, setAutoRotate]);
+
+  // Pre-calculate vectors for performance
+  const lookAtVector = useMemo(() => new Vector3(), []);
+  const positionVector = useMemo(() => new Vector3(), []);
 
   useFrame((state, delta) => {
     if (!localRef.current) return;
@@ -97,6 +104,7 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
     const adjustedDelta = delta * simSpeed;
     localAngleRef.current -= scaledValues.meanMotion * adjustedDelta;
 
+    // Kepler's equation solver
     let E = localAngleRef.current;
     for (let i = 0; i < 10; i++) {
       const deltaE = (E - eccentricity * Math.sin(E) - localAngleRef.current) /
@@ -114,26 +122,28 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
 
     const x = r * Math.cos(-trueAnomaly);
     const baseZ = r * Math.sin(-trueAnomaly);
-    const inclination = orbitalInclination * (Math.PI / 180);
-    const y = Math.sin(inclination) * baseZ;
-    const z = Math.cos(inclination) * baseZ;
+    const y = Math.sin(scaledValues.inclination) * baseZ;
+    const z = Math.cos(scaledValues.inclination) * baseZ;
 
-    localRef.current.position.set(x, y, z);
+    positionVector.set(x, y, z);
+    localRef.current.position.copy(positionVector);
 
-    if (isMoonSelected || name === activeCamera?.name) {
-      const worldPos = localRef.current.getWorldPosition(new Vector3());
-      updateMoonPosition(name, { x: worldPos.x, y: worldPos.y, z: worldPos.z });
-      updateMoonWorldPosition(name, { x: worldPos.x, y: worldPos.y, z: worldPos.z });
+    if (isMoonSelected || isActiveMoon) {
+      localRef.current.getWorldPosition(worldPositionRef.current);
+      const pos = worldPositionRef.current;
+      updateMoonPosition(name, { x: pos.x, y: pos.y, z: pos.z });
+      updateMoonWorldPosition(name, { x: pos.x, y: pos.y, z: pos.z });
     }
 
     if (name === 'Moon' && planetPosition) {
-      localRef.current.lookAt(new Vector3(...planetPosition));
+      lookAtVector.set(...planetPosition);
+      localRef.current.lookAt(lookAtVector);
     }
   });
 
   return (
     <>
-      {activeCamera?.name === name && localRef.current && (
+      {isActiveMoon && localRef.current && (
         <SatelliteCamera
           target={localRef.current}
           targetName={name}
@@ -186,12 +196,13 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
           orbitalInclination={orbitalInclination}
           color={color}
           name={`${name}-orbit-path`}
-          hiRes={isMoonSelected}
+          hiRes={true}
           lineType="solid"
-          lineWidth={isMoonSelected ? 1 : 0.4}
+          lineWidth={isMoonSelected ? 1 : .6}
           position={localRef.current?.position}
         />
       )}
+
     </>
   );
 });

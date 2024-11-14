@@ -81,7 +81,7 @@
   .modal {
     position: absolute;
     z-index: 500;
-    height: 370px;
+    height: 400px;
     width: 330px;
     top: 10%;
     display: flex;
@@ -90,7 +90,7 @@
     border-radius: 6px 0 0 6px;
     pointer-events: auto;
     background: url("../../public/assets/ui/side_panel_bg.png") no-repeat center center;
-    background-size: 100% 100%;
+    // background-size: 100% 100%;
     transition: all 0.2s ease-out;
 
     &.closed {
@@ -214,8 +214,27 @@
     }
   }
 
-  .kepler-1,
-  .kepler-2 {
+  &.kepler-1,
+  &.kepler-2,
+  &.kepler-3,
+  &.newton-1 {
+    .content header {
+      color: #e69c38;
+      font-size: 0.7rem;
+      font-weight: bold;
+      width: 200px;
+    }
+
+    .info-con {
+      .label {
+        color: white;
+      }
+      .value {
+        color: #70eeff;
+        font-weight: bold;
+      }
+    }
+
     .slider-con {
       display: flex;
       flex-direction: column;

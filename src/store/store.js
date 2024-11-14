@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import * as THREE from 'three';
-import initialPlanetsData from '../data/planetsData';
+import initialPlanetsData, { distanceScaleFactor } from '../data/planetsData';
 import initialMoonsData from '../data/moonsData';
 import useExperimentsStore from './experiments';
 
@@ -279,6 +279,31 @@ const customCameraAngles = {
         title: 'Asteroid Belt',
         position: [-700, 2200, 6600],
         target: [0, 0, 0]
+    },
+    'Kepler-2': {
+        title: 'Kepler-2',
+        calculatePosition: (planet) => {
+            if (!planet) return [-700, 2200, 6600];
+
+            const orbitalRadius = planet.orbitalRadius * distanceScaleFactor;
+            const eccentricity = planet.eccentricity;
+            // Calculate offset based on eccentricity
+            const centerOffset = orbitalRadius * eccentricity;
+
+            return [
+                centerOffset,       // Offset x to account for eccentricity
+                orbitalRadius * 2,  // Height above orbital plane
+                0                   // Center on z-axis
+            ];
+        },
+        calculateTarget: (planet) => {
+            if (!planet) return [0, 0, 0];
+
+            const orbitalRadius = planet.orbitalRadius * distanceScaleFactor;
+            const centerOffset = orbitalRadius * planet.eccentricity;
+
+            return [centerOffset, 0, 0]; // Target the center of the elliptical orbit
+        }
     }
 }
 
@@ -452,21 +477,28 @@ const useCameraStore = create((set, get) => ({
     //     });
     // },
 
-    switchToCustomCamera: (id) => {
-        // Get custom camera data
+    switchToCustomCamera: (id, planet = null) => {
         const customCameraData = customCameraAngles[id];
         if (!customCameraData) return;
-        const { position, target, title } = customCameraData;
+
+        const position = customCameraData.calculatePosition
+            ? customCameraData.calculatePosition(planet)
+            : customCameraData.position;
+
+        const target = customCameraData.calculateTarget
+            ? customCameraData.calculateTarget(planet)
+            : customCameraData.target;
+
         set({
             activeCamera: {
                 type: 'custom',
-                name: title,
+                name: customCameraData.title,
                 position: new THREE.Vector3(...position),
-                target: new THREE.Vector3(...target)
+                target: new THREE.Vector3(...target),
+                custom: { planet }
             },
             isCameraTransitioning: true
-        }
-        );
+        });
     },
 
     // Legacy camera states - maintained for backward compatibility
