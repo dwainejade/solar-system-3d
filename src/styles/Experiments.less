@@ -81,7 +81,7 @@
   .modal {
     position: absolute;
     z-index: 500;
-    height: 370px;
+    height: 380px;
     width: 330px;
     top: 10%;
     display: flex;
@@ -152,6 +152,10 @@
             color: @btn-color-4;
           }
         }
+
+        h2 {
+          font-size: 1.4rem;
+        }
       }
 
       header {
@@ -171,9 +175,9 @@
       h2 {
         font-family: "Termina-Black";
         text-transform: uppercase;
-        font-size: 1.1rem;
+        font-size: 1.8rem;
         margin: 0;
-        margin-bottom: 4px;
+        // margin-bottom: 4px;
         color: @off-white-color;
       }
 
@@ -182,10 +186,12 @@
         flex-direction: column;
         justify-content: center;
         gap: 20px;
-        border: solid 1px #fff;
+        border: solid 2px #fff;
         padding: 10px;
         p {
-          color: @bg-color-2;
+          font-size: 0.9rem;
+          color: #e1cdaa;
+          font-weight: 500;
           margin: 0;
         }
       }
@@ -250,7 +256,7 @@
     .slider-con {
       display: flex;
       flex-direction: column;
-      margin: 20px 0;
+      margin: 20px 0 30px 0;
       .slider-control {
         display: flex;
         justify-content: space-between;

@@ -41,9 +41,7 @@ function ExperimentsModal() {
           </div>
         </div>
         <div className='kepler-section'>
-          <h2 className='title'>
-            Kepler's Laws <span>{">"}</span>
-          </h2>
+          <h2 className='title'>Kepler's Laws</h2>
 
           <div className='btn-con'>
             <button className='btn' onClick={() => handleExperiementType("kepler-1")}>

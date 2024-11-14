@@ -69,7 +69,7 @@
 .experiments-modal-wrapper .modal {
   position: absolute;
   z-index: 500;
-  height: 370px;
+  height: 380px;
   width: 330px;
   top: 10%;
   display: flex;
@@ -133,6 +133,9 @@
 .experiments-modal-wrapper .modal .content.experiments header h4 {
   color: #f46a68;
 }
+.experiments-modal-wrapper .modal .content.experiments h2 {
+  font-size: 1.4rem;
+}
 .experiments-modal-wrapper .modal .content header {
   display: flex;
   justify-content: space-between;
@@ -149,9 +152,8 @@
 .experiments-modal-wrapper .modal .content h2 {
   font-family: "Termina-Black";
   text-transform: uppercase;
-  font-size: 1.1rem;
+  font-size: 1.8rem;
   margin: 0;
-  margin-bottom: 4px;
   color: #e1cdaa;
 }
 .experiments-modal-wrapper .modal .content .description-con {
@@ -159,11 +161,13 @@
   flex-direction: column;
   justify-content: center;
   gap: 20px;
-  border: solid 1px #fff;
+  border: solid 2px #fff;
   padding: 10px;
 }
 .experiments-modal-wrapper .modal .content .description-con p {
-  color: #fdf3e0;
+  font-size: 0.9rem;
+  color: #e1cdaa;
+  font-weight: 500;
   margin: 0;
 }
 .experiments-modal-wrapper .modal .content .newton-section {
@@ -216,7 +220,7 @@
 .experiments-modal-wrapper .kepler-2 .slider-con {
   display: flex;
   flex-direction: column;
-  margin: 20px 0;
+  margin: 20px 0 30px 0;
 }
 .experiments-modal-wrapper .kepler-1 .slider-con .slider-control,
 .experiments-modal-wrapper .kepler-2 .slider-con .slider-control {

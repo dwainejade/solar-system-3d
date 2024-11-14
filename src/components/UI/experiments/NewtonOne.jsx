@@ -79,7 +79,7 @@ function NewtonGravity() {
   return (
     <>
       <div className='newton-section kepler-1'>
-        <h2 className='title'>{selectedPlanet} Mass Scale</h2>
+        <h2 className='title'>{selectedPlanet}</h2>
 
         <Slider
           name={"newton-gravity-slider"}
