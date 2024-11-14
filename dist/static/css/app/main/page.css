@@ -54,11 +54,24 @@
   color: #717171;
 }
 .planet-selector-item.active,
-.speed-selector-item.active {
+.speed-selector-item.active,
+.planet-selector-item:hover,
+.speed-selector-item:hover {
   background-color: #add1d7;
 }
 .planet-selector-item.active > span,
-.speed-selector-item.active > span {
+.speed-selector-item.active > span,
+.planet-selector-item:hover > span,
+.speed-selector-item:hover > span {
+  font-weight: bold;
+  color: #000;
+}
+.planet-selector-item:hover,
+.speed-selector-item:hover {
+  background-color: #add1d7;
+}
+.planet-selector-item:hover > span,
+.speed-selector-item:hover > span {
   font-weight: bold;
   color: #000;
 }

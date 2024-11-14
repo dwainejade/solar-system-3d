@@ -52,16 +52,21 @@
     border: transparent 2px solid;
     color: #717171;
 
-    &.active {
+    &.active,
+    &:hover {
       background-color: @active-color;
       & > span {
         font-weight: bold;
         color: #000;
       }
     }
-    // &:hover {
-    //   background-color: #55555520;
-    // }
+    &:hover {
+      background-color: @active-color;
+      & > span {
+        font-weight: bold;
+        color: #000;
+      }
+    }
 
     &-chevron {
       margin-left: 8px;
