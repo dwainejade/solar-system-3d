@@ -82,6 +82,12 @@ function KeplerTwo() {
           amountOfTicks={10}
         />
 
+        <div className='details-con'>
+          <p>
+            Eccentricity: <span>{eccentricity}</span>
+          </p>
+        </div>
+
         <div className='description-con'>
           <p>
             Kepler's second law states that a planet sweeps out equal areas in equal times, moving faster when the planet is closer to the

@@ -90,7 +90,7 @@ function KeplerThree() {
 
   return (
     <>
-      <div className='newton-section kepler-1'>
+      <div className='newton-section kepler-3'>
         <h2 className='title'>{selectedPlanet}</h2>
 
         <Slider
@@ -109,25 +109,23 @@ function KeplerThree() {
           amountOfTicks={10}
         />
 
-        <div className='answer-con' style={{ color: "white" }}>
-          <p>Current AU: {AU.toFixed(2)}</p>
-          <p>Current Orbital Period: {calculatePeriod(AU).toFixed(2)} years</p>
-
-          <p>Natural AU: {initialAU.toFixed(2)}</p>
-          <p>Natural Period: {(originalOrbitalPeriod / 365.25).toFixed(2)} years</p>
+        <div className='details-con'>
+          <p>
+            Earth's AU: <span>{AU.toFixed(2)}</span>
+          </p>
         </div>
       </div>
 
-      <footer className='experiment-footer'>
+      <footer className='experiment-footer kepler-3-footer'>
         <button
           className={`btn start-btn ${experimentStatus === "started" ? "active" : ""}`}
           onClick={handleStartExperiment}
           disabled={experimentStatus === "started"}
         >
-          Start Experiment
+          Calculate Orbital Period
         </button>
         <button className='btn reset-btn' onClick={handleReset}>
-          Reset Values
+          Reset
         </button>
       </footer>
     </>

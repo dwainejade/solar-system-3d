@@ -58,7 +58,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 30px;
+    height: 40px;
 
     &:hover {
       background-color: darken(@label-color, 10%);
@@ -96,6 +96,13 @@
 
     &.newton-1 {
       height: 450px;
+    }
+
+    &.kepler-1 {
+      height: 400px;
+    }
+    &.kepler-2 {
+      height: 430px;
     }
 
     &.closed {
@@ -200,8 +207,14 @@
         flex-direction: column;
 
         .details-con {
+          padding-left: 2rem;
           p {
+            &:first-child {
+              margin-top: 0;
+            }
+
             color: #e1cdaa;
+            font-weight: 500;
             span {
               color: #a6f5ff;
             }
@@ -229,9 +242,19 @@
     display: flex;
     justify-content: space-evenly;
 
+    &.kepler-3-footer {
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+
+      .btn {
+        width: 190px;
+      }
+    }
+
     .btn {
       padding: 8px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: #fff;
       width: 135px;
       white-space: nowrap;
@@ -252,7 +275,11 @@
   }
 
   .kepler-1,
-  .kepler-2 {
+  .kepler-2,
+  .kepler-3 {
+    .slider-con.kepler-2-slider {
+      margin: 20px 0;
+    }
     .slider-con {
       display: flex;
       flex-direction: column;
