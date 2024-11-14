@@ -78,6 +78,7 @@
   border-radius: 6px 0 0 6px;
   pointer-events: auto;
   background: url("../../public/assets/ui/side_panel_bg.png") no-repeat center center;
+  background-size: 100% 100%;
   transition: all 0.2s ease-out;
 }
 .experiments-modal-wrapper .modal.closed {
