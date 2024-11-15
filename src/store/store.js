@@ -280,31 +280,16 @@ const customCameraAngles = {
         position: [-700, 2200, 6600],
         target: [0, 0, 0]
     },
-    'Kepler-2': {
-        title: 'Kepler-2',
-        calculatePosition: (planet) => {
-            if (!planet) return [-700, 2200, 6600];
-
-            const orbitalRadius = planet.orbitalRadius * distanceScaleFactor;
-            const eccentricity = planet.eccentricity;
-            // Calculate offset based on eccentricity
-            const centerOffset = orbitalRadius * eccentricity;
-
-            return [
-                centerOffset,       // Offset x to account for eccentricity
-                orbitalRadius * 2,  // Height above orbital plane
-                0                   // Center on z-axis
-            ];
-        },
-        calculateTarget: (planet) => {
-            if (!planet) return [0, 0, 0];
-
-            const orbitalRadius = planet.orbitalRadius * distanceScaleFactor;
-            const centerOffset = orbitalRadius * planet.eccentricity;
-
-            return [centerOffset, 0, 0]; // Target the center of the elliptical orbit
-        }
-    }
+    'kepler': {
+        title: 'kepler',
+        position: [700, 2200, 6600],
+        target: [0, 0, 0]
+    },
+    'newton': {
+        title: 'newton',
+        position: [700, 2000, 1000],
+        target: [0, 0, 0]
+    },
 }
 
 const useCameraStore = create((set, get) => ({
@@ -479,8 +464,9 @@ const useCameraStore = create((set, get) => ({
 
     switchToCustomCamera: (id, planet = null) => {
         const customCameraData = customCameraAngles[id];
+        console.log('custom camera data', customCameraData)
         if (!customCameraData) return;
-
+        console.log('switching to custom camera', customCameraData)
         const position = customCameraData.calculatePosition
             ? customCameraData.calculatePosition(planet)
             : customCameraData.position;
