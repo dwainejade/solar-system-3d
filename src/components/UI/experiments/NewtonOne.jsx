@@ -9,7 +9,6 @@ function NewtonGravity() {
   const { updatePlanetData, resetSinglePlanetData } = usePlanetStore();
   const { setSimSpeed, simSpeed, prevSpeed } = useStore();
   const { experimentPlanet, experimentStatus, setExperimentStatus } = useExperimentsStore();
-  console.log("experiment", experimentStatus);
 
   const selectedPlanet = experimentPlanet || "Earth";
 
