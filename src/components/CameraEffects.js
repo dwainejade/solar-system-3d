@@ -5,7 +5,6 @@ import { usePlanetStore } from "../store/store";
 const CameraEffects = () => {
     const { camera } = useThree();
     const { selectedPlanet, selectedMoon } = usePlanetStore();
-    console.log(selectedPlanet)
     // Effect to change camera properties based on selectedPlanet
     useEffect(() => {
         if (selectedPlanet) {

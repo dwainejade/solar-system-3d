@@ -4,22 +4,27 @@ import useStore, { usePlanetStore, useCameraStore } from "../../store/store";
 import DetailsMenu from "./DetailsMenu";
 import ResetModal from "./ResetModal";
 import FocusLock from 'react-focus-lock';
+import PlanetSelector from "./PlanetSelector";
 
 const Menu = () => {
   const {
     simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, toggleFullscreen,
-    showDetailsMenu, toggleDetailsMenu
+    showDetailsMenu, toggleDetailsMenu, viewOnlyMode, resetAllData,
   } = useStore();
   const {
     selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels, planetsData,
-    resetPlanetsData, showResetPlanetModal, showResetAllModal, toggleResetAllModal, orbitPaths, toggleOrbitPaths,
+    resetPlanetsData, showResetPlanetModal, showResetAllModal, toggleResetAllModal, orbitPaths, toggleOrbitPaths, moonsData, setSelectedMoon, selectedMoon
   } = usePlanetStore();
-  const { setTriggerReset, toggleSatelliteCamera, isCameraTransitioning, satelliteCamera, autoRotate, isZoomingToSun } = useCameraStore();
+  const { toggleSatelliteCamera, isCameraTransitioning, satelliteCamera, autoRotate, isZoomingToSun, switchToMoonCamera, switchToCustomCamera, switchToPlanetCamera, activeCamera, resetCamera } = useCameraStore();
 
   const [firstRender, setFirstRender] = useState(true);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [textClass, setTextClass] = useState('');
   const [displayText, setDisplayText] = useState('');
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [hoveredPlanetName, setHoveredPlanetName] = useState(null); // Track which planet's moons are displayed
+
 
   const toggleMenu = () => {
     setMenuOpen(!isMenuOpen);
@@ -30,18 +35,36 @@ const Menu = () => {
   };
 
   const handleResetAll = () => {
-    setTriggerReset(true);
-    resetPlanetsData();
+    resetAllData();
     toggleSatelliteCamera(false);
-  };
-
-  const resetCamera = () => {
-    setTriggerReset(true);
   };
 
   const handleFullscreen = () => {
     toggleFullscreen();
   };
+
+
+  useEffect(() => {
+    setIsDropdownOpen(false);
+    if (activeCamera.type === 'planet') {
+      setSelectedPlanet(planetsData[activeCamera.name]);
+      // setSelectedMoon(null);
+      toggleDetailsMenu(true);
+    }
+
+    if (activeCamera.type === 'moon') {
+      // setSelectedPlanet(null);
+      const moon = moonsData[activeCamera.parentName]?.find((m) => m.name === activeCamera.name);
+      setSelectedMoon(moon);
+      toggleDetailsMenu(true);
+    }
+
+    if (activeCamera.name === 'Asteroid Belt') {
+      setSelectedPlanet(null);
+      // setSelectedMoon(null);
+      toggleDetailsMenu(true);
+    }
+  }, [activeCamera]);
 
   const speedOptions = [
     { label: "-1 year /s", value: -31557600 },
@@ -65,16 +88,32 @@ const Menu = () => {
     setPrevSpeed(newSpeed);
   };
 
-  const handlePlanetChange = (e) => {
-    const newSelectedPlanetName = e.target.value;
-    if (newSelectedPlanetName === 'reset-camera') {
-      resetCamera();
-      setSelectedPlanet(null);
-    } else {
-      const newSelectedPlanet = planetsData[newSelectedPlanetName];
-      setSelectedPlanet(newSelectedPlanet);
-      toggleDetailsMenu(true);
-    }
+  const handlePlanetSelect = (planetName) => {
+    switchToPlanetCamera(planetName);
+  };
+
+
+  const handleMoonSelect = (planetName, moonName) => {
+    const planet = planetsData[planetName];
+    setSelectedPlanet(planet);
+    setTimeout(() => {
+      switchToMoonCamera(planetName, moonName);
+    }, 100);
+  };
+
+  const handleSolarSystemSelect = () => {
+    resetCamera();
+  };
+
+  const handleAsteroidBeltSelect = () => {
+    setSelectedPlanet({
+      name: "Asteroid Belt",
+    });
+    setSelectedPlanet(null);
+    setSelectedMoon(null);
+    toggleDetailsMenu(true);
+    switchToCustomCamera('Asteroid Belt');
+    setIsDropdownOpen(false);
   };
 
   useLayoutEffect(() => {
@@ -107,48 +146,45 @@ const Menu = () => {
   }, [autoRotate]);
 
 
+  const disableSpeedToggle = () => {
+    if (activeCamera.type === 'custom') return false;
+    else if (isCameraTransitioning || !isMenuOpen) return true;
+    return false;
+  };
+
   return (
     <div className={`menu-wrapper ${showResetAllModal || showResetPlanetModal ? "disabled" : "enabled"}`}>
-
-      {/* Text that slides and fades in/out */}
       <div className={`auto-rotate-text ${textClass}`}>
         {displayText}
       </div>
-      {/* Reset button */}
-      <button className="reset-all-btn btn" onClick={handleResetBtn} />
-      {/* Fullscreen button */}
+
+      {!viewOnlyMode && <button className="reset-all-btn btn" onClick={handleResetBtn} />}
       <button className="fullscreen-btn btn" onClick={handleFullscreen} />
 
-      {/* Bottom menu */}
       <div className={`bottom-menu ${isMenuOpen ? "open" : "closed"}`}>
         <button onClick={toggleMenu} className="menu-toggle-btn btn" />
 
         <div className="left-con">
-          {/* Dropdown for selecting planets */}
           <div className="menu-item">
-            <label htmlFor="planetSelection">Select a Planet</label>
-            <select
-              id="planetSelection"
-              onChange={handlePlanetChange}
-              value={selectedPlanet?.name || "Select a Planet"}
-              disabled={!isMenuOpen}
-            >
-              <option value="reset-camera">Solar System</option>
-              {Object.keys(planetsData).map((planetName) => (
-                <option key={planetName} value={planetName}>
-                  {planetName}
-                </option>
-              ))}
-            </select>
+            <label>Select a Planet</label>
+            <PlanetSelector
+              planetsData={planetsData}
+              moonsData={moonsData}
+              activeCamera={activeCamera}
+              onPlanetSelect={handlePlanetSelect}
+              onMoonSelect={handleMoonSelect}
+              onSolarSystemSelect={handleSolarSystemSelect}
+              onAsteroidBeltSelect={handleAsteroidBeltSelect}
+            />
           </div>
-          {/* Dropdown for sim speed */}
+
           <div className="menu-item">
             <label htmlFor="simSpeedSelect">Simulation Speed</label>
             <select
               id="simSpeedSelect"
               onChange={handleSpeedChange}
-              value={isCameraTransitioning ? prevSpeed : simSpeed}
-              disabled={isCameraTransitioning || !isMenuOpen}
+              value={simSpeed === 0 ? prevSpeed : simSpeed}
+              disabled={disableSpeedToggle()}
             >
               {speedOptions.map((option, index) => (
                 <option key={index} value={option.value}>
@@ -158,7 +194,7 @@ const Menu = () => {
             </select>
           </div>
         </div>
-        {/* Divider */}
+
         <div className="divider" />
         <div className="right-con">
           <div className="menu-item">
@@ -192,29 +228,33 @@ const Menu = () => {
       </div>
 
       {/* Details menu */}
-      <div
-        className={`details-menu ${selectedPlanet &&
-          (!isCameraTransitioning && showDetailsMenu && satelliteCamera || selectedPlanet?.name === "Sun" && !isZoomingToSun)
-          ? "open"
-          : "closed"
-          }`}
-        key={selectedPlanet?.name}
-      >
-        <div className="details-menu-inner">
-          {selectedPlanet?.name &&
-            <DetailsMenu />
-          }
+      <>
+        <div
+          className={`details-menu ${selectedPlanet &&
+            (!isCameraTransitioning && showDetailsMenu && satelliteCamera || selectedPlanet?.name === "Sun" && !isZoomingToSun)
+            ? "open"
+            : "closed"
+            }`}
+          key={selectedPlanet?.name}
+        >
+          <div className="details-menu-inner">
+            {(activeCamera.type === 'planet' || activeCamera.type === 'moon' || activeCamera.name === 'Asteroid Belt' || activeCamera.name === 'Sun') &&
+              <DetailsMenu />
+            }
+          </div>
         </div>
-      </div>
 
-      {(showResetPlanetModal || showResetAllModal) && (
-        <>
-          <div className="backdrop" />
-          <FocusLock>
-            <ResetModal type={showResetPlanetModal ? "single" : "all"} handleResetAll={handleResetAll} />
-          </FocusLock>
-        </>
-      )}
+        {(showResetPlanetModal || showResetAllModal) && (
+          <>
+            <div className="backdrop" />
+            <FocusLock>
+              <ResetModal type={showResetPlanetModal ? "single" : "all"} handleResetAll={handleResetAll} />
+            </FocusLock>
+          </>
+        )}
+
+      </>
+
     </div>
   );
 };

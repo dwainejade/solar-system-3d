@@ -1,146 +1,185 @@
-import React, { useRef, forwardRef, useState, useMemo } from "react";
+import React, { useRef, forwardRef, useCallback, useMemo } from "react";
+import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
-import useStore, { useCameraStore, usePlanetStore } from "../store/store";
-import { useTexture } from "@react-three/drei";
+import { Html, useTexture } from "@react-three/drei";
 import { Vector3 } from "three";
+import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import { moonDistanceScaleFactor, moonSizeScaleFactor } from "../data/moonsData";
 import OrbitPath from "./OrbitPath";
-import SatelliteCamera from "./SatelliteCamera";
-import Labels from "./Labels";
+import SatelliteCamera from "./SatelliteCameraMoon";
 
-const Moon = forwardRef(({ moonData, planetPosition }, ref) => {
-  const { name, orbitalRadius, radius, color, orbitalPeriod, orbitalInclination } = moonData;
-  const { simSpeed, toggleDetailsMenu } = useStore();
-  const { selectedMoon, moonAngles, setSelectedMoon, updateMoonPosition, updateMoonWorldPosition, setSelectedPlanet, displayLabels, orbitPaths } = usePlanetStore();
-  const { satelliteCamera, toggleSatelliteCamera } = useCameraStore();
+const Moon = forwardRef(({ moonData, planetPosition, parentName }, ref) => {
+  const {
+    name,
+    orbitalRadius,
+    radius,
+    color,
+    orbitalPeriod,
+    orbitalInclination,
+    eccentricity
+  } = moonData;
+
+  const moonTexture = name === 'Moon' ? useTexture('../assets/earth/moon/moon.jpg') : null;
 
   const localRef = ref || useRef();
-  const localAngleRef = useRef(moonAngles[name] || Math.random() * 2 * Math.PI);
+  const localAngleRef = useRef(Math.random() * 2 * Math.PI);
+  const meshRef = useRef();
 
-  const isMoonSelected = selectedMoon && selectedMoon.name === name;
+  const scaledValues = useMemo(() => ({
+    radius: radius * moonSizeScaleFactor,
+    orbitalRadius: orbitalRadius * moonDistanceScaleFactor,
+    meanMotion: (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60)
+  }), [radius, orbitalRadius, orbitalPeriod]);
 
-  const moonTexture = name === 'Moon' ? useTexture('../assets/earth/moon/2k_moon.jpg') : null;
+  const {
+    isSurfaceCameraActive,
+    satelliteCamera,
+    toggleSatelliteCamera,
+    setAutoRotate,
+    autoRotate,
+    activeCamera,
+    switchToPlanetCamera,
+    toggleCameraTransitioning,
+    switchToMoonCamera
+  } = useCameraStore()
+  const { simSpeed, toggleDetailsMenu } = useStore();
+  const { selectedMoon, setSelectedMoon, displayLabels, orbitPaths, updateMoonPosition, updateMoonWorldPosition } = usePlanetStore();
 
-  const scaledRadius = radius * moonSizeScaleFactor;
-  const scaledOrbitalRadius = orbitalRadius * moonDistanceScaleFactor;
+  // const selectedMoon = usePlanetStore(state => state.selectedMoon);
+  // const setSelectedMoon = usePlanetStore(state => state.setSelectedMoon);
+  // const displayLabels = usePlanetStore(state => state.displayLabels);
+  // const orbitPaths = usePlanetStore(state => state.orbitPaths);
+  // const updateMoonPosition = usePlanetStore(state => state.updateMoonPosition);
+  // const updateMoonWorldPosition = usePlanetStore(state => state.updateMoonWorldPosition);
 
-  const orbitalSpeed = useMemo(() => {
-    return (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60); // Orbital period in Earth days
-  }, [orbitalPeriod]);
+  const isMoonSelected = selectedMoon?.name === name;
 
+  const geometry = useMemo(() => new THREE.SphereGeometry(
+    scaledValues.radius,
+    isMoonSelected ? 32 : 14,
+    isMoonSelected ? 16 : 12
+  ), [scaledValues.radius, isMoonSelected]);
+
+  const material = useMemo(() => new THREE.MeshStandardMaterial({
+    metalness: 0.5,
+    roughness: 0.8,
+    map: moonTexture || null,
+    color: !moonTexture ? color : null,
+  }), [moonTexture, color]);
+
+  const handleClick = useCallback(e => {
+    e.stopPropagation();
+    if (!isMoonSelected) {
+      toggleDetailsMenu(true);
+      setSelectedMoon(moonData);
+      switchToMoonCamera(parentName, name);
+    }
+  }, [isMoonSelected, moonData, parentName, name]);
+
+  const handleDoubleClick = e => {
+    e.stopPropagation();
+    setAutoRotate(!autoRotate);
+  };
 
   useFrame((state, delta) => {
-    localAngleRef.current -= orbitalSpeed * simSpeed * delta;
-
-    const angle = localAngleRef.current;
-    const moonX = Math.cos(angle) * scaledOrbitalRadius;
-    const moonZ = Math.sin(angle) * scaledOrbitalRadius;
-    const inclination = orbitalInclination * (Math.PI / 180);
-    const moonY = Math.sin(angle) * Math.sin(inclination) * scaledOrbitalRadius;
-
-    if (localRef.current) {
-      localRef.current.position.set(moonX, moonY, moonZ);
-      updateMoonPosition(name, { x: moonX, y: moonY, z: moonZ });
-      if (name === 'Moon' && planetPosition) {
-        // Point the moon towards the parent planet's position
-        const planetPos = new Vector3(...planetPosition);
-        localRef.current.lookAt(planetPos);
-      }
-      // Log position to debug
-      // console.log(`Moon ${name} position:`, localRef.current.position);
-    } else {
-      console.error(`Local ref is not set for moon ${name}`);
-    }
-  });
-
-  const handleClick = e => {
-    e.stopPropagation();
-    // toggleDetailsMenu(false);
-
-    // if (isMoonSelected) return;
-    // setSelectedMoon(moonData);
-  };
-
-  const [isHovered, setIsHovered] = useState(false);
-  const handlePointerOver = e => {
-    e.stopPropagation();
-    setIsHovered(true);
-    // document.body.style.cursor = "pointer";
-  };
-
-  const handlePointerOut = e => {
-    e.stopPropagation();
-    setIsHovered(false);
-    // document.body.style.cursor = "auto";
-  };
-
-  const [scale, setScale] = useState(scaledRadius);
-  const [textSize, setTextSize] = useState(1);
-  useFrame(({ camera }) => {
     if (!localRef.current) return;
 
-    const worldPosition = localRef.current.getWorldPosition(new Vector3());
-    const distance = worldPosition.distanceTo(camera.position);
-    updateMoonWorldPosition(name, { x: worldPosition.x, y: worldPosition.y, z: worldPosition.z });
-    const textSizeFactor = 0.016;
-    if (distance / 100 <= scaledRadius) {
-      setScale(scaledRadius);
-    } else {
-      setScale(distance / 100);
-    }
-    if (distance < 4500) {
-      setTextSize(textSizeFactor * distance);
+    const adjustedDelta = delta * simSpeed;
+    localAngleRef.current -= scaledValues.meanMotion * adjustedDelta;
+
+    let E = localAngleRef.current;
+    for (let i = 0; i < 10; i++) {
+      const deltaE = (E - eccentricity * Math.sin(E) - localAngleRef.current) /
+        (1 - eccentricity * Math.cos(E));
+      E -= deltaE;
+      if (Math.abs(deltaE) < 1e-6) break;
     }
 
+    const trueAnomaly = 2 * Math.atan(
+      Math.sqrt((1 + eccentricity) / (1 - eccentricity)) * Math.tan(E / 2)
+    );
+
+    const r = (scaledValues.orbitalRadius * (1 - eccentricity * eccentricity)) /
+      (1 + eccentricity * Math.cos(trueAnomaly));
+
+    const x = r * Math.cos(-trueAnomaly);
+    const baseZ = r * Math.sin(-trueAnomaly);
+    const inclination = orbitalInclination * (Math.PI / 180);
+    const y = Math.sin(inclination) * baseZ;
+    const z = Math.cos(inclination) * baseZ;
+
+    localRef.current.position.set(x, y, z);
+
+    if (isMoonSelected || name === activeCamera?.name) {
+      const worldPos = localRef.current.getWorldPosition(new Vector3());
+      updateMoonPosition(name, { x: worldPos.x, y: worldPos.y, z: worldPos.z });
+      updateMoonWorldPosition(name, { x: worldPos.x, y: worldPos.y, z: worldPos.z });
+    }
+
+    if (name === 'Moon' && planetPosition) {
+      localRef.current.lookAt(new Vector3(...planetPosition));
+    }
   });
-
-  // convert localRef.current.position to world position
-  // const worldPosition = localRef.current?.getWorldPosition(new Vector3());
-  // const newTarget = { position: worldPosition };
 
   return (
     <>
-      {/* {isMoonSelected && localRef.current &&
-        <SatelliteCamera target={localRef.current} targetName={name} size={scaledRadius} satelliteCamera={satelliteCamera} toggleSatelliteCamera={toggleSatelliteCamera} />
-      } */}
+      {activeCamera?.name === name && localRef.current && (
+        <SatelliteCamera
+          target={localRef.current}
+          targetName={name}
+          size={scaledValues.radius}
+        />
+      )}
 
       <group ref={localRef}>
-        {/* Invisible mesh for interaction */}
         <mesh
-          visible={false}
-          onPointerOver={handlePointerOver}
-          onPointerOut={handlePointerOut}
+          ref={meshRef}
           onClick={handleClick}
+          onDoubleClick={handleDoubleClick}
+          key={name}
+          rotation={name === 'Moon' ? [0, Math.PI * 3.5, 0] : [0, 0, 0]}
         >
-          <sphereGeometry args={[(Math.max(scaledRadius, scale)) * 2, 8, 8]} />
+          <primitive object={geometry} />
+          <primitive object={material} />
         </mesh>
 
-        <mesh key={name + '-textured'} rotation={name === 'Moon' ? [0, Math.PI * 3.5, 0] : [0, 0, 0]}>
-          <sphereGeometry args={[scaledRadius, 14, 12]} />
-          <meshStandardMaterial metalness={0.5} roughness={0.5} map={moonTexture || null} color={!moonTexture ? color : null} />
-        </mesh>
-
-        {(displayLabels || isHovered && !isMoonSelected) && simSpeed < 200000 && (
-          <Labels key={name + '-label'} text={name} size={textSize} position={[0, scale * 1.5, 0]} color={color} font={'../assets/fonts/Termina_Heavy.ttf'} />
+        {(displayLabels || isMoonSelected) && (
+          <Html
+            position={[0, scaledValues.radius * 1.2, 0]}
+            center
+            zIndexRange={[100, 0]}
+            occlude={simSpeed < 20000}
+            style={isMoonSelected ? { pointerEvents: 'none' } : {}}
+          >
+            <span
+              className="planet-label"
+              onClick={handleClick}
+              style={{
+                color: color,
+                fontSize: isMoonSelected ? '14px' : '12px',
+                cursor: 'pointer',
+              }}
+            >{name}</span>
+          </Html>
         )}
       </group>
 
       {orbitPaths && (
-        <group position={[0, 0, 0]}>
-          <OrbitPath
-            origin={[0, 0, 0]}
-            radius={scaledOrbitalRadius}
-            orbitalInclination={orbitalInclination}
-            color={color}
-            name={name + "-orbit-path"}
-            hiRes={isMoonSelected}
-            lineType={'solid'}
-            opacity={0.3}
-          />
-        </group>
+        <OrbitPath
+          origin={[0, 0, 0]}
+          radius={scaledValues.orbitalRadius}
+          eccentricity={eccentricity}
+          orbitalInclination={orbitalInclination}
+          color={color}
+          name={`${name}-orbit-path`}
+          hiRes={isMoonSelected}
+          lineType="solid"
+          lineWidth={isMoonSelected ? 1 : 0.4}
+          position={localRef.current?.position}
+        />
       )}
     </>
   );
 });
 
-export default Moon;
+export default React.memo(Moon);

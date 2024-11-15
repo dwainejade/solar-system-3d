@@ -1,0 +1,355 @@
+@font-face {
+  font-family: "Termina-Black";
+  src: url("../../src/fonts/Termina_Black.ttf"), format("truetype");
+  font-weight: 900;
+  font-style: normal;
+}
+@font-face {
+  font-family: "FranklinGothic-URW";
+  src: url("../../src/fonts/FranklinGothic_URW_Medium.ttf"), format("truetype");
+  font-weight: medium;
+  font-style: normal;
+}
+.left-button-con {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  gap: 10px;
+  padding: 5px;
+  position: absolute;
+  top: 0;
+}
+.left-button-con .reset-all-btn {
+  height: 40px;
+  width: 40px;
+  position: relative;
+}
+.left-button-con .experiments-btn {
+  height: 30px;
+  padding: 5px 12px;
+}
+.experiments-modal-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 100%;
+}
+.experiments-modal-wrapper .btn {
+  border: none;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #463a39;
+  background-color: #f19a00;
+  text-align: left;
+  transition: all 0.05s ease-in-out;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 40px;
+}
+.experiments-modal-wrapper .btn:hover {
+  background-color: #be7900;
+}
+.experiments-modal-wrapper .btn:active {
+  scale: 0.95 !important;
+}
+.experiments-modal-wrapper button {
+  pointer-events: all;
+  cursor: pointer;
+}
+.experiments-modal-wrapper button:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  filter: grayscale(1);
+}
+.experiments-modal-wrapper .modal {
+  position: absolute;
+  z-index: 500;
+  height: 380px;
+  width: 330px;
+  top: 10%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2%;
+  border-radius: 6px 0 0 6px;
+  pointer-events: auto;
+  background: url("../../public/assets/ui/side_panel_bg.png") no-repeat center center;
+  background-size: 100% 100%;
+  transition: all 0.2s ease-out;
+}
+.experiments-modal-wrapper .modal.newton-1 {
+  height: 450px;
+}
+.experiments-modal-wrapper .modal.kepler-1 {
+  height: 400px;
+}
+.experiments-modal-wrapper .modal.kepler-2 {
+  height: 430px;
+}
+.experiments-modal-wrapper .modal.closed {
+  right: -100%;
+  opacity: 0;
+}
+.experiments-modal-wrapper .modal.open {
+  right: 0;
+  opacity: 1;
+}
+.experiments-modal-wrapper .modal .close-btn-container {
+  flex: 30%;
+  display: flex;
+  justify-content: flex-end;
+}
+.experiments-modal-wrapper .modal .close-btn-container .close-modal {
+  width: 30px;
+  height: 30px;
+  border-radius: 20px;
+  border: 0;
+  background-color: #f46a68;
+  color: #000;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.experiments-modal-wrapper .modal .close-btn-container .close-modal:hover {
+  background-color: cyan;
+  color: #fff;
+}
+.experiments-modal-wrapper .modal .content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  padding: 6% 4% 6% 8%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.experiments-modal-wrapper .modal .content.experiments {
+  padding: 8% 4% 8% 8%;
+}
+.experiments-modal-wrapper .modal .content.experiments header h4 {
+  color: #f46a68;
+}
+.experiments-modal-wrapper .modal .content.experiments h2 {
+  font-size: 1.4rem;
+}
+.experiments-modal-wrapper .modal .content header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.experiments-modal-wrapper .modal .content header h4 {
+  color: #f19a00;
+  font-family: "Termina-Black";
+  font-size: 0.75rem;
+  margin: 0;
+  text-transform: uppercase;
+  flex: 70%;
+}
+.experiments-modal-wrapper .modal .content h2 {
+  font-family: "Termina-Black";
+  text-transform: uppercase;
+  font-size: 1.8rem;
+  margin: 0;
+  color: #e1cdaa;
+}
+.experiments-modal-wrapper .modal .content .description-con {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  border: solid 2px #fff;
+  padding: 10px;
+}
+.experiments-modal-wrapper .modal .content .description-con p {
+  font-size: 0.9rem;
+  color: #e1cdaa;
+  font-weight: 500;
+  margin: 0;
+}
+.experiments-modal-wrapper .modal .content .newton-section {
+  display: flex;
+  flex-direction: column;
+}
+.experiments-modal-wrapper .modal .content .newton-section .details-con {
+  padding-left: 2rem;
+}
+.experiments-modal-wrapper .modal .content .newton-section .details-con p {
+  color: #e1cdaa;
+  font-weight: 500;
+}
+.experiments-modal-wrapper .modal .content .newton-section .details-con p:first-child {
+  margin-top: 0;
+}
+.experiments-modal-wrapper .modal .content .newton-section .details-con p span {
+  color: #a6f5ff;
+}
+.experiments-modal-wrapper .modal .content .kepler-section {
+  display: flex;
+  flex-direction: column;
+}
+.experiments-modal-wrapper .modal .content .btn-con {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.experiments-modal-wrapper .modal .content .btn-con .btn {
+  padding: 5px 10px;
+}
+.experiments-modal-wrapper .experiment-footer {
+  display: flex;
+  justify-content: space-evenly;
+}
+.experiments-modal-wrapper .experiment-footer.kepler-3-footer {
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+.experiments-modal-wrapper .experiment-footer.kepler-3-footer .btn {
+  width: 190px;
+}
+.experiments-modal-wrapper .experiment-footer .btn {
+  padding: 8px;
+  font-size: 0.85rem;
+  color: #fff;
+  width: 135px;
+  white-space: nowrap;
+  justify-content: center;
+}
+.experiments-modal-wrapper .experiment-footer .btn.start-btn {
+  background-color: #969b17;
+}
+.experiments-modal-wrapper .experiment-footer .btn.start-btn:hover {
+  background-color: #6b6f10;
+}
+.experiments-modal-wrapper .experiment-footer .btn.reset-btn {
+  background-color: #f46a68;
+}
+.experiments-modal-wrapper .experiment-footer .btn.reset-btn:hover {
+  background-color: #f13b38;
+}
+.experiments-modal-wrapper .kepler-1 .slider-con.kepler-2-slider,
+.experiments-modal-wrapper .kepler-2 .slider-con.kepler-2-slider,
+.experiments-modal-wrapper .kepler-3 .slider-con.kepler-2-slider {
+  margin: 20px 0;
+}
+.experiments-modal-wrapper .kepler-1 .slider-con,
+.experiments-modal-wrapper .kepler-2 .slider-con,
+.experiments-modal-wrapper .kepler-3 .slider-con {
+  display: flex;
+  flex-direction: column;
+  margin: 20px 0 30px 0;
+}
+.experiments-modal-wrapper .kepler-1 .slider-con .slider-control,
+.experiments-modal-wrapper .kepler-2 .slider-con .slider-control,
+.experiments-modal-wrapper .kepler-3 .slider-con .slider-control {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.experiments-modal-wrapper .kepler-1 .slider.disabled,
+.experiments-modal-wrapper .kepler-2 .slider.disabled,
+.experiments-modal-wrapper .kepler-3 .slider.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+.experiments-modal-wrapper .kepler-1 .input-con,
+.experiments-modal-wrapper .kepler-2 .input-con,
+.experiments-modal-wrapper .kepler-3 .input-con {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  translate: 0 10px;
+  width: 90%;
+  margin: 0 4%;
+  /* slider styling */
+}
+.experiments-modal-wrapper .kepler-1 .input-con input[type="range"],
+.experiments-modal-wrapper .kepler-2 .input-con input[type="range"],
+.experiments-modal-wrapper .kepler-3 .input-con input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 1.5px;
+  background: linear-gradient(to right, transparent 0%, transparent 2.5%, #dfcda7 2.5%, #dfcda7 97.5%, transparent 97.5%, transparent 100%);
+  outline: none;
+}
+.experiments-modal-wrapper .kepler-1 .input-con input[type="range"]::-webkit-slider-thumb,
+.experiments-modal-wrapper .kepler-2 .input-con input[type="range"]::-webkit-slider-thumb,
+.experiments-modal-wrapper .kepler-3 .input-con input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 11px;
+  height: 11px;
+  background: #ff6b6b;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.experiments-modal-wrapper .kepler-1 .input-con input[type="range"]::-webkit-slider-thumb:hover,
+.experiments-modal-wrapper .kepler-2 .input-con input[type="range"]::-webkit-slider-thumb:hover,
+.experiments-modal-wrapper .kepler-3 .input-con input[type="range"]::-webkit-slider-thumb:hover {
+  background: #ff8585;
+}
+.experiments-modal-wrapper .kepler-1 .input-con .slider-markers,
+.experiments-modal-wrapper .kepler-2 .input-con .slider-markers,
+.experiments-modal-wrapper .kepler-3 .input-con .slider-markers {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  color: #dfcda7;
+}
+.experiments-modal-wrapper .kepler-1 .input-con .slider-ticks,
+.experiments-modal-wrapper .kepler-2 .input-con .slider-ticks,
+.experiments-modal-wrapper .kepler-3 .input-con .slider-ticks {
+  position: absolute;
+  top: -20%;
+  left: 3%;
+  width: 95.5%;
+  height: 60%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  z-index: -1;
+}
+.experiments-modal-wrapper .kepler-1 .input-con .slider-ticks .tick,
+.experiments-modal-wrapper .kepler-2 .input-con .slider-ticks .tick,
+.experiments-modal-wrapper .kepler-3 .input-con .slider-ticks .tick {
+  width: 1.5px;
+  height: 100%;
+  background-color: #dfcda7;
+}
+.experiments-modal-wrapper .kepler-1 .increment-btn,
+.experiments-modal-wrapper .kepler-2 .increment-btn,
+.experiments-modal-wrapper .kepler-3 .increment-btn,
+.experiments-modal-wrapper .kepler-1 .decrement-btn,
+.experiments-modal-wrapper .kepler-2 .decrement-btn,
+.experiments-modal-wrapper .kepler-3 .decrement-btn {
+  width: 24px;
+  height: 20px;
+  border-radius: 20px;
+  border: 0;
+  background-color: #f19a00;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.05s ease-in-out;
+  font-size: 1rem;
+  padding: 0;
+}
+.experiments-modal-wrapper .kepler-1 .increment-btn:hover,
+.experiments-modal-wrapper .kepler-2 .increment-btn:hover,
+.experiments-modal-wrapper .kepler-3 .increment-btn:hover,
+.experiments-modal-wrapper .kepler-1 .decrement-btn:hover,
+.experiments-modal-wrapper .kepler-2 .decrement-btn:hover,
+.experiments-modal-wrapper .kepler-3 .decrement-btn:hover {
+  background-color: #ffb025;
+}
