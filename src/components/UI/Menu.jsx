@@ -209,7 +209,7 @@ const Menu = () => {
 
           <div className='menu-item'>
             <label htmlFor='simSpeedSelect'>Simulation Speed</label>
-            <SpeedSelector speedOptions={speedOptions} onSpeedSelect={handleSpeedChange} disable={disableSpeedToggle} />
+            <SpeedSelector simSpeed={simSpeed} speedOptions={speedOptions} onSpeedSelect={handleSpeedChange} disable={disableSpeedToggle} />
             {/* <select
               id='simSpeedSelect'
               onChange={handleSpeedChange}

@@ -22,9 +22,7 @@
   padding: 4px 8px;
 }
 .planet-selector-menu,
-.speed-selector-menu,
-.planet-selector-dropdown,
-.speed-selector-dropdown {
+.speed-selector-menu {
   position: absolute;
   bottom: 100%;
   right: 0;
