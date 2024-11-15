@@ -307,27 +307,45 @@ const Planet = ({ name = 'Earth', textures }) => {
     switch (experimentType) {
       case 'kepler-2':
         return {
-          lineWidth: 1,
+          name: name + 'orbital-path',
           color: '#fff',
-          opacity: .5,
+          lineWidth: 1,
+          opacity: 1,
           hiRes: true,
           transparent: true,
+          arcLength: .8,
+          origin: orbitalOrigin,
+          radius: scaledOrbitalRadius,
+          eccentricity,
+          orbitalInclination,
         }
       case 'kepler-3':
         return {
-          lineWidth: 1,
-          color: '#fff',
-          opacity: .5,
+          name: name + 'orbital-path',
+          color,
+          lineWidth: 5,
+          opacity: .1,
           hiRes: true,
           transparent: true,
+          arcLength: .8,
+          origin: orbitalOrigin,
+          radius: scaledOrbitalRadius,
+          eccentricity,
+          orbitalInclination,
         }
       default:
         return {
+          name: name + 'orbital-path',
+          color,
           lineWidth: 2,
-          color: color,
           opacity: 1,
           transparent: true,
           hiRes: true,
+          arcLength: .8,
+          origin: orbitalOrigin,
+          radius: scaledOrbitalRadius,
+          eccentricity,
+          orbitalInclination,
         }
     }
   };
@@ -475,15 +493,8 @@ const Planet = ({ name = 'Earth', textures }) => {
 
       {orbitPaths && experimentType !== 'newton-1' && (
         <OrbitPath
-          origin={orbitalOrigin}
-          radius={scaledOrbitalRadius}
-          eccentricity={eccentricity}
-          orbitalInclination={orbitalInclination}
-          color={'#fff'}
-          name={name + "-orbit-path"}
-          {...orbitPathConfig()}
           position={localRef.current?.position}
-          arcLength={1}
+          {...orbitPathConfig()}
         />
       )}
 
