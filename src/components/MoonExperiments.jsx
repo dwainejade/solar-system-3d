@@ -236,6 +236,7 @@ const MoonExperiments = forwardRef(({ moonData, planetRef, parentName, scaledPla
     switchToMoonCamera(parentName, name);
   };
 
+
   return (
     <>
       {activeCamera?.name === name && localRef.current && (
@@ -248,118 +249,72 @@ const MoonExperiments = forwardRef(({ moonData, planetRef, parentName, scaledPla
         />
       )}
 
-      {orbitPaths && (
-        experimentType ? (
-          <>
-            <MotionTrail
-              target={localRef}
-              color={color}
-              width={5}
-              opacity={1}
-              active={experimentStatus}
-              minPoints={100}
-              maxPoints={500}
-            />
+      {experimentType === 'newton-1'
+        ? <MotionTrail
+          target={localRef}
+          color={color}
+          width={2}
+          active={experimentStatus && orbitPaths}
+          minPoints={100}
+          maxPoints={150}
+        />
+        : <OrbitPath
+          radius={scaledValues.orbitalRadius}
+          eccentricity={eccentricity}
+          orbitalInclination={orbitalInclination}
+          color={color}
+          name={`${name}-orbit-path`}
+          hiRes={true}
+          lineWidth={1}
+          position={localRef.current?.position}
+          arcLength={.8}
+        />
+      }
 
-            <group ref={localRef}>
-              <mesh
-                ref={meshRef}
-                key={name + '-textured'}
-                rotation={name === 'Moon' ? [0, Math.PI * 3.5, 0] : [0, 0, 0]}
-              >
-                <sphereGeometry args={[scaledValues.radius, (isMoonSelected ? 38 : 24), (isMoonSelected ? 28 : 16)]} />
-                <meshStandardMaterial
-                  metalness={hasCollided ? 0.8 : 0.5}
-                  roughness={hasCollided ? 0.2 : 0.5}
-                  map={!hasCollided ? moonTexture : null}
-                  color={hasCollided ? 'red' : (!moonTexture ? color : null)}
-                  emissive={hasCollided ? 'orangered' : 'black'}
-                  emissiveIntensity={hasCollided ? 0.1 : 0}
-                />
-              </mesh>
+      <group ref={localRef}>
+        <mesh
+          ref={meshRef}
+          key={name + '-textured'}
+          rotation={name === 'Moon' ? [0, Math.PI * 3.5, 0] : [0, 0, 0]}
+          onClick={handleClick}
+        >
+          <sphereGeometry args={[scaledValues.radius, (isMoonSelected ? 38 : 24), (isMoonSelected ? 28 : 16)]} />
+          <meshStandardMaterial
+            metalness={hasCollided ? 0.8 : 0.5}
+            roughness={hasCollided ? 0.2 : 0.5}
+            map={!hasCollided ? moonTexture : null}
+            color={hasCollided ? 'red' : (!moonTexture ? color : null)}
+            emissive={hasCollided ? 'darkred' : 'black'}
+          />
+        </mesh>
 
-              {(displayLabels || isMoonSelected) && (
-                <Html
-                  position={[0, scaledValues.radius * 1.2, 0]}
-                  center
-                  zIndexRange={[100, 0]}
-                  occlude={simSpeed < 20000}
-                  style={isMoonSelected ? { pointerEvents: 'none' } : {}}
-                >
-                  <span
-                    className="planet-label"
-                    style={{
-                      color: color,
-                      fontSize: isMoonSelected ? '14px' : '12px',
-                      cursor: 'pointer',
-                    }}
-                  >{name}</span>
-                </Html>
-              )}
-            </group>
-          </>
-        ) : (
-          <>
-            <group ref={localRef}>
-              <mesh
-                ref={meshRef}
-                key={name + '-textured'}
-                rotation={name === 'Moon' ? [0, Math.PI * 3.5, 0] : [0, 0, 0]}
-                onClick={handleClick}
-              >
-                <sphereGeometry args={[scaledValues.radius, (isMoonSelected ? 38 : 24), (isMoonSelected ? 28 : 16)]} />
-                <meshStandardMaterial
-                  metalness={hasCollided ? 0.8 : 0.5}
-                  roughness={hasCollided ? 0.2 : 0.5}
-                  map={!hasCollided ? moonTexture : null}
-                  color={hasCollided ? 'red' : (!moonTexture ? color : null)}
-                  emissive={hasCollided ? 'darkred' : 'black'}
-                />
-              </mesh>
-
-              {(displayLabels || isMoonSelected) && (
-                <Html
-                  position={[0, scaledValues.radius * 1.2, 0]}
-                  center
-                  zIndexRange={[100, 0]}
-                  // occlude={simSpeed < 20000}
-                  style={isMoonSelected ? { pointerEvents: 'none' } : {}}
-                >
-                  <span
-                    className="planet-label"
-                    onClick={handleClick}
-                    style={{
-                      color: color,
-                      fontSize: isMoonSelected ? '14px' : '12px',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {name}
-                  </span>
-                </Html>
-              )}
-            </group>
-
-            <OrbitPath
-              origin={[0, 0, 0]}
-              radius={scaledValues.orbitalRadius}
-              eccentricity={eccentricity}
-              orbitalInclination={orbitalInclination}
-              color={color}
-              name={`${name}-orbit-path`}
-              hiRes={true}
-              lineWidth={1}
-              position={localRef.current?.position}
-              arcLength={.9}
-            />
-          </>
-        )
-      )}
+        {(displayLabels || isMoonSelected) && (
+          <Html
+            position={[0, scaledValues.radius * 1.2, 0]}
+            center
+            zIndexRange={[100, 0]}
+            // occlude={simSpeed < 20000}
+            style={isMoonSelected ? { pointerEvents: 'none' } : {}}
+          >
+            <span
+              className="planet-label"
+              onClick={handleClick}
+              style={{
+                color: color,
+                fontSize: isMoonSelected ? '14px' : '12px',
+                cursor: 'pointer',
+              }}
+            >
+              {name}
+            </span>
+          </Html>
+        )}
+      </group>
 
       {localRef.current && experimentType === 'newton-1' && (
         <GravityVectors
           moonRef={localRef}
-          planetPosition={planetRef?.current?.position}
+          planetRef={planetRef}
           length={scaledValues.radius * massRatio * 100 / (localRef.current.position.length() || 1)}
         />
       )}

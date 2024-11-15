@@ -1,65 +1,66 @@
 import React from 'react';
-import { Line } from '@react-three/drei';
-import { Vector3, BufferGeometry, Float32BufferAttribute } from 'three';
+import { Vector3, Matrix4, Quaternion } from 'three';
 
-const createArrowGeometry = (start, end, headLength = 0.4, headWidth = 0.2) => {
-    const direction = new Vector3().subVectors(end, start).normalize();
-    const length = start.distanceTo(end);
+// Arrow component that creates a cylinder with cone tip
+const Arrow = ({ start, end, color, thickness = 0.1 }) => {
+    const direction = new Vector3().subVectors(end, start);
+    const length = direction.length() * .5;
+    const normalized = direction.normalize();
 
-    // Calculate arrow head points
-    const headStart = new Vector3().copy(end).sub(direction.multiplyScalar(headLength));
-    const headBase = new Vector3().copy(headStart);
+    // Create quaternion for rotation
+    const quaternion = new Quaternion();
     const up = new Vector3(0, 1, 0);
-    const right = new Vector3().crossVectors(direction, up).normalize().multiplyScalar(headWidth);
+    quaternion.setFromUnitVectors(up, normalized);
 
-    if (Math.abs(direction.y) === 1) {
-        right.set(1, 0, 0).multiplyScalar(headWidth);
-    }
+    // Arrow head (cone) proportions
+    const headLength = 1; // 20% of total length
+    const headRadius = .3;
+    const bodyLength = length - headLength;
 
-    const headRight = new Vector3().copy(headBase).add(right);
-    const headLeft = new Vector3().copy(headBase).sub(right);
+    return (
+        <group position={start}>
+            <group quaternion={quaternion}>
+                {/* Arrow body (cylinder) */}
+                <mesh position={[0, bodyLength / 2, 0]}>
+                    <cylinderGeometry args={[thickness, thickness, bodyLength, 8]} />
+                    <meshStandardMaterial color={color} emissive={color} />
+                </mesh>
 
-    // Create vertices for the arrow head
-    const vertices = new Float32Array([
-        // Line
-        start.x, start.y, start.z,
-        headStart.x, headStart.y, headStart.z,
-        // Arrow head
-        headLeft.x, headLeft.y, headLeft.z,
-        end.x, end.y, end.z,
-        headRight.x, headRight.y, headRight.z
-    ]);
-
-    const geometry = new BufferGeometry();
-    geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3));
-    return geometry;
+                {/* Arrow head (cone) */}
+                <mesh position={[0, length - headLength / 2, 0]}>
+                    <coneGeometry args={[headRadius, headLength, 8]} />
+                    <meshStandardMaterial color={color} emissive={color} />
+                </mesh>
+            </group>
+        </group>
+    );
 };
 
-const GravityVectors = ({ moonRef, planetPosition, length = 3 }) => {
-    if (!moonRef?.current || !planetPosition) return null;
+const GravityVectors = ({ moonRef, planetRef, length = 3 }) => {
+    if (!moonRef?.current?.position || !planetRef?.current?.position) return null;
 
-    const moonPos = moonRef.current.position;
-    const planetPos = new Vector3(0, 0, 0);
+    const moonPos = moonRef.current.position.clone();
+    const planetPos = new Vector3(0, 0, 0); // Planet's local position
 
     // Calculate direction vectors
     const towardsPlanet = new Vector3()
         .subVectors(planetPos, moonPos)
         .normalize()
-        .multiplyScalar(length);
+        .multiplyScalar(Math.max(5, length));
 
     const towardsMoon = new Vector3()
         .subVectors(moonPos, planetPos)
         .normalize()
-        .multiplyScalar(length);
+        .multiplyScalar(Math.max(5, length));
 
     // Calculate end points
-    const moonVectorEnd = new Vector3(
+    const moonArrowEnd = new Vector3(
         moonPos.x + towardsPlanet.x,
         moonPos.y + towardsPlanet.y,
         moonPos.z + towardsPlanet.z
     );
 
-    const planetVectorEnd = new Vector3(
+    const planetArrowEnd = new Vector3(
         planetPos.x + towardsMoon.x,
         planetPos.y + towardsMoon.y,
         planetPos.z + towardsMoon.z
@@ -68,14 +69,20 @@ const GravityVectors = ({ moonRef, planetPosition, length = 3 }) => {
     return (
         <>
             {/* Vector pointing from moon towards planet */}
-            <line geometry={createArrowGeometry(moonPos, moonVectorEnd, length * 0.2, length * 0.1)}>
-                <lineBasicMaterial attach="material" color="salmon" linewidth={2} />
-            </line>
+            <Arrow
+                start={moonPos}
+                end={moonArrowEnd}
+                color="orange"
+                thickness={0.04}
+            />
 
             {/* Vector pointing from planet towards moon */}
-            <line geometry={createArrowGeometry(planetPos, planetVectorEnd, length * 0.2, length * 0.1)}>
-                <lineBasicMaterial attach="material" color="dodgerblue" linewidth={2} />
-            </line>
+            <Arrow
+                start={planetPos}
+                end={planetArrowEnd}
+                color="green"
+                thickness={0.04}
+            />
         </>
     );
 };

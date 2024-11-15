@@ -82,6 +82,8 @@ function OrbitPath({
       vertexColors={colors}
       lineWidth={lineWidth}
       depthWrite={false}
+      transparent
+      opacity={opacity}
     />
   );
 }
