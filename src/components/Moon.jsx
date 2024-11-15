@@ -199,7 +199,7 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
           hiRes={isMoonSelected}
           lineWidth={isMoonSelected ? 2 : 1}
           position={localRef.current?.position}
-          arcLength={.65}
+          arcLength={.8}
         />
       )}
 

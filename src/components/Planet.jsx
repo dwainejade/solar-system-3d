@@ -478,11 +478,11 @@ const Planet = ({ name = 'Earth', textures }) => {
           orbitalInclination={orbitalInclination}
           color={color}
           name={name + "-orbit-path"}
-          lineWidth={isPlanetSelected ? 2 : 1}
+          lineWidth={isPlanetSelected ? 3 : 2}
           opacity={orbitPathOpacity}
           hiRes={isPlanetSelected}
           position={localRef.current?.position}
-          arcLength={0.9}
+          arcLength={.9}
         />
       )}
     </>
