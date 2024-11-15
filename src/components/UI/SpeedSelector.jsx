@@ -50,7 +50,7 @@ const SpeedSelector = ({ speedOptions, onSpeedSelect, disable }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const [selectedOption, setSelectedOption] = useState("Select an option");
-  const dropdownRef = useRef(null);
+  const speedDropdownRef = useRef(null);
 
   const toggleDropdown = () => setIsOpen(!isOpen);
   const handleOptionClick = option => {
@@ -59,8 +59,23 @@ const SpeedSelector = ({ speedOptions, onSpeedSelect, disable }) => {
     setIsOpen(false);
   };
 
+  // Close dropdown if clicked outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (speedDropdownRef.current && !speedDropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    // Attach the event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Clean up the event listener
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [speedDropdownRef]);
+
   return (
-    <div className='speed-selector' ref={dropdownRef}>
+    <div className='speed-selector' ref={speedDropdownRef}>
       <button onClick={toggleDropdown} className='speed-selector-button' disabled={disable()} aria-haspopup='true' aria-expanded={isOpen}>
         {selectedOption}
       </button>
