@@ -561,7 +561,8 @@ body {
   font-weight: 600;
 }
 #planetSelection,
-#simSpeedSelect {
+#simSpeedSelect,
+.speed-selector {
   background-color: #fff5e6;
   color: #717171;
   font-weight: bold;
@@ -574,19 +575,22 @@ body {
 }
 @media screen and (max-width: 500px) {
   #planetSelection,
-  #simSpeedSelect {
+  #simSpeedSelect,
+  .speed-selector {
     width: 90px;
   }
 }
 @media screen and (max-width: 400px) {
   #planetSelection,
-  #simSpeedSelect {
+  #simSpeedSelect,
+  .speed-selector {
     width: 80px;
   }
 }
 @media screen and (max-width: 300px) {
   #planetSelection,
-  #simSpeedSelect {
+  #simSpeedSelect,
+  .speed-selector {
     width: 70px;
   }
 }

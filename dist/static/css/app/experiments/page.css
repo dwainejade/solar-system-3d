@@ -1,13 +1,15 @@
 /*!*********************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[13].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[13].oneOf[12].use[3]!./src/styles/Dropdown.css ***!
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[3]!./src/styles/Dropdown.css ***!
   \*********************************************************************************************************************************************************************************************************************************************************************/
-.planet-selector {
+.planet-selector,
+.speed-selector {
   position: relative;
   display: inline-block;
   -webkit-user-select: none;
           user-select: none;
 }
-.planet-selector-button {
+.planet-selector-button,
+.speed-selector-button {
   background-color: #fdf5e8;
   color: #333333;
   border: 0;
@@ -23,7 +25,8 @@
   color: #717171;
   padding: 4px 8px;
 }
-.planet-selector-menu {
+.planet-selector-menu,
+.speed-selector-menu {
   position: absolute;
   bottom: 100%;
   right: 0;
@@ -34,7 +37,8 @@
   z-index: 1000;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
 }
-.planet-selector-item {
+.planet-selector-item,
+.speed-selector-item {
   padding: 4px 8px;
   font-size: 0.95rem;
   color: #333333;
@@ -47,28 +51,47 @@
   border: transparent 2px solid;
   color: #717171;
 }
-.planet-selector-item.active {
+.planet-selector-item.active,
+.speed-selector-item.active,
+.planet-selector-item:hover,
+.speed-selector-item:hover {
   background-color: #add1d7;
 }
-.planet-selector-item.active > span {
+.planet-selector-item.active > span,
+.speed-selector-item.active > span,
+.planet-selector-item:hover > span,
+.speed-selector-item:hover > span {
   font-weight: bold;
   color: #000;
 }
-.planet-selector-item-chevron {
+.planet-selector-item:hover,
+.speed-selector-item:hover {
+  background-color: #add1d7;
+}
+.planet-selector-item:hover > span,
+.speed-selector-item:hover > span {
+  font-weight: bold;
+  color: #000;
+}
+.planet-selector-item-chevron,
+.speed-selector-item-chevron {
   margin-left: 8px;
   font-size: 10px;
   opacity: 0.7;
 }
-.planet-selector .highlight {
+.planet-selector .highlight,
+.speed-selector .highlight {
   /* Add styles for highlighted parent planet */
   background-color: #add1d740;
   /* Similar to active but more subtle */
 }
-.planet-selector .hover {
+.planet-selector .hover,
+.speed-selector .hover {
   /* Add styles for hovered parent planet */
   background-color: #b3dfe6d1;
 }
-.planet-selector-submenu {
+.planet-selector-submenu,
+.speed-selector-submenu {
   position: absolute;
   left: 100%;
   bottom: 0;
@@ -79,16 +102,18 @@
   visibility: hidden;
   opacity: 0;
 }
-.planet-selector-submenu .item {
+.planet-selector-submenu .item,
+.speed-selector-submenu .item {
   font-weight: normal;
 }
-.planet-selector-submenu.visible {
+.planet-selector-submenu.visible,
+.speed-selector-submenu.visible {
   visibility: visible;
   opacity: 1;
 }
 
 /*!************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[13].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[13].oneOf[12].use[3]!./src/styles.css ***!
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[3]!./src/styles.css ***!
   \************************************************************************************************************************************************************************************************************************************************************/
 @font-face {
   font-family: "Termina-Black";
@@ -318,7 +343,6 @@ body {
 .Main .menu-wrapper .details-menu {
   position: absolute;
   z-index: 200;
-  height: -webkit-fit-content;
   height: -moz-fit-content;
   height: fit-content;
   width: 270px;
@@ -357,7 +381,6 @@ body {
 .Main .menu-wrapper .details-menu .planet-details.saved input.value {
   display: inline;
   min-width: 0px;
-  width: -webkit-min-content;
   width: min-content;
   padding: 0;
   color: #fff;
@@ -653,7 +676,8 @@ body {
   font-weight: 600;
 }
 #planetSelection,
-#simSpeedSelect {
+#simSpeedSelect,
+.speed-selector {
   background-color: #fff5e6;
   color: #717171;
   font-weight: bold;
@@ -666,19 +690,22 @@ body {
 }
 @media screen and (max-width: 500px) {
   #planetSelection,
-  #simSpeedSelect {
+  #simSpeedSelect,
+  .speed-selector {
     width: 90px;
   }
 }
 @media screen and (max-width: 400px) {
   #planetSelection,
-  #simSpeedSelect {
+  #simSpeedSelect,
+  .speed-selector {
     width: 80px;
   }
 }
 @media screen and (max-width: 300px) {
   #planetSelection,
-  #simSpeedSelect {
+  #simSpeedSelect,
+  .speed-selector {
     width: 70px;
   }
 }
@@ -798,7 +825,7 @@ body {
 }
 
 /*!************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[13].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[13].oneOf[12].use[3]!./src/styles/Experiments.css ***!
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[3]!./src/styles/Experiments.css ***!
   \************************************************************************************************************************************************************************************************************************************************************************/
 @font-face {
   font-family: "Termina-Black";
@@ -1041,32 +1068,50 @@ body {
 }
 .experiments-modal-wrapper .kepler-1 .slider-con.kepler-2-slider,
 .experiments-modal-wrapper .kepler-2 .slider-con.kepler-2-slider,
-.experiments-modal-wrapper .kepler-3 .slider-con.kepler-2-slider {
+.experiments-modal-wrapper .kepler-3 .slider-con.kepler-2-slider,
+.experiments-modal-wrapper .newton-1 .slider-con.kepler-2-slider {
   margin: 20px 0;
+}
+.experiments-modal-wrapper .kepler-1 .info-con .label,
+.experiments-modal-wrapper .kepler-2 .info-con .label,
+.experiments-modal-wrapper .kepler-3 .info-con .label,
+.experiments-modal-wrapper .newton-1 .info-con .label {
+  color: white;
+}
+.experiments-modal-wrapper .kepler-1 .info-con .value,
+.experiments-modal-wrapper .kepler-2 .info-con .value,
+.experiments-modal-wrapper .kepler-3 .info-con .value,
+.experiments-modal-wrapper .newton-1 .info-con .value {
+  color: #70eeff;
+  font-weight: bold;
 }
 .experiments-modal-wrapper .kepler-1 .slider-con,
 .experiments-modal-wrapper .kepler-2 .slider-con,
-.experiments-modal-wrapper .kepler-3 .slider-con {
+.experiments-modal-wrapper .kepler-3 .slider-con,
+.experiments-modal-wrapper .newton-1 .slider-con {
   display: flex;
   flex-direction: column;
   margin: 20px 0 30px 0;
 }
 .experiments-modal-wrapper .kepler-1 .slider-con .slider-control,
 .experiments-modal-wrapper .kepler-2 .slider-con .slider-control,
-.experiments-modal-wrapper .kepler-3 .slider-con .slider-control {
+.experiments-modal-wrapper .kepler-3 .slider-con .slider-control,
+.experiments-modal-wrapper .newton-1 .slider-con .slider-control {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 .experiments-modal-wrapper .kepler-1 .slider.disabled,
 .experiments-modal-wrapper .kepler-2 .slider.disabled,
-.experiments-modal-wrapper .kepler-3 .slider.disabled {
+.experiments-modal-wrapper .kepler-3 .slider.disabled,
+.experiments-modal-wrapper .newton-1 .slider.disabled {
   opacity: 0.6;
   pointer-events: none;
 }
 .experiments-modal-wrapper .kepler-1 .input-con,
 .experiments-modal-wrapper .kepler-2 .input-con,
-.experiments-modal-wrapper .kepler-3 .input-con {
+.experiments-modal-wrapper .kepler-3 .input-con,
+.experiments-modal-wrapper .newton-1 .input-con {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -1077,7 +1122,8 @@ body {
 }
 .experiments-modal-wrapper .kepler-1 .input-con input[type="range"],
 .experiments-modal-wrapper .kepler-2 .input-con input[type="range"],
-.experiments-modal-wrapper .kepler-3 .input-con input[type="range"] {
+.experiments-modal-wrapper .kepler-3 .input-con input[type="range"],
+.experiments-modal-wrapper .newton-1 .input-con input[type="range"] {
   -webkit-appearance: none;
   width: 100%;
   height: 1.5px;
@@ -1086,7 +1132,8 @@ body {
 }
 .experiments-modal-wrapper .kepler-1 .input-con input[type="range"]::-webkit-slider-thumb,
 .experiments-modal-wrapper .kepler-2 .input-con input[type="range"]::-webkit-slider-thumb,
-.experiments-modal-wrapper .kepler-3 .input-con input[type="range"]::-webkit-slider-thumb {
+.experiments-modal-wrapper .kepler-3 .input-con input[type="range"]::-webkit-slider-thumb,
+.experiments-modal-wrapper .newton-1 .input-con input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 11px;
   height: 11px;
@@ -1096,12 +1143,14 @@ body {
 }
 .experiments-modal-wrapper .kepler-1 .input-con input[type="range"]::-webkit-slider-thumb:hover,
 .experiments-modal-wrapper .kepler-2 .input-con input[type="range"]::-webkit-slider-thumb:hover,
-.experiments-modal-wrapper .kepler-3 .input-con input[type="range"]::-webkit-slider-thumb:hover {
+.experiments-modal-wrapper .kepler-3 .input-con input[type="range"]::-webkit-slider-thumb:hover,
+.experiments-modal-wrapper .newton-1 .input-con input[type="range"]::-webkit-slider-thumb:hover {
   background: #ff8585;
 }
 .experiments-modal-wrapper .kepler-1 .input-con .slider-markers,
 .experiments-modal-wrapper .kepler-2 .input-con .slider-markers,
-.experiments-modal-wrapper .kepler-3 .input-con .slider-markers {
+.experiments-modal-wrapper .kepler-3 .input-con .slider-markers,
+.experiments-modal-wrapper .newton-1 .input-con .slider-markers {
   margin-top: 10px;
   display: flex;
   justify-content: space-between;
@@ -1109,7 +1158,8 @@ body {
 }
 .experiments-modal-wrapper .kepler-1 .input-con .slider-ticks,
 .experiments-modal-wrapper .kepler-2 .input-con .slider-ticks,
-.experiments-modal-wrapper .kepler-3 .input-con .slider-ticks {
+.experiments-modal-wrapper .kepler-3 .input-con .slider-ticks,
+.experiments-modal-wrapper .newton-1 .input-con .slider-ticks {
   position: absolute;
   top: -20%;
   left: 3%;
@@ -1123,7 +1173,8 @@ body {
 }
 .experiments-modal-wrapper .kepler-1 .input-con .slider-ticks .tick,
 .experiments-modal-wrapper .kepler-2 .input-con .slider-ticks .tick,
-.experiments-modal-wrapper .kepler-3 .input-con .slider-ticks .tick {
+.experiments-modal-wrapper .kepler-3 .input-con .slider-ticks .tick,
+.experiments-modal-wrapper .newton-1 .input-con .slider-ticks .tick {
   width: 1.5px;
   height: 100%;
   background-color: #dfcda7;
@@ -1131,9 +1182,11 @@ body {
 .experiments-modal-wrapper .kepler-1 .increment-btn,
 .experiments-modal-wrapper .kepler-2 .increment-btn,
 .experiments-modal-wrapper .kepler-3 .increment-btn,
+.experiments-modal-wrapper .newton-1 .increment-btn,
 .experiments-modal-wrapper .kepler-1 .decrement-btn,
 .experiments-modal-wrapper .kepler-2 .decrement-btn,
-.experiments-modal-wrapper .kepler-3 .decrement-btn {
+.experiments-modal-wrapper .kepler-3 .decrement-btn,
+.experiments-modal-wrapper .newton-1 .decrement-btn {
   width: 24px;
   height: 20px;
   border-radius: 20px;
@@ -1150,9 +1203,11 @@ body {
 .experiments-modal-wrapper .kepler-1 .increment-btn:hover,
 .experiments-modal-wrapper .kepler-2 .increment-btn:hover,
 .experiments-modal-wrapper .kepler-3 .increment-btn:hover,
+.experiments-modal-wrapper .newton-1 .increment-btn:hover,
 .experiments-modal-wrapper .kepler-1 .decrement-btn:hover,
 .experiments-modal-wrapper .kepler-2 .decrement-btn:hover,
-.experiments-modal-wrapper .kepler-3 .decrement-btn:hover {
+.experiments-modal-wrapper .kepler-3 .decrement-btn:hover,
+.experiments-modal-wrapper .newton-1 .decrement-btn:hover {
   background-color: #ffb025;
 }
 
