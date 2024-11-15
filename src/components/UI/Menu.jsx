@@ -210,18 +210,6 @@ const Menu = () => {
           <div className='menu-item'>
             <label htmlFor='simSpeedSelect'>Simulation Speed</label>
             <SpeedSelector simSpeed={simSpeed} speedOptions={speedOptions} onSpeedSelect={handleSpeedChange} disable={disableSpeedToggle} />
-            {/* <select
-              id='simSpeedSelect'
-              onChange={handleSpeedChange}
-              value={simSpeed === 0 ? prevSpeed : simSpeed}
-              disabled={disableSpeedToggle()}
-            >
-              {speedOptions.map((option, index) => (
-                <option key={index} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select> */}
           </div>
         </div>
 
