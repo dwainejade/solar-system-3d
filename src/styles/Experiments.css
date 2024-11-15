@@ -28,6 +28,22 @@
 .left-button-con .experiments-btn {
   height: 30px;
   padding: 5px 12px;
+  background-color: #f19a00;
+  outline: #f19a00;
+  color: #483939;
+}
+.left-button-con .experiments-btn:hover {
+  background-color: #c47400;
+  outline: #68e4fc;
+}
+.left-button-con .experiments-btn:active {
+  background-color: #b26900;
+  outline: #68e4fc;
+}
+.left-button-con .experiments-btn:disabled {
+  background-color: #c9c9c9;
+  outline: #eaeaea;
+  color: #7c7c7c;
 }
 .experiments-modal-wrapper {
   position: absolute;
