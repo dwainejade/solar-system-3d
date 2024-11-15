@@ -196,10 +196,10 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
           orbitalInclination={orbitalInclination}
           color={color}
           name={`${name}-orbit-path`}
-          hiRes={true}
-          lineType="solid"
-          lineWidth={isMoonSelected ? 1 : .6}
+          hiRes={isMoonSelected}
+          lineWidth={isMoonSelected ? 2 : 1}
           position={localRef.current?.position}
+          arcLength={.65}
         />
       )}
 

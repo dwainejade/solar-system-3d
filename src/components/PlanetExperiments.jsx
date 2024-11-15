@@ -78,7 +78,7 @@ const Planet = ({ name = 'Earth', textures }) => {
   let rotationSpeed = rotationPeriod ? (2 * Math.PI) / (rotationPeriod * 3600) : 0;
   rotationSpeed *= rotationSpeedScaleFactor;
 
-  const isPlanetSelected = selectedPlanet && selectedPlanet.name === name;
+  const isPlanetSelected = experimentType === 'newton-1' ? true : selectedPlanet && selectedPlanet.name === name;
   const renderMoons = () => {
     if (isPlanetSelected) return true;
     if (selectedMoon?.parentName === name) return true;
@@ -105,11 +105,55 @@ const Planet = ({ name = 'Earth', textures }) => {
     const adjustedDelta = delta * simSpeed;
     if (experimentStatus === "completed") return;
 
-    // Calculate mean motion (n)
+    if (experimentType === 'newton-1') {
+      // Only handle rotation, skip orbital motion
+      if (rotationPeriod && meshRef.current) {
+        const rotationPeriodInSeconds = rotationPeriod * 3600;
+        const rotationSpeed = (2 * Math.PI) / rotationPeriodInSeconds;
+        const rotationIncrement = rotationSpeed * adjustedDelta;
+
+        const yAxis = new THREE.Vector3(0, 1, 0);
+        meshRef.current.rotateOnAxis(yAxis, rotationIncrement);
+
+        if (cloudsRef.current) {
+          cloudsRef.current.rotation.y += rotationIncrement * 1.1;
+        }
+      }
+
+      // For newton-1, keep the planet stationary at its initial position
+      if (localRef.current) {
+        // Calculate initial position (only done once)
+        if (!localRef.current.userData.initialPositionSet) {
+          const r = scaledOrbitalRadius * (1 - eccentricity);
+          const x = r;
+          const y = 0;
+          const z = 0;
+          localRef.current.position.set(x, y, z);
+          updatePlanetPosition(name, { x, y, z });
+          localRef.current.userData.initialPositionSet = true;
+        }
+
+        // Update visual properties
+        const distance = localRef.current.position.distanceTo(state.camera.position);
+        setScale(distance / 1000 <= scaledRadius ? scaledRadius : distance / 1000);
+        setShowTextures(activeCamera.type === 'moon' || distance < textureDisplayDistance);
+
+        const maxDistance = scaledRadius * 100;
+        const minDistance = scaledRadius * 1;
+        const opacity = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
+        setOrbitPathOpacity(opacity);
+
+        if (textSize.current) {
+          textSize.current = distance * 0.02;
+        }
+      }
+      return; // Skip the rest of the orbital calculations
+    }
+
+    // Original orbital motion code for other experiment types
     const meanMotion = (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60);
     localAngleRef.current -= meanMotion * adjustedDelta;
 
-    //  Solve Kepler's Equation iteratively
     let E = localAngleRef.current;
     const maxIterations = 10;
     const tolerance = 1e-6;
@@ -429,7 +473,7 @@ const Planet = ({ name = 'Earth', textures }) => {
         })}
       </group>
 
-      {orbitPaths && (
+      {orbitPaths && experimentType !== 'newton-1' && (
         <OrbitPath
           origin={orbitalOrigin}
           radius={scaledOrbitalRadius}
@@ -439,6 +483,7 @@ const Planet = ({ name = 'Earth', textures }) => {
           name={name + "-orbit-path"}
           {...orbitPathConfig()}
           position={localRef.current?.position}
+          arcLength={1}
         />
       )}
 

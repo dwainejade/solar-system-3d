@@ -3,8 +3,8 @@ import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import useExperimentsStore from "@/store/experiments";
-import { useTexture, Line, Html } from "@react-three/drei";
-import { Vector3, CatmullRomCurve3 } from "three";
+import { useTexture, Trail, Line, Html } from "@react-three/drei";
+import { Vector3, } from "three";
 import { moonDistanceScaleFactor, moonSizeScaleFactor } from "../data/moonsData";
 import initialPlanetsData, { sizeScaleFactor } from "../data/planetsData";
 import { G, distanceScaleFactor } from "../data/planetsData";
@@ -13,7 +13,6 @@ import SatelliteCamera from "./SatelliteCameraMoon";
 import GravityVectors from "./GravityVectors";
 import Labels from "./Labels";
 import { calculateKeplerianOrbit, calculateModifiedKeplerianOrbit, calculateSpiralOrbit } from "../helpers/calculateOrbits";
-import MotionTrail from "../helpers/MotionTrail";
 
 const MoonExperiments = forwardRef(({ moonData, planetRef, parentName, scaledPlanetRadius }, ref) => {
   const {
@@ -60,105 +59,36 @@ const MoonExperiments = forwardRef(({ moonData, planetRef, parentName, scaledPla
   const localAngleRef = useRef(moonAngles[name] || initialAngle);
   const startAngleRef = useRef(null);
   const meshRef = useRef();
+  const arrowHelperRef = useRef();
 
-  // Add segment management
-  const activeSegmentRef = useRef([]);
-  const completedSegmentsRef = useRef([]);
+  // Create a ref for storing local positions
+  const trailPointsRef = useRef([]);
+  const maxTrailPoints = 300; // Maximum number of points to store
+  const trailUpdateInterval = 1; // Update every N frames
+  const frameCounter = useRef(0);
+
 
   // States
   const [hasCollided, setHasCollided] = useState(false);
   const isMoonSelected = selectedMoon && selectedMoon.name === name;
   const moonTexture = name === 'Moon' ? useTexture('../assets/earth/moon/moon.jpg') : null;
 
+  const initialVelocityRef = useRef(null);
+
   const [hasEscaped, setHasEscaped] = useState(false);
   const independentPositionRef = useRef(null);
   const independentVelocityRef = useRef(null);
 
-  // const maxPathPoints = 1000; // Increased for smoother trails
-  // const [pathPoints, setPathPoints] = useState([]);
-  // const frameCounter = useRef(0);
-  // const lastPointRef = useRef(null);
-  // const lastTimeRef = useRef(Date.now());
-
-  // Add interpolated points between distant positions
-  // const addPathPoint = useCallback((position) => {
-  //   const currentTime = Date.now();
-  //   const timeDelta = currentTime - lastTimeRef.current;
-
-  //   setPathPoints(prev => {
-  //     let newPoints = [...prev];
-  //     const newPosition = new THREE.Vector3(position[0], position[1], position[2]);
-
-  //     if (lastPointRef.current) {
-  //       const distance = lastPointRef.current.distanceTo(newPosition);
-  //       const speed = distance / timeDelta;
-  //       const maxSegmentLength = scaledValues.radius * 0.5;
-
-  //       // If points are too far apart, interpolate between them
-  //       if (distance > maxSegmentLength) {
-  //         const numInterpolatedPoints = Math.ceil(distance / maxSegmentLength);
-  //         for (let i = 1; i <= numInterpolatedPoints; i++) {
-  //           const t = i / numInterpolatedPoints;
-  //           const interpolatedPoint = lastPointRef.current.clone().lerp(newPosition, t);
-  //           newPoints.push({
-  //             x: interpolatedPoint.x,
-  //             y: interpolatedPoint.y,
-  //             z: interpolatedPoint.z
-  //           });
-  //         }
-  //       } else {
-  //         newPoints.push({ x: position[0], y: position[1], z: position[2] });
-  //       }
-  //     } else {
-  //       newPoints.push({ x: position[0], y: position[1], z: position[2] });
-  //     }
-
-  //     lastPointRef.current = newPosition;
-  //     lastTimeRef.current = currentTime;
-
-  //     // Keep only the most recent points
-  //     if (newPoints.length > maxPathPoints) {
-  //       newPoints = newPoints.slice(-maxPathPoints);
-  //     }
-
-  //     return newPoints;
-  //   });
-  // }, [scaledValues.radius]);
-
-  // // Create smooth curve and colors
-  // const { linePoints, lineColors } = useMemo(() => {
-  //   if (pathPoints.length < 2) return { linePoints: [], lineColors: [] };
-
-  //   // Create a smooth curve through all points
-  //   const curve = new THREE.CatmullRomCurve3(
-  //     pathPoints.map(p => new THREE.Vector3(p.x, p.y, p.z)),
-  //     false, // Don't close the curve
-  //     'centripetal',
-  //     0.5
-  //   );
-
-  //   // Sample more points along the curve for smoothness
-  //   const numSamples = pathPoints.length * 3;
-  //   const smoothPoints = curve.getPoints(numSamples);
-
-  //   // Generate colors with proper fade
-  //   const colors = smoothPoints.map((_, index) => {
-  //     const progress = index / (smoothPoints.length - 1);
-  //     return new THREE.Color(color).multiplyScalar(progress);
-  //   });
-
-  //   return { linePoints: smoothPoints, lineColors: colors };
-  // }, [pathPoints, color]);
-
-
   // Reset when experiment status changes
   useEffect(() => {
     if (experimentStatus === null) {
+      // Reset angle to current position instead of random
       if (localRef.current) {
         const currentPos = localRef.current.position;
         localAngleRef.current = Math.atan2(currentPos.z, currentPos.x);
       }
       startAngleRef.current = null;
+      trailPointsRef.current = [];
       setHasCollided(false);
       if (meshRef.current) {
         meshRef.current.material.color.set(moonTexture ? 'white' : color);
@@ -219,19 +149,24 @@ const MoonExperiments = forwardRef(({ moonData, planetRef, parentName, scaledPla
     const adjustedDelta = delta * simSpeed;
 
     if (localRef.current) {
-      // frameCounter.current += 1;
-      // const updateInterval = Math.max(1, Math.floor(1 / (simSpeed * 0.0001))); // Adjust sampling rate based on speed
+      // Update trail
+      frameCounter.current += 1;
+      if (frameCounter.current >= trailUpdateInterval) {
+        if (willEscape || hasEscaped) {
+          const worldPos = localRef.current.getWorldPosition(new THREE.Vector3());
+          trailPointsRef.current.push([worldPos.x, worldPos.y, worldPos.z]);
+        } else {
+          const currentPos = localRef.current.position.clone();
+          trailPointsRef.current.push([currentPos.x, currentPos.y, currentPos.z]);
+        }
 
-      // if (frameCounter.current >= updateInterval) {
-      //   if (willEscape || hasEscaped) {
-      //     const worldPos = localRef.current.getWorldPosition(new THREE.Vector3());
-      //     addPathPoint([worldPos.x, worldPos.y, worldPos.z]);
-      //   } else {
-      //     const currentPos = localRef.current.position.clone();
-      //     addPathPoint([currentPos.x, currentPos.y, currentPos.z]);
-      //   }
-      //   frameCounter.current = 0;
-      // }
+        if (trailPointsRef.current.length > maxTrailPoints) {
+          trailPointsRef.current = trailPointsRef.current.slice(
+            trailPointsRef.current.length - maxTrailPoints
+          );
+        }
+        frameCounter.current = 0;
+      }
 
       // Calculate new position based on mass ratio
       if (willEscape || hasEscaped) {
@@ -248,7 +183,8 @@ const MoonExperiments = forwardRef(({ moonData, planetRef, parentName, scaledPla
           setExperimentStatus("completed");
           return;
         }
-      } else if (Math.abs(massRatio - 2) < 0.1) {
+      }
+      else if (Math.abs(massRatio - 2) < 0.1) {
         const { position, angle } = calculateSpiralOrbit({
           meanMotion: scaledValues.meanMotion,
           orbitalRadius: scaledValues.orbitalRadius,
@@ -259,7 +195,8 @@ const MoonExperiments = forwardRef(({ moonData, planetRef, parentName, scaledPla
 
         localRef.current.position.copy(position);
         localAngleRef.current = angle;
-      } else if (Math.abs(massRatio - 1.5) < 0.1) {
+      }
+      else if (Math.abs(massRatio - 1.5) < 0.1) {
         const { position, angle } = calculateModifiedKeplerianOrbit({
           meanMotion: scaledValues.meanMotion,
           eccentricity,
@@ -273,7 +210,8 @@ const MoonExperiments = forwardRef(({ moonData, planetRef, parentName, scaledPla
 
         localRef.current.position.copy(position);
         localAngleRef.current = angle;
-      } else {
+      }
+      else {
         const { position, angle } = calculateKeplerianOrbit({
           meanMotion: scaledValues.meanMotion,
           eccentricity,
@@ -310,6 +248,7 @@ const MoonExperiments = forwardRef(({ moonData, planetRef, parentName, scaledPla
       // Get camera position in moon's local space
       const cameraPosition = new THREE.Vector3();
       state.camera.getWorldPosition(cameraPosition);
+      // Transform camera position to local space of the moon's parent
       localRef.current.parent.worldToLocal(cameraPosition);
 
       // Update world position for other calculations
@@ -330,6 +269,7 @@ const MoonExperiments = forwardRef(({ moonData, planetRef, parentName, scaledPla
     switchToMoonCamera(parentName, name);
   };
 
+
   return (
     <>
       {activeCamera?.name === name && localRef.current && (
@@ -345,52 +285,52 @@ const MoonExperiments = forwardRef(({ moonData, planetRef, parentName, scaledPla
       {orbitPaths && (
         experimentType ? (
           <>
-            <MotionTrail
-              target={localRef}
+            <Trail
+              key={experimentStatus}
+              width={(experimentStatus) ? 4 : 0}
+              length={50}
               color={color}
-              width={5}
-              opacity={1}
-              active={experimentStatus}
-              minPoints={100}   // Adjust this for minimum trail length
-              maxPoints={500}  // Adjust this for maximum trail length
-            />
-
-            <group ref={localRef}>
-              <mesh
-                ref={meshRef}
-                key={name + '-textured'}
-                rotation={name === 'Moon' ? [0, Math.PI * 3.5, 0] : [0, 0, 0]}
-              >
-                <sphereGeometry args={[scaledValues.radius, (isMoonSelected ? 38 : 24), (isMoonSelected ? 28 : 16)]} />
-                <meshStandardMaterial
-                  metalness={hasCollided ? 0.8 : 0.5}
-                  roughness={hasCollided ? 0.2 : 0.5}
-                  map={!hasCollided ? moonTexture : null}
-                  color={hasCollided ? 'red' : (!moonTexture ? color : null)}
-                  emissive={hasCollided ? 'orangered' : 'black'}
-                  emissiveIntensity={hasCollided ? 0.1 : 0}
-                />
-              </mesh>
-
-              {(displayLabels || isMoonSelected) && (
-                <Html
-                  position={[0, scaledValues.radius * 1.2, 0]}
-                  center
-                  zIndexRange={[100, 0]}
-                  occlude={simSpeed < 20000}
-                  style={isMoonSelected ? { pointerEvents: 'none' } : {}}
+              attenuation={(t) => t * t}
+              decay={experimentStatus === 'completed' ? false : 0.01} // Scales decay inversely with speed
+            >
+              <group ref={localRef}>
+                <mesh
+                  ref={meshRef}
+                  key={name + '-textured'}
+                  rotation={name === 'Moon' ? [0, Math.PI * 3.5, 0] : [0, 0, 0]}
+                // onClick={handleClick}
                 >
-                  <span
-                    className="planet-label"
-                    style={{
-                      color: color,
-                      fontSize: isMoonSelected ? '14px' : '12px',
-                      cursor: 'pointer',
-                    }}
-                  >{name}</span>
-                </Html>
-              )}
-            </group>
+                  <sphereGeometry args={[scaledValues.radius, (isMoonSelected ? 38 : 24), (isMoonSelected ? 28 : 16)]} />
+                  <meshStandardMaterial
+                    metalness={hasCollided ? 0.8 : 0.5}
+                    roughness={hasCollided ? 0.2 : 0.5}
+                    map={!hasCollided ? moonTexture : null}
+                    color={hasCollided ? 'red' : (!moonTexture ? color : null)}
+                    emissive={hasCollided ? 'darkred' : 'black'}
+                  />
+                </mesh>
+
+                {(displayLabels || isMoonSelected) && (
+                  <Html
+                    position={[0, scaledValues.radius * 1.2, 0]}
+                    center
+                    zIndexRange={[100, 0]}
+                    occlude={simSpeed < 20000}
+                    style={isMoonSelected ? { pointerEvents: 'none' } : {}}
+                  >
+                    <span
+                      className="planet-label"
+                      // onClick={handleClick}
+                      style={{
+                        color: color,
+                        fontSize: isMoonSelected ? '14px' : '12px',
+                        cursor: 'pointer',
+                      }}
+                    >{name}</span>
+                  </Html>
+                )}
+              </group>
+            </Trail>
           </>
         ) : (
           <>
@@ -427,9 +367,7 @@ const MoonExperiments = forwardRef(({ moonData, planetRef, parentName, scaledPla
                       fontSize: isMoonSelected ? '14px' : '12px',
                       cursor: 'pointer',
                     }}
-                  >
-                    {name}
-                  </span>
+                  >{name}</span>
                 </Html>
               )}
             </group>
@@ -442,9 +380,9 @@ const MoonExperiments = forwardRef(({ moonData, planetRef, parentName, scaledPla
               color={color}
               name={`${name}-orbit-path`}
               hiRes={true}
+              lineType="solid"
               lineWidth={1}
               position={localRef.current?.position}
-              arcLength={.9}
             />
           </>
         )
