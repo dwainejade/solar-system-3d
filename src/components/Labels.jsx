@@ -14,7 +14,7 @@ function Labels({ name, text, size = 1, position = [0, 3, 0], color, handleClick
     return (
         <Billboard
             onClick={handleClick}
-            onPointerDown={handlePointerDown}
+            onPointerDown={(e) => handlePointerDown(e, "down")}
             onPointerOver={handlePointerOver}
             onPointerOut={handlePointerOut}
         >

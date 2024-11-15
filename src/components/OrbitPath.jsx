@@ -1,5 +1,6 @@
 import { Line } from "@react-three/drei";
 import { useMemo } from "react";
+import * as THREE from "three";
 
 function OrbitPath({
   origin,
@@ -8,83 +9,78 @@ function OrbitPath({
   orbitalInclination,
   color,
   name,
-  lineWidth = 1,
+  lineWidth = 2,
   opacity = 1,
   hiRes = false,
-  depthWrite = true,
-  arcLength = 'full',
+  arcLength = 0.8, // Default to 80% of the orbit
   position
 }) {
-  // Only check position for partial arcs
-  if (arcLength !== 'full' && !position) return null;
+  const segments = hiRes ? 512 : 64;
 
-  const segments = hiRes ? 2048 : 64;
+  // Extract position components for dependency tracking
+  const posX = Array.isArray(position) ? position[0] : position?.x || 0;
+  const posY = Array.isArray(position) ? position[1] : position?.y || 0;
+  const posZ = Array.isArray(position) ? position[2] : position?.z || 0;
 
-  const points = useMemo(() => {
+  const { points, colors } = useMemo(() => {
     const pointsArray = [];
+    const colorsArray = [];
 
-    if (arcLength === 'full') {
-      // For full orbit, generate complete ellipse starting from 0
-      for (let i = 0; i <= segments; i++) {
-        const theta = (i / segments) * 2 * Math.PI;
+    // Calculate current angle from position components
+    const currentAngle = Math.atan2(posZ, posX);
+    const baseColor = new THREE.Color(color);
 
-        // Calculate radius at this angle using the elliptical orbit equation
-        const r = (radius * (1 - eccentricity * eccentricity)) /
-          (1 + eccentricity * Math.cos(theta));
+    // Calculate how many segments to use based on arcLength
+    const totalArcAngle = arcLength * 2 * Math.PI;
+    const segmentsToUse = Math.floor(segments * arcLength);
 
-        // Convert to Cartesian coordinates
-        const x = r * Math.cos(theta);
-        const baseZ = r * Math.sin(theta);
+    // Generate points for the specified arc length
+    for (let i = 0; i <= segmentsToUse; i++) {
+      // Calculate angle for this point, starting from current position and going backwards
+      const theta = currentAngle - (i / segmentsToUse) * totalArcAngle;
 
-        // Apply inclination
-        const inclination = orbitalInclination * (Math.PI / 180);
-        const y = Math.sin(inclination) * baseZ;
-        const z = Math.cos(inclination) * baseZ;
+      // Calculate radius with eccentricity
+      const r = (radius * (1 - eccentricity * eccentricity)) /
+        (1 + eccentricity * Math.cos(theta));
 
-        pointsArray.push([x, y, z]);
-      }
+      // Calculate position
+      const x = r * Math.cos(theta);
+      const baseZ = r * Math.sin(theta);
+      const inclination = orbitalInclination * (Math.PI / 180);
+      const y = Math.sin(inclination) * baseZ;
+      const z = Math.cos(inclination) * baseZ;
 
-      // Close the loop by connecting back to the start
-      pointsArray.push(pointsArray[0]);
-    } else {
-      // Calculate start angle from current position for partial arc
-      const startAngle = Math.atan2(
-        position.z * Math.cos(orbitalInclination * (Math.PI / 180)),
-        position.x
-      );
+      pointsArray.push([x, y, z]);
 
-      // Generate points for partial arc
-      for (let i = 0; i <= segments; i++) {
-        const theta = startAngle - (i / segments) * arcLength;
-
-        const r = (radius * (1 - eccentricity * eccentricity)) /
-          (1 + eccentricity * Math.cos(theta));
-
-        const x = r * Math.cos(theta);
-        const baseZ = r * Math.sin(theta);
-
-        const inclination = orbitalInclination * (Math.PI / 180);
-        const y = Math.sin(inclination) * baseZ;
-        const z = Math.cos(inclination) * baseZ;
-
-        pointsArray.push([x, y, z]);
-      }
-
-      // For partial arc, ensure first point matches current position
-      pointsArray[0] = [position.x, position.y, position.z];
+      // Calculate fade for the tail
+      // Fade should complete over the visible arc length
+      const fadeProgress = i / segmentsToUse;
+      const fadeColor = new THREE.Color(color).lerp(new THREE.Color(0x000000), fadeProgress);
+      colorsArray.push(fadeColor);
     }
 
-    return pointsArray;
-  }, [radius, eccentricity, orbitalInclination, segments, arcLength, position]);
+    return {
+      points: pointsArray,
+      colors: colorsArray
+    };
+  }, [
+    radius,
+    eccentricity,
+    orbitalInclination,
+    segments,
+    posX,
+    posY,
+    posZ,
+    color,
+    arcLength
+  ]);
 
   return (
     <Line
-      name={name}
+      key={name}
       points={points}
-      color={color}
+      vertexColors={colors}
       lineWidth={lineWidth}
-      transparent
-      opacity={opacity}
       depthWrite={false}
     />
   );

@@ -11,7 +11,7 @@ import SatelliteCamera from "./SatelliteCamera";
 import Moon from "./MoonExperiments";
 import MoonTwo from "./MoonExperimentsTwo";
 import Labels from "./Labels";
-import { earthAtmosphereShader } from "../shaders/atmosphere";
+import { earthAtmosphereShader } from "../shaders/earth/atmosphere";
 import Rings from "./Rings";
 import KeplerTriangles from "./KeplerTriangles";
 import GravityVectors from "./GravityVectors";
@@ -78,14 +78,14 @@ const Planet = ({ name = 'Earth', textures }) => {
   let rotationSpeed = rotationPeriod ? (2 * Math.PI) / (rotationPeriod * 3600) : 0;
   rotationSpeed *= rotationSpeedScaleFactor;
 
-  const isPlanetSelected = selectedPlanet && selectedPlanet.name === name;
+  const isPlanetSelected = experimentType === 'newton-1' ? true : selectedPlanet && selectedPlanet.name === name;
   const renderMoons = () => {
     if (isPlanetSelected) return true;
     if (selectedMoon?.parentName === name) return true;
     return false;
   };
 
-  const detailLevel = (isPlanetSelected || renderMoons()) ? 64 : 16;
+  const detailLevel = (isPlanetSelected || renderMoons()) ? 128 : 32;
 
   const [scale, setScale] = useState(scaledRadius);
   const textSize = useRef(1);
@@ -105,11 +105,55 @@ const Planet = ({ name = 'Earth', textures }) => {
     const adjustedDelta = delta * simSpeed;
     if (experimentStatus === "completed") return;
 
-    // Calculate mean motion (n)
+    if (experimentType === 'newton-1') {
+      // Only handle rotation, skip orbital motion
+      if (rotationPeriod && meshRef.current) {
+        const rotationPeriodInSeconds = rotationPeriod * 3600;
+        const rotationSpeed = (2 * Math.PI) / rotationPeriodInSeconds;
+        const rotationIncrement = rotationSpeed * adjustedDelta;
+
+        const yAxis = new THREE.Vector3(0, 1, 0);
+        meshRef.current.rotateOnAxis(yAxis, rotationIncrement);
+
+        if (cloudsRef.current) {
+          cloudsRef.current.rotation.y += rotationIncrement * 1.1;
+        }
+      }
+
+      // For newton-1, keep the planet stationary at its initial position
+      if (localRef.current) {
+        // Calculate initial position (only done once)
+        if (!localRef.current.userData.initialPositionSet) {
+          const r = scaledOrbitalRadius * (1 - eccentricity);
+          const x = r;
+          const y = 0;
+          const z = 0;
+          localRef.current.position.set(x, y, z);
+          updatePlanetPosition(name, { x, y, z });
+          localRef.current.userData.initialPositionSet = true;
+        }
+
+        // Update visual properties
+        const distance = localRef.current.position.distanceTo(state.camera.position);
+        setScale(distance / 1000 <= scaledRadius ? scaledRadius : distance / 1000);
+        setShowTextures(activeCamera.type === 'moon' || distance < textureDisplayDistance);
+
+        const maxDistance = scaledRadius * 100;
+        const minDistance = scaledRadius * 1;
+        const opacity = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
+        setOrbitPathOpacity(opacity);
+
+        if (textSize.current) {
+          textSize.current = distance * 0.02;
+        }
+      }
+      return; // Skip the rest of the orbital calculations
+    }
+
+    // Original orbital motion code for other experiment types
     const meanMotion = (2 * Math.PI) / (orbitalPeriod * 24 * 60 * 60);
     localAngleRef.current -= meanMotion * adjustedDelta;
 
-    //  Solve Kepler's Equation iteratively
     let E = localAngleRef.current;
     const maxIterations = 10;
     const tolerance = 1e-6;
@@ -256,8 +300,37 @@ const Planet = ({ name = 'Earth', textures }) => {
   // Calculate safe geometry values
   const visibleSphereRadius = Math.max(0.1, renderMoons() ? scaledRadius : scale * 8);
   const planetSphereRadius = Math.max(0.1, renderMoons() ? scaledRadius : scale * 8);
-  const cloudSphereRadius = Math.max(0.1, scaledRadius * 1.008);
-  const atmosphereSphereRadius = Math.max(0.1, scaledRadius * 1.02);
+  const cloudSphereRadius = Math.max(0.1, scaledRadius * 1.005);
+  const atmosphereSphereRadius = Math.max(0.1, scaledRadius * 1.008);
+
+  const orbitPathConfig = () => {
+    switch (experimentType) {
+      case 'kepler-2':
+        return {
+          lineWidth: 1,
+          color: '#fff',
+          opacity: .5,
+          hiRes: true,
+          transparent: true,
+        }
+      case 'kepler-3':
+        return {
+          lineWidth: 1,
+          color: '#fff',
+          opacity: .5,
+          hiRes: true,
+          transparent: true,
+        }
+      default:
+        return {
+          lineWidth: 2,
+          color: color,
+          opacity: 1,
+          transparent: true,
+          hiRes: true,
+        }
+    }
+  };
 
   return (
     <>
@@ -272,7 +345,7 @@ const Planet = ({ name = 'Earth', textures }) => {
       <group ref={localRef}>
         <mesh
           visible={false}
-          onClick={handleClick}
+          // onClick={handleClick}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
@@ -365,7 +438,7 @@ const Planet = ({ name = 'Earth', textures }) => {
             <span
               className='planet-label'
               style={{ color }}
-              onClick={handleClick}
+              // onClick={handleClick}
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
@@ -400,18 +473,17 @@ const Planet = ({ name = 'Earth', textures }) => {
         })}
       </group>
 
-      {orbitPaths && (
+      {orbitPaths && experimentType !== 'newton-1' && (
         <OrbitPath
           origin={orbitalOrigin}
           radius={scaledOrbitalRadius}
           eccentricity={eccentricity}
           orbitalInclination={orbitalInclination}
-          color={color}
+          color={'#fff'}
           name={name + "-orbit-path"}
-          lineWidth={2}
-          opacity={.5}
-          hiRes={isPlanetSelected}
+          {...orbitPathConfig()}
           position={localRef.current?.position}
+          arcLength={1}
         />
       )}
 

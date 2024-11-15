@@ -9,7 +9,7 @@ import SatelliteCamera from "./SatelliteCamera";
 import Moon from "./Moon";
 import Labels from "./Labels";
 import initialMoonsData from "@/data/moonsData";
-import { earthAtmosphereShader } from "../shaders/atmosphere";
+import { earthAtmosphereShader } from "../shaders/earth/atmosphere";
 import Rings from "./Rings";
 
 // First, let's create these utilities outside the component
@@ -47,6 +47,30 @@ const calculateOrbitPosition = (meanAnomaly, eccentricity, radius) => {
     baseZ: r * Math.sin(-trueAnomaly)
   };
 };
+
+const RingSystem = ({ radius, color, width = 2 }) => {
+  const ringCount = 20;
+  const spacing = width / ringCount;
+
+  return (
+    <group rotation={[Math.PI / 2, 0, 0]}>
+      {Array.from({ length: ringCount }).map((_, i) => (
+        <OrbitPath
+          key={`ring-${i}`}
+          origin={[0, 0, 0]}
+          radius={radius + (i * spacing)}
+          color={color}
+          lineWidth={0.2}
+          opacity={0.4}
+          hiRes={true}
+          eccentricity={0}
+          orbitalInclination={0}
+        />
+      ))}
+    </group>
+  );
+};
+
 
 const Planet = ({ name = 'Earth', textures }) => {
   const { planetsData, moonsData } = usePlanetStore();
@@ -128,12 +152,6 @@ const Planet = ({ name = 'Earth', textures }) => {
   const [showTextures, setShowTextures] = useState(false);
   const textureDisplayDistance = 500;
   const [orbitPathOpacity, setOrbitPathOpacity] = useState(1);
-
-
-  const earthParameters = {
-    atmosphereDayColor: '#0088FF',
-    atmosphereTwilightColor: '#FF9D00'
-  };
 
 
   useEffect(() => {
@@ -330,24 +348,38 @@ const Planet = ({ name = 'Earth', textures }) => {
           ref={meshRef}
           key={isPlanetSelected ? name + '-textured' : name + '-basic'}
           onDoubleClick={handleDoubleClick}
+          castShadow
         >
           <sphereGeometry args={[(renderMoons() ? scaledRadius : scaleRef.current * 8), detailLevel, detailLevel / 2]} />
           {((!isPlanetSelected && !renderMoons()) && texturesLoaded) ?
             <meshBasicMaterial color={color} />
             :
             <>
-              {name === "Earth" && isPlanetSelected &&
+              {name === "Earth" && isPlanetSelected && (
                 <>
                   <mesh ref={cloudsRef} key={`${name}-cloud_texture`}>
-                    <sphereGeometry args={[Math.min(scaledRadius * 1.008), detailLevel, detailLevel / 2]} />
-                    <meshStandardMaterial alphaMap={textures?.clouds} transparent opacity={0.8} />
+                    <sphereGeometry args={[scaledRadius * 1.005, detailLevel, detailLevel / 2]} />
+                    <meshStandardMaterial
+                      alphaMap={textures?.clouds}
+                      transparent
+                      opacity={0.8}
+                      depthWrite={false}
+                    />
                   </mesh>
                   <mesh key={`${name}-atmosphere_texture`}>
-                    <sphereGeometry args={[Math.min(scaledRadius * 1.02), detailLevel, detailLevel / 2]} />
-                    <shaderMaterial args={[earthAtmosphereShader]} />
+                    <sphereGeometry args={[scaledRadius * 1.01, detailLevel, detailLevel]} />
+                    <shaderMaterial
+                      args={[earthAtmosphereShader]}
+                      transparent
+                      opacity={.1}
+                      side={THREE.BackSide}
+                      // blending={THREE.AdditiveBlending}
+                      depthWrite={false}
+                      depthTest={true}
+                    />
                   </mesh>
                 </>
-              }
+              )}
               <meshStandardMaterial
                 metalness={0.6}
                 roughness={0.8}
@@ -431,6 +463,7 @@ const Planet = ({ name = 'Earth', textures }) => {
                 moonData={moon}
                 planetPosition={localRef.current?.position}
                 parentName={name}
+                parentMeshRef={meshRef} // Pass the mesh reference
               />
             </group>
           );
@@ -445,10 +478,11 @@ const Planet = ({ name = 'Earth', textures }) => {
           orbitalInclination={orbitalInclination}
           color={color}
           name={name + "-orbit-path"}
-          lineWidth={isPlanetSelected ? 2 : .5}
+          lineWidth={isPlanetSelected ? 2 : 1}
           opacity={orbitPathOpacity}
           hiRes={isPlanetSelected}
           position={localRef.current?.position}
+          arcLength={0.9}
         />
       )}
     </>

@@ -3,13 +3,13 @@ import useStore, { usePlanetStore, useCameraStore } from "../store/store";
 import useExperimentsStore from "@/store/experiments";
 import { sizeScaleFactor } from "../data/planetsData";
 import { useFrame } from "@react-three/fiber";
-import { sunOuterShader } from "../shaders/atmosphere";
 
 
 const Sun = ({ position, textures }) => {
   const { selectedPlanet, setSelectedPlanet, planetsData } = usePlanetStore();
   const { toggleZoomingToSun, switchToSunCamera, switchToPlanetCamera } = useCameraStore();
-  const { experimentMode } = useExperimentsStore();
+  const { experimentMode, experimentType } = useExperimentsStore();
+
   const [isDragging, setIsDragging] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
   const { simSpeed } = useStore();
@@ -82,7 +82,11 @@ const Sun = ({ position, textures }) => {
     }
     if (localRef.current?.material?.uniforms?.time) {
       localRef.current.material.uniforms.time.value += delta;
+
+      // Update shader time uniform
+      localRef.current.material.uniforms.time.value += delta;
     }
+
   });
 
 
@@ -98,16 +102,8 @@ const Sun = ({ position, textures }) => {
         onPointerOver={handlePointerOver}
         onPointerOut={handlePointerOut}
       >
-        <sphereGeometry args={[scale, 32, 32]} />
-        {textures ? (
-          <meshBasicMaterial map={textures.map} color={[10, 3, 0]} toneMapped={false} zIndexRange={[100 - 1]} />
-        ) : (
-          <meshBasicMaterial color={[10, 4, 0]} toneMapped={false} />
-        )}
-      </mesh>
-      <mesh key={`${name}-atmosphere`}>
-        <sphereGeometry args={[scale * 1.08, 32, 32]} />
-        <shaderMaterial args={[sunOuterShader]} />
+        <sphereGeometry args={[experimentMode ? scale * .5 : scale, 32, 32]} />
+        <meshBasicMaterial map={textures.map} color={[10, 3, 0]} toneMapped={false} zIndexRange={[100 - 1]} />
       </mesh>
     </group>
 
