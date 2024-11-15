@@ -12,12 +12,8 @@ function ExperimentsModal() {
 
     const handleExperiementType = (type) => {
         setExperimentType(type);
-
-        // Switch camera for Kepler's Second Law
-        if (type === 'kepler-2') {
-            switchToCustomCamera('Kepler-2', planetsData[experimentPlanet]);
-        }
     }
+
     const handleCloseModal = () => {
         if (experimentType) {
             setExperimentType(null);

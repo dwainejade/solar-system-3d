@@ -25,7 +25,7 @@ const MoonSatelliteCamera = ({ target, size, targetName, bodyType = 'moon' }) =>
     const mousePositionRef = useRef({ x: 0, y: 0 });
     const sphericalRef = useRef(new THREE.Spherical(size * 6, Math.PI / 2, 0));
 
-    const minZoom = size * 5;
+    const minZoom = size * 4;
     const maxZoom = 1000;
     const zoomSpeed = 0.02;
 

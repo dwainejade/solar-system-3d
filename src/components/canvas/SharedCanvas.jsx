@@ -70,11 +70,11 @@ const SharedCanvas = ({ children, mode = 'main' }) => {
 
           <EffectComposer>
             <Bloom
-              intensity={0.5}           // Reduced from 1.2
-              luminanceThreshold={1.0}  // Increased from 0.9
-              luminanceSmoothing={0.5}  // Reduced from 0.9
+              intensity={0.5}
+              luminanceThreshold={1.0}
+              luminanceSmoothing={0.5}
               mipmapBlur
-              radius={0.65}             // Reduced from 0.65
+              radius={0.8}
             />
           </EffectComposer>
         </Suspense>
