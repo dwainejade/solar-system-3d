@@ -109,10 +109,10 @@ const Scene = () => {
         // Adjust scaling for better moon visibility
         const scaledRadius = moon.radius * moonSizeScaleFactor;
         const optimalDistance = calculateOptimalDistance(scaledRadius);
+        console.log(scaledRadius, optimalDistance)
 
         // Set a reasonable minimum distance for viewing moons
         setMinDistance(optimalDistance / 2);
-
         // Update camera target and distance
         cameraControlsRef.current.setTarget(
           moonPosition.x,
@@ -300,8 +300,8 @@ const Scene = () => {
   const cameraConfig = {
     maxDistance: maxDistance,
     minDistance: minDistance,
-    near: 0.001,
-    far: 1500000,
+    near: 0.0001,
+    far: 20000000,
     smoothTime: .6,
     enableDamping: true,
     draggingSmoothTime: 0.25, // Smooth drag movement

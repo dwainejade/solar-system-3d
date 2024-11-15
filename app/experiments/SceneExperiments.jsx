@@ -3,7 +3,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { CameraControls, useTexture } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "@/store/store";
 import useExperimentsStore from "@/store/experiments";
-import { sizeScaleFactor } from "@/data/planetsData";
+import { sizeScaleFactor, distanceScaleFactor } from "@/data/planetsData";
 import Sun from "@/components/Sun";
 import Planet from "@/components/PlanetExperiments";
 import Stars from "@/components/Stars"
@@ -13,9 +13,9 @@ import * as THREE from "three";
 
 const Scene = () => {
   const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, setViewOnlyMode } = useStore();
-  const { planetPositions, selectedPlanet, selectedMoon, setSelectedMoon, planetsData, moonsData, moonPositions, resetPlanetsData } = usePlanetStore();
-  const { satelliteCamera, isCameraTransitioning, toggleCameraTransitioning, isZoomingToSun, resetCamera, toggleZoomingToSun, activeCamera, setActiveCamera, setSceneCameras, sceneCameras, satelliteCameraState, setSatelliteCameraState } = useCameraStore();
-  const { experimentPlanet } = useExperimentsStore();
+  const { planetPositions, selectedPlanet, setSelectedPlanet, selectedMoon, setSelectedMoon, planetsData, moonsData, moonPositions, resetPlanetsData } = usePlanetStore();
+  const { satelliteCamera, isCameraTransitioning, toggleCameraTransitioning, isZoomingToSun, resetCamera, toggleZoomingToSun, activeCamera, setActiveCamera, switchToCustomCamera, satelliteCameraState, setSatelliteCameraState } = useCameraStore();
+  const { experimentPlanet, experimentType } = useExperimentsStore();
 
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
@@ -217,6 +217,70 @@ const Scene = () => {
       setMinDistance(200);
       cameraControlsRef.current.maxDistance = 160000
     }
+
+    if (activeCamera.name === 'kepler' && experimentPlanet && isCameraTransitioning) {
+      const planet = planetsData[experimentPlanet];
+      const orbitalRadius = planet.orbitalRadius * distanceScaleFactor;
+      const eccentricity = planet.eccentricity;
+      const centerOffset = orbitalRadius / 2 * eccentricity;
+
+      // Position camera above the orbit's center
+      cameraControlsRef.current.setPosition(
+        centerOffset,
+        orbitalRadius * 5,
+        0,
+        true
+      );
+
+      cameraControlsRef.current.setTarget(
+        centerOffset,
+        0,
+        0,
+        true
+      );
+      // Remove zoom constraints
+      setMinDistance(orbitalRadius);
+      cameraControlsRef.current.maxDistance = 2000000;
+
+      // End the transition
+      toggleCameraTransitioning(false);
+    }
+
+    if (activeCamera.name === 'newton' && experimentPlanet && isCameraTransitioning) {
+      const planet = planetsData[experimentPlanet];
+      const scaledRadius = planet.radius * sizeScaleFactor;
+
+      // Get planet position
+      const planetPosition = planetPositions[experimentPlanet];
+      if (!planetPosition) return;
+
+      // Calculate optimal viewing distance based on planet and moon orbits
+      const moonOrbitRadius = scaledRadius * 10; // Approximate moon orbit radius
+      const optimalDistance = moonOrbitRadius * 4; // Give enough space to see full moon orbit
+
+      // Position camera to view planet and moons
+      cameraControlsRef.current.setPosition(
+        planetPosition.x + optimalDistance,
+        optimalDistance * 0.5, // Slightly elevated view
+        planetPosition.z,
+        true
+      );
+
+      // Look at the planet
+      cameraControlsRef.current.setTarget(
+        planetPosition.x,
+        planetPosition.y,
+        planetPosition.z,
+        true
+      );
+
+      // Set camera constraints
+      setMinDistance(scaledRadius * 6); // Allow zoom in to planet surface
+      cameraControlsRef.current.maxDistance = optimalDistance * 20; // Allow some zoom out
+
+      // End the transition
+      toggleCameraTransitioning(false);
+    }
   });
   // console.log({ isCameraTransitioning })
   useEffect(() => {
@@ -272,6 +336,17 @@ const Scene = () => {
 
     cameraControlsRef.current?.camera.updateProjectionMatrix();
   }, [selectedPlanet, selectedMoon, activeCamera]);
+
+  useEffect(() => {
+    if (!experimentType) return;
+    if (experimentType.includes('kepler')) {
+      switchToCustomCamera('kepler', planetsData[experimentPlanet]);
+    } else if (experimentType === 'newton-1') {
+      setSelectedPlanet(experimentPlanet);
+      switchToCustomCamera('newton', planetsData[experimentPlanet]);
+    }
+
+  }, [experimentType]);
 
   useEffect(() => {
     const handleMouseDown = (event) => {

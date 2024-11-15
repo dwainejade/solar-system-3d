@@ -138,7 +138,7 @@ const SceneOne = () => {
     specular: "../assets/earth/2k_earth_specular_map.png",
   });
   const moonTextures = useTexture({
-    map: "../assets/earth/moon/2k_moon.jpg",
+    map: "../assets/earth/moon/moon.jpg",
   });
 
   // camera settings

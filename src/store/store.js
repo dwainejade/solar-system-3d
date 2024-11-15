@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import * as THREE from 'three';
-import initialPlanetsData from '../data/planetsData';
+import initialPlanetsData, { distanceScaleFactor } from '../data/planetsData';
 import initialMoonsData from '../data/moonsData';
 import useExperimentsStore from './experiments';
 
@@ -279,7 +279,17 @@ const customCameraAngles = {
         title: 'Asteroid Belt',
         position: [-700, 2200, 6600],
         target: [0, 0, 0]
-    }
+    },
+    'kepler': {
+        title: 'kepler',
+        position: [700, 2200, 6600],
+        target: [0, 0, 0]
+    },
+    'newton': {
+        title: 'newton',
+        position: [700, 2000, 1000],
+        target: [0, 0, 0]
+    },
 }
 
 const useCameraStore = create((set, get) => ({
@@ -452,21 +462,29 @@ const useCameraStore = create((set, get) => ({
     //     });
     // },
 
-    switchToCustomCamera: (id) => {
-        // Get custom camera data
+    switchToCustomCamera: (id, planet = null) => {
         const customCameraData = customCameraAngles[id];
+        console.log('custom camera data', customCameraData)
         if (!customCameraData) return;
-        const { position, target, title } = customCameraData;
+        console.log('switching to custom camera', customCameraData)
+        const position = customCameraData.calculatePosition
+            ? customCameraData.calculatePosition(planet)
+            : customCameraData.position;
+
+        const target = customCameraData.calculateTarget
+            ? customCameraData.calculateTarget(planet)
+            : customCameraData.target;
+
         set({
             activeCamera: {
                 type: 'custom',
-                name: title,
+                name: customCameraData.title,
                 position: new THREE.Vector3(...position),
-                target: new THREE.Vector3(...target)
+                target: new THREE.Vector3(...target),
+                custom: { planet }
             },
             isCameraTransitioning: true
-        }
-        );
+        });
     },
 
     // Legacy camera states - maintained for backward compatibility

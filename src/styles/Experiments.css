@@ -239,32 +239,50 @@
 }
 .experiments-modal-wrapper .kepler-1 .slider-con.kepler-2-slider,
 .experiments-modal-wrapper .kepler-2 .slider-con.kepler-2-slider,
-.experiments-modal-wrapper .kepler-3 .slider-con.kepler-2-slider {
+.experiments-modal-wrapper .kepler-3 .slider-con.kepler-2-slider,
+.experiments-modal-wrapper .newton-1 .slider-con.kepler-2-slider {
   margin: 20px 0;
+}
+.experiments-modal-wrapper .kepler-1 .info-con .label,
+.experiments-modal-wrapper .kepler-2 .info-con .label,
+.experiments-modal-wrapper .kepler-3 .info-con .label,
+.experiments-modal-wrapper .newton-1 .info-con .label {
+  color: white;
+}
+.experiments-modal-wrapper .kepler-1 .info-con .value,
+.experiments-modal-wrapper .kepler-2 .info-con .value,
+.experiments-modal-wrapper .kepler-3 .info-con .value,
+.experiments-modal-wrapper .newton-1 .info-con .value {
+  color: #70eeff;
+  font-weight: bold;
 }
 .experiments-modal-wrapper .kepler-1 .slider-con,
 .experiments-modal-wrapper .kepler-2 .slider-con,
-.experiments-modal-wrapper .kepler-3 .slider-con {
+.experiments-modal-wrapper .kepler-3 .slider-con,
+.experiments-modal-wrapper .newton-1 .slider-con {
   display: flex;
   flex-direction: column;
   margin: 20px 0 30px 0;
 }
 .experiments-modal-wrapper .kepler-1 .slider-con .slider-control,
 .experiments-modal-wrapper .kepler-2 .slider-con .slider-control,
-.experiments-modal-wrapper .kepler-3 .slider-con .slider-control {
+.experiments-modal-wrapper .kepler-3 .slider-con .slider-control,
+.experiments-modal-wrapper .newton-1 .slider-con .slider-control {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 .experiments-modal-wrapper .kepler-1 .slider.disabled,
 .experiments-modal-wrapper .kepler-2 .slider.disabled,
-.experiments-modal-wrapper .kepler-3 .slider.disabled {
+.experiments-modal-wrapper .kepler-3 .slider.disabled,
+.experiments-modal-wrapper .newton-1 .slider.disabled {
   opacity: 0.6;
   pointer-events: none;
 }
 .experiments-modal-wrapper .kepler-1 .input-con,
 .experiments-modal-wrapper .kepler-2 .input-con,
-.experiments-modal-wrapper .kepler-3 .input-con {
+.experiments-modal-wrapper .kepler-3 .input-con,
+.experiments-modal-wrapper .newton-1 .input-con {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -275,7 +293,8 @@
 }
 .experiments-modal-wrapper .kepler-1 .input-con input[type="range"],
 .experiments-modal-wrapper .kepler-2 .input-con input[type="range"],
-.experiments-modal-wrapper .kepler-3 .input-con input[type="range"] {
+.experiments-modal-wrapper .kepler-3 .input-con input[type="range"],
+.experiments-modal-wrapper .newton-1 .input-con input[type="range"] {
   -webkit-appearance: none;
   width: 100%;
   height: 1.5px;
@@ -284,7 +303,8 @@
 }
 .experiments-modal-wrapper .kepler-1 .input-con input[type="range"]::-webkit-slider-thumb,
 .experiments-modal-wrapper .kepler-2 .input-con input[type="range"]::-webkit-slider-thumb,
-.experiments-modal-wrapper .kepler-3 .input-con input[type="range"]::-webkit-slider-thumb {
+.experiments-modal-wrapper .kepler-3 .input-con input[type="range"]::-webkit-slider-thumb,
+.experiments-modal-wrapper .newton-1 .input-con input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 11px;
   height: 11px;
@@ -294,12 +314,14 @@
 }
 .experiments-modal-wrapper .kepler-1 .input-con input[type="range"]::-webkit-slider-thumb:hover,
 .experiments-modal-wrapper .kepler-2 .input-con input[type="range"]::-webkit-slider-thumb:hover,
-.experiments-modal-wrapper .kepler-3 .input-con input[type="range"]::-webkit-slider-thumb:hover {
+.experiments-modal-wrapper .kepler-3 .input-con input[type="range"]::-webkit-slider-thumb:hover,
+.experiments-modal-wrapper .newton-1 .input-con input[type="range"]::-webkit-slider-thumb:hover {
   background: #ff8585;
 }
 .experiments-modal-wrapper .kepler-1 .input-con .slider-markers,
 .experiments-modal-wrapper .kepler-2 .input-con .slider-markers,
-.experiments-modal-wrapper .kepler-3 .input-con .slider-markers {
+.experiments-modal-wrapper .kepler-3 .input-con .slider-markers,
+.experiments-modal-wrapper .newton-1 .input-con .slider-markers {
   margin-top: 10px;
   display: flex;
   justify-content: space-between;
@@ -307,7 +329,8 @@
 }
 .experiments-modal-wrapper .kepler-1 .input-con .slider-ticks,
 .experiments-modal-wrapper .kepler-2 .input-con .slider-ticks,
-.experiments-modal-wrapper .kepler-3 .input-con .slider-ticks {
+.experiments-modal-wrapper .kepler-3 .input-con .slider-ticks,
+.experiments-modal-wrapper .newton-1 .input-con .slider-ticks {
   position: absolute;
   top: -20%;
   left: 3%;
@@ -321,7 +344,8 @@
 }
 .experiments-modal-wrapper .kepler-1 .input-con .slider-ticks .tick,
 .experiments-modal-wrapper .kepler-2 .input-con .slider-ticks .tick,
-.experiments-modal-wrapper .kepler-3 .input-con .slider-ticks .tick {
+.experiments-modal-wrapper .kepler-3 .input-con .slider-ticks .tick,
+.experiments-modal-wrapper .newton-1 .input-con .slider-ticks .tick {
   width: 1.5px;
   height: 100%;
   background-color: #dfcda7;
@@ -329,9 +353,11 @@
 .experiments-modal-wrapper .kepler-1 .increment-btn,
 .experiments-modal-wrapper .kepler-2 .increment-btn,
 .experiments-modal-wrapper .kepler-3 .increment-btn,
+.experiments-modal-wrapper .newton-1 .increment-btn,
 .experiments-modal-wrapper .kepler-1 .decrement-btn,
 .experiments-modal-wrapper .kepler-2 .decrement-btn,
-.experiments-modal-wrapper .kepler-3 .decrement-btn {
+.experiments-modal-wrapper .kepler-3 .decrement-btn,
+.experiments-modal-wrapper .newton-1 .decrement-btn {
   width: 24px;
   height: 20px;
   border-radius: 20px;
@@ -348,8 +374,10 @@
 .experiments-modal-wrapper .kepler-1 .increment-btn:hover,
 .experiments-modal-wrapper .kepler-2 .increment-btn:hover,
 .experiments-modal-wrapper .kepler-3 .increment-btn:hover,
+.experiments-modal-wrapper .newton-1 .increment-btn:hover,
 .experiments-modal-wrapper .kepler-1 .decrement-btn:hover,
 .experiments-modal-wrapper .kepler-2 .decrement-btn:hover,
-.experiments-modal-wrapper .kepler-3 .decrement-btn:hover {
+.experiments-modal-wrapper .kepler-3 .decrement-btn:hover,
+.experiments-modal-wrapper .newton-1 .decrement-btn:hover {
   background-color: #ffb025;
 }

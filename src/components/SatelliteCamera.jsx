@@ -24,7 +24,7 @@ const SatelliteCamera = ({ target, size, targetName, bodyType = 'planet' }) => {
     const sphericalRef = useRef(new THREE.Spherical(size * 6, Math.PI / 2, 0));
 
     const minZoom = size * 2.8;
-    const maxZoom = 300;
+    const maxZoom = 1000;
     const zoomSpeed = 0.1;
 
     const handleUserInteraction = useCallback(() => {
@@ -214,7 +214,7 @@ const SatelliteCamera = ({ target, size, targetName, bodyType = 'planet' }) => {
             key={targetName}
             makeDefault={satelliteCamera}
             fov={50}
-            near={0.01}
+            near={0.0001}
             far={1200000}
         />
     );

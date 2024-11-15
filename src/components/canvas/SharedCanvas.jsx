@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Html, PerformanceMonitor, useProgress, Stats, Preload } from "@react-three/drei";
+import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import useStore from "../../store/store";
 import Menu from "../UI/Menu";
 import ExperimentsMenu from "../UI/experiments/ExperimentsMenu";
@@ -11,7 +12,7 @@ import "../../styles.css";
 const SharedCanvas = ({ children, mode = 'main' }) => {
   const { fullscreen, isLoading, toggleLoading } = useStore();
   const { errors, loaded } = useProgress();
-  const total = 17
+  const total = 17;
   const progressPercentage = (loaded / total) * 100;
   const [dpr, setDpr] = useState([1, 2]);
 
@@ -43,22 +44,39 @@ const SharedCanvas = ({ children, mode = 'main' }) => {
     <div className={`Main ${fullscreen ? "fullscreen" : "minimized"}`}>
       <Canvas
         id='Canvas'
-        shadows dpr={dpr}
+        shadows
+        dpr={dpr}
         gl={{
           antialias: true,
-          // alpha: false,
           logarithmicDepthBuffer: true,
         }}
-        camera={{ fov: 50, position: [20000, 20000, 20000], near: 0.1, far: 2000000 }}
-      // frameloop="demand"
+        camera={{
+          fov: 50,
+          position: [20000, 20000, 20000],
+          near: 0.1,
+          far: 2000000
+        }}
       >
         <Stats />
-        <PerformanceMonitor onIncline={() => setDpr([1, 2])} onDecline={() => setDpr([1, 1])} />
+        <PerformanceMonitor
+          onIncline={() => setDpr([1, 2])}
+          onDecline={() => setDpr([1, 1])}
+        />
 
         <Suspense fallback={<Loader />}>
           <ambientLight intensity={0.02} />
           <pointLight color='#f6f3ea' intensity={2} position={[0, 0, 0]} />
           {children}
+
+          <EffectComposer>
+            <Bloom
+              intensity={0.5}
+              luminanceThreshold={1.0}
+              luminanceSmoothing={0.5}
+              mipmapBlur
+              radius={0.8}
+            />
+          </EffectComposer>
         </Suspense>
         <Preload all />
       </Canvas>
