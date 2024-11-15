@@ -1,107 +1,102 @@
-import React, { useState, useEffect } from 'react';
-import useStore, { usePlanetStore } from '../../../store/store';
-import planetsData from '../../../data/planetsData';
-import useExperimentsStore from '../../../store/experiments';
-import { getSpeedValue } from '../../../helpers/utils';
-import Slider from '../../../components/UI/Slider';
+import React, { useState, useEffect } from "react";
+import useStore, { usePlanetStore } from "../../../store/store";
+import planetsData from "../../../data/planetsData";
+import useExperimentsStore from "../../../store/experiments";
+import { getSpeedValue } from "../../../helpers/utils";
+import Slider from "../../../components/UI/Slider";
 
 function KeplerOne() {
-    const { planetsData: newPlanetsData, updatePlanetData, resetSinglePlanetData } = usePlanetStore();
-    const { setSimSpeed, simSpeed, prevSpeed } = useStore();
-    const { experimentMode, experimentPlanet, setExperimentStatus, experimentStatus } = useExperimentsStore();
+  const { planetsData: newPlanetsData, updatePlanetData, resetSinglePlanetData } = usePlanetStore();
+  const { setSimSpeed, simSpeed, prevSpeed } = useStore();
+  const { experimentMode, experimentPlanet, setExperimentStatus, experimentStatus } = useExperimentsStore();
 
-    const selectedPlanet = experimentPlanet || 'Earth';
+  const selectedPlanet = experimentPlanet || "Earth";
 
-    // Initialize eccentricity from planet data
-    const [eccentricity, setEccentricity] = useState(newPlanetsData[selectedPlanet].eccentricity);
-    const originalEccentricity = planetsData[experimentPlanet].eccentricity; // Saturn's original eccentricity
+  // Initialize eccentricity from planet data
+  const [eccentricity, setEccentricity] = useState(newPlanetsData[selectedPlanet].eccentricity);
+  const originalEccentricity = planetsData[experimentPlanet].eccentricity; // Saturn's original eccentricity
 
-    const handleIncrement = () => {
-        const newValue = Math.min(0.9, eccentricity + 0.1);
-        setEccentricity(newValue);
-        if (experimentMode) {
-            updatePlanetData(selectedPlanet, { eccentricity: newValue });
-        }
+  const handleIncrement = () => {
+    const newValue = Math.min(0.9, eccentricity + 0.1);
+    setEccentricity(newValue);
+    if (experimentMode) {
+      updatePlanetData(selectedPlanet, { eccentricity: newValue });
+    }
+  };
+
+  const handleDecrement = () => {
+    const newValue = Math.max(0, eccentricity - 0.1);
+    setEccentricity(newValue);
+    if (experimentMode) {
+      updatePlanetData(selectedPlanet, { eccentricity: newValue });
+    }
+  };
+
+  const handleSliderChange = e => {
+    const newValue = parseFloat(e.target.value);
+    setEccentricity(newValue);
+    if (experimentMode) {
+      updatePlanetData(selectedPlanet, { eccentricity: newValue });
+    }
+  };
+
+  const handleStartExperiment = () => {
+    updatePlanetData(selectedPlanet, { eccentricity: eccentricity });
+    const newSpeed = getSpeedValue("1 year /s");
+    setSimSpeed(newSpeed); // Set to normal speed when starting
+    setExperimentStatus("started");
+  };
+
+  const handleReset = () => {
+    setEccentricity(originalEccentricity);
+    updatePlanetData(selectedPlanet, { eccentricity: originalEccentricity });
+    setSimSpeed(1);
+    setExperimentStatus(null);
+  };
+
+  useEffect(() => {
+    return () => {
+      handleReset();
     };
+  }, []);
 
-    const handleDecrement = () => {
-        const newValue = Math.max(0, eccentricity - 0.1);
-        setEccentricity(newValue);
-        if (experimentMode) {
-            updatePlanetData(selectedPlanet, { eccentricity: newValue });
-        }
-    };
+  return (
+    <>
+      <div className='newton-section kepler-1'>
+        <h2 className='title'>{selectedPlanet}</h2>
 
-    const handleSliderChange = (e) => {
-        const newValue = parseFloat(e.target.value);
-        setEccentricity(newValue);
-        if (experimentMode) {
-            updatePlanetData(selectedPlanet, { eccentricity: newValue });
-        }
-    };
+        <Slider
+          name={"kepler-1-slider"}
+          min={0}
+          max={0.9}
+          markers={["0", ".9"]}
+          onDecrement={handleDecrement}
+          onIncrement={handleIncrement}
+          onSliderChange={handleSliderChange}
+          value={eccentricity}
+          disableSlider={experimentStatus === "started"}
+          disableIncrement={eccentricity >= 0.9 || experimentStatus === "started"}
+          disableDecrement={eccentricity <= 0 || experimentStatus === "started"}
+          amountOfTicks={10}
+        />
 
-    const handleStartExperiment = () => {
-        updatePlanetData(selectedPlanet, { eccentricity: eccentricity });
-        const newSpeed = getSpeedValue('1 year /s');
-        setSimSpeed(newSpeed); // Set to normal speed when starting
-        setExperimentStatus("started");
-    };
-
-    const handleReset = () => {
-        setEccentricity(originalEccentricity);
-        updatePlanetData(selectedPlanet, { eccentricity: originalEccentricity });
-        setSimSpeed(1);
-        setExperimentStatus(null);
-    };
-
-    useEffect(() => {
-        return () => {
-            handleReset();
-        }
-    }, [])
-
-    return (
-        <>
-            <header>Kepler's First Law</header>
-            <div className="newton-section kepler-1">
-                <h2 className="title">{selectedPlanet}</h2>
-
-                <Slider
-                    name={'kepler-1-slider'}
-                    min={0}
-                    max={.9}
-                    markers={['0', '.9']}
-                    onDecrement={handleDecrement}
-                    onIncrement={handleIncrement}
-                    onSliderChange={handleSliderChange}
-                    value={eccentricity}
-                    disableSlider={experimentStatus === 'started'}
-                    disableIncrement={eccentricity >= 0.9 || experimentStatus === 'started'}
-                    disableDecrement={eccentricity <= 0 || experimentStatus === 'started'}
-                    amountOfTicks={10}
-                />
-
-                <div className="description-con">
-                    <p>Planets orbit the Sun in an ellipse, with the Sun at one of the foci.</p>
-                    <p>Note that {selectedPlanet}'s normal eccentricity is {originalEccentricity}.</p>
-                </div>
-            </div>
-            <footer className="experiment-footer">
-                <button
-                    className={`btn start-btn ${experimentMode ? 'active' : ''}`}
-                    onClick={handleStartExperiment}
-                >
-                    Start Experiment
-                </button>
-                <button
-                    className="btn reset-btn"
-                    onClick={handleReset}
-                >
-                    Reset Values
-                </button>
-            </footer>
-        </>
-    );
+        <div className='description-con'>
+          <p>Planets orbit the Sun in an ellipse, with the Sun at one of the foci.</p>
+          <p>
+            Note that {selectedPlanet}'s normal eccentricity is {originalEccentricity}.
+          </p>
+        </div>
+      </div>
+      <footer className='experiment-footer'>
+        <button className={`btn start-btn ${experimentMode ? "active" : ""}`} onClick={handleStartExperiment}>
+          Start Experiment
+        </button>
+        <button className='btn reset-btn' onClick={handleReset}>
+          Reset Values
+        </button>
+      </footer>
+    </>
+  );
 }
 
 export default KeplerOne;
