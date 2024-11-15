@@ -2,29 +2,25 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
 
-/**
- * A fork of 'next-pwa' that has app directory support
- * @see https://github.com/shadowwalker/next-pwa/issues/424#issuecomment-1332258575
- */
 const withPWA = require('@ducanh2912/next-pwa').default({
   dest: 'public',
   disable: process.env.NODE_ENV === 'development',
 })
 
 const nextConfig = {
-  basePath: '/solar-system-interactive',
-  assetPrefix: '/solar-system-interactive',
+  // Only apply basePath and assetPrefix in production
+  basePath: process.env.NODE_ENV === 'development' ? '' : '/solar-system-interactive',
+  assetPrefix: process.env.NODE_ENV === 'development' ? '' : '/solar-system-interactive',
   output: process.env.NODE_ENV === "development" ? undefined : "export",
   distDir: 'dist',
-  reactStrictMode: true, // Recommended for the `pages` directory, default in `app`.
+  reactStrictMode: true,
   trailingSlash: true,
   images: {},
   webpack(config, { isServer }) {
     if (!isServer) {
-      // We're in the browser build, so we can safely exclude the sharp module
       config.externals.push('sharp')
     }
-    // audio support
+
     config.module.rules.push({
       test: /\.(ogg|mp3|wav|mpe?g)$/i,
       exclude: config.exclude,
@@ -43,7 +39,6 @@ const nextConfig = {
       ],
     })
 
-    // shader support
     config.module.rules.push({
       test: /\.(glsl|vs|fs|vert|frag)$/,
       exclude: /node_modules/,
