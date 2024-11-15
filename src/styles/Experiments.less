@@ -34,6 +34,25 @@
   .experiments-btn {
     height: 30px;
     padding: 5px 12px;
+    background-color: @label-color;
+    outline: @label-color;
+    color: @text-color-3;
+
+    &:hover {
+      background-color: #c47400;
+      outline: #68e4fc;
+    }
+
+    &:active {
+      background-color: #b26900;
+      outline: #68e4fc;
+    }
+
+    &:disabled {
+      background-color: #c9c9c9;
+      outline: #eaeaea;
+      color: #7c7c7c;
+    }
   }
 }
 
