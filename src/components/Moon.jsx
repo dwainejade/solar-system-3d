@@ -169,11 +169,6 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
             position={[0, scaledValues.radius * 1.2, 0]}
             center
             zIndexRange={[100, 0]}
-            occlude={(parentMeshRef && simSpeed < 20000) ? [parentMeshRef] : undefined}
-            occludeOptions={{
-              threshold: 0.1,
-              recursive: false
-            }}
             style={isMoonSelected ? { pointerEvents: 'none' } : {}}
           >
             <span
@@ -181,7 +176,7 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
               onClick={handleClick}
               style={{
                 color: color,
-                fontSize: isMoonSelected ? '14px' : '12px',
+                fontSize: '12px',
                 cursor: 'pointer',
               }}
             >{name}</span>
