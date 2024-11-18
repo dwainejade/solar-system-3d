@@ -70,16 +70,16 @@ function OrbitPath({
       colorsArray.push(fadeColor);
     }
 
-    if (name === "Triton-orbit-path") {
-      console.log("Triton points:", {
-        currentAngle: currentAngle * (180 / Math.PI),
-        isRetrograde,
-        first: pointsArray[0],
-        last: pointsArray[pointsArray.length - 1],
-        thetaFirst: (currentAngle + Math.PI) * (180 / Math.PI),
-        thetaLast: (currentAngle + Math.PI - totalArcAngle) * (180 / Math.PI)
-      });
-    }
+    // if (name === "Triton-orbit-path") {
+    //   console.log("Triton points:", {
+    //     currentAngle: currentAngle * (180 / Math.PI),
+    //     isRetrograde,
+    //     first: pointsArray[0],
+    //     last: pointsArray[pointsArray.length - 1],
+    //     thetaFirst: (currentAngle + Math.PI) * (180 / Math.PI),
+    //     thetaLast: (currentAngle + Math.PI - totalArcAngle) * (180 / Math.PI)
+    //   });
+    // }
 
     return {
       points: pointsArray,
