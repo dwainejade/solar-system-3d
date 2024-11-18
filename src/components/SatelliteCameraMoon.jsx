@@ -212,7 +212,7 @@ const MoonSatelliteCamera = ({ target, size, targetName, bodyType = 'moon' }) =>
     return (
         <PerspectiveCamera
             ref={cameraRef}
-            name={'satellite-camera-' + targetName}
+            name={'moon-satellite-camera-' + targetName}
             key={targetName}
             makeDefault={satelliteCamera}
             fov={50}

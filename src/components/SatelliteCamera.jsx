@@ -210,7 +210,7 @@ const SatelliteCamera = ({ target, size, targetName, bodyType = 'planet' }) => {
     return (
         <PerspectiveCamera
             ref={cameraRef}
-            name={'satellite-camera-' + targetName}
+            name={'planet-satellite-camera-' + targetName}
             key={targetName}
             makeDefault={satelliteCamera}
             fov={50}
