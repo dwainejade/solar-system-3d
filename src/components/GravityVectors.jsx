@@ -1,5 +1,5 @@
 import React from 'react';
-import { Vector3, Matrix4, Quaternion } from 'three';
+import { Vector3, Quaternion } from 'three';
 
 // Arrow component that creates a cylinder with cone tip
 const Arrow = ({ start, end, color, thickness = 0.1 }) => {
@@ -13,8 +13,8 @@ const Arrow = ({ start, end, color, thickness = 0.1 }) => {
     quaternion.setFromUnitVectors(up, normalized);
 
     // Arrow head (cone) proportions
-    const headLength = 1; // 20% of total length
-    const headRadius = .3;
+    const headLength = .8; // 20% of total length
+    const headRadius = .4;
     const bodyLength = length - headLength;
 
     return (
@@ -28,8 +28,8 @@ const Arrow = ({ start, end, color, thickness = 0.1 }) => {
 
                 {/* Arrow head (cone) */}
                 <mesh position={[0, length - headLength / 2, 0]}>
-                    <coneGeometry args={[headRadius, headLength, 8]} />
-                    <meshStandardMaterial color={color} emissive={color} />
+                    <coneGeometry args={[headRadius, headLength, 16]} />
+                    <meshStandardMaterial color={color} emissive={color} emissiveIntensity={.8} transparent={true} opacity={0.5} />
                 </mesh>
             </group>
         </group>
@@ -46,12 +46,12 @@ const GravityVectors = ({ moonRef, planetRef, length = 3 }) => {
     const towardsPlanet = new Vector3()
         .subVectors(planetPos, moonPos)
         .normalize()
-        .multiplyScalar(Math.max(5, length));
+        .multiplyScalar(Math.min(25, length * 8));
 
     const towardsMoon = new Vector3()
         .subVectors(moonPos, planetPos)
         .normalize()
-        .multiplyScalar(Math.max(5, length));
+        .multiplyScalar(Math.min(25, length * 8));
 
     // Calculate end points
     const moonArrowEnd = new Vector3(

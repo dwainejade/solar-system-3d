@@ -6,18 +6,25 @@ import * as THREE from 'three'
 function Labels({ text, size = 1, position = [0, 3, 0], color, handleClick, handlePointerDown }) {
     const { camera } = useThree()
     const textRef = useRef()
+    const baseSize = 1000  // Adjust this constant as needed
 
     useFrame(() => {
         if (textRef.current) {
+            // Get the text's world position
             const textWorldPos = new THREE.Vector3()
             textRef.current.getWorldPosition(textWorldPos)
 
+            // Get the camera's world position
             const cameraWorldPos = new THREE.Vector3()
             camera.getWorldPosition(cameraWorldPos)
 
+            // Compute the distance between the text and the camera
             const distanceToCamera = cameraWorldPos.distanceTo(textWorldPos)
-            const scaleFactor = distanceToCamera / 55
 
+            // Calculate the scale factor based on distance and size prop
+            const scaleFactor = (distanceToCamera * size) / baseSize
+
+            // Apply the scaling to the text
             textRef.current.scale.setScalar(scaleFactor)
         }
     })

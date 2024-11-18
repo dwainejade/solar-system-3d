@@ -10,7 +10,7 @@ const SceneExperimentsPage = () => {
 
   useEffect(() => {
     toggleExperimentMode(true);
-  }, []);
+  }, [toggleExperimentMode]);
 
   return (
     <SharedCanvas mode={experimentMode ? 'experiments' : 'main'}>

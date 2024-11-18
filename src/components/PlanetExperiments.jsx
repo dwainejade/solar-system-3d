@@ -378,7 +378,7 @@ const Planet = ({ name = 'Earth', textures }) => {
         <mesh
           ref={meshRef}
           key={isPlanetSelected ? name + '-textured' : name + '-basic'}
-          onDoubleClick={handleDoubleClick}
+        // onDoubleClick={handleDoubleClick}
         >
           <sphereGeometry args={[planetSphereRadius, detailLevel, detailLevel / 2]} />
           {((!isPlanetSelected && !renderMoons()) && texturesLoaded) ?
@@ -470,24 +470,21 @@ const Planet = ({ name = 'Earth', textures }) => {
 
         {renderMoons() && moons.map((moon, index) => {
           // Only render regular moons if we're not in an escape scenario
-          if (!(experimentStatus && massRatio <= 0.5)) {
-            const shouldAlignWithTilt = ["Saturn", "Uranus"].includes(name);
-            return (
-              <group
-                key={`${name}-moon-group-${index}`}
-                rotation={shouldAlignWithTilt ? [THREE.MathUtils.degToRad(axialTilt), 0, 0] : [0, 0, 0]}
-              >
-                <Moon
-                  key={`${name}-moon-${index}`}
-                  moonData={moon}
-                  planetRef={localRef}
-                  parentName={name}
-                  scaledPlanetRadius={scaledRadius}
-                />
-              </group>
-            );
-          }
-          return null;
+          const shouldAlignWithTilt = ["Saturn", "Uranus"].includes(name);
+          return (
+            <group
+              key={`${name}-moon-group-${index}`}
+              rotation={shouldAlignWithTilt ? [THREE.MathUtils.degToRad(axialTilt), 0, 0] : [0, 0, 0]}
+            >
+              <Moon
+                key={`${name}-moon-${index}`}
+                moonData={moon}
+                planetRef={localRef}
+                parentName={name}
+                scaledPlanetRadius={scaledRadius}
+              />
+            </group>
+          );
         })}
       </group>
 
@@ -513,7 +510,7 @@ const Planet = ({ name = 'Earth', textures }) => {
       }
 
       {/* Render MoonTwo outside of planet group when in escape scenario */}
-      {renderMoons() && experimentStatus && massRatio <= 0.5 && moons.map((moon, index) => (
+      {/* {renderMoons() && experimentStatus && massRatio <= 0.5 && moons.map((moon, index) => (
         <MoonTwo
           key={`${name}-escaped-moon-${index}`}
           moonData={moon}
@@ -521,7 +518,7 @@ const Planet = ({ name = 'Earth', textures }) => {
           parentName={name}
           scaledPlanetRadius={scaledRadius}
         />
-      ))}
+      ))} */}
     </>
   );
 };

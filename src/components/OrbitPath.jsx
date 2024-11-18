@@ -12,10 +12,11 @@ function OrbitPath({
   lineWidth = 2,
   opacity = 1,
   hiRes = false,
-  arcLength = 0.8, // Default to 80% of the orbit
+  arcLength = 0.8,
   position
 }) {
   const segments = hiRes ? 512 : 64;
+  const isRetrograde = orbitalInclination > 90;
 
   // Extract position components for dependency tracking
   const posX = Array.isArray(position) ? position[0] : position?.x || 0;
@@ -30,33 +31,53 @@ function OrbitPath({
     const currentAngle = Math.atan2(posZ, posX);
     const baseColor = new THREE.Color(color);
 
-    // Calculate how many segments to use based on arcLength
+    const inclinationRad = (orbitalInclination * -Math.PI) / 180;
+    const rotationMatrix = new THREE.Matrix4().makeRotationX(inclinationRad);
+
     const totalArcAngle = arcLength * 2 * Math.PI;
     const segmentsToUse = Math.floor(segments * arcLength);
 
-    // Generate points for the specified arc length
     for (let i = 0; i <= segmentsToUse; i++) {
-      // Calculate angle for this point, starting from current position and going backwards
-      const theta = currentAngle - (i / segmentsToUse) * totalArcAngle;
+      let theta;
+      if (isRetrograde) {
+        // For retrograde orbits, start at current angle + π and move backwards
+        theta = (currentAngle + Math.PI) - (i / segmentsToUse) * totalArcAngle;
+      } else {
+        // Normal orbits remain the same
+        theta = currentAngle - (i / segmentsToUse) * totalArcAngle;
+      }
 
       // Calculate radius with eccentricity
       const r = (radius * (1 - eccentricity * eccentricity)) /
         (1 + eccentricity * Math.cos(theta));
 
-      // Calculate position
-      const x = r * Math.cos(theta);
-      const baseZ = r * Math.sin(theta);
-      const inclination = orbitalInclination * (Math.PI / 180);
-      const y = Math.sin(inclination) * baseZ;
-      const z = Math.cos(inclination) * baseZ;
+      // Create point in orbital plane (XZ plane)
+      const point = new THREE.Vector3(
+        r * Math.cos(theta),
+        0,
+        r * Math.sin(theta)
+      );
 
-      pointsArray.push([x, y, z]);
+      // Apply inclination rotation
+      point.applyMatrix4(rotationMatrix);
 
-      // Calculate fade for the tail
-      // Fade should complete over the visible arc length
+      pointsArray.push([point.x, point.y, point.z]);
+
+      // Calculate fade
       const fadeProgress = i / segmentsToUse;
-      const fadeColor = new THREE.Color(color).lerp(new THREE.Color(0x000000), fadeProgress);
+      const fadeColor = baseColor.clone().lerp(new THREE.Color(0x000000), fadeProgress);
       colorsArray.push(fadeColor);
+    }
+
+    if (name === "Triton-orbit-path") {
+      console.log("Triton points:", {
+        currentAngle: currentAngle * (180 / Math.PI),
+        isRetrograde,
+        first: pointsArray[0],
+        last: pointsArray[pointsArray.length - 1],
+        thetaFirst: (currentAngle + Math.PI) * (180 / Math.PI),
+        thetaLast: (currentAngle + Math.PI - totalArcAngle) * (180 / Math.PI)
+      });
     }
 
     return {

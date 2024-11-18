@@ -3,10 +3,10 @@ import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import useExperimentsStore from "@/store/experiments";
-import { useTexture, Line, Html } from "@react-three/drei";
-import { Vector3, CatmullRomCurve3 } from "three";
+import { useTexture, Html } from "@react-three/drei";
+import { Vector3 } from "three";
 import { moonDistanceScaleFactor, moonSizeScaleFactor } from "../data/moonsData";
-import initialPlanetsData, { sizeScaleFactor } from "../data/planetsData";
+import initialPlanetsData from "../data/planetsData";
 import { G, distanceScaleFactor } from "../data/planetsData";
 import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCameraMoon";
@@ -15,7 +15,7 @@ import Labels from "./Labels";
 import { calculateKeplerianOrbit, calculateModifiedKeplerianOrbit, calculateSpiralOrbit } from "../helpers/calculateOrbits";
 import MotionTrail from "../helpers/MotionTrail";
 
-const MoonExperiments = forwardRef(({ moonData, planetRef, parentName, scaledPlanetRadius }, ref) => {
+const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }) => {
   const {
     name,
     orbitalRadius,
@@ -55,11 +55,12 @@ const MoonExperiments = forwardRef(({ moonData, planetRef, parentName, scaledPla
   const massRatio = planetMass / originalPlanetMass;
 
   // Refs
-  const localRef = ref || useRef();
-  const initialAngle = Math.random() * 2 * Math.PI;
-  const localAngleRef = useRef(moonAngles[name] || initialAngle);
-  const startAngleRef = useRef(null);
+  const localRef = useRef();
   const meshRef = useRef();
+  const startAngleRef = useRef(null);
+
+  // Initialize angle from current position instead of random
+  const localAngleRef = useRef(null);
 
   // States
   const [hasCollided, setHasCollided] = useState(false);
@@ -69,17 +70,23 @@ const MoonExperiments = forwardRef(({ moonData, planetRef, parentName, scaledPla
   const [hasEscaped, setHasEscaped] = useState(false);
   const independentPositionRef = useRef(null);
   const independentVelocityRef = useRef(null);
+  const hasInitialized = useRef(false);
 
 
-  // Reset when experiment status changes
+  // Set initial position once when component mounts
+  useEffect(() => {
+    if (localRef.current && !hasInitialized.current) {
+      localRef.current.position.set(scaledValues.orbitalRadius, 0, 0);
+      hasInitialized.current = true;
+    }
+  }, [scaledValues.orbitalRadius,]);
+
+  // Reset experiment state without changing position
   useEffect(() => {
     if (experimentStatus === null) {
-      if (localRef.current) {
-        const currentPos = localRef.current.position;
-        localAngleRef.current = Math.atan2(currentPos.z, currentPos.x);
-      }
       startAngleRef.current = null;
       setHasCollided(false);
+      setHasEscaped(false);
       if (meshRef.current) {
         meshRef.current.material.color.set(moonTexture ? 'white' : color);
         meshRef.current.material.emissive.set('black');
@@ -90,19 +97,19 @@ const MoonExperiments = forwardRef(({ moonData, planetRef, parentName, scaledPla
   useFrame((state, delta) => {
     if (hasCollided || experimentStatus === "completed") return;
 
+    // Before experiment starts, maintain initial position
     if (experimentStatus !== "started") {
       if (localRef.current) {
-        localRef.current.position.set(scaledValues.orbitalRadius, 0, 0);
+        const moonPosition = localRef.current.getWorldPosition(new Vector3());
+        updateMoonPosition(name, { x: moonPosition.x, y: moonPosition.y, z: moonPosition.z });
       }
       return;
     }
 
     const willEscape = massRatio <= 0.5;
 
-    // Initialize trajectory
+    // Initialize experiment from current position
     if (startAngleRef.current === null) {
-      const currentPos = localRef.current.position;
-      localAngleRef.current = Math.atan2(currentPos.z, currentPos.x);
       startAngleRef.current = localAngleRef.current;
 
       if (willEscape) {
@@ -267,7 +274,7 @@ const MoonExperiments = forwardRef(({ moonData, planetRef, parentName, scaledPla
           hiRes={true}
           lineWidth={1}
           position={localRef.current?.position}
-          arcLength={.8}
+          arcLength={.9}
         />
       }
 
@@ -320,6 +327,6 @@ const MoonExperiments = forwardRef(({ moonData, planetRef, parentName, scaledPla
       )}
     </>
   );
-});
+};
 
 export default MoonExperiments;
