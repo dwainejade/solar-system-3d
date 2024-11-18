@@ -3,7 +3,6 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import useStore, { useCameraStore, usePlanetStore } from '../../store/store';
 import { distanceScaleFactor, MASS_OF_SUN, G, asteroidBeltData } from '../../data/planetsData';
-import Labels from '../Labels';
 import { Html } from '@react-three/drei';
 
 const AsteroidBelt = ({ meshCount = 500 }) => {
@@ -17,11 +16,11 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
     const labelRef = useRef();
     const colorArray = useRef();
 
-    const opacity = ((activeCamera.type === 'planet' || activeCamera.type === 'moon') && activeCamera.name !== 'Sun') ? 0.3 : 1;
+    const opacity = ((activeCamera.type === 'planet' || activeCamera.type === 'moon') && activeCamera.name !== 'Sun') ? 0.01 : 1;
 
 
-    const innerRadius = asteroidBeltData.innerRadius; // Real inner edge
-    const outerRadius = asteroidBeltData.outerRadius; // Real outer edge
+    const innerRadius = asteroidBeltData.innerRadius;
+    const outerRadius = asteroidBeltData.outerRadius;
     const beltWidth = outerRadius - innerRadius;
     const averageRadius = ((innerRadius + outerRadius) / 2) * distanceScaleFactor;
 
@@ -30,8 +29,8 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
         C: {
             baseHue: 0.083,
             hueVariation: 0.02,
-            saturation: [0.15, 0.25],  // Increased saturation
-            lightness: [0.25, 0.35]    // Increased lightness
+            saturation: [0.15, 0.25],
+            lightness: [0.25, 0.35]
         },
         S: {
             baseHue: 0.055,
@@ -42,20 +41,20 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
         M: {
             baseHue: 0.1,
             hueVariation: 0.01,
-            saturation: [0.15, 0.3],   // Increased saturation
-            lightness: [0.4, 0.5]      // Increased lightness
+            saturation: [0.15, 0.3],
+            lightness: [0.4, 0.5]
         },
         D: {
             baseHue: 0.065,
             hueVariation: 0.01,
-            saturation: [0.15, 0.2],   // Increased saturation
-            lightness: [0.2, 0.25]     // Increased lightness
+            saturation: [0.15, 0.2],
+            lightness: [0.2, 0.25]
         },
         V: {
             baseHue: 0.03,
             hueVariation: 0.01,
-            saturation: [0.3, 0.5],    // Increased saturation
-            lightness: [0.3, 0.4]      // Increased lightness
+            saturation: [0.3, 0.5],
+            lightness: [0.3, 0.4]
         }
     };
 
@@ -90,14 +89,11 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
         return color;
     }, []);
 
-    // Updated size distribution based on real asteroid data
     const generateAsteroidSize = useCallback(() => {
         const randomValue = Math.random();
-        // Most asteroids are very small, few are large
-        const minSize = 6;  // Minimum visible size
-        const maxSize = 18;   // Maximum size for large asteroids
-        // Power law distribution (roughly follows real asteroid size distribution)
-        return minSize + (maxSize - minSize) * Math.pow(randomValue, 4);
+        const minSize = 10;  // Minimum visible size
+        const maxSize = 25;   // Maximum size for large asteroids
+        return minSize + (maxSize - minSize) * Math.pow(randomValue, 20);
     }, []);
 
     const generateOrbitalElements = useCallback((index) => {
@@ -252,7 +248,7 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
                     roughness={0.7}      // Reduced for more specular highlights
                     metalness={0.5}      // Increased for more reflectivity
                     emissive="#888"   // Slight self-illumination
-                    emissiveIntensity={activeCamera.type === 'planet' ? 0 : 0.1}
+                    emissiveIntensity={0.1}
                     toneMapped={false}   // Preserve bright colors
                     transparent={true}
                     opacity={opacity}

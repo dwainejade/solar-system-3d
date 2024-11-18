@@ -8,7 +8,6 @@ import Sun from "@/components/Sun";
 import Planet from "@/components/PlanetExperiments";
 import Stars from "@/components/Stars"
 import { useFrame } from "@react-three/fiber";
-import AsteroidBelt from "@/components/asteroids/AsteroidBeltShaders";
 import * as THREE from "three";
 
 const Scene = () => {

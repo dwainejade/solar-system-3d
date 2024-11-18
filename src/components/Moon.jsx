@@ -7,6 +7,7 @@ import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import { moonDistanceScaleFactor, moonSizeScaleFactor } from "../data/moonsData";
 import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCameraMoon";
+import Labels from "./Labels";
 
 const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }, ref) => {
   const {
@@ -73,8 +74,8 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
         '#include <map_fragment>',
         `
         #include <map_fragment>
-        diffuseColor.rgb *= .7;
-        diffuseColor.rgb = pow(diffuseColor.rgb, vec3(1.5));
+        diffuseColor.rgb *= 1.0;
+        diffuseColor.rgb = pow(diffuseColor.rgb, vec3(3));
         `
       );
     }
@@ -155,7 +156,7 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
         <mesh
           ref={meshRef}
           onClick={handleClick}
-          onDoubleClick={handleDoubleClick}
+          // onDoubleClick={handleDoubleClick}
           key={name}
           rotation={name === 'Moon' ? [0, Math.PI * 3.5, 0] : [0, 0, 0]}
         >
@@ -163,16 +164,11 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
           <primitive object={material} />
         </mesh>
 
-        {(displayLabels || isMoonSelected) && (
+        {(isMoonSelected) ? (
           <Html
             position={[0, scaledValues.radius * 1.2, 0]}
             center
             zIndexRange={[100, 0]}
-            occlude={parentMeshRef ? [parentMeshRef] : undefined}
-            occludeOptions={{
-              threshold: 0.1,
-              recursive: false
-            }}
             style={isMoonSelected ? { pointerEvents: 'none' } : {}}
           >
             <span
@@ -180,12 +176,22 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
               onClick={handleClick}
               style={{
                 color: color,
-                fontSize: isMoonSelected ? '14px' : '12px',
+                fontSize: '12px',
                 cursor: 'pointer',
               }}
             >{name}</span>
           </Html>
-        )}
+        )
+          :
+          <Labels
+            text={name}
+            size={12}
+            position={[0, scaledValues.radius * 1.2, 0]}
+            color={color}
+            handleClick={handleClick}
+            font={'../assets/fonts/Termina_Black.ttf'}
+          />
+        }
       </group>
 
       {orbitPaths && (
@@ -199,7 +205,8 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
           hiRes={isMoonSelected}
           lineWidth={isMoonSelected ? 2 : 1}
           position={localRef.current?.position}
-          arcLength={.8}
+          arcLength={.9}
+          orbitalPeriod={orbitalPeriod}
         />
       )}
 

@@ -97,6 +97,7 @@ const Planet = ({ name = 'Earth', textures }) => {
     updatePlanetPosition,
     selectedPlanet,
     setSelectedPlanet,
+    moonSelected,
     displayLabels,
     selectedMoon,
     setSelectedMoon,
@@ -222,14 +223,18 @@ const Planet = ({ name = 'Earth', textures }) => {
       // Handle scaling and visibility
       const distance = localRef.current.position.distanceTo(state.camera.position);
 
-      // Update scales based on distance
-      if (distance / 1000 <= scaledRadius) {
+      // Update scales based on distance and selection state
+      if (selectedMoon) {
+        // When a moon is selected, use fixed scaling relative to planet size
         scaleRef.current = scaledRadius;
+        textSize.current = distance * .02; // Adjust this multiplier as needed
       } else {
-        scaleRef.current = distance / 1000;
-      }
-
-      if (textSize.current) {
+        // Normal scaling logic for non-moon-selected states
+        if (distance / 1000 <= scaledRadius) {
+          scaleRef.current = scaledRadius;
+        } else {
+          scaleRef.current = distance / 1000;
+        }
         textSize.current = distance * 0.02;
       }
 
@@ -253,6 +258,7 @@ const Planet = ({ name = 'Earth', textures }) => {
     name,
     isPlanetSelected,
     scaledRadius,
+    selectedMoon,
     activeCamera.type,
     textureDisplayDistance
   ]);
@@ -276,7 +282,6 @@ const Planet = ({ name = 'Earth', textures }) => {
     switchToPlanetCamera(name);
   }, [isDragging, activeCamera.name, name, mergedData]);
 
-  // Do the same for other handlers
 
   const handlePointerDown = e => {
     e.stopPropagation();
@@ -318,6 +323,8 @@ const Planet = ({ name = 'Earth', textures }) => {
 
   const moons = moonsData[name] || [];
 
+  const showOrbitPath = orbitPaths && ((!selectedPlanet && !selectedMoon) || isHovered || isPlanetSelected);
+
   return (
     <>
       {activeCamera?.name === name && localRef.current &&
@@ -347,7 +354,7 @@ const Planet = ({ name = 'Earth', textures }) => {
         <mesh
           ref={meshRef}
           key={isPlanetSelected ? name + '-textured' : name + '-basic'}
-          onDoubleClick={handleDoubleClick}
+          // onDoubleClick={handleDoubleClick}
           castShadow
         >
           <sphereGeometry args={[(renderMoons() ? scaledRadius : scaleRef.current * 8), detailLevel, detailLevel / 2]} />
@@ -415,16 +422,17 @@ const Planet = ({ name = 'Earth', textures }) => {
         )}
 
         {renderPlanetLabels() && (
-          <Labels
-            key={name}
-            text={name}
-            size={textSize?.current}
-            position={[0, scaleRef.current * 1.2 + textSize?.current, 0]}
-            color={color}
-            handleClick={handleClick}
-            handlePointerDown={handlePointerDown}
-            font={'../assets/fonts/Termina_Black.ttf'}
-          />
+          <group position={[0, 0, 0]}>
+            <Labels
+              text={name}
+              size={16}
+              position={[0, scaleRef.current * 1.2 + textSize?.current, 0]}
+              color={color}
+              handleClick={handleClick}
+              handlePointerDown={handlePointerDown}
+              font={'../assets/fonts/Termina_Black.ttf'}
+            />
+          </group>
         )}
 
         {(displayLabels && isPlanetSelected) && (
@@ -470,19 +478,19 @@ const Planet = ({ name = 'Earth', textures }) => {
         })}
       </group>
 
-      {orbitPaths && (
+      {showOrbitPath && (
         <OrbitPath
-          origin={orbitalOrigin}
           radius={scaledOrbitalRadius}
           eccentricity={eccentricity}
           orbitalInclination={orbitalInclination}
           color={color}
           name={name + "-orbit-path"}
-          lineWidth={isPlanetSelected ? 3 : 2}
+          lineWidth={1}
           opacity={orbitPathOpacity}
           hiRes={isPlanetSelected}
-          position={localRef.current?.position}
           arcLength={.9}
+          position={localRef.current?.position}
+          orbitalPeriod={orbitalPeriod}
         />
       )}
     </>

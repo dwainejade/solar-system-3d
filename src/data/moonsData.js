@@ -1,5 +1,5 @@
 export const moonDistanceScaleFactor = 0.0001;
-export const moonSizeScaleFactor = 0.0001;
+export const moonSizeScaleFactor = 0.0002;
 
 const moonsData = {
     Mercury: [],
