@@ -1,4 +1,3 @@
-// utils/KeplerianOrbit.js
 import * as THREE from 'three';
 
 export function calculateKeplerianOrbit({
@@ -9,8 +8,8 @@ export function calculateKeplerianOrbit({
     currentAngle,
     deltaTime
 }) {
-    // Update angle
-    const newAngle = currentAngle - meanMotion * deltaTime;
+    // Changed direction (added plus instead of minus)
+    const newAngle = currentAngle + meanMotion * deltaTime;
 
     // Solve Kepler's Equation
     let E = newAngle;
@@ -35,8 +34,8 @@ export function calculateKeplerianOrbit({
         (1 + eccentricity * Math.cos(trueAnomaly));
 
     // Calculate position
-    const x = r * Math.cos(-trueAnomaly);
-    const baseZ = r * Math.sin(-trueAnomaly);
+    const x = r * Math.cos(trueAnomaly); // Removed negative sign
+    const baseZ = r * Math.sin(trueAnomaly); // Removed negative sign
 
     // Apply inclination
     const inclination = orbitalInclination * (Math.PI / 180);
@@ -49,7 +48,6 @@ export function calculateKeplerianOrbit({
     };
 }
 
-// Optional: Additional orbital calculation functions
 export function calculateModifiedKeplerianOrbit({
     meanMotion,
     eccentricity,
@@ -80,19 +78,21 @@ export function calculateSpiralOrbit({
     startAngle,
     deltaTime
 }) {
-    const totalRotation = startAngle - currentAngle;
-    const rotations = totalRotation / (2 * Math.PI);
-    const spiralTightness = Math.PI;
-    const radiusFactor = Math.exp(-rotations * spiralTightness);
+    // Calculate how many revolutions have occurred
+    const totalRotation = Math.abs(startAngle - currentAngle);
+    const revolutions = totalRotation / (2 * Math.PI);
+
+    const decayFactor = 2.4;
+
+    const radiusFactor = Math.exp(-revolutions * decayFactor);
     const currentRadius = orbitalRadius * radiusFactor;
 
-    // Increase speed as radius decreases (inverse square law-like behavior)
-    const radiusRatio = currentRadius / orbitalRadius; // Goes from 1 to near 0
-    const speedMultiplier = 1 + Math.pow((1 - radiusRatio), 2) * 15; // Quadratic increase in speed
+    const speedIncrease = Math.pow(orbitalRadius / currentRadius, 0.8);
+    // Changed direction (added plus instead of minus)
+    const adjustedMeanMotion = meanMotion * speedIncrease * 5.0;
+    const newAngle = currentAngle + adjustedMeanMotion * deltaTime;
 
-    // Calculate new angle with increased speed near the center
-    const newAngle = currentAngle - meanMotion * speedMultiplier * deltaTime;
-
+    // Convert polar coordinates to Cartesian (removed negative signs)
     const x = currentRadius * Math.cos(newAngle);
     const z = currentRadius * Math.sin(newAngle);
 

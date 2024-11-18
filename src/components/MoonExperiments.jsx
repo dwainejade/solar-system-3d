@@ -283,7 +283,7 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
           ref={meshRef}
           key={name + '-textured'}
           rotation={name === 'Moon' ? [0, Math.PI * 3.5, 0] : [0, 0, 0]}
-          onClick={handleClick}
+        // onClick={handleClick} 
         >
           <sphereGeometry args={[scaledValues.radius, (isMoonSelected ? 38 : 24), (isMoonSelected ? 28 : 16)]} />
           <meshStandardMaterial
@@ -305,7 +305,7 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
           >
             <span
               className="planet-label"
-              onClick={handleClick}
+              // onClick={handleClick}
               style={{
                 color: color,
                 fontSize: isMoonSelected ? '14px' : '12px',
