@@ -12,7 +12,7 @@ import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCameraMoon";
 import GravityVectors from "./GravityVectors";
 import Labels from "./Labels";
-import { calculateKeplerianOrbit, calculateModifiedKeplerianOrbit, calculateSpiralOrbit } from "../helpers/calculateOrbits";
+import { calculateKeplerianOrbit, calculateModifiedKeplerianOrbit, calculateSpiralOrbit, calculateEscapeTrajectory } from "../helpers/calculateOrbits";
 import MotionTrail from "../helpers/MotionTrail";
 
 const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }) => {
@@ -107,56 +107,47 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
     }
 
     const willEscape = massRatio <= 0.5;
+    const adjustedDelta = delta * simSpeed;
 
     // Initialize experiment from current position
     if (startAngleRef.current === null) {
       startAngleRef.current = localAngleRef.current;
 
       if (willEscape) {
-        const worldPos = new THREE.Vector3();
-        localRef.current.getWorldPosition(worldPos);
+        const initialSetup = calculateEscapeTrajectory({
+          meanMotion: scaledValues.meanMotion,
+          orbitalRadius: scaledValues.orbitalRadius,
+          currentAngle: localAngleRef.current,
+          deltaTime: adjustedDelta
+        });
 
-        // Calculate Earth's orbital velocity
-        const earthOrbitalSpeed = newPlanetsData[parentName].orbitalSpeed * distanceScaleFactor;
-        const earthVelocity = new THREE.Vector2(
-          -earthOrbitalSpeed * Math.sin(startAngleRef.current),
-          earthOrbitalSpeed * Math.cos(startAngleRef.current)
-        );
+        independentPositionRef.current = initialSetup.position;
+        independentVelocityRef.current = initialSetup.velocity;
 
-        // Calculate Moon's initial velocity relative to Earth
-        const moonSpeed = scaledValues.meanMotion * scaledValues.orbitalRadius;
-        const moonLocalVel = new THREE.Vector2(
-          -moonSpeed * Math.sin(localAngleRef.current),
-          moonSpeed * Math.cos(localAngleRef.current)
-        );
-
-        // Combined initial velocity
-        const escapeVelocity = moonLocalVel.add(earthVelocity);
-
-        independentPositionRef.current = worldPos;
-        independentVelocityRef.current = escapeVelocity;
-
-        // Move to scene root immediately
+        // Move to scene root for independent motion
         const scene = localRef.current.parent.parent;
         scene.attach(localRef.current);
         setHasEscaped(true);
       }
     }
 
-    const adjustedDelta = delta * simSpeed;
-
     if (localRef.current) {
       // Calculate new position based on mass ratio
       if (willEscape || hasEscaped) {
-        const pos = independentPositionRef.current;
-        const vel = independentVelocityRef.current;
+        const { position, velocity } = calculateEscapeTrajectory({
+          meanMotion: scaledValues.meanMotion,
+          orbitalRadius: scaledValues.orbitalRadius,
+          currentAngle: localAngleRef.current,
+          deltaTime: adjustedDelta,
+          initialVelocity: independentVelocityRef.current,
+          position: independentPositionRef.current
+        });
 
-        pos.x += vel.x * adjustedDelta;
-        pos.z += vel.y * adjustedDelta;
+        independentPositionRef.current = position;
+        independentVelocityRef.current = velocity;
+        localRef.current.position.copy(position);
 
-        localRef.current.position.copy(pos);
-
-        const distanceFromOrigin = pos.length();
+        const distanceFromOrigin = position.length();
         if (distanceFromOrigin > scaledValues.orbitalRadius * 3) {
           setExperimentStatus("completed");
           return;

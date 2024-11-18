@@ -74,8 +74,8 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
         '#include <map_fragment>',
         `
         #include <map_fragment>
-        diffuseColor.rgb *= .7;
-        diffuseColor.rgb = pow(diffuseColor.rgb, vec3(1.5));
+        diffuseColor.rgb *= 1.0;
+        diffuseColor.rgb = pow(diffuseColor.rgb, vec3(3));
         `
       );
     }
@@ -206,6 +206,7 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
           lineWidth={isMoonSelected ? 2 : 1}
           position={localRef.current?.position}
           arcLength={.9}
+          orbitalPeriod={orbitalPeriod}
         />
       )}
 

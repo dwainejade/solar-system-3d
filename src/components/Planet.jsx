@@ -323,6 +323,8 @@ const Planet = ({ name = 'Earth', textures }) => {
 
   const moons = moonsData[name] || [];
 
+  const showOrbitPath = orbitPaths && ((!selectedPlanet && !selectedMoon) || isHovered || isPlanetSelected);
+
   return (
     <>
       {activeCamera?.name === name && localRef.current &&
@@ -476,18 +478,19 @@ const Planet = ({ name = 'Earth', textures }) => {
         })}
       </group>
 
-      {orbitPaths && (
+      {showOrbitPath && (
         <OrbitPath
           radius={scaledOrbitalRadius}
           eccentricity={eccentricity}
           orbitalInclination={orbitalInclination}
           color={color}
           name={name + "-orbit-path"}
-          lineWidth={(selectedPlanet || moonSelected) && !isPlanetSelected ? 0 : 1}
+          lineWidth={1}
           opacity={orbitPathOpacity}
           hiRes={isPlanetSelected}
           arcLength={.9}
           position={localRef.current?.position}
+          orbitalPeriod={orbitalPeriod}
         />
       )}
     </>

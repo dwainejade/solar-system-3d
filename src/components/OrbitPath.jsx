@@ -13,10 +13,11 @@ function OrbitPath({
   opacity = 1,
   hiRes = false,
   arcLength = 0.8,
-  position
+  position,
+  orbitalPeriod
 }) {
   const segments = hiRes ? 512 : 64;
-  const isRetrograde = orbitalInclination > 90;
+  const isRetrograde = orbitalPeriod < 0;
 
   // Extract position components for dependency tracking
   const posX = Array.isArray(position) ? position[0] : position?.x || 0;
