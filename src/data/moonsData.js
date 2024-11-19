@@ -593,24 +593,24 @@ const moonsData = {
             gravity: null,
             gravitationalAcceleration: null,
         },
-        {
-            name: "Triton",
-            id: "neptune-triton",
-            parentName: "Neptune",
-            mass: 2.14e22,
-            orbitalRadius: 354800,
-            radius: 1353.4,
-            orbitalPeriod: -5.877,
-            orbitalInclination: 156.885,
-            eccentricity: 0.000016,
-            color: "lightblue",
-            orbitalSpeed: 4.39,
-            axialTilt: 0.0,
-            rotationPeriod: -5.877,
-            surfaceTemp: -235, // °C
-            gravity: 0.779, // m/s^2
-            gravitationalAcceleration: 0.779, // m/s^2
-        },
+        // {
+        //     name: "Triton",
+        //     id: "neptune-triton",
+        //     parentName: "Neptune",
+        //     mass: 2.14e22,
+        //     orbitalRadius: 354800,
+        //     radius: 1353.4,
+        //     orbitalPeriod: -5.877,
+        //     orbitalInclination: 156.885,
+        //     eccentricity: 0.000016,
+        //     color: "lightblue",
+        //     orbitalSpeed: 4.39,
+        //     axialTilt: 0.0,
+        //     rotationPeriod: -5.877,
+        //     surfaceTemp: -235, // °C
+        //     gravity: 0.779, // m/s^2
+        //     gravitationalAcceleration: 0.779, // m/s^2
+        // },
         // Additional
         {
             name: "Proteus",
