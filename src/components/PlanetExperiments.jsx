@@ -100,6 +100,23 @@ const Planet = ({ name = 'Earth', textures }) => {
       setDaysElapsed(0);
     }
   }, [experimentStatus]);
+  useEffect(() => {
+    if (meshRef.current) {
+      meshRef.current.rotation.order = 'YXZ';
+      meshRef.current.rotation.y = 0;
+      meshRef.current.rotation.x = THREE.MathUtils.degToRad(axialTilt);
+    }
+  }, [axialTilt, selectedPlanet]);
+  useEffect(() => {
+    if (textures?.map) {
+      textures.map.colorSpace = THREE.SRGBColorSpace;
+      textures.map.needsUpdate = true;
+    }
+    if (textures?.clouds) {
+      textures.clouds.colorSpace = THREE.SRGBColorSpace;
+      textures.clouds.needsUpdate = true;
+    }
+  }, []);
 
   useFrame((state, delta) => {
     const adjustedDelta = delta * simSpeed;
@@ -225,13 +242,6 @@ const Planet = ({ name = 'Earth', textures }) => {
     }
   });
 
-  useEffect(() => {
-    if (meshRef.current) {
-      meshRef.current.rotation.order = 'YXZ';
-      meshRef.current.rotation.y = 0;
-      meshRef.current.rotation.x = THREE.MathUtils.degToRad(axialTilt);
-    }
-  }, [axialTilt, selectedPlanet]);
 
   const handleClick = e => {
     e.stopPropagation();
@@ -350,6 +360,7 @@ const Planet = ({ name = 'Earth', textures }) => {
     }
   };
 
+
   return (
     <>
       {activeCamera?.name === name && localRef.current &&
@@ -389,7 +400,7 @@ const Planet = ({ name = 'Earth', textures }) => {
                 <>
                   <mesh ref={cloudsRef} key={`${name}-cloud_texture`}>
                     <sphereGeometry args={[cloudSphereRadius, detailLevel, detailLevel / 2]} />
-                    <meshStandardMaterial alphaMap={textures?.clouds} transparent opacity={0.8} />
+                    <meshBasicMaterial alphaMap={textures?.clouds} transparent opacity={0.8} />
                   </mesh>
                   <mesh key={`${name}-atmosphere_texture`}>
                     <sphereGeometry args={[atmosphereSphereRadius, detailLevel, detailLevel / 2]} />
@@ -397,7 +408,7 @@ const Planet = ({ name = 'Earth', textures }) => {
                   </mesh>
                 </>
               }
-              <meshStandardMaterial
+              <meshBasicMaterial
                 metalness={0.6}
                 roughness={0.8}
                 map={textures?.map}
