@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import useStore, { usePlanetStore } from "../../../store/store";
 import initialPlanetsData, { G } from "../../../data/planetsData";
 import useExperimentsStore from "../../../store/experiments";
@@ -6,20 +6,45 @@ import { getSpeedValue } from "../../../helpers/utils";
 import Slider from "../../../components/UI/Slider";
 
 function NewtonGravity() {
-  const { updatePlanetData, resetSinglePlanetData } = usePlanetStore();
+  const { updatePlanetData, resetSinglePlanetData, updatePlanetPosition } = usePlanetStore();
   const { setSimSpeed, simSpeed, prevSpeed } = useStore();
-  const { experimentPlanet, experimentStatus, setExperimentStatus } = useExperimentsStore();
+  const { experimentPlanet, setExperimentPlanet, experimentStatus, setExperimentStatus } = useExperimentsStore();
 
-  const selectedPlanet = experimentPlanet || "Earth";
-
-  // Initialize mass scale
+  const selectedPlanet = "Earth";
   const [massScale, setMassScale] = useState(1);
   const originalMass = initialPlanetsData[selectedPlanet].mass;
   const sliderValues = [0.5, 1, 2];
   const [sliderIndex, setSliderIndex] = useState(1);
 
+
+  // Separate initialization effect
+  useEffect(() => {
+    setExperimentPlanet("Earth");
+  }, []);
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      resetSinglePlanetData(selectedPlanet);
+      updatePlanetPosition(selectedPlanet, initialPlanetsData[selectedPlanet].position);
+      setExperimentStatus(null);
+      setSimSpeed(1);
+    };
+  }, []);
+
+  // Reset states when experiment starts
+  useEffect(() => {
+    if (experimentStatus === "started") {
+      setMassScale(1);
+      updatePlanetData(selectedPlanet, {
+        escaped: false,
+        collided: false
+      });
+      updatePlanetPosition(selectedPlanet, initialPlanetsData[selectedPlanet].position);
+    }
+  }, [experimentStatus]);
+
   const handleIncrement = () => {
-    // base on sliderValues array
     if (massScale < sliderValues[sliderValues.length - 1]) {
       const newIndex = sliderIndex + 1;
       const newValue = sliderValues[newIndex];
@@ -58,8 +83,8 @@ function NewtonGravity() {
 
   const calculateGravitationalForce = () => {
     const earthMass = originalMass * massScale;
-    const moonMass = 7.34767309e22; // Moon's mass in kg
-    const distance = 384400000; // Average Earth-Moon distance in meters
+    const moonMass = 7.34767309e22;
+    const distance = 384400000;
     return (G * (earthMass * moonMass)) / (distance * distance);
   };
 
@@ -110,7 +135,11 @@ function NewtonGravity() {
         </div>
       </div>
       <footer className='experiment-footer'>
-        <button className={`btn start-btn ${experimentStatus ? "active" : ""}`} onClick={handleStartExperiment} disabled={experimentStatus}>
+        <button
+          className={`btn start-btn ${experimentStatus ? "active" : ""}`}
+          onClick={handleStartExperiment}
+          disabled={experimentStatus}
+        >
           Start Experiment
         </button>
         <button className='btn reset-btn' onClick={handleReset}>
