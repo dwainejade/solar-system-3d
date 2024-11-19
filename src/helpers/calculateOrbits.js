@@ -128,7 +128,7 @@ export function calculateEscapeTrajectory({
     // Regular trajectory calculation
     const outwardDirection = position.clone().normalize();
     // Reduced escape acceleration from 0.2 to 0.02
-    const escapeAcceleration = 0.000002;
+    const escapeAcceleration = 0.00000004;
 
     // Update velocity with reduced acceleration
     const newVelocity = initialVelocity.clone();
