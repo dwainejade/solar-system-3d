@@ -464,9 +464,7 @@ const useCameraStore = create((set, get) => ({
 
     switchToCustomCamera: (id, planet = null) => {
         const customCameraData = customCameraAngles[id];
-        console.log('custom camera data', customCameraData)
         if (!customCameraData) return;
-        console.log('switching to custom camera', customCameraData)
         const position = customCameraData.calculatePosition
             ? customCameraData.calculatePosition(planet)
             : customCameraData.position;
