@@ -103,13 +103,17 @@ export function calculateEscapeTrajectory({
     initialVelocity = null,
     position = null
 }) {
+    const G = 0.000004; // Drastically reduced gravitational constant
+
     // Initial setup if this is the first call
     if (!initialVelocity || !position) {
-        // Reduced initial speed multiplier from 1.2 to 1.05
-        const initialSpeed = meanMotion * orbitalRadius * 1.05;
+        // Calculate initial escape velocity - reduced multiplier
+        const tangentialSpeed = meanMotion * orbitalRadius * 1.02; // Just slightly above orbital velocity
+
+        // Initial velocity is tangential to the orbit
         const velocity = new THREE.Vector2(
-            -initialSpeed * Math.sin(currentAngle),
-            initialSpeed * Math.cos(currentAngle)
+            -tangentialSpeed * Math.sin(currentAngle),
+            tangentialSpeed * Math.cos(currentAngle)
         );
 
         const pos = new THREE.Vector3(
@@ -125,19 +129,26 @@ export function calculateEscapeTrajectory({
         };
     }
 
-    // Regular trajectory calculation
-    const outwardDirection = position.clone().normalize();
-    // Reduced escape acceleration from 0.2 to 0.02
-    const escapeAcceleration = 0.000002;
+    // Calculate very weak gravitational effect
+    const distanceToCenter = Math.sqrt(position.x * position.x + position.z * position.z);
+    const gravitationalAcceleration = G / (distanceToCenter * distanceToCenter);
 
-    // Update velocity with reduced acceleration
+    // Direction to center
+    const directionToCenter = new THREE.Vector2(
+        -position.x / distanceToCenter,
+        -position.z / distanceToCenter
+    );
+
+    // Update velocity with very weak gravity
     const newVelocity = initialVelocity.clone();
-    newVelocity.x += outwardDirection.x * escapeAcceleration * deltaTime;
-    newVelocity.y += outwardDirection.z * escapeAcceleration * deltaTime;
+    newVelocity.x += directionToCenter.x * gravitationalAcceleration * deltaTime * 0.1; // Further reduced gravity
+    newVelocity.y += directionToCenter.y * gravitationalAcceleration * deltaTime * 0.1;
 
-    // Optional: Add a small damping factor to prevent excessive speed
-    const dampingFactor = 0.999;
-    newVelocity.multiplyScalar(dampingFactor);
+    // Very small constant acceleration in velocity direction
+    const escapeAcceleration = 0.0000000001; // Reduced escape acceleration
+    const velocityDirection = newVelocity.clone().normalize();
+    newVelocity.x += velocityDirection.x * escapeAcceleration * deltaTime;
+    newVelocity.y += velocityDirection.y * escapeAcceleration * deltaTime;
 
     // Update position
     const newPosition = position.clone();

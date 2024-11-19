@@ -1,18 +1,21 @@
-import React, { useRef, forwardRef, useState, useEffect, useCallback, useMemo } from "react";
+import React, { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
-import { distanceScaleFactor, sizeScaleFactor, rotationSpeedScaleFactor } from "../data/planetsData";
+import {
+  distanceScaleFactor,
+  sizeScaleFactor,
+  rotationSpeedScaleFactor,
+} from "../data/planetsData";
 import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCamera";
 import Moon from "./Moon";
 import Labels from "./Labels";
-import initialMoonsData from "@/data/moonsData";
 import { earthAtmosphereShader } from "../shaders/earth/atmosphere";
 import Rings from "./Rings";
 
-// First, let's create these utilities outside the component
+// Utility functions (keep these as they are)
 const calculateTrueAnomaly = (E, eccentricity) => {
   return 2 * Math.atan(
     Math.sqrt((1 + eccentricity) / (1 - eccentricity)) *
@@ -71,7 +74,6 @@ const RingSystem = ({ radius, color, width = 2 }) => {
   );
 };
 
-
 const Planet = ({ name = 'Earth', textures }) => {
   const { planetsData, moonsData } = usePlanetStore();
   const bodyData = planetsData[name];
@@ -125,14 +127,14 @@ const Planet = ({ name = 'Earth', textures }) => {
   const [isHovered, setIsHovered] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
 
-  const isPlanetSelected = selectedPlanet && selectedPlanet.name === name;
-
+  const isPlanetSelected = activeCamera.name === name || selectedPlanet?.name === name;
 
   const renderMoons = () => {
-    if (isPlanetSelected) return true
-    else if (selectedMoon?.parentName === name) return true
-    return false
-  }
+    if (isPlanetSelected) return true;
+    else if (selectedMoon?.parentName === name) return true;
+    return false;
+  };
+
   const renderPlanetLabels = () => {
     // Only consider the planet's own selected state, not moon selection
     if (isPlanetSelected) return false;
@@ -140,20 +142,18 @@ const Planet = ({ name = 'Earth', textures }) => {
   };
 
   const computedValues = useMemo(() => ({
-    scaledOrbitalRadius: orbitalRadius * (isSurfaceCameraActive ? .0001 : distanceScaleFactor),
+    scaledOrbitalRadius: orbitalRadius * (isSurfaceCameraActive ? 0.0001 : distanceScaleFactor),
     scaledRadius: radius * sizeScaleFactor,
     rotationSpeed: rotationPeriod ? ((2 * Math.PI) / (rotationPeriod * 3600)) * rotationSpeedScaleFactor : 0,
     detailLevel: (isPlanetSelected || renderMoons()) ? 64 : 16
-  }), [orbitalRadius, isSurfaceCameraActive, radius, rotationPeriod, isPlanetSelected, renderMoons()]);
+  }), [orbitalRadius, isSurfaceCameraActive, radius, rotationPeriod, isPlanetSelected, renderMoons]);
 
   const { scaledOrbitalRadius, scaledRadius, rotationSpeed, detailLevel } = computedValues;
 
   const scaleRef = useRef(computedValues.scaledRadius);
-  const textSize = useRef(1);
   const [showTextures, setShowTextures] = useState(false);
-  const textureDisplayDistance = 500;
+  const textureDisplayDistance = 700;
   const [orbitPathOpacity, setOrbitPathOpacity] = useState(1);
-
 
   useEffect(() => {
     return () => {
@@ -170,7 +170,6 @@ const Planet = ({ name = 'Earth', textures }) => {
       }
     };
   }, []);
-
 
   const frameCallback = useCallback((state, delta) => {
     const adjustedDelta = delta * simSpeed;
@@ -223,29 +222,14 @@ const Planet = ({ name = 'Earth', textures }) => {
       // Handle scaling and visibility
       const distance = localRef.current.position.distanceTo(state.camera.position);
 
-      // Update scales based on distance and selection state
-      if (selectedMoon) {
-        // When a moon is selected, use fixed scaling relative to planet size
-        scaleRef.current = scaledRadius;
-        textSize.current = distance * .02; // Adjust this multiplier as needed
-      } else {
-        // Normal scaling logic for non-moon-selected states
-        if (distance / 1000 <= scaledRadius) {
-          scaleRef.current = scaledRadius;
-        } else {
-          scaleRef.current = distance / 1000;
-        }
-        textSize.current = distance * 0.02;
-      }
-
       // Update visibility flags
-      setShowTextures(activeCamera.type === 'moon' || distance < textureDisplayDistance);
+      setShowTextures(isPlanetSelected || distance < textureDisplayDistance);
 
       // Update orbit path opacity
       const maxDistance = scaledRadius * 100;
       const minDistance = scaledRadius * 1;
-      const opacity = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
-      setOrbitPathOpacity(opacity);
+      const newOpacity = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
+      setOrbitPathOpacity(newOpacity);
     }
   }, [
     simSpeed,
@@ -281,7 +265,6 @@ const Planet = ({ name = 'Earth', textures }) => {
     setSelectedPlanet(mergedData);
     switchToPlanetCamera(name);
   }, [isDragging, activeCamera.name, name, mergedData]);
-
 
   const handlePointerDown = e => {
     e.stopPropagation();
@@ -320,10 +303,21 @@ const Planet = ({ name = 'Earth', textures }) => {
     setAutoRotate(!autoRotate);
   };
 
-
   const moons = moonsData[name] || [];
 
+  // Determine whether to show the orbit path based on conditions
   const showOrbitPath = orbitPaths && ((!selectedPlanet && !selectedMoon) || isHovered || isPlanetSelected);
+
+  useEffect(() => {
+    if (textures?.map) {
+      textures.map.colorSpace = THREE.SRGBColorSpace;
+      textures.map.needsUpdate = true;
+    }
+    if (textures?.clouds) {
+      textures.clouds.colorSpace = THREE.SRGBColorSpace;
+      textures.clouds.needsUpdate = true;
+    }
+  }, []);
 
   return (
     <>
@@ -337,6 +331,7 @@ const Planet = ({ name = 'Earth', textures }) => {
       }
 
       <group ref={localRef}>
+        {/* Invisible mesh for interaction */}
         <mesh
           visible={false}
           onClick={handleClick}
@@ -346,60 +341,73 @@ const Planet = ({ name = 'Earth', textures }) => {
           onPointerOver={handlePointerOver}
           onPointerOut={handlePointerOut}
         >
-          {activeCamera?.name !== name &&
-            <sphereGeometry args={[renderMoons() ? scaledRadius : scaleRef.current * 8, 8, 8]} />
-          }
+          {activeCamera?.name !== name && (
+            <sphereGeometry
+              args={[
+                renderMoons() ? scaledRadius : scaleRef.current * 8,
+                8,
+                8,
+              ]}
+            />
+          )}
         </mesh>
 
+        {/* Planet Mesh */}
         <mesh
           ref={meshRef}
-          key={isPlanetSelected ? name + '-textured' : name + '-basic'}
-          // onDoubleClick={handleDoubleClick}
+          key={isPlanetSelected ? `${name}-textured` : `${name}-basic`}
           castShadow
         >
-          <sphereGeometry args={[(renderMoons() ? scaledRadius : scaleRef.current * 8), detailLevel, detailLevel / 2]} />
-          {((!isPlanetSelected && !renderMoons()) && texturesLoaded) ?
+          <sphereGeometry
+            args={[
+              renderMoons() ? scaledRadius : scaleRef.current * 8,
+              detailLevel,
+              detailLevel / 2,
+            ]}
+          />
+
+          {/* Conditional Material Rendering */}
+          {isPlanetSelected ? (
+            <meshStandardMaterial
+              metalness={0.6}
+              roughness={0.8}
+              map={textures?.map}
+            />
+          ) : (
             <meshBasicMaterial color={color} />
-            :
+          )}
+
+          {/* Earth-specific Textures */}
+          {name === "Earth" && isPlanetSelected && (
             <>
-              {name === "Earth" && isPlanetSelected && (
-                <>
-                  <mesh ref={cloudsRef} key={`${name}-cloud_texture`}>
-                    <sphereGeometry args={[scaledRadius * 1.005, detailLevel, detailLevel / 2]} />
-                    <meshStandardMaterial
-                      alphaMap={textures?.clouds}
-                      transparent
-                      opacity={0.8}
-                      depthWrite={false}
-                    />
-                  </mesh>
-                  <mesh key={`${name}-atmosphere_texture`}>
-                    <sphereGeometry args={[scaledRadius * 1.01, detailLevel, detailLevel]} />
-                    <shaderMaterial
-                      args={[earthAtmosphereShader]}
-                      transparent
-                      opacity={.1}
-                      side={THREE.BackSide}
-                      // blending={THREE.AdditiveBlending}
-                      depthWrite={false}
-                      depthTest={true}
-                    />
-                  </mesh>
-                </>
-              )}
-              <meshStandardMaterial
-                metalness={0.6}
-                roughness={0.8}
-                map={textures?.map}
-                onBuild={() => setTexturesLoaded(true)}
-              />
+              <mesh ref={cloudsRef} key={`${name}-cloud_texture`}>
+                <sphereGeometry args={[scaledRadius * 1.005, detailLevel, detailLevel / 2]} />
+                <meshStandardMaterial
+                  alphaMap={textures?.clouds}
+                  transparent
+                  opacity={0.8}
+                  depthWrite={false}
+                />
+              </mesh>
+              <mesh key={`${name}-atmosphere_texture`}>
+                <sphereGeometry args={[scaledRadius * 1.01, detailLevel, detailLevel]} />
+                <shaderMaterial
+                  args={[earthAtmosphereShader]}
+                  transparent
+                  opacity={0.1}
+                  side={THREE.BackSide}
+                  depthWrite={false}
+                  depthTest={true}
+                />
+              </mesh>
             </>
-          }
+          )}
         </mesh>
 
+        {/* Rings for Saturn and Uranus */}
         {name === "Saturn" && showTextures && (
           <Rings
-            key={detailLevel + name + '-ring'}
+            key={`${detailLevel}${name}-ring`}
             innerRadius={scaledRadius * 1.2}
             outerRadius={scaledRadius * 2}
             height={0}
@@ -411,7 +419,7 @@ const Planet = ({ name = 'Earth', textures }) => {
 
         {name === "Uranus" && showTextures && (
           <Rings
-            key={detailLevel + name + '-ring'}
+            key={`${detailLevel}${name}-ring`}
             innerRadius={scaledRadius * 1.5}
             outerRadius={scaledRadius * 1.9}
             height={0}
@@ -421,12 +429,13 @@ const Planet = ({ name = 'Earth', textures }) => {
           />
         )}
 
+        {/* Labels */}
         {renderPlanetLabels() && (
           <group position={[0, 0, 0]}>
             <Labels
               text={name}
               size={16}
-              position={[0, scaleRef.current * 1.2 + textSize?.current, 0]}
+              position={[0, scaleRef.current * 13, 0]}
               color={color}
               handleClick={handleClick}
               handlePointerDown={handlePointerDown}
@@ -459,6 +468,7 @@ const Planet = ({ name = 'Earth', textures }) => {
           </Html>
         )}
 
+        {/* Moons */}
         {renderMoons() && moons.map((moon, index) => {
           const shouldAlignWithTilt = ["Saturn", "Uranus"].includes(name);
           return (
@@ -478,19 +488,20 @@ const Planet = ({ name = 'Earth', textures }) => {
         })}
       </group>
 
+      {/* Orbit Path */}
       {showOrbitPath && (
         <OrbitPath
           radius={scaledOrbitalRadius}
           eccentricity={eccentricity}
           orbitalInclination={orbitalInclination}
           color={color}
-          name={name + "-orbit-path"}
+          name={`${name}-orbit-path`}
           lineWidth={1}
           opacity={orbitPathOpacity}
           hiRes={isPlanetSelected}
-          arcLength={.9}
+          arcLength={0.9}
           position={localRef.current?.position}
-          orbitalPeriod={orbitalPeriod}
+          orbitalPeriod={orbitalPeriod} // Ensure OrbitPath handles retrograde correctly
         />
       )}
     </>

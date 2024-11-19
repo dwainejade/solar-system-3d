@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import useStore, { useCameraStore, usePlanetStore } from '../../store/store';
 import { distanceScaleFactor, MASS_OF_SUN, G, asteroidBeltData } from '../../data/planetsData';
 import { Html } from '@react-three/drei';
+import Labels from '../Labels';
 
 const AsteroidBelt = ({ meshCount = 500 }) => {
     const { simSpeed } = useStore();
@@ -191,37 +192,27 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
         return instancedGeometry;
     }, []);
 
+    const handleClick = () => {
+        if (activeCamera.name !== 'Asteroid Belt') {
+            switchToCustomCamera('Asteroid Belt');
+        }
+    };
 
     return (
-        <group>
-            {(displayLabels || isHoveredRef.current) && (
-                <Html
-                    position={[-100, 700, 3600]}
-                    as='div'
-                    wrapperClass='label-wrapper'
-                    center
-                    zIndexRange={[100, 0]}
-                >
-                    <span
-                        className="planet-label"
-                        style={{ color: "#FFA500", cursor: 'pointer', fontSize: '12px', textAlign: 'center', whiteSpace: 'nowrap' }}
-                        onClick={() => {
-                            if (activeCamera.name !== 'Asteroid Belt') {
-                                switchToCustomCamera('Asteroid Belt');
-                            }
-                            console.log('clicked')
-                        }}
-                        onMouseEnter={() => {
-                            isHoveredRef.current = true;
-                            document.body.style.cursor = "pointer";
-                        }}
-                        onMouseLeave={() => {
-                            isHoveredRef.current = false;
-                            document.body.style.cursor = "auto";
-                        }}
-                    >Asteroid Belt</span>
-                </Html>
-            )}
+        <group >
+            <group position={[-0, 800, 4000]}>
+
+                {(displayLabels || isHoveredRef.current) && (
+                    <Labels
+                        text="Asteroid Belt"
+                        size={16}
+                        color="#FFA500"
+                        handleClick={handleClick}
+                        zIndexRange={[100, 0]}
+
+                    />
+                )}
+            </group>
 
 
             <instancedMesh
@@ -245,11 +236,11 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
             >
                 <meshStandardMaterial
                     vertexColors
-                    roughness={0.7}      // Reduced for more specular highlights
-                    metalness={0.5}      // Increased for more reflectivity
-                    emissive="#888"   // Slight self-illumination
+                    roughness={0.7}
+                    metalness={0.7}
+                    emissive="#888"
                     emissiveIntensity={0.1}
-                    toneMapped={false}   // Preserve bright colors
+                    toneMapped={false}
                     transparent={true}
                     opacity={opacity}
                 />

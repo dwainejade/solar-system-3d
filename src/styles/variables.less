@@ -10,3 +10,25 @@
 @btn-color-4: #f46a68;
 @cyan-color: #4cddfb;
 @off-white-color: #e1cdaa;
+
+@mobile-breakpoint: 768px;
+@tablet-breakpoint: 1024px;
+@desktop-breakpoint: 1300px;
+
+.mobile-only() {
+  @media (max-width: @mobile-breakpoint) {
+    @arguments();
+  }
+}
+
+.tablet-only() {
+  @media (min-width: (@mobile-breakpoint + 1)) and (max-width: @tablet-breakpoint) {
+    @arguments();
+  }
+}
+
+.desktop-only() {
+  @media (min-width: (@tablet-breakpoint + 1)) {
+    @arguments();
+  }
+}

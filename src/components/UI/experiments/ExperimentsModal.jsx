@@ -1,13 +1,16 @@
+import { useEffect } from "react";
 import useExperimentsStore from "../../../store/experiments";
-import useStore, { usePlanetStore } from "../../../store/store";
+import useStore, { usePlanetStore, useCameraStore } from "../../../store/store";
 import KeplerOne from "./KeplerOne";
 import KeplerTwo from "./KeplerTwo";
 import KeplerThree from "./KeplerThree";
 import NewtonOne from "./NewtonOne";
 
 function ExperimentsModal() {
-  const { experimentsModal, toggleExperimentsModal, experimentType, setExperimentType } = useExperimentsStore();
+  const { experimentsModal, toggleExperimentsModal, experimentType, setExperimentType, setExperimentStatus } = useExperimentsStore();
   const { updatePlanetData, planetsData } = usePlanetStore();
+  const { resetCamera } = useCameraStore();
+
   const handleCloseModal = () => {
     if (experimentType) {
       setExperimentType(null);
@@ -26,7 +29,13 @@ function ExperimentsModal() {
     "kepler-1": "Kepler's First Law",
     "kepler-2": "Kepler's Second Law",
     "kepler-3": "Kepler's Third Law",
-  };
+  }
+
+  useEffect(() => {
+    if (experimentType === null)
+      resetCamera()
+  }, [experimentType])
+
 
   const defaultMenu = () => {
     return (

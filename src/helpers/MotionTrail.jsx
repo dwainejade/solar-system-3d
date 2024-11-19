@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import * as THREE from 'three';
 import { Line } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import useStore from '@/store/store';
 
 const MotionTrail = ({
     target,
@@ -11,7 +10,8 @@ const MotionTrail = ({
     opacity = 1,
     active = true,
     minPoints = 150,
-    maxPoints = 300
+    maxPoints = 300,
+    pause = false
 }) => {
     const [points, setPoints] = useState([]);
     const frameCount = useRef(0);
@@ -19,6 +19,7 @@ const MotionTrail = ({
 
     useFrame(() => {
         if (!active || !target?.current) return;
+        if (pause) return;
 
         frameCount.current++;
 
