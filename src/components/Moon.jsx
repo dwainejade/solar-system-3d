@@ -1,4 +1,4 @@
-import React, { useRef, forwardRef, useCallback, useMemo } from "react";
+import React, { useRef, forwardRef, useCallback, useMemo, useEffect } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { Html, useTexture } from "@react-three/drei";
@@ -57,29 +57,12 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
   const isMoonSelected = selectedMoon?.name === name;
   const isActiveMoon = name === activeCamera?.name;
 
-  // Memoize geometry and material
-  const geometry = useMemo(() => new THREE.SphereGeometry(
-    scaledValues.radius,
-    isMoonSelected ? 32 : 14,
-    isMoonSelected ? 16 : 12
-  ), [scaledValues.radius, isMoonSelected]);
-
-  const material = useMemo(() => new THREE.MeshStandardMaterial({
-    metalness: 0.2,
-    roughness: .8,
-    map: moonTexture || null,
-    color: !moonTexture ? color : null,
-    onBeforeCompile: (shader) => {
-      shader.fragmentShader = shader.fragmentShader.replace(
-        '#include <map_fragment>',
-        `
-        #include <map_fragment>
-        diffuseColor.rgb *= 1.0;
-        diffuseColor.rgb = pow(diffuseColor.rgb, vec3(3));
-        `
-      );
+  useEffect(() => {
+    if (moonTexture) {
+      moonTexture.colorSpace = THREE.SRGBColorSpace;
+      moonTexture.needsUpdate = true;
     }
-  }), [moonTexture, color]);
+  }, []);
 
   const handleClick = useCallback(e => {
     e.stopPropagation();
@@ -160,8 +143,15 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
           key={name}
           rotation={name === 'Moon' ? [0, Math.PI * 3.5, 0] : [0, 0, 0]}
         >
-          <primitive object={geometry} />
-          <primitive object={material} />
+          {/* <primitive object={geometry} />
+          <primitive object={material} /> */}
+          <sphereGeometry args={[scaledValues.radius, isMoonSelected ? 32 : 14, isMoonSelected ? 20 : 12]} />
+          <meshStandardMaterial
+            metalness={0.2}
+            roughness={.8}
+            map={moonTexture ? moonTexture : null}
+            color={moonTexture ? null : color}
+          />
         </mesh>
 
         {(isMoonSelected) ? (
