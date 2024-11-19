@@ -1,13 +1,12 @@
-import React, { useRef, forwardRef, useState, useEffect, useMemo, useCallback } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import * as THREE from "three";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import useExperimentsStore from "@/store/experiments";
 import { useTexture, Html } from "@react-three/drei";
 import { Vector3 } from "three";
 import { moonDistanceScaleFactor, moonSizeScaleFactor } from "../data/moonsData";
 import initialPlanetsData from "../data/planetsData";
-import { G, distanceScaleFactor } from "../data/planetsData";
 import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCameraMoon";
 import GravityVectors from "./GravityVectors";
@@ -30,7 +29,6 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
   const { simSpeed, toggleDetailsMenu } = useStore();
   const {
     selectedMoon,
-    moonAngles,
     setSelectedMoon,
     updateMoonPosition,
     updateMoonWorldPosition,
@@ -38,7 +36,7 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
     orbitPaths,
     planetsData: newPlanetsData
   } = usePlanetStore();
-  const { satelliteCamera, activeCamera, switchToMoonCamera } = useCameraStore();
+  const { activeCamera, switchToMoonCamera } = useCameraStore();
   const { experimentStatus, setExperimentStatus, experimentType } = useExperimentsStore();
 
   // Constants
@@ -56,43 +54,36 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
 
   // Refs
   const localRef = useRef();
-  const meshRef = useRef();
-  const startAngleRef = useRef(null);
-
-  // Initialize angle from current position instead of random
-  const localAngleRef = useRef(null);
+  const startAngleRef = useRef(0);
+  const localAngleRef = useRef(0);
+  const localPositionRef = useRef(new Vector3(scaledValues.orbitalRadius, 0, 0));
+  const velocityRef = useRef(null);
+  const escapeInitializedRef = useRef(false);
 
   // States
   const [hasCollided, setHasCollided] = useState(false);
+  const [hasEscaped, setHasEscaped] = useState(false);
   const isMoonSelected = selectedMoon && selectedMoon.name === name;
   const moonTexture = name === 'Moon' ? useTexture('../assets/earth/moon/moon.jpg') : null;
 
-  const [hasEscaped, setHasEscaped] = useState(false);
-  const independentPositionRef = useRef(null);
-  const independentVelocityRef = useRef(null);
-  const hasInitialized = useRef(false);
-
-
-  // Set initial position once when component mounts
+  // Reset position when experiment status changes
   useEffect(() => {
-    if (localRef.current && !hasInitialized.current) {
+    if ((experimentStatus !== 'completed' || !experimentStatus) && localRef.current) {
+      // Reset all refs and state
       localRef.current.position.set(scaledValues.orbitalRadius, 0, 0);
-      hasInitialized.current = true;
-    }
-  }, [scaledValues.orbitalRadius,]);
-
-  // Reset experiment state without changing position
-  useEffect(() => {
-    if (experimentStatus === null) {
-      startAngleRef.current = null;
+      localPositionRef.current.set(scaledValues.orbitalRadius, 0, 0);
+      startAngleRef.current = 0;
+      localAngleRef.current = 0;
+      velocityRef.current = null;
+      escapeInitializedRef.current = false;
       setHasCollided(false);
       setHasEscaped(false);
-      if (meshRef.current) {
-        meshRef.current.material.color.set(moonTexture ? 'white' : color);
-        meshRef.current.material.emissive.set('black');
-      }
+
+      // Update position tracking
+      const moonPosition = localRef.current.getWorldPosition(new Vector3());
+      updateMoonPosition(name, { x: moonPosition.x, y: moonPosition.y, z: moonPosition.z });
     }
-  }, [experimentStatus, color, moonTexture]);
+  }, [experimentStatus, scaledValues.orbitalRadius, name]);
 
   useFrame((state, delta) => {
     if (hasCollided || experimentStatus === "completed") return;
@@ -109,46 +100,35 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
     const willEscape = massRatio <= 0.5;
     const adjustedDelta = delta * simSpeed;
 
-    // Initialize experiment from current position
-    if (startAngleRef.current === null) {
-      startAngleRef.current = localAngleRef.current;
-
-      if (willEscape) {
-        const initialSetup = calculateEscapeTrajectory({
-          meanMotion: scaledValues.meanMotion,
-          orbitalRadius: scaledValues.orbitalRadius,
-          currentAngle: localAngleRef.current,
-          deltaTime: adjustedDelta
-        });
-
-        independentPositionRef.current = initialSetup.position;
-        independentVelocityRef.current = initialSetup.velocity;
-
-        // Move to scene root for independent motion
-        const scene = localRef.current.parent.parent;
-        scene.attach(localRef.current);
-        setHasEscaped(true);
-      }
-    }
-
     if (localRef.current) {
-      // Calculate new position based on mass ratio
-      if (willEscape || hasEscaped) {
+      if (willEscape) {
+        // Initialize escape state if not already done
+        if (!escapeInitializedRef.current) {
+          localPositionRef.current.copy(localRef.current.position);
+          velocityRef.current = new Vector3(
+            -localRef.current.position.y,
+            localRef.current.position.x,
+            0
+          ).normalize().multiplyScalar(scaledValues.meanMotion * scaledValues.orbitalRadius);
+          escapeInitializedRef.current = true;
+          setHasEscaped(true);
+        }
+
         const { position, velocity } = calculateEscapeTrajectory({
           meanMotion: scaledValues.meanMotion,
           orbitalRadius: scaledValues.orbitalRadius,
           currentAngle: localAngleRef.current,
           deltaTime: adjustedDelta,
-          initialVelocity: independentVelocityRef.current,
-          position: independentPositionRef.current
+          initialVelocity: velocityRef.current,
+          position: localPositionRef.current
         });
 
-        independentPositionRef.current = position;
-        independentVelocityRef.current = velocity;
+        localPositionRef.current.copy(position);
+        velocityRef.current = velocity;
         localRef.current.position.copy(position);
 
         const distanceFromOrigin = position.length();
-        if (distanceFromOrigin > scaledValues.orbitalRadius * 3) {
+        if (distanceFromOrigin > scaledValues.orbitalRadius * 6) {
           setExperimentStatus("completed");
           return;
         }
@@ -196,10 +176,6 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
       if (distanceFromCenter <= collisionDistance && !willEscape) {
         setHasCollided(true);
         setExperimentStatus("completed");
-        if (meshRef.current) {
-          meshRef.current.material.color.set('red');
-          meshRef.current.material.emissive.set('darkred');
-        }
         return;
       }
 
@@ -210,11 +186,6 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
       if (name === 'Moon') {
         localRef.current.lookAt(new Vector3(0, 0, 0));
       }
-
-      // Get camera position in moon's local space
-      const cameraPosition = new THREE.Vector3();
-      state.camera.getWorldPosition(cameraPosition);
-      localRef.current.parent.worldToLocal(cameraPosition);
 
       // Update world position for other calculations
       const worldPosition = localRef.current.getWorldPosition(new Vector3());
@@ -234,6 +205,29 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
     switchToMoonCamera(parentName, name);
   };
 
+  const getMinPoints = () => {
+    switch (massRatio) {
+      case .5:
+        return 300;
+      case 1:
+        return 100;
+      case 2:
+      default:
+        return 80;
+    }
+  };
+
+  const getMaxPoints = () => {
+    switch (massRatio) {
+      case .5:
+        return 500;
+      case 1:
+        return 100;
+      case 2:
+      default:
+        return 90;
+    }
+  };
 
   return (
     <>
@@ -249,12 +243,14 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
 
       {experimentType === 'newton-1'
         ? <MotionTrail
+          key={experimentStatus ? 'moon-trail-active' : 'moon-trail'}
           target={localRef}
           color={color}
           width={2}
           active={experimentStatus && orbitPaths}
-          minPoints={100}
-          maxPoints={150}
+          minPoints={getMinPoints()}
+          maxPoints={getMaxPoints()}
+          pause={experimentStatus === 'completed'}
         />
         : <OrbitPath
           radius={scaledValues.orbitalRadius}
@@ -271,41 +267,25 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
 
       <group ref={localRef}>
         <mesh
-          ref={meshRef}
-          key={name + '-textured'}
+          key={'moon-mesh' + hasCollided + experimentStatus}
           rotation={name === 'Moon' ? [0, Math.PI * 3.5, 0] : [0, 0, 0]}
-        // onClick={handleClick} 
         >
           <sphereGeometry args={[scaledValues.radius, (isMoonSelected ? 38 : 24), (isMoonSelected ? 28 : 16)]} />
-          <meshStandardMaterial
+          <meshBasicMaterial
             metalness={hasCollided ? 0.8 : 0.5}
             roughness={hasCollided ? 0.2 : 0.5}
             map={!hasCollided ? moonTexture : null}
             color={hasCollided ? 'red' : (!moonTexture ? color : null)}
-            emissive={hasCollided ? 'darkred' : 'black'}
           />
         </mesh>
 
-        {(displayLabels || isMoonSelected) && (
-          <Html
+        {displayLabels && (
+          <Labels
+            text={name}
+            size={16}
             position={[0, scaledValues.radius * 1.2, 0]}
-            center
-            zIndexRange={[100, 0]}
-            // occlude={simSpeed < 20000}
-            style={isMoonSelected ? { pointerEvents: 'none' } : {}}
-          >
-            <span
-              className="planet-label"
-              // onClick={handleClick}
-              style={{
-                color: color,
-                fontSize: isMoonSelected ? '14px' : '12px',
-                cursor: 'pointer',
-              }}
-            >
-              {name}
-            </span>
-          </Html>
+            color={color}
+          />
         )}
       </group>
 

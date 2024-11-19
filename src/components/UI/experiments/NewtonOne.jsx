@@ -89,7 +89,7 @@ function NewtonGravity() {
   };
 
   const handleStartExperiment = () => {
-    setSimSpeed(getSpeedValue("1 hour /s"));
+    setSimSpeed(getSpeedValue("1 day /s"));
     setExperimentStatus("started");
   };
 
