@@ -246,38 +246,31 @@ const Scene = () => {
     }
 
     if (activeCamera.name === 'newton' && experimentPlanet && isCameraTransitioning) {
-      const planet = planetsData[experimentPlanet];
+      const planet = planetsData['Earth'];
+      // hardcoded for now
+      const planetPosition = {
+        x: 1494.5039999707724,
+        y: 8.16068867940263e-9,
+        z: 0.009351460384996825
+      }
       const scaledRadius = planet.radius * sizeScaleFactor;
+      const moonOrbitRadius = scaledRadius * 10;
+      const optimalDistance = moonOrbitRadius * 4;
 
-      // Get planet position
-      const planetPosition = planetPositions[experimentPlanet];
-      if (!planetPosition) return;
-
-      // Calculate optimal viewing distance based on planet and moon orbits
-      const moonOrbitRadius = scaledRadius * 10; // Approximate moon orbit radius
-      const optimalDistance = moonOrbitRadius * 4; // Give enough space to see full moon orbit
-
-      // Position camera to view planet and moons
-      cameraControlsRef.current.setPosition(
+      cameraControlsRef.current.setLookAt(
         planetPosition.x + optimalDistance,
-        optimalDistance * 0.5, // Slightly elevated view
+        optimalDistance * 0.5,
         planetPosition.z,
-        true
-      );
-
-      // Look at the planet
-      cameraControlsRef.current.setTarget(
         planetPosition.x,
         planetPosition.y,
         planetPosition.z,
         true
       );
 
-      // Set camera constraints
-      setMinDistance(scaledRadius * 6); // Allow zoom in to planet surface
-      cameraControlsRef.current.maxDistance = optimalDistance * 20; // Allow some zoom out
+      setMinDistance(scaledRadius * 6);
+      cameraControlsRef.current.maxDistance = optimalDistance * 20;
 
-      // End the transition
+      // Only end transition if we successfully updated camera
       toggleCameraTransitioning(false);
     }
   });
@@ -341,11 +334,9 @@ const Scene = () => {
     if (experimentType.includes('kepler')) {
       switchToCustomCamera('kepler', planetsData[experimentPlanet]);
     } else if (experimentType === 'newton-1') {
-      setSelectedPlanet(experimentPlanet);
-      switchToCustomCamera('newton', planetsData[experimentPlanet]);
+      switchToCustomCamera('newton', planetsData['Earth']);
     }
-
-  }, [experimentType]);
+  }, [experimentType, experimentPlanet]);
 
   useEffect(() => {
     const handleMouseDown = (event) => {
@@ -399,24 +390,23 @@ const Scene = () => {
 
   const renderPlanet = () => {
     switch (experimentPlanet) {
-      case 'Earth':
-        return <Planet name="Earth" textures={earthTextures} />
       case 'Mars':
-        return <Planet name="Mars" textures={marsTextures} />
+        return <Planet key={experimentPlanet} name="Mars" textures={marsTextures} />
       case 'Venus':
-        return <Planet name="Venus" textures={venusTextures} />
+        return <Planet key={experimentPlanet} name="Venus" textures={venusTextures} />
       case 'Mercury':
-        return <Planet name="Mercury" textures={mercuryTextures} />
+        return <Planet key={experimentPlanet} name="Mercury" textures={mercuryTextures} />
       case 'Jupiter':
-        return <Planet name="Jupiter" textures={jupiterTextures} />
+        return <Planet key={experimentPlanet} name="Jupiter" textures={jupiterTextures} />
       case 'Saturn':
-        return <Planet name="Saturn" textures={saturnTextures} />
+        return <Planet key={experimentPlanet} name="Saturn" textures={saturnTextures} />
       case 'Uranus':
-        return <Planet name="Uranus" textures={uranusTextures} />
+        return <Planet key={experimentPlanet} name="Uranus" textures={uranusTextures} />
       case 'Neptune':
-        return <Planet name="Neptune" textures={neptuneTextures} />
+        return <Planet key={experimentPlanet} name="Neptune" textures={neptuneTextures} />
+      case 'Earth':
       default:
-        return <Planet name="Earth" textures={earthTextures} />
+        return <Planet key={experimentPlanet} name="Earth" textures={earthTextures} />
     }
   }
 

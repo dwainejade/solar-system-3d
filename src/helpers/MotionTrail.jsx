@@ -11,7 +11,8 @@ const MotionTrail = ({
     opacity = 1,
     active = true,
     minPoints = 150,
-    maxPoints = 300
+    maxPoints = 300,
+    pause = false
 }) => {
     const [points, setPoints] = useState([]);
     const frameCount = useRef(0);
@@ -19,6 +20,7 @@ const MotionTrail = ({
 
     useFrame(() => {
         if (!active || !target?.current) return;
+        if (pause) return;
 
         frameCount.current++;
 
