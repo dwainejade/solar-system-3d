@@ -47,13 +47,16 @@ const SharedCanvas = ({ children, mode = 'main' }) => {
         shadows
         dpr={dpr}
         gl={{
-          antialias: true,
           logarithmicDepthBuffer: true,
+          antialias: false,
+          alpha: false,
+          powerPreference: 'high-performance',
+          depth: false
         }}
         camera={{
           fov: 50,
           position: [20000, 20000, 20000],
-          near: 0.1,
+          near: 0.001,
           far: 2000000
         }}
       >
@@ -61,6 +64,7 @@ const SharedCanvas = ({ children, mode = 'main' }) => {
         <PerformanceMonitor
           onIncline={() => setDpr([1, 2])}
           onDecline={() => setDpr([1, 1])}
+          flipflops={true}
         />
 
         <Suspense fallback={<Loader />}>
