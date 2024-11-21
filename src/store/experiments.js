@@ -24,7 +24,7 @@ const useExperimentsStore = create(
     persist(
         (set, get) => ({
             ...initialState,
-            experimentMode: false,
+            experimentMode: true,
             setExperimentStatus: (newStatus) => set({ experimentStatus: newStatus }),
 
             toggleExperimentMode: (newState) => set({ experimentMode: newState }),
