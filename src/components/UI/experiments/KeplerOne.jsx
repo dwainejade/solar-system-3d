@@ -42,7 +42,7 @@ function KeplerOne() {
 
   const handleStartExperiment = () => {
     updatePlanetData(selectedPlanet, { eccentricity: eccentricity });
-    const newSpeed = getSpeedValue("1 year /s");
+    const newSpeed = getSpeedValue("1 month /s");
     setSimSpeed(newSpeed); // Set to normal speed when starting
     setExperimentStatus("started");
   };
