@@ -13,7 +13,7 @@ import AsteroidBelt from "@/components/asteroids/AsteroidBelt";
 import * as THREE from "three";
 
 const SceneThree = () => {
-  const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, setViewOnlyMode } = useStore();
+  const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, setViewOnlyMode, toggleDetailsMenu } = useStore();
   const { planetPositions, selectedPlanet, setSelectedPlanet, selectedMoon, setSelectedMoon, planetsData, moonsData, moonPositions, resetPlanetsData } = usePlanetStore();
   const { satelliteCamera, isCameraTransitioning, toggleCameraTransitioning, isZoomingToSun, resetCamera, toggleZoomingToSun, activeCamera, setActiveCamera, setSceneCameras, sceneCameras, satelliteCameraState, setSatelliteCameraState } = useCameraStore();
   const { experimentMode, toggleExperimentMode } = useExperimentsStore();
@@ -206,6 +206,7 @@ const SceneThree = () => {
       }
       toggleCameraTransitioning(false);
       setMinDistance(200);
+      toggleDetailsMenu(true);
     }
 
     // When in orbit mode but not transitioning, allow free movement
