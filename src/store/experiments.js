@@ -10,15 +10,9 @@ const initialState = {
     experimentsModal: false,
     initialPlanetsData: planetsData,
     experimentPlanet: 'Earth',
+    newtonOneStatus: null,
 };
 
-// const experimentCameraAngles = {
-//     'kepler-1': {
-//         title: "Kepler's First Law",
-//         position: [0, 0, 0],
-//         target: [0, 0, 0]
-//     }
-// }
 
 const useExperimentsStore = create(
     persist(
@@ -26,6 +20,8 @@ const useExperimentsStore = create(
             ...initialState,
             experimentMode: true,
             setExperimentStatus: (newStatus) => set({ experimentStatus: newStatus }),
+
+            setNewtonOneStatus: (newStatus) => set({ newtonOneStatus: newStatus }),
 
             toggleExperimentMode: (newState) => set({ experimentMode: newState }),
 

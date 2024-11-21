@@ -8,7 +8,7 @@ import Slider from "../../../components/UI/Slider";
 function NewtonGravity() {
   const { updatePlanetData, resetSinglePlanetData, updatePlanetPosition } = usePlanetStore();
   const { setSimSpeed, simSpeed, prevSpeed } = useStore();
-  const { experimentPlanet, setExperimentPlanet, experimentStatus, setExperimentStatus } = useExperimentsStore();
+  const { experimentPlanet, setExperimentPlanet, experimentStatus, setExperimentStatus, newtonOneStatus, setNewtonOneStatus } = useExperimentsStore();
 
   const selectedPlanet = "Earth";
   const [massScale, setMassScale] = useState(1);
@@ -21,15 +21,6 @@ function NewtonGravity() {
     setExperimentPlanet("Earth");
   }, []);
 
-  // Cleanup effect
-  useEffect(() => {
-    return () => {
-      resetSinglePlanetData(selectedPlanet);
-      updatePlanetPosition(selectedPlanet, initialPlanetsData[selectedPlanet].position);
-      setExperimentStatus(null);
-      setSimSpeed(1);
-    };
-  }, []);
 
   // Modified experiment status effect - only reset position and flags
   useEffect(() => {
@@ -92,7 +83,16 @@ function NewtonGravity() {
     resetSinglePlanetData(selectedPlanet);
     setSimSpeed(1);
     setExperimentStatus(null);
+    setNewtonOneStatus(null);
   };
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      updatePlanetPosition(selectedPlanet, initialPlanetsData[selectedPlanet].position);
+      handleReset();
+    };
+  }, []);
 
   return (
     <>
@@ -123,10 +123,16 @@ function NewtonGravity() {
             Gravitational Force: <span>{(calculateGravitationalForce() / 1e20).toFixed(2)}e20 N</span>
           </p>
         </div>
-
-        <div className='description-con'>
-          <p>The increased gravitational force between the earth and the moon cause the moon to crash into the earth. Uh oh!</p>
-        </div>
+        {newtonOneStatus &&
+          <div className='description-con'>
+            {newtonOneStatus === 'stable' &&
+              <p>This is the normal gravitational force between the earth and the moon, causing its expected orbit.</p>}
+            {newtonOneStatus === 'collided' &&
+              <p>The increased gravitational force between the earth and the moon cause the moon to crash into the earth. Uh oh!</p>}
+            {newtonOneStatus === 'escaped' &&
+              <p>The decreased gravitational force between the earth and the moon caused the moon to fly off into space. Uh oh!</p>}
+          </div>
+        }
       </div>
       <footer className='experiment-footer'>
         <button

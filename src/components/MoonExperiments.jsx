@@ -36,7 +36,7 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
     planetsData: newPlanetsData
   } = usePlanetStore();
   const { activeCamera, switchToMoonCamera } = useCameraStore();
-  const { experimentStatus, setExperimentStatus, experimentType } = useExperimentsStore();
+  const { experimentStatus, setExperimentStatus, experimentType, newtonOneStatus, setNewtonOneStatus } = useExperimentsStore();
 
   // Constants
   const scaledValues = useMemo(() => ({
@@ -111,6 +111,7 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
           ).normalize().multiplyScalar(scaledValues.meanMotion * scaledValues.orbitalRadius);
           escapeInitializedRef.current = true;
           setHasEscaped(true);
+          setNewtonOneStatus('escaped');
         }
 
         const { position, velocity } = calculateEscapeTrajectory({
@@ -132,6 +133,7 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
           return;
         }
       } else if (Math.abs(massRatio - 2) < 0.1) {
+
         const { position, angle } = calculateSpiralOrbit({
           meanMotion: scaledValues.meanMotion,
           orbitalRadius: scaledValues.orbitalRadius,
@@ -157,6 +159,8 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
         localRef.current.position.copy(position);
         localAngleRef.current = angle;
       } else {
+        // This is the normal 1x mass case
+        setNewtonOneStatus('stable');
         const { position, angle } = calculateKeplerianOrbit({
           meanMotion: scaledValues.meanMotion,
           eccentricity,
@@ -174,6 +178,7 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
       const distanceFromCenter = localRef.current.position.length();
       if (distanceFromCenter <= collisionDistance && !willEscape) {
         setHasCollided(true);
+        setNewtonOneStatus('collided');
         setExperimentStatus("completed");
         return;
       }
@@ -282,7 +287,7 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
           <Labels
             text={name}
             size={16}
-            position={[0, scaledValues.radius * 1.2, 0]}
+            position={[0, scaledValues.radius * 2, 0]}
             color={color}
           />
         )}
