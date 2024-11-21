@@ -208,24 +208,24 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
   const getMinPoints = () => {
     switch (massRatio) {
       case .5:
-        return 300;
+        return 500;
       case 1:
-        return 100;
+        return 200;
       case 2:
       default:
-        return 80;
+        return 100;
     }
   };
 
   const getMaxPoints = () => {
     switch (massRatio) {
       case .5:
-        return 500;
+        return 750;
       case 1:
-        return 100;
+        return 350;
       case 2:
       default:
-        return 90;
+        return 150;
     }
   };
 
