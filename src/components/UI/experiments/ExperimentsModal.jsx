@@ -70,7 +70,7 @@ function ExperimentsModal() {
 
   return (
     <div className='experiments-modal-wrapper'>
-      <div className={`modal ${experimentType === null ? "experiments" : experimentType} ${experimentsModal ? "open" : "closed"}`}>
+      <div className={`modal ${experimentType === null ? "experiments" : experimentType} open`}>
         <div className={`content ${experimentType === null ? "experiments" : experimentType}`}>
           <header>
             <h4 className='title'>{experimentHeader[experimentType]}</h4>
