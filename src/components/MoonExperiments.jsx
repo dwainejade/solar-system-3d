@@ -1,18 +1,17 @@
 import React, { useRef, useState, useEffect, useMemo } from "react";
-import * as THREE from "three";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useTexture } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
+import { Vector3 } from "three";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import useExperimentsStore from "@/store/experiments";
-import { useTexture, Html } from "@react-three/drei";
-import { Vector3 } from "three";
 import { moonDistanceScaleFactor, moonSizeScaleFactor } from "../data/moonsData";
 import initialPlanetsData from "../data/planetsData";
-import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCameraMoon";
+import OrbitPath from "./OrbitPath";
 import GravityVectors from "./GravityVectors";
+import MotionTrail from "../helpers/MotionTrail";
 import Labels from "./Labels";
 import { calculateKeplerianOrbit, calculateModifiedKeplerianOrbit, calculateSpiralOrbit, calculateEscapeTrajectory } from "../helpers/calculateOrbits";
-import MotionTrail from "../helpers/MotionTrail";
 
 const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }) => {
   const {
