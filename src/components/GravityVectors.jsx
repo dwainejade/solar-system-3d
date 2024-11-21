@@ -46,12 +46,12 @@ const GravityVectors = ({ moonRef, planetRef, length = 3 }) => {
     const towardsPlanet = new Vector3()
         .subVectors(planetPos, moonPos)
         .normalize()
-        .multiplyScalar(Math.min(25, length * 8));
+        .multiplyScalar(Math.max(3, Math.min(25, length * 8)));
 
     const towardsMoon = new Vector3()
         .subVectors(moonPos, planetPos)
         .normalize()
-        .multiplyScalar(Math.min(25, length * 8));
+        .multiplyScalar(Math.max(3, Math.min(25, length * 8)));
 
     // Calculate end points
     const moonArrowEnd = new Vector3(
