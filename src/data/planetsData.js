@@ -81,7 +81,7 @@ const earthData = {
     color: "dodgerblue",
     gravity: 9.807,
     gravitationalAcceleration: 0.00593,
-    eccentricity: 0.001, // Slightly elliptical
+    eccentricity: 0.0167, // Slightly elliptical
 };
 
 const marsData = {

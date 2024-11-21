@@ -258,7 +258,7 @@ const Scene = () => {
       if (isCameraTransitioning) {
         const scaledRadius = planet.radius * sizeScaleFactor;
         const moonOrbitRadius = scaledRadius * 10;
-        const optimalDistance = moonOrbitRadius * 10;
+        const optimalDistance = moonOrbitRadius * 15;
 
         // Initial camera setup
         cameraControlsRef.current.setLookAt(
@@ -290,7 +290,7 @@ const Scene = () => {
 
           // Set minimum distance to match Earth-Moon separation
           // Add a small multiplier to ensure both are always in view
-          setMinDistance(earthMoonDistance * 1.2);
+          setMinDistance(earthMoonDistance * 2);
 
           // Calculate midpoint between Earth and Moon for camera target
           const midpoint = {
