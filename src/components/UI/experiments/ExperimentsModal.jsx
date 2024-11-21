@@ -16,7 +16,7 @@ function ExperimentsModal() {
       setExperimentType(null);
       return;
     }
-    toggleExperimentsModal(false);
+    // toggleExperimentsModal(false);
   };
 
   const handleExperiementType = type => {
@@ -76,9 +76,11 @@ function ExperimentsModal() {
             <h4 className='title'>{experimentHeader[experimentType]}</h4>
 
             <div className='close-btn-container'>
-              <button className='close-modal' onClick={handleCloseModal}>
-                x
-              </button>
+              {experimentType &&
+                <button className='close-modal' onClick={handleCloseModal}>
+                  x
+                </button>
+              }
             </div>
           </header>
           {!experimentType && defaultMenu()}

@@ -154,10 +154,10 @@ const Menu = () => {
         {displayText}
       </div>
 
-      <div className="left-button-con">
+      {/* <div className="left-button-con">
         <button className="reset-all-btn btn" onClick={handleResetBtn} />
         <button onClick={handleExperimentBtn} className="experiments-btn btn">Experiments</button>
-      </div>
+      </div> */}
       <button className="fullscreen-btn btn" onClick={handleFullscreen} />
 
       <div className={`bottom-menu ${isMenuOpen ? "open" : "closed"}`}>
