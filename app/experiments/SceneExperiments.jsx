@@ -14,7 +14,7 @@ const Scene = () => {
   const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, setViewOnlyMode } = useStore();
   const { planetPositions, selectedPlanet, setSelectedPlanet, selectedMoon, setSelectedMoon, planetsData, moonsData, moonPositions, resetPlanetsData } = usePlanetStore();
   const { satelliteCamera, isCameraTransitioning, toggleCameraTransitioning, isZoomingToSun, resetCamera, toggleZoomingToSun, activeCamera, setActiveCamera, switchToCustomCamera, satelliteCameraState, setSatelliteCameraState } = useCameraStore();
-  const { experimentPlanet, experimentType } = useExperimentsStore();
+  const { experimentPlanet, experimentType, experimentStatus } = useExperimentsStore();
 
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);
@@ -245,35 +245,104 @@ const Scene = () => {
       toggleCameraTransitioning(false);
     }
 
-    if (activeCamera.name === 'newton' && experimentPlanet && isCameraTransitioning) {
+
+    if (activeCamera.name === 'newton' && experimentPlanet) {
       const planet = planetsData['Earth'];
-      // hardcoded for now
       const planetPosition = {
         x: 1494.5039999707724,
         y: 8.16068867940263e-9,
         z: 0.009351460384996825
+      };
+
+      // During initial transition, set up the camera
+      if (isCameraTransitioning) {
+        const scaledRadius = planet.radius * sizeScaleFactor;
+        const moonOrbitRadius = scaledRadius * 10;
+        const optimalDistance = moonOrbitRadius * 10;
+
+        // Initial camera setup
+        cameraControlsRef.current.setLookAt(
+          planetPosition.x,
+          optimalDistance,
+          -moonOrbitRadius,
+          planetPosition.x,
+          planetPosition.y,
+          planetPosition.z,
+          true
+        );
+
+        setMinDistance(moonOrbitRadius);
+        cameraControlsRef.current.maxDistance = moonOrbitRadius * 20;
+
+        toggleCameraTransitioning(false);
+      } else {
+        // Find the moon's position
+        const moonKey = Object.keys(moonPositions).find(key => key.includes('Moon'));
+        if (moonKey && moonPositions[moonKey]) {
+          const moonPos = moonPositions[moonKey];
+
+          // Calculate distance between Earth and Moon
+          const earthMoonDistance = new THREE.Vector3(
+            moonPos.x - planetPosition.x,
+            moonPos.y - planetPosition.y,
+            moonPos.z - planetPosition.z
+          ).length();
+
+          // Set minimum distance to match Earth-Moon separation
+          // Add a small multiplier to ensure both are always in view
+          setMinDistance(earthMoonDistance * 1.2);
+
+          // Calculate midpoint between Earth and Moon for camera target
+          const midpoint = {
+            x: (planetPosition.x + moonPos.x) / 2,
+            y: (planetPosition.y + moonPos.y) / 2,
+            z: (planetPosition.z + moonPos.z) / 2
+          };
+
+          // Update camera target to the midpoint
+          cameraControlsRef.current.setTarget(
+            midpoint.x,
+            midpoint.y,
+            midpoint.z,
+            true
+          );
+        }
       }
-      const scaledRadius = planet.radius * sizeScaleFactor;
-      const moonOrbitRadius = scaledRadius * 10;
-      const optimalDistance = moonOrbitRadius * 4;
-
-      cameraControlsRef.current.setLookAt(
-        planetPosition.x + optimalDistance,
-        optimalDistance * 0.5,
-        planetPosition.z,
-        planetPosition.x,
-        planetPosition.y,
-        planetPosition.z,
-        true
-      );
-
-      setMinDistance(scaledRadius * 6);
-      cameraControlsRef.current.maxDistance = optimalDistance * 20;
-
-      // Only end transition if we successfully updated camera
-      toggleCameraTransitioning(false);
     }
   });
+
+  useEffect(() => {
+    if (experimentStatus === null && activeCamera.name === 'newton' && cameraControlsRef.current) {
+      const planet = planetsData['Earth'];
+      const planetPosition = {
+        x: 1494.5039999707724,
+        y: 8.16068867940263e-9,
+        z: 0.009351460384996825
+      };
+
+      const scaledRadius = planet.radius * sizeScaleFactor;
+      const moonOrbitRadius = scaledRadius * 10;
+      const optimalDistance = moonOrbitRadius * 10;
+
+      // Reset to initial Newton camera position
+      cameraControlsRef.current.setLookAt(
+        planetPosition.x,           // Camera X: Same as planet
+        optimalDistance,           // Camera Y: High above planet
+        -moonOrbitRadius,         // Camera Z: Same initial position
+        planetPosition.x,          // Target X: Earth center
+        planetPosition.y,          // Target Y: Earth center
+        planetPosition.z,          // Target Z: Earth center
+        true                      // Enable smooth transition
+      );
+
+      // Reset camera constraints to initial values
+      setMinDistance(scaledRadius * 20);
+      cameraControlsRef.current.maxDistance = moonOrbitRadius * 20;
+
+      toggleCameraTransitioning(false);
+    }
+  }, [experimentStatus]);
+
   // console.log({ isCameraTransitioning })
   useEffect(() => {
     if (cameraControlsRef.current && !hasInitialized) {

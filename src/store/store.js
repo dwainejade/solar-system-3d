@@ -287,7 +287,7 @@ const customCameraAngles = {
     },
     'newton': {
         title: 'newton',
-        position: [700, 2000, 1000],
+        position: [2000, 2000, -2000],
         target: [0, 0, 0]
     },
 }
