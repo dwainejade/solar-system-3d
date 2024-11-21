@@ -100,7 +100,7 @@ const usePlanetStore = create(
             orbitPaths: true,
             toggleOrbitPaths: () => set(state => ({ orbitPaths: !state.orbitPaths })),
 
-            displayLabels: false, // render planet names in scene
+            displayLabels: true, // render planet names in scene
             toggleDisplayLabels: () => set((state) => ({ displayLabels: !state.displayLabels })),
 
             showResetPlanetModal: false,
