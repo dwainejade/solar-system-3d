@@ -22,14 +22,14 @@ const Arrow = ({ start, end, color, thickness = 0.1 }) => {
             <group quaternion={quaternion}>
                 {/* Arrow body (cylinder) */}
                 <mesh position={[0, bodyLength / 2, 0]}>
-                    <cylinderGeometry args={[thickness, thickness, bodyLength, 8]} />
-                    <meshStandardMaterial color={color} emissive={color} />
+                    <cylinderGeometry args={[thickness, thickness, bodyLength, 32]} />
+                    <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1} transparent opacity={0.5} depthWrite={false} depthTest={false} />
                 </mesh>
 
                 {/* Arrow head (cone) */}
                 <mesh position={[0, length - headLength / 2, 0]}>
-                    <coneGeometry args={[headRadius, headLength, 16]} />
-                    <meshStandardMaterial color={color} emissive={color} emissiveIntensity={.8} transparent={true} opacity={0.5} />
+                    <coneGeometry args={[headRadius, headLength, 32]} />
+                    <meshStandardMaterial color={color} emissive={color} emissiveIntensity={.8} transparent opacity={0.5} depthWrite={false} depthTest={false} />
                 </mesh>
             </group>
         </group>
@@ -46,12 +46,12 @@ const GravityVectors = ({ moonRef, planetRef, length = 3 }) => {
     const towardsPlanet = new Vector3()
         .subVectors(planetPos, moonPos)
         .normalize()
-        .multiplyScalar(Math.min(25, length * 8));
+        .multiplyScalar(Math.max(3, Math.min(25, length * 8)));
 
     const towardsMoon = new Vector3()
         .subVectors(moonPos, planetPos)
         .normalize()
-        .multiplyScalar(Math.min(25, length * 8));
+        .multiplyScalar(Math.max(3, Math.min(25, length * 8)));
 
     // Calculate end points
     const moonArrowEnd = new Vector3(

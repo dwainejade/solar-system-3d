@@ -183,6 +183,7 @@ const Menu = () => {
     return false;
   };
 
+
   return (
     <div className={`menu-wrapper ${showResetAllModal || showResetPlanetModal ? "disabled" : "enabled"}`}>
       <div className={`auto-rotate-text ${textClass}`}>{displayText}</div>
@@ -218,7 +219,7 @@ const Menu = () => {
           <div className='menu-item'>
             <label htmlFor='orbitPathToggle'>Orbit Paths</label>
             <div className='switch' onClick={() => toggleOrbitPaths(!orbitPaths)} disabled={!isMenuOpen}>
-              <input id='orbitPathToggle' type='checkbox' checked={orbitPaths} onChange={() => {}} style={{ display: "none" }} />
+              <input id='orbitPathToggle' type='checkbox' checked={orbitPaths} onChange={() => { }} style={{ display: "none" }} />
               <div className='slider round'></div>
             </div>
           </div>
@@ -226,7 +227,7 @@ const Menu = () => {
           <div className='menu-item'>
             <label htmlFor='labelToggle'>Labels</label>
             <div className='switch' onClick={() => toggleDisplayLabels(!displayLabels)} disabled={!isMenuOpen}>
-              <input id='labelToggle' type='checkbox' checked={displayLabels} onChange={() => {}} style={{ display: "none" }} />
+              <input id='labelToggle' type='checkbox' checked={displayLabels} onChange={() => { }} style={{ display: "none" }} />
               <div className='slider round'></div>
             </div>
           </div>
@@ -236,13 +237,12 @@ const Menu = () => {
       {/* Details menu */}
       <>
         <div
-          className={`details-menu ${
-            selectedPlanet &&
-            ((!isCameraTransitioning && showDetailsMenu && satelliteCamera) || (selectedPlanet?.name === "Sun" && !isZoomingToSun))
-              ? "open"
-              : "closed"
-          }`}
-          key={selectedPlanet?.name}
+          className={`details-menu ${(selectedPlanet || activeCamera.name === "Sun" || activeCamera.name === "Asteroid Belt") &&
+            ((!isCameraTransitioning && showDetailsMenu))
+            ? "open"
+            : "closed"
+            }`}
+          key={activeCamera.name}
         >
           <div className='details-menu-inner'>
             {(activeCamera.type === "planet" ||

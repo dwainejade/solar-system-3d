@@ -1,18 +1,17 @@
 import React, { useRef, useState, useEffect, useMemo } from "react";
-import * as THREE from "three";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useTexture } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
+import { Vector3 } from "three";
 import useStore, { useCameraStore, usePlanetStore } from "../store/store";
 import useExperimentsStore from "@/store/experiments";
-import { useTexture, Html } from "@react-three/drei";
-import { Vector3 } from "three";
 import { moonDistanceScaleFactor, moonSizeScaleFactor } from "../data/moonsData";
 import initialPlanetsData from "../data/planetsData";
-import OrbitPath from "./OrbitPath";
 import SatelliteCamera from "./SatelliteCameraMoon";
+import OrbitPath from "./OrbitPath";
 import GravityVectors from "./GravityVectors";
+import MotionTrail from "../helpers/MotionTrail";
 import Labels from "./Labels";
 import { calculateKeplerianOrbit, calculateModifiedKeplerianOrbit, calculateSpiralOrbit, calculateEscapeTrajectory } from "../helpers/calculateOrbits";
-import MotionTrail from "../helpers/MotionTrail";
 
 const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }) => {
   const {
@@ -37,7 +36,7 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
     planetsData: newPlanetsData
   } = usePlanetStore();
   const { activeCamera, switchToMoonCamera } = useCameraStore();
-  const { experimentStatus, setExperimentStatus, experimentType } = useExperimentsStore();
+  const { experimentStatus, setExperimentStatus, experimentType, newtonOneStatus, setNewtonOneStatus } = useExperimentsStore();
 
   // Constants
   const scaledValues = useMemo(() => ({
@@ -112,6 +111,7 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
           ).normalize().multiplyScalar(scaledValues.meanMotion * scaledValues.orbitalRadius);
           escapeInitializedRef.current = true;
           setHasEscaped(true);
+          setNewtonOneStatus('escaped');
         }
 
         const { position, velocity } = calculateEscapeTrajectory({
@@ -133,6 +133,7 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
           return;
         }
       } else if (Math.abs(massRatio - 2) < 0.1) {
+
         const { position, angle } = calculateSpiralOrbit({
           meanMotion: scaledValues.meanMotion,
           orbitalRadius: scaledValues.orbitalRadius,
@@ -158,6 +159,8 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
         localRef.current.position.copy(position);
         localAngleRef.current = angle;
       } else {
+        // This is the normal 1x mass case
+        setNewtonOneStatus('stable');
         const { position, angle } = calculateKeplerianOrbit({
           meanMotion: scaledValues.meanMotion,
           eccentricity,
@@ -175,6 +178,7 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
       const distanceFromCenter = localRef.current.position.length();
       if (distanceFromCenter <= collisionDistance && !willEscape) {
         setHasCollided(true);
+        setNewtonOneStatus('collided');
         setExperimentStatus("completed");
         return;
       }
@@ -208,24 +212,24 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
   const getMinPoints = () => {
     switch (massRatio) {
       case .5:
-        return 300;
+        return 500;
       case 1:
-        return 100;
+        return 200;
       case 2:
       default:
-        return 80;
+        return 100;
     }
   };
 
   const getMaxPoints = () => {
     switch (massRatio) {
       case .5:
-        return 500;
+        return 750;
       case 1:
-        return 100;
+        return 350;
       case 2:
       default:
-        return 90;
+        return 150;
     }
   };
 
@@ -283,7 +287,7 @@ const MoonExperiments = ({ moonData, planetRef, parentName, scaledPlanetRadius }
           <Labels
             text={name}
             size={16}
-            position={[0, scaledValues.radius * 1.2, 0]}
+            position={[0, scaledValues.radius * 2, 0]}
             color={color}
           />
         )}

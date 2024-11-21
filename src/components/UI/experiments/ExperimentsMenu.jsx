@@ -2,22 +2,39 @@
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import useStore, { usePlanetStore, useCameraStore } from "../../../store/store";
 import useExperimentsStore from "../../../store/experiments";
-import DetailsMenu from "../DetailsMenu";
-import ResetModal from "../ResetModal";
-import FocusLock from 'react-focus-lock';
 import ExperimentsModal from "./ExperimentsModal";
 
+const SPEED_OPTIONS = {
+  "-1 year /s": -31557600,
+  "-1 month /s": -2629800,
+  "-1 week /s": -604800,
+  "-1 day /s": -86400,
+  "-1 hour /s": -3600,
+  "-1 minute /s": -60,
+  "Real-time": 1,
+  "1 minute /s": 60,
+  "1 hour /s": 3600,
+  "1 day /s": 86400,
+  "1 week /s": 604800,
+  "1 month /s": 2629800,
+  "1 year /s": 31557600
+};
+
+// max speeds for each experiment type
+const EXPERIMENT_SPEED_LIMITS = {
+  'kepler-1': "1 year /s",
+  'kepler-2': "1 month /s",
+  'kepler-3': "1 year /s",
+  'newton-1': "1 day /s",
+  'default': "1 year /s"
+};
+
+
 const Menu = () => {
-  const { toggleExperimentsModal, experimentsModal, resetExperiments, experimentPlanet, setExperimentPlanet, experimentMode, experimentStatus } = useExperimentsStore();
-  const {
-    simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, toggleFullscreen,
-    showDetailsMenu, toggleDetailsMenu, viewOnlyMode, resetAllData,
-  } = useStore();
-  const {
-    selectedPlanet, setSelectedPlanet, displayLabels, toggleDisplayLabels, planetsData,
-    resetPlanetsData, showResetPlanetModal, showResetAllModal, toggleResetAllModal, orbitPaths, toggleOrbitPaths, moonsData, setSelectedMoon, selectedMoon
-  } = usePlanetStore();
-  const { toggleSatelliteCamera, isCameraTransitioning, satelliteCamera, autoRotate, isZoomingToSun, switchToMoonCamera, switchToCustomCamera, switchToPlanetCamera, activeCamera, resetCamera } = useCameraStore();
+  const { resetExperiments, experimentPlanet, setExperimentPlanet, experimentStatus, experimentType } = useExperimentsStore();
+  const { simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, toggleFullscreen, resetAllData, } = useStore();
+  const { displayLabels, toggleDisplayLabels, planetsData, showResetPlanetModal, showResetAllModal, toggleResetAllModal, orbitPaths, toggleOrbitPaths } = usePlanetStore();
+  const { isCameraTransitioning, autoRotate, activeCamera } = useCameraStore();
 
   const [firstRender, setFirstRender] = useState(true);
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -25,8 +42,6 @@ const Menu = () => {
   const [displayText, setDisplayText] = useState('');
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [hoveredPlanetName, setHoveredPlanetName] = useState(null); // Track which planet's moons are displayed
-
 
   const toggleMenu = () => {
     setMenuOpen(!isMenuOpen);
@@ -34,7 +49,6 @@ const Menu = () => {
 
   const handleResetBtn = () => {
     toggleResetAllModal(true);
-    toggleExperimentsModal(false);
   };
 
   const handleResetAll = () => {
@@ -46,65 +60,30 @@ const Menu = () => {
     toggleFullscreen();
   };
 
-  const speedOptions = [
-    // { label: "-1 year /s", value: -31557600 },
-    // { label: "-1 month /s", value: -2629800 },
-    // { label: "-1 week /s", value: -604800 },
-    // { label: "-1 day /s", value: -86400 },
-    // { label: "-1 hour /s", value: -3600 },
-    // { label: "-1 minute /s", value: -60 },
-    { label: "Real-time", value: 1 },
-    { label: "1 minute /s", value: 60 },
-    { label: "1 hour /s", value: 3600 },
-    { label: "1 day /s", value: 86400 },
-    { label: "1 week /s", value: 604800 },
-    { label: "1 month /s", value: 2629800 },
-    { label: "1 year /s", value: 31557600 },
-  ];
-
-  const handleSpeedChange = (event) => {
-    const newSpeed = parseInt(event.target.value, 10);
-    setSimSpeed(newSpeed);
-    setPrevSpeed(newSpeed);
+  const disablePlanetSelect = () => {
+    if (experimentType === 'newton-1') return true;
   };
+
+  // Get available speed options based on experiment type
+  const getSpeedOptions = () => {
+    if (!experimentType) {
+      return Object.entries(SPEED_OPTIONS);
+    }
+
+    const maxSpeed = EXPERIMENT_SPEED_LIMITS[experimentType] || EXPERIMENT_SPEED_LIMITS.default;
+    const allOptions = Object.entries(SPEED_OPTIONS);
+
+    // Find the index of "Real-time" and maxSpeed
+    const startIndex = allOptions.findIndex(([key]) => key === "Real-time");
+    const maxIndex = allOptions.findIndex(([key]) => key === maxSpeed);
+
+    return allOptions.slice(startIndex, maxIndex + 1);
+  };
+
 
   const handlePlanetSelect = (planetName) => {
-    const planet = planetsData[planetName];
     setExperimentPlanet(planetName);
-    // setSelectedPlanet(planet);
-    // setSelectedMoon(null);
-    // toggleDetailsMenu(true);
-    // switchToPlanetCamera(planetName);
     setIsDropdownOpen(false); // Close dropdown after selection
-  };
-
-  const handleMoonSelect = (planetName, moonName) => {
-    const planet = planetsData[planetName];
-    const moon = moonsData[planetName]?.find((m) => m.name === moonName);
-    setSelectedMoon(moon);
-    switchToMoonCamera(hoveredPlanetName, moonName);
-    setIsDropdownOpen(false);
-    if (selectedPlanet && selectedPlanet.name !== planetName) {
-      setSelectedPlanet(planetName);
-    }
-  };
-
-  const handleSolarSystemSelect = () => {
-    setSelectedPlanet(null);
-    setSelectedMoon(null);
-    resetCamera();
-    setIsDropdownOpen(false);
-  };
-
-  const handleAsteroidBeltSelect = () => {
-    setSelectedPlanet({
-      name: "Asteroid Belt",
-
-    });
-    setSelectedMoon(null);
-    toggleDetailsMenu(true);
-    switchToCustomCamera('Asteroid Belt');
-    setIsDropdownOpen(false);
   };
 
   useLayoutEffect(() => {
@@ -136,17 +115,18 @@ const Menu = () => {
     };
   }, [autoRotate]);
 
+  useEffect(() => {
+    return () => {
+      handleResetAll()
+    }
+  }, []);
 
   const disableSpeedToggle = () => {
-    if (activeCamera.type === 'custom') return false;
-    else if (experimentStatus === null) return true;
-    else if (isCameraTransitioning || !isMenuOpen) return true;
+    if (experimentStatus !== 'started') return true;
+    else if (!isMenuOpen) return true;
     return false;
   };
 
-  const handleExperimentBtn = () => {
-    toggleExperimentsModal(!experimentsModal);
-  };
 
   return (
     <div className={`menu-wrapper ${showResetAllModal || showResetPlanetModal ? "disabled" : "enabled"}`}>
@@ -154,10 +134,6 @@ const Menu = () => {
         {displayText}
       </div>
 
-      <div className="left-button-con">
-        <button className="reset-all-btn btn" onClick={handleResetBtn} />
-        <button onClick={handleExperimentBtn} className="experiments-btn btn">Experiments</button>
-      </div>
       <button className="fullscreen-btn btn" onClick={handleFullscreen} />
 
       <div className={`bottom-menu ${isMenuOpen ? "open" : "closed"}`}>
@@ -170,7 +146,7 @@ const Menu = () => {
               <button
                 className="dropdown-trigger"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                disabled={!isMenuOpen || experimentStatus}
+                disabled={!isMenuOpen || experimentStatus || disablePlanetSelect()}
               >
                 {experimentPlanet}
               </button>
@@ -194,20 +170,6 @@ const Menu = () => {
                     {/* <li onClick={handleAsteroidBeltSelect}>Asteroid Belt</li> */}
                   </ul>
                 )}
-                {/* Submenu for moons */}
-                {hoveredPlanetName && isDropdownOpen && (
-                  <ul className="submenu">
-                    {moonsData[hoveredPlanetName]?.map((moon) => (
-                      <li
-                        key={moon.name}
-                        className="submenu-item"
-                        onClick={() => handleMoonSelect(hoveredPlanetName, moon.name)}
-                      >
-                        {moon.name}
-                      </li>
-                    ))}
-                  </ul>
-                )}
               </div>
             </div>
           </div>
@@ -216,13 +178,13 @@ const Menu = () => {
             <label htmlFor="simSpeedSelect">Simulation Speed</label>
             <select
               id="simSpeedSelect"
-              onChange={handleSpeedChange}
-              value={isCameraTransitioning ? prevSpeed : simSpeed}
+              onChange={(e) => setSimSpeed(SPEED_OPTIONS[e.target.value])}
+              value={Object.entries(SPEED_OPTIONS).find(([_, v]) => v === simSpeed)?.[0] || "Real-time"}
               disabled={disableSpeedToggle()}
             >
-              {speedOptions.map((option, index) => (
-                <option key={index} value={option.value}>
-                  {option.label}
+              {getSpeedOptions().map(([label, value]) => (
+                <option key={label} value={label}>
+                  {label}
                 </option>
               ))}
             </select>
@@ -260,35 +222,6 @@ const Menu = () => {
           </div>
         </div>
       </div>
-
-      {/* Details menu */}
-      {!viewOnlyMode && !experimentMode && (
-        <>
-          <div
-            className={`details-menu ${selectedPlanet &&
-              (!isCameraTransitioning && showDetailsMenu && satelliteCamera || selectedPlanet?.name === "Sun" && !isZoomingToSun)
-              ? "open"
-              : "closed"
-              }`}
-            key={selectedPlanet?.name}
-          >
-            <div className="details-menu-inner">
-              {selectedPlanet?.name &&
-                <DetailsMenu />
-              }
-            </div>
-          </div>
-
-          {(showResetPlanetModal || showResetAllModal) && (
-            <>
-              <div className="backdrop" />
-              <FocusLock>
-                <ResetModal type={showResetPlanetModal ? "single" : "all"} handleResetAll={handleResetAll} />
-              </FocusLock>
-            </>
-          )}
-        </>
-      )}
 
       <ExperimentsModal />
 

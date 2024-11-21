@@ -13,7 +13,7 @@ import AsteroidBelt from "@/components/asteroids/AsteroidBelt";
 import * as THREE from "three";
 
 const Scene = () => {
-  const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, setViewOnlyMode } = useStore();
+  const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, setViewOnlyMode, toggleDetailsMenu } = useStore();
   const { planetPositions, selectedPlanet, setSelectedPlanet, selectedMoon, setSelectedMoon, planetsData, moonsData, moonPositions, resetPlanetsData } = usePlanetStore();
   const { satelliteCamera, isCameraTransitioning, toggleCameraTransitioning, isZoomingToSun, resetCamera, toggleZoomingToSun, activeCamera, setActiveCamera, setSceneCameras, sceneCameras, satelliteCameraState, setSatelliteCameraState } = useCameraStore();
   const { experimentMode, toggleExperimentMode } = useExperimentsStore();
@@ -206,6 +206,7 @@ const Scene = () => {
       }
       toggleCameraTransitioning(false);
       setMinDistance(200);
+      toggleDetailsMenu(true);
     }
 
     // When in orbit mode but not transitioning, allow free movement
@@ -214,6 +215,23 @@ const Scene = () => {
       cameraControlsRef.current.maxDistance = maxDistance
     }
   });
+
+  useEffect(() => {
+    if (cameraControlsRef.current && !hasInitialized) {
+      // Set initial camera position
+      cameraControlsRef.current.setPosition(...initialCameraPosition, false);
+      cameraControlsRef.current.setTarget(...initialTarget, false);
+
+      // Ensure controls are ready
+      cameraControlsRef.current.camera.updateProjectionMatrix();
+
+      // Animate to default position with a slight delay
+      setTimeout(() => {
+        resetCamera();
+        setHasInitialized(true);
+      }, 100);
+    }
+  }, [cameraControlsRef.current]);
 
   // Handle camera mode changes
   useEffect(() => {

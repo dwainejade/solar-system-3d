@@ -154,7 +154,7 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
           />
         </mesh>
 
-        {(isMoonSelected) ? (
+        {(isMoonSelected && displayLabels) &&
           <Html
             position={[0, scaledValues.radius * 1.2, 0]}
             center
@@ -171,8 +171,9 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
               }}
             >{name}</span>
           </Html>
-        )
-          :
+        }
+
+        {displayLabels && !isMoonSelected &&
           <Labels
             text={name}
             size={12}

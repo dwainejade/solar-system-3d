@@ -212,83 +212,33 @@ const DetailsMenu = () => {
     setIsEditing(false); // Exit editing mode after reset
   };
 
-  const renderAsteroidBeltDetails = () => (
-    <div className="asteroid-belt-details">
-      <div className="item w2">
-        <label>Inner Radius:</label>
-        <span className="value">{formatScientificNotation(editableBodyData.innerRadius)} km</span>
-      </div>
-      <div className="item w2">
-        <label>Outer Radius:</label>
-        <span className="value">{formatScientificNotation(editableBodyData.outerRadius)} km</span>
-      </div>
-      <div className="item w2">
-        <label>Total Mass:</label>
-        <span className="value">{formatScientificNotation(editableBodyData.mass)} kg</span>
-      </div>
-      <div className="item w2">
-        <label>Orbital Period:</label>
-        <span className="value">{formatScientificNotation(editableBodyData.orbitalPeriod)} days</span>
-      </div>
-      <div className="item w2">
-        <label>Surface Temperature:</label>
-        <span className="value">{editableBodyData.surfaceTemp}°C</span>
-      </div>
+  const renderAsteroidBeltDetails = () => {
 
-      <div className="composition-section w4">
-        <h3 className="section-title">Composition</h3>
-        <div className="composition-grid">
-          <div className="composition-item">
-            <label>Rocky:</label>
-            <span>{editableBodyData.composition?.rocky}</span>
-          </div>
-          <div className="composition-item">
-            <label>Metallic:</label>
-            <span>{editableBodyData.composition?.metallic}</span>
-          </div>
-          <div className="composition-item">
-            <label>Other:</label>
-            <span>{editableBodyData.composition?.other}</span>
-          </div>
+    return (
+      <div className="planet-details asteroid-belt-details" >
+        <div className="item w2">
+          <label>Inner Radius:</label>
+          <span className="value">{formatScientificNotation(editableBodyData.innerRadius)} km</span>
         </div>
-      </div>
-
-      <div className="major-objects-section w4">
-        <h3 className="section-title">Major Objects</h3>
-        <div className="objects-grid">
-          {editableBodyData.interestPoints?.map((point, index) => (
-            <div key={index} className="object-item">
-              <div className="object-name">{point.title}</div>
-              <div className="object-type">{point.type}</div>
-              <div className="object-diameter">Diameter: {point.diameter} km</div>
-            </div>
-          ))}
+        <div className="item w2">
+          <label>Outer Radius:</label>
+          <span className="value">{formatScientificNotation(editableBodyData.outerRadius)} km</span>
         </div>
-      </div>
-
-      <div className="stats-section w4">
-        <h3 className="section-title">Estimated Objects</h3>
-        <div className="stats-grid">
-          <div className="stat-item">
-            <label>Total Objects:</label>
-            <span>{editableBodyData.estimatedObjects?.total}</span>
-          </div>
-          <div className="stat-item">
-            <label>Larger than 1km:</label>
-            <span>{editableBodyData.estimatedObjects?.largerThan1km}</span>
-          </div>
-          <div className="stat-item">
-            <label>Identified:</label>
-            <span>{editableBodyData.estimatedObjects?.identified}</span>
-          </div>
+        <div className="item w2">
+          <label>Total Mass:</label>
+          <span className="value">{formatScientificNotation(editableBodyData.mass)} kg</span>
         </div>
-      </div>
-
-      <div className="description-section w4">
-        <p className="description">{editableBodyData.description}</p>
-      </div>
-    </div>
-  );
+        <div className="item w2">
+          <label>Orbital Period:</label>
+          <span className="value">{formatScientificNotation(editableBodyData.orbitalPeriod)} days</span>
+        </div>
+        <div className="item w2">
+          <label>Total Objects:</label>
+          <span>{editableBodyData.estimatedObjects?.total}</span>
+        </div>
+      </div >
+    );
+  }
 
 
   return (
@@ -296,7 +246,7 @@ const DetailsMenu = () => {
       <h2>{editableBodyData?.name}</h2>
 
       {editableBodyData && (
-        <div className={`planet-details ${isEditing ? 'editing' : 'saved'}`}>
+        <>
           {activeCamera.name === 'Asteroid Belt' ? (
             renderAsteroidBeltDetails()
           ) : (
@@ -388,7 +338,7 @@ const DetailsMenu = () => {
               </div>
             </>
           )}
-        </div>
+        </>
       )}
     </>
   )

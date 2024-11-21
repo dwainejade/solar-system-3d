@@ -8,7 +8,7 @@ import Slider from "../../../components/UI/Slider";
 function NewtonGravity() {
   const { updatePlanetData, resetSinglePlanetData, updatePlanetPosition } = usePlanetStore();
   const { setSimSpeed, simSpeed, prevSpeed } = useStore();
-  const { experimentPlanet, setExperimentPlanet, experimentStatus, setExperimentStatus } = useExperimentsStore();
+  const { experimentPlanet, setExperimentPlanet, experimentStatus, setExperimentStatus, newtonOneStatus, setNewtonOneStatus } = useExperimentsStore();
 
   const selectedPlanet = "Earth";
   const [massScale, setMassScale] = useState(1);
@@ -16,69 +16,53 @@ function NewtonGravity() {
   const sliderValues = [0.5, 1, 2];
   const [sliderIndex, setSliderIndex] = useState(1);
 
-
   // Separate initialization effect
   useEffect(() => {
     setExperimentPlanet("Earth");
   }, []);
 
-  // Cleanup effect
-  useEffect(() => {
-    return () => {
-      resetSinglePlanetData(selectedPlanet);
-      updatePlanetPosition(selectedPlanet, initialPlanetsData[selectedPlanet].position);
-      setExperimentStatus(null);
-      setSimSpeed(1);
-    };
-  }, []);
 
-  // Reset states when experiment starts
+  // Modified experiment status effect - only reset position and flags
   useEffect(() => {
     if (experimentStatus === "started") {
-      setMassScale(1);
       updatePlanetData(selectedPlanet, {
         escaped: false,
-        collided: false
+        collided: false,
+        // Keep the current mass and radius, just update the experiment flags
+        position: initialPlanetsData[selectedPlanet].position
       });
-      updatePlanetPosition(selectedPlanet, initialPlanetsData[selectedPlanet].position);
     }
   }, [experimentStatus]);
 
-  const handleIncrement = () => {
-    if (massScale < sliderValues[sliderValues.length - 1]) {
-      const newIndex = sliderIndex + 1;
-      const newValue = sliderValues[newIndex];
+  // Update planet data whenever mass scale changes
+  useEffect(() => {
+    updatePlanetData(selectedPlanet, {
+      mass: originalMass * massScale,
+      radius: initialPlanetsData[selectedPlanet].radius * massScale,
+    });
+  }, [massScale]);
 
+  const handleIncrement = () => {
+    if (sliderIndex < sliderValues.length - 1) {
+      const newIndex = sliderIndex + 1;
       setSliderIndex(newIndex);
-      setMassScale(newValue);
-      updatePlanetData(selectedPlanet, {
-        mass: originalMass * newValue,
-        radius: initialPlanetsData[selectedPlanet].radius * newValue,
-      });
+      setMassScale(sliderValues[newIndex]);
     }
   };
 
   const handleDecrement = () => {
-    if (massScale > sliderValues[0]) {
+    if (sliderIndex > 0) {
       const newIndex = sliderIndex - 1;
-      const newValue = sliderValues[newIndex];
       setSliderIndex(newIndex);
-      setMassScale(newValue);
-      updatePlanetData(selectedPlanet, {
-        mass: originalMass * newValue,
-        radius: initialPlanetsData[selectedPlanet].radius * newValue,
-      });
+      setMassScale(sliderValues[newIndex]);
     }
   };
 
   const handleSliderChange = e => {
     const value = parseFloat(e.target.value);
-    const newValue = value === 0 ? 0.5 : value;
-    setMassScale(newValue);
-    updatePlanetData(selectedPlanet, {
-      mass: originalMass * newValue,
-      radius: initialPlanetsData[selectedPlanet].radius * newValue,
-    });
+    const newIndex = value === 0 ? 0 : value;
+    setSliderIndex(newIndex);
+    setMassScale(sliderValues[newIndex]);
   };
 
   const calculateGravitationalForce = () => {
@@ -95,10 +79,20 @@ function NewtonGravity() {
 
   const handleReset = () => {
     setMassScale(1);
+    setSliderIndex(1);
     resetSinglePlanetData(selectedPlanet);
     setSimSpeed(1);
     setExperimentStatus(null);
+    setNewtonOneStatus(null);
   };
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      updatePlanetPosition(selectedPlanet, initialPlanetsData[selectedPlanet].position);
+      handleReset();
+    };
+  }, []);
 
   return (
     <>
@@ -114,10 +108,10 @@ function NewtonGravity() {
           onDecrement={handleDecrement}
           onIncrement={handleIncrement}
           onSliderChange={handleSliderChange}
-          value={massScale === 0.5 ? 0 : massScale}
-          disableSlider={experimentStatus === "started"}
-          disableIncrement={massScale >= 2 || experimentStatus === "started"}
-          disableDecrement={massScale <= 0 || experimentStatus === "started"}
+          value={sliderIndex}
+          disableSlider={experimentStatus}
+          disableIncrement={sliderIndex >= 2 || experimentStatus}
+          disableDecrement={sliderIndex <= 0 || experimentStatus}
           amountOfTicks={3}
         />
 
@@ -129,10 +123,16 @@ function NewtonGravity() {
             Gravitational Force: <span>{(calculateGravitationalForce() / 1e20).toFixed(2)}e20 N</span>
           </p>
         </div>
-
-        <div className='description-con'>
-          <p>The increased gravitational force between the earth and the moon cause the moon to crash into the earth. Uh oh!</p>
-        </div>
+        {newtonOneStatus &&
+          <div className='description-con'>
+            {newtonOneStatus === 'stable' &&
+              <p>This is the normal gravitational force between the earth and the moon, causing its expected orbit.</p>}
+            {newtonOneStatus === 'collided' &&
+              <p>The increased gravitational force between the earth and the moon cause the moon to crash into the earth. Uh oh!</p>}
+            {newtonOneStatus === 'escaped' &&
+              <p>The decreased gravitational force between the earth and the moon caused the moon to fly off into space. Uh oh!</p>}
+          </div>
+        }
       </div>
       <footer className='experiment-footer'>
         <button

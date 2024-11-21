@@ -221,6 +221,12 @@ const Planet = ({ name = 'Earth', textures }) => {
 
       // Handle scaling and visibility
       const distance = localRef.current.position.distanceTo(state.camera.position);
+      // Update scales based on distance
+      if (distance / 1000 <= scaledRadius) {
+        scaleRef.current = scaledRadius;
+      } else {
+        scaleRef.current = distance / 1000;
+      }
 
       // Update visibility flags
       setShowTextures(isPlanetSelected || distance < textureDisplayDistance);

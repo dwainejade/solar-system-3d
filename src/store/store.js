@@ -100,7 +100,7 @@ const usePlanetStore = create(
             orbitPaths: true,
             toggleOrbitPaths: () => set(state => ({ orbitPaths: !state.orbitPaths })),
 
-            displayLabels: false, // render planet names in scene
+            displayLabels: true, // render planet names in scene
             toggleDisplayLabels: () => set((state) => ({ displayLabels: !state.displayLabels })),
 
             showResetPlanetModal: false,
@@ -287,7 +287,7 @@ const customCameraAngles = {
     },
     'newton': {
         title: 'newton',
-        position: [700, 2000, 1000],
+        position: [2000, 2000, -2000],
         target: [0, 0, 0]
     },
 }

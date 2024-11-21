@@ -16,7 +16,7 @@ function ExperimentsModal() {
       setExperimentType(null);
       return;
     }
-    toggleExperimentsModal(false);
+    // toggleExperimentsModal(false);
   };
 
   const handleExperiementType = type => {
@@ -70,15 +70,17 @@ function ExperimentsModal() {
 
   return (
     <div className='experiments-modal-wrapper'>
-      <div className={`modal ${experimentType === null ? "experiments" : experimentType} ${experimentsModal ? "open" : "closed"}`}>
+      <div className={`modal ${experimentType === null ? "experiments" : experimentType} open`}>
         <div className={`content ${experimentType === null ? "experiments" : experimentType}`}>
           <header>
             <h4 className='title'>{experimentHeader[experimentType]}</h4>
 
             <div className='close-btn-container'>
-              <button className='close-modal' onClick={handleCloseModal}>
-                x
-              </button>
+              {experimentType &&
+                <button className='close-modal' onClick={handleCloseModal}>
+                  x
+                </button>
+              }
             </div>
           </header>
           {!experimentType && defaultMenu()}
