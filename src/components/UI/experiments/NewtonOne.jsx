@@ -109,9 +109,9 @@ function NewtonGravity() {
           onIncrement={handleIncrement}
           onSliderChange={handleSliderChange}
           value={sliderIndex}
-          disableSlider={experimentStatus === "started"}
-          disableIncrement={sliderIndex >= 2 || experimentStatus === "started"}
-          disableDecrement={sliderIndex <= 0 || experimentStatus === "started"}
+          disableSlider={experimentStatus}
+          disableIncrement={sliderIndex >= 2 || experimentStatus}
+          disableDecrement={sliderIndex <= 0 || experimentStatus}
           amountOfTicks={3}
         />
 

@@ -22,14 +22,14 @@ const Arrow = ({ start, end, color, thickness = 0.1 }) => {
             <group quaternion={quaternion}>
                 {/* Arrow body (cylinder) */}
                 <mesh position={[0, bodyLength / 2, 0]}>
-                    <cylinderGeometry args={[thickness, thickness, bodyLength, 8]} />
-                    <meshStandardMaterial color={color} emissive={color} />
+                    <cylinderGeometry args={[thickness, thickness, bodyLength, 32]} />
+                    <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1} transparent opacity={0.5} depthWrite={false} depthTest={false} />
                 </mesh>
 
                 {/* Arrow head (cone) */}
                 <mesh position={[0, length - headLength / 2, 0]}>
-                    <coneGeometry args={[headRadius, headLength, 16]} />
-                    <meshStandardMaterial color={color} emissive={color} emissiveIntensity={.8} transparent={true} opacity={0.5} />
+                    <coneGeometry args={[headRadius, headLength, 32]} />
+                    <meshStandardMaterial color={color} emissive={color} emissiveIntensity={.8} transparent opacity={0.5} depthWrite={false} depthTest={false} />
                 </mesh>
             </group>
         </group>
