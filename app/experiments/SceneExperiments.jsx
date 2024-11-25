@@ -245,68 +245,60 @@ const Scene = () => {
       toggleCameraTransitioning(false);
     }
 
-
+    // Handle 'newton' camera
     if (activeCamera.name === 'newton' && experimentPlanet) {
-      const planet = planetsData['Earth'];
-      const planetPosition = {
-        x: 1494.5039999707724,
-        y: 8.16068867940263e-9,
-        z: 0.009351460384996825
-      };
+      const planet = planetsData[experimentPlanet];
+      const planetPosition = planet ? planet.position : { x: 0, y: 0, z: 0 };
 
-      // During initial transition, set up the camera
-      if (isCameraTransitioning) {
+      // Assuming 'newton' is tracking Earth's moon or a specific moon
+      const moonKey = Object.keys(moonPositions).find(key => key.includes('Moon'));
+      const moonPos = moonKey ? moonPositions[moonKey] : null;
+
+      if (moonPos) {
+        // Calculate midpoint between planet and moon
+        const midpoint = {
+          x: (moonPos.x + planetPosition.x) / 2,
+          y: (moonPos.y + planetPosition.y) / 2,
+          z: (moonPos.z + planetPosition.z) / 2,
+        };
+
+        // Calculate direction vector from planet to moon
+        const direction = new THREE.Vector3(
+          moonPos.x - planetPosition.x,
+          moonPos.y - planetPosition.y,
+          moonPos.z - planetPosition.z
+        ).normalize();
+
+        // Define desired distance from the midpoint
         const scaledRadius = planet.radius * sizeScaleFactor;
-        const moonOrbitRadius = scaledRadius * 10;
-        const optimalDistance = moonOrbitRadius * 15;
+        const distance = scaledRadius * 10; // Adjust the multiplier as needed
 
-        // Initial camera setup
-        cameraControlsRef.current.setLookAt(
-          planetPosition.x,
-          optimalDistance,
-          -moonOrbitRadius,
-          planetPosition.x,
-          planetPosition.y,
-          planetPosition.z,
+        // Calculate camera position offset from the midpoint
+        const cameraPosition = {
+          x: midpoint.x + direction.x * distance,
+          y: midpoint.y + direction.y * distance,
+          z: midpoint.z + direction.z * distance,
+        };
+
+        // Update camera target to the midpoint
+        cameraControlsRef.current.setTarget(
+          midpoint.x,
+          midpoint.y,
+          midpoint.z,
           true
         );
 
-        setMinDistance(moonOrbitRadius);
-        cameraControlsRef.current.maxDistance = moonOrbitRadius * 20;
+        // Update camera position to frame both planet and moon
+        cameraControlsRef.current.setPosition(
+          cameraPosition.x,
+          cameraPosition.y,
+          cameraPosition.z,
+          true
+        );
 
-        toggleCameraTransitioning(false);
-      } else {
-        // Find the moon's position
-        const moonKey = Object.keys(moonPositions).find(key => key.includes('Moon'));
-        if (moonKey && moonPositions[moonKey]) {
-          const moonPos = moonPositions[moonKey];
-
-          // Calculate distance between Earth and Moon
-          const earthMoonDistance = new THREE.Vector3(
-            moonPos.x - planetPosition.x,
-            moonPos.y - planetPosition.y,
-            moonPos.z - planetPosition.z
-          ).length();
-
-          // Set minimum distance to match Earth-Moon separation
-          // Add a small multiplier to ensure both are always in view
-          setMinDistance(earthMoonDistance * 2);
-
-          // Calculate midpoint between Earth and Moon for camera target
-          const midpoint = {
-            x: (planetPosition.x + moonPos.x) / 2,
-            y: (planetPosition.y + moonPos.y) / 2,
-            z: (planetPosition.z + moonPos.z) / 2
-          };
-
-          // Update camera target to the midpoint
-          cameraControlsRef.current.setTarget(
-            midpoint.x,
-            midpoint.y,
-            midpoint.z,
-            true
-          );
-        }
+        // Optionally, set min and max distances
+        setMinDistance(distance / 2);
+        cameraControlsRef.current.maxDistance = distance * 2;
       }
     }
   });
