@@ -19,4 +19,4 @@
         rim = pow(rim, 3.0); // Increased power for sharper falloff
         gl_FragColor = vec4(glowColor, rim * glowIntensity);
       }
-    `}},7045:function(){}},function(e){e.O(0,[260,689,723,802,122,971,190,744],function(){return e(e.s=206)}),_N_E=e.O()}]);
+    `}},7045:function(){}},function(e){e.O(0,[260,689,723,562,122,971,190,744],function(){return e(e.s=206)}),_N_E=e.O()}]);
