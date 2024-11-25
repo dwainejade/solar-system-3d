@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Html, PerformanceMonitor, useProgress, Stats, Preload } from "@react-three/drei";
+import { Html, PerformanceMonitor, useProgress, Preload } from "@react-three/drei";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import useStore from "../../store/store";
 import Menu from "../UI/Menu";
@@ -60,7 +60,6 @@ const SharedCanvas = ({ children, mode = 'main' }) => {
           far: 2000000
         }}
       >
-        <Stats />
         <PerformanceMonitor
           onIncline={() => setDpr([1, 2])}
           onDecline={() => setDpr([1, 1])}
