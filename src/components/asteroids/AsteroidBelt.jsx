@@ -17,7 +17,7 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
     const labelRef = useRef();
     const colorArray = useRef();
 
-    const opacity = ((activeCamera.type === 'planet' || activeCamera.type === 'moon') && activeCamera.name !== 'Sun') ? 0.01 : 1;
+    const opacity = ((activeCamera.type === 'planet' || activeCamera.type === 'moon') && activeCamera.name !== 'Sun') ? 0 : 1;
 
 
     const innerRadius = asteroidBeltData.innerRadius;
@@ -202,7 +202,7 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
         <group >
             <group position={[-0, 800, 4000]}>
 
-                {(displayLabels || isHoveredRef.current) && (
+                {(displayLabels) && (
                     <Labels
                         text="Asteroid Belt"
                         size={16}
@@ -225,14 +225,14 @@ const AsteroidBelt = ({ meshCount = 500 }) => {
                         setAutoRotate(true);
                     }
                 }}
-                onPointerOver={() => {
-                    isHoveredRef.current = true;
-                    document.body.style.cursor = "pointer";
-                }}
-                onPointerOut={() => {
-                    isHoveredRef.current = false;
-                    document.body.style.cursor = "auto";
-                }}
+            // onPointerOver={() => {
+            //     isHoveredRef.current = true;
+            //     document.body.style.cursor = "pointer";
+            // }}
+            // onPointerOut={() => {
+            //     isHoveredRef.current = false;
+            //     document.body.style.cursor = "auto";
+            // }}
             >
                 <meshStandardMaterial
                     vertexColors
