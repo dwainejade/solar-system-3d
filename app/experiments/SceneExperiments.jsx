@@ -246,94 +246,40 @@ const Scene = () => {
     }
 
     // Handle 'newton' camera
-    if (activeCamera.name === 'newton' && experimentPlanet) {
-      const planet = planetsData[experimentPlanet];
-      const planetPosition = planet ? planet.position : { x: 0, y: 0, z: 0 };
+    if (activeCamera.name === 'newton') {
+      const planetPosition = planetPositions['Earth'] || { x: 1471.0167999983175, y: 0, z: 0 };
+      // Always set target to Earth's position
+      cameraControlsRef.current.setTarget(
+        planetPosition.x,
+        planetPosition.y,
+        planetPosition.z,
+        true
+      );
 
-      // Assuming 'newton' is tracking Earth's moon or a specific moon
-      const moonKey = Object.keys(moonPositions).find(key => key.includes('Moon'));
-      const moonPos = moonKey ? moonPositions[moonKey] : null;
-
-      if (moonPos) {
-        // Calculate midpoint between planet and moon
-        const midpoint = {
-          x: (moonPos.x + planetPosition.x) / 2,
-          y: (moonPos.y + planetPosition.y) / 2,
-          z: (moonPos.z + planetPosition.z) / 2,
-        };
-
-        // Calculate direction vector from planet to moon
-        const direction = new THREE.Vector3(
-          moonPos.x - planetPosition.x,
-          moonPos.y - planetPosition.y,
-          moonPos.z - planetPosition.z
-        ).normalize();
-
-        // Define desired distance from the midpoint
-        const scaledRadius = planet.radius * sizeScaleFactor;
-        const distance = scaledRadius * 10; // Adjust the multiplier as needed
-
-        // Calculate camera position offset from the midpoint
-        const cameraPosition = {
-          x: midpoint.x + direction.x * distance,
-          y: midpoint.y + direction.y * distance,
-          z: midpoint.z + direction.z * distance,
-        };
-
-        // Update camera target to the midpoint
-        cameraControlsRef.current.setTarget(
-          midpoint.x,
-          midpoint.y,
-          midpoint.z,
-          true
-        );
-
-        // Update camera position to frame both planet and moon
+      // Set initial camera position only when transitioning
+      if (isCameraTransitioning) {
+        const viewDistance = 90;
         cameraControlsRef.current.setPosition(
-          cameraPosition.x,
-          cameraPosition.y,
-          cameraPosition.z,
+          planetPosition.x,
+          viewDistance,
+          planetPosition.z + viewDistance - 1.5,
           true
         );
-
-        // Optionally, set min and max distances
-        setMinDistance(distance / 2);
-        cameraControlsRef.current.maxDistance = distance * 2;
+        toggleCameraTransitioning(false);
       }
+
+      // Set zoom constraints
+      setMinDistance(5);
+      cameraControlsRef.current.maxDistance = 200;
     }
   });
 
   useEffect(() => {
-    if (experimentStatus === null && activeCamera.name === 'newton' && cameraControlsRef.current) {
-      const planet = planetsData['Earth'];
-      const planetPosition = {
-        x: 1494.5039999707724,
-        y: 8.16068867940263e-9,
-        z: 0.009351460384996825
-      };
-
-      const scaledRadius = planet.radius * sizeScaleFactor;
-      const moonOrbitRadius = scaledRadius * 10;
-      const optimalDistance = moonOrbitRadius * 10;
-
-      // Reset to initial Newton camera position
-      cameraControlsRef.current.setLookAt(
-        planetPosition.x,           // Camera X: Same as planet
-        optimalDistance,           // Camera Y: High above planet
-        -moonOrbitRadius,         // Camera Z: Same initial position
-        planetPosition.x,          // Target X: Earth center
-        planetPosition.y,          // Target Y: Earth center
-        planetPosition.z,          // Target Z: Earth center
-        true                      // Enable smooth transition
-      );
-
-      // Reset camera constraints to initial values
-      setMinDistance(scaledRadius * 20);
-      cameraControlsRef.current.maxDistance = moonOrbitRadius * 20;
-
-      toggleCameraTransitioning(false);
+    if (activeCamera.name === 'newton') {
+      console.log('Newton camera activated, setting transition');
+      toggleCameraTransitioning(true);
     }
-  }, [experimentStatus]);
+  }, [activeCamera.name]);
 
   // console.log({ isCameraTransitioning })
   useEffect(() => {
