@@ -393,7 +393,7 @@ const Planet = ({ name = 'Earth', textures }) => {
         >
           <sphereGeometry args={[planetSphereRadius, detailLevel, detailLevel / 2]} />
           {((!isPlanetSelected && !renderMoons()) && texturesLoaded) ?
-            <meshBasicMaterial color={color} />
+            <meshBasicMaterial map={textures?.map} />
             :
             <>
               {name === "Earth" && isPlanetSelected &&
