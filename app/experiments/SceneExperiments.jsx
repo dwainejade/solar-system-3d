@@ -11,10 +11,10 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
 const Scene = () => {
-  const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, setViewOnlyMode } = useStore();
-  const { planetPositions, selectedPlanet, setSelectedPlanet, selectedMoon, setSelectedMoon, planetsData, moonsData, moonPositions, resetPlanetsData } = usePlanetStore();
-  const { satelliteCamera, isCameraTransitioning, toggleCameraTransitioning, isZoomingToSun, resetCamera, toggleZoomingToSun, activeCamera, setActiveCamera, switchToCustomCamera, satelliteCameraState, setSatelliteCameraState } = useCameraStore();
-  const { experimentPlanet, experimentType, experimentStatus } = useExperimentsStore();
+  const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed } = useStore();
+  const { planetPositions, selectedPlanet, selectedMoon, setSelectedMoon, planetsData, moonsData, moonPositions } = usePlanetStore();
+  const { satelliteCamera, isCameraTransitioning, toggleCameraTransitioning, isZoomingToSun, resetCamera, toggleZoomingToSun, activeCamera, switchToCustomCamera, satelliteCameraState, setSatelliteCameraState } = useCameraStore();
+  const { experimentPlanet, experimentType, } = useExperimentsStore();
 
   const cameraControlsRef = useRef();
   const [minDistance, setMinDistance] = useState(200);

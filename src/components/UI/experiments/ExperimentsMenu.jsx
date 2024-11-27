@@ -47,10 +47,6 @@ const Menu = () => {
     setMenuOpen(!isMenuOpen);
   };
 
-  const handleResetBtn = () => {
-    toggleResetAllModal(true);
-  };
-
   const handleResetAll = () => {
     resetExperiments();
     resetAllData();
@@ -62,6 +58,7 @@ const Menu = () => {
 
   const disablePlanetSelect = () => {
     if (experimentType === 'newton-1') return true;
+    if (experimentType === 'kepler-3') return true;
   };
 
   // Get available speed options based on experiment type

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import useStore, { usePlanetStore } from "../../../store/store";
 import useExperimentsStore from "../../../store/experiments";
+import initialPlanetsData, { G } from "../../../data/planetsData";
 import { getSpeedValue } from "../../../helpers/utils";
 import Slider from "../../../components/UI/Slider";
 
@@ -11,8 +12,8 @@ function KeplerTwo() {
   const selectedPlanet = experimentPlanet;
 
   // Initialize eccentricity from planet data
-  const [eccentricity, setEccentricity] = useState(planetsData[selectedPlanet].eccentricity);
-  const originalEccentricity = 0.054; // Saturn's original eccentricity
+  const originalEccentricity = initialPlanetsData[selectedPlanet].eccentricity;
+  const [eccentricity, setEccentricity] = useState(originalEccentricity);
 
   const handleIncrement = () => {
     const newValue = Math.min(0.9, eccentricity + 0.01);
@@ -49,6 +50,7 @@ function KeplerTwo() {
     setSimSpeed(1);
     updatePlanetData(selectedPlanet, { eccentricity: originalEccentricity, initialOrbitalAngle: 0 });
     setExperimentStatus(null);
+    console.log("reset");
   };
   // Update local eccentricity if planet data changes externally
   useEffect(() => {
@@ -72,6 +74,7 @@ function KeplerTwo() {
           min={0}
           max={0.9}
           markers={["0", ".9"]}
+          step={0.01}
           onDecrement={handleDecrement}
           onIncrement={handleIncrement}
           onSliderChange={handleSliderChange}
