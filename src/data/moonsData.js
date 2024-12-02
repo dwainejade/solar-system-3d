@@ -391,24 +391,24 @@ const moonsData = {
       gravity: 0.017, // m/s²
       gravitationalAcceleration: 0.017, // m/s²
     },
-    {
-      name: "Phoebe",
-      id: "saturn-phoebe",
-      parentName: "Saturn",
-      mass: 8.292e18, // kg
-      orbitalRadius: 12952000, // km
-      radius: 106.5, // km
-      orbitalPeriod: 550.31, // days (retrograde)
-      orbitalInclination: 175.3, // degrees (retrograde)
-      eccentricity: 0.163,
-      color: "#4A4A4A", // dark grey
-      orbitalSpeed: 1.71, // km/s
-      axialTilt: 0, // degrees
-      rotationPeriod: 9.274, // hours
-      surfaceTemp: -193, // °C
-      gravity: 0.049, // m/s²
-      gravitationalAcceleration: 0.049, // m/s²
-    },
+    // {
+    //   name: "Phoebe",
+    //   id: "saturn-phoebe",
+    //   parentName: "Saturn",
+    //   mass: 8.292e18, // kg
+    //   orbitalRadius: 12952000, // km
+    //   radius: 106.5, // km
+    //   orbitalPeriod: 550.31, // days (retrograde)
+    //   orbitalInclination: 175.3, // degrees (retrograde)
+    //   eccentricity: 0.163,
+    //   color: "#4A4A4A", // dark grey
+    //   orbitalSpeed: 1.71, // km/s
+    //   axialTilt: 0, // degrees
+    //   rotationPeriod: 9.274, // hours
+    //   surfaceTemp: -193, // °C
+    //   gravity: 0.049, // m/s²
+    //   gravitationalAcceleration: 0.049, // m/s²
+    // },
     {
       name: "Janus",
       id: "saturn-janus",
