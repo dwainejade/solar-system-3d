@@ -131,22 +131,6 @@ const Scene = () => {
         const optimalDistance = calculateOptimalDistance(scaledRadius);
         setMinDistance(optimalDistance / 2);
 
-        const currentTarget = new THREE.Vector3();
-        const currentPosition = new THREE.Vector3();
-        cameraControlsRef.current.getTarget(currentTarget);
-        cameraControlsRef.current.getPosition(currentPosition);
-
-        // Calculate percentage of movement completed
-        const targetPosition = new THREE.Vector3(moonPosition.x, moonPosition.y, moonPosition.z);
-        const totalDistance = targetPosition.distanceTo(currentPosition);
-        const remainingDistance = currentTarget.distanceTo(targetPosition);
-        const percentComplete = 1 - remainingDistance / totalDistance;
-
-        if (percentComplete > 0.99) {
-          // Consider transition complete at 95%
-          toggleCameraTransitioning(false);
-        }
-
         cameraControlsRef.current.setTarget(moonPosition.x, moonPosition.y, moonPosition.z, true);
         cameraControlsRef.current.dollyTo(optimalDistance, true);
       }

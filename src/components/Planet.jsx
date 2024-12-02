@@ -505,7 +505,7 @@ const Planet = ({ name = 'Earth', textures }) => {
           lineWidth={1}
           opacity={orbitPathOpacity}
           hiRes={isPlanetSelected}
-          arcLength={0.9}
+          arcLength={0.75}
           position={localRef.current?.position}
           orbitalPeriod={orbitalPeriod} // Ensure OrbitPath handles retrograde correctly
         />
