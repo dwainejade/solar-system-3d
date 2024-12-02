@@ -31,7 +31,7 @@ function KeplerThree() {
     const remainingDays = Math.round(periodInDays % 365.25);
     if (years === 0) return `${remainingDays} days`;
     if (remainingDays === 0) return `${years > 1 ? `${years} years` : `${years} year`}`;
-    return `${years} years, ${remainingDays} days`;
+    return `${years > 1 ? `${years} years` : `${years} year`}, ${remainingDays} days`;
   };
 
   const handleUpdatePlanetData = newAU => {
