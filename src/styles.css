@@ -414,6 +414,12 @@ body {
     width: 16px;
   }
 }
+.Main .switch input:focus-visible + .slider {
+  outline: 1px solid white;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px #005fcc !important;
+  transition: outline 0s;
+}
 .Main .switch input:checked + .slider {
   background-color: #969b17;
 }
