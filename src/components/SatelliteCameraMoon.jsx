@@ -116,9 +116,10 @@ const MoonSatelliteCamera = ({ target, size, targetName, bodyType = 'moon' }) =>
 
         if (activeCamera.name === targetName && !satelliteCamera) {
             const distance = orbitCamera.position.distanceTo(targetWorldPos);
-            const sizeThreshold = Math.max(size * 5, 0.1);
+            const sizeThreshold = Math.max(size * 5, 0.01);
 
             if (distance <= sizeThreshold) {
+                toggleSatelliteCamera(false);
                 switchCamera(orbitCamera);
             }
             return;
