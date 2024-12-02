@@ -46,6 +46,7 @@
   background-color: transparent;
   border: transparent 2px solid;
   color: #717171;
+  font-weight: bold;
 }
 .planet-selector-item.active,
 .speed-selector-item.active,
