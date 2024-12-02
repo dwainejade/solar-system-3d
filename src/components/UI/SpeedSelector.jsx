@@ -156,7 +156,7 @@ const SpeedSelector = ({ simSpeed, speedOptions, onSpeedSelect, disable }) => {
               onMouseLeave={handleMouseLeave}
               tabIndex={focusedIndex === index + 1 ? 0 : -1}
               isFocused={focusedIndex === index + 1}
-            ></MenuItem>
+            />
           ))}
         </div>
       )}

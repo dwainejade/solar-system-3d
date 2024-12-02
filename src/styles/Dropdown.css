@@ -12,7 +12,7 @@
   cursor: pointer;
   font-size: 13px;
   font-weight: bold;
-  width: 122px;
+  width: 120px;
   height: 34px;
   display: flex;
   align-items: center;
@@ -20,6 +20,10 @@
   text-align: left;
   color: #717171;
   padding: 4px 8px;
+  &:disabled {
+    cursor: not-allowed;
+    background-color: #999;
+  }
 }
 .planet-selector-menu,
 .speed-selector-menu {

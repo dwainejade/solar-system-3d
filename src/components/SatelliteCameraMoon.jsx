@@ -26,7 +26,7 @@ const MoonSatelliteCamera = ({ target, size, targetName, bodyType = 'moon' }) =>
     const sphericalRef = useRef(new THREE.Spherical(size * 6, Math.PI / 2, 0));
 
     const minZoom = size * 4;
-    const maxZoom = 1000;
+    const maxZoom = 10000;
     const zoomSpeed = 0.02;
 
     const handleUserInteraction = useCallback(() => {
