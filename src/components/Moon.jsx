@@ -196,7 +196,7 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
           hiRes={isMoonSelected}
           lineWidth={isMoonSelected ? 2 : 1}
           position={localRef.current?.position}
-          arcLength={.9}
+          arcLength={.8}
           orbitalPeriod={orbitalPeriod}
         />
       )}
