@@ -61,6 +61,7 @@ const PlanetSelector = ({
   onMoonSelect,
   onAsteroidBeltSelect,
   onSolarSystemSelect,
+  disabled = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState(null);
@@ -301,7 +302,7 @@ const PlanetSelector = ({
 
   return (
     <div ref={dropdownRef} className='planet-selector' onKeyDown={handleKeyDown}>
-      <button className='planet-selector-button' onClick={() => setIsOpen(!isOpen)} aria-haspopup='true' aria-expanded={isOpen}>
+      <button className='planet-selector-button' onClick={() => setIsOpen(!isOpen)} aria-haspopup='true' aria-expanded={isOpen} disabled={disabled}>
         {getActiveLabel()}
       </button>
 

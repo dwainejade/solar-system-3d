@@ -183,7 +183,6 @@ const Menu = () => {
     return false;
   };
 
-
   return (
     <div className={`menu-wrapper ${showResetAllModal || showResetPlanetModal ? "disabled" : "enabled"}`}>
       <div className={`auto-rotate-text ${textClass}`}>{displayText}</div>
@@ -205,6 +204,7 @@ const Menu = () => {
               onMoonSelect={handleMoonSelect}
               onSolarSystemSelect={handleSolarSystemSelect}
               onAsteroidBeltSelect={handleAsteroidBeltSelect}
+              disabled={!isMenuOpen}
             />
           </div>
 
@@ -218,16 +218,16 @@ const Menu = () => {
         <div className='right-con'>
           <div className='menu-item'>
             <label htmlFor='orbitPathToggle'>Orbit Paths</label>
-            <div className='switch' onClick={() => toggleOrbitPaths(!orbitPaths)} disabled={!isMenuOpen}>
-              <input id='orbitPathToggle' type='checkbox' checked={orbitPaths} onChange={() => { }} style={{ display: "none" }} />
+            <div className='switch' onClick={() => toggleOrbitPaths(!orbitPaths)}>
+              <input id='orbitPathToggle' type='checkbox' checked={orbitPaths} onChange={() => { }} disabled={!isMenuOpen} />
               <div className='slider round'></div>
             </div>
           </div>
 
           <div className='menu-item'>
             <label htmlFor='labelToggle'>Labels</label>
-            <div className='switch' onClick={() => toggleDisplayLabels(!displayLabels)} disabled={!isMenuOpen}>
-              <input id='labelToggle' type='checkbox' checked={displayLabels} onChange={() => { }} style={{ display: "none" }} />
+            <div className='switch' onClick={() => toggleDisplayLabels(!displayLabels)}>
+              <input id='labelToggle' type='checkbox' checked={displayLabels} onChange={() => { }} disabled={!isMenuOpen} />
               <div className='slider round'></div>
             </div>
           </div>
