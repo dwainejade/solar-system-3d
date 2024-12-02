@@ -16,7 +16,7 @@ function OrbitPath({
   position,
   orbitalPeriod
 }) {
-  const segments = hiRes ? 512 : 64;
+  const segments = hiRes ? 512 : 128;
   const isRetrograde = orbitalPeriod < 0;
 
   // Extract position components for dependency tracking
