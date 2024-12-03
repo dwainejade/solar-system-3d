@@ -60,7 +60,7 @@ function ExperimentsModal() {
               Second Law (Equal Areas) <span>{">"}</span>
             </button>
             <button className='btn' onClick={() => handleExperiementType("kepler-3")}>
-              Third Law (Distance & period rel) <span>{">"}</span>
+              Third Law (Distance and Period Relation) <span>{">"}</span>
             </button>
           </div>
         </div>

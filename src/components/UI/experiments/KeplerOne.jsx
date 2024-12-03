@@ -55,10 +55,11 @@ function KeplerOne() {
   };
 
   useEffect(() => {
+    handleReset();
     return () => {
       handleReset();
     };
-  }, []);
+  }, [selectedPlanet]);
 
   return (
     <>
@@ -70,6 +71,7 @@ function KeplerOne() {
           min={0}
           max={0.9}
           markers={["0", ".9"]}
+          step={0.01}
           onDecrement={handleDecrement}
           onIncrement={handleIncrement}
           onSliderChange={handleSliderChange}
@@ -88,7 +90,11 @@ function KeplerOne() {
         </div>
       </div>
       <footer className='experiment-footer'>
-        <button className={`btn start-btn ${experimentMode ? "active" : ""}`} onClick={handleStartExperiment}>
+        <button
+          className={`btn start-btn ${experimentMode ? "active" : ""}`}
+          onClick={handleStartExperiment}
+          disabled={experimentStatus === "started"}
+        >
           Start Experiment
         </button>
         <button className='btn reset-btn' onClick={handleReset}>

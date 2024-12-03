@@ -26,7 +26,7 @@ const MoonSatelliteCamera = ({ target, size, targetName, bodyType = 'moon' }) =>
     const sphericalRef = useRef(new THREE.Spherical(size * 6, Math.PI / 2, 0));
 
     const minZoom = size * 4;
-    const maxZoom = 1000;
+    const maxZoom = 10000;
     const zoomSpeed = 0.02;
 
     const handleUserInteraction = useCallback(() => {
@@ -116,9 +116,10 @@ const MoonSatelliteCamera = ({ target, size, targetName, bodyType = 'moon' }) =>
 
         if (activeCamera.name === targetName && !satelliteCamera) {
             const distance = orbitCamera.position.distanceTo(targetWorldPos);
-            const sizeThreshold = Math.max(size * 5, 0.1);
+            const sizeThreshold = Math.max(size * 5, 0.01);
 
             if (distance <= sizeThreshold) {
+                toggleSatelliteCamera(false);
                 switchCamera(orbitCamera);
             }
             return;

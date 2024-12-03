@@ -102,37 +102,29 @@ const SceneThree = () => {
       }
     }
 
-    if (activeCamera.type === 'moon') {
+    if (activeCamera.type === "moon") {
       const moonPosition = moonPositions[activeCamera.name];
       const moon = findMoonByName(activeCamera.name, activeCamera.parentName);
+
       if (moonPosition && moon) {
-        // Adjust scaling for better moon visibility
+        const currentPosition = new THREE.Vector3();
+        cameraControlsRef.current.getPosition(currentPosition);
+
         const scaledRadius = moon.radius * moonSizeScaleFactor;
         const optimalDistance = calculateOptimalDistance(scaledRadius);
-
-        // Set a reasonable minimum distance for viewing moons
         setMinDistance(optimalDistance / 2);
 
-        // Update camera target and distance
-        cameraControlsRef.current.setTarget(
+        cameraControlsRef.current.setLookAt(
+          currentPosition.x,
+          currentPosition.y,
+          currentPosition.z,
           moonPosition.x,
           moonPosition.y,
           moonPosition.z,
           true
         );
 
-        // Adjust dollyTo distance for better moon viewing
         cameraControlsRef.current.dollyTo(optimalDistance, true);
-
-        // Track transition completion
-        const currentTarget = new THREE.Vector3();
-        cameraControlsRef.current.getTarget(currentTarget);
-        const distanceToTarget = currentTarget.distanceTo(new THREE.Vector3(moonPosition.x, moonPosition.y, moonPosition.z));
-
-        if (distanceToTarget < 0.1) {
-          // toggleZoomingToSun(false);
-          toggleCameraTransitioning(false);
-        }
       }
     }
 

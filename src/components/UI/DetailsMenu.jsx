@@ -31,7 +31,7 @@ const DetailsMenu = () => {
   const { isEditing, setIsEditing, showDetailsMenu, toggleDetailsMenu, viewOnlyMode } = useStore();
   const { selectedPlanet, updatePlanetData, planetsData, moonsData: currentMoonsData, handleBodyReset, showResetPlanetModal, showResetAllModal, toggleResetPlanetModal, selectedMoon, updateMoonData } = usePlanetStore();
   const [editableBodyData, setEditableBodyData] = useState({});
-  const { activeCamera } = useCameraStore();
+  const { activeCamera, isCameraTransitioning } = useCameraStore();
 
   useEffect(() => {
     if (activeCamera.type === 'planet' || activeCamera.name === 'Sun') {
@@ -284,6 +284,13 @@ const DetailsMenu = () => {
 
                 {selectedPlanet?.name !== 'Sun' &&
                   <div className="item w2">
+                    <label htmlFor="eccentricity">Eccentricity:</label>
+                    <span className="value">{editableBodyData.eccentricity}</span>
+                  </div>
+                }
+
+                {selectedPlanet?.name !== 'Sun' &&
+                  <div className="item w2">
                     <label htmlFor="orbitalPeriod">Orbital Period:</label>
                     <span className="value">{formatScientificNotation(editableBodyData.orbitalPeriod)} days</span>
                   </div>
@@ -325,11 +332,11 @@ const DetailsMenu = () => {
 
                 {selectedPlanet?.name !== 'Sun' && !viewOnlyMode &&
                   <div className='button-con'>
-                    <button onClick={isEditing ? handleSave : toggleEditing} className='edit-planet-btn btn'>
+                    <button onClick={isEditing ? handleSave : toggleEditing} className='edit-planet-btn btn' disabled={isCameraTransitioning}>
                       {isEditing ? "Save Values" : "Adjust Values"}
                     </button>
 
-                    <button onClick={handleReset} className='reset-planet-btn btn'>
+                    <button onClick={handleReset} className='reset-planet-btn btn' disabled={isCameraTransitioning}>
                       Reset Values
                     </button>
                   </div>

@@ -222,11 +222,16 @@ const Scene = () => {
       const orbitalRadius = planet.orbitalRadius * distanceScaleFactor;
       const eccentricity = planet.eccentricity;
       const centerOffset = orbitalRadius / 2 * eccentricity;
+      let zoomMultiplier = 5;
+
+      if (experimentType === 'kepler-3') {
+        zoomMultiplier = 25;
+      }
 
       // Position camera above the orbit's center
       cameraControlsRef.current.setPosition(
         centerOffset,
-        orbitalRadius * 5,
+        orbitalRadius * zoomMultiplier,
         0,
         true
       );

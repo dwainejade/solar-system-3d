@@ -126,11 +126,11 @@ function NewtonGravity() {
         {newtonOneStatus &&
           <div className='description-con'>
             {newtonOneStatus === 'stable' &&
-              <p>This is the normal gravitational force between the earth and the moon, causing its expected orbit.</p>}
-            {newtonOneStatus === 'collided' &&
-              <p>The increased gravitational force between the earth and the moon cause the moon to crash into the earth. Uh oh!</p>}
+              <p>This is the normal gravitational force between the Earth and the Moon, causing its expected orbit.</p>}
+            {newtonOneStatus === 'colliede' &&
+              <p>The increased gravitational force between the Earth and the Moon causes the Moon to crash into the Earth. Uh oh!</p>}
             {newtonOneStatus === 'escaped' &&
-              <p>The decreased gravitational force between the earth and the moon caused the moon to fly off into space. Uh oh!</p>}
+              <p>The decreased gravitational force between the Earth and the Moon caused the moon to fly off into space. Uh oh!</p>}
           </div>
         }
       </div>

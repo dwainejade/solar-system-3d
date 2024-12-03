@@ -50,7 +50,6 @@ function KeplerTwo() {
     setSimSpeed(1);
     updatePlanetData(selectedPlanet, { eccentricity: originalEccentricity, initialOrbitalAngle: 0 });
     setExperimentStatus(null);
-    console.log("reset");
   };
   // Update local eccentricity if planet data changes externally
   useEffect(() => {
@@ -74,7 +73,7 @@ function KeplerTwo() {
           min={0}
           max={0.9}
           markers={["0", ".9"]}
-          step={0.01}
+          step={0.001}
           onDecrement={handleDecrement}
           onIncrement={handleIncrement}
           onSliderChange={handleSliderChange}
@@ -87,19 +86,23 @@ function KeplerTwo() {
 
         <div className='details-con'>
           <p>
-            Eccentricity: <span>{eccentricity}</span>
+            Eccentricity: <span>{eccentricity.toFixed(4)}</span>
           </p>
         </div>
 
         <div className='description-con'>
           <p>
-            Kepler's second law states that a planet sweeps out equal areas in equal times, moving faster when the planet is closer to the
+            A planet sweeps out equal areas in equal times, moving faster when the planet is closer to the
             Sun and slower when it is farther away.
           </p>
         </div>
       </div>
       <footer className='experiment-footer'>
-        <button className={`btn start-btn ${experimentStatus ? "active" : ""}`} onClick={handleStartExperiment} disabled={experimentStatus}>
+        <button
+          className={`btn start-btn ${experimentStatus ? "active" : ""}`}
+          onClick={handleStartExperiment}
+          disabled={experimentStatus}
+        >
           Start Experiment
         </button>
         <button className='btn reset-btn' onClick={handleReset}>

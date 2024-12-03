@@ -53,8 +53,6 @@ const Menu = () => {
   const [textClass, setTextClass] = useState("");
   const [displayText, setDisplayText] = useState("");
 
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [hoveredPlanetName, setHoveredPlanetName] = useState(null); // Track which planet's moons are displayed
 
   const toggleMenu = () => {
     setMenuOpen(!isMenuOpen);
@@ -74,15 +72,12 @@ const Menu = () => {
   };
 
   useEffect(() => {
-    setIsDropdownOpen(false);
     if (activeCamera.type === "planet") {
       setSelectedPlanet(planetsData[activeCamera.name]);
-      // setSelectedMoon(null);
       toggleDetailsMenu(true);
     }
 
     if (activeCamera.type === "moon") {
-      // setSelectedPlanet(null);
       const moon = moonsData[activeCamera.parentName]?.find(m => m.name === activeCamera.name);
       setSelectedMoon(moon);
       toggleDetailsMenu(true);
@@ -90,7 +85,6 @@ const Menu = () => {
 
     if (activeCamera.name === "Asteroid Belt") {
       setSelectedPlanet(null);
-      // setSelectedMoon(null);
       toggleDetailsMenu(true);
     }
   }, [activeCamera]);
@@ -102,7 +96,7 @@ const Menu = () => {
     { label: "-1 day /s", value: -86400 },
     { label: "-1 hour /s", value: -3600 },
     { label: "-1 minute /s", value: -60 },
-    { label: "Real-time", value: 1 },
+    { label: "real time", value: 1 },
     { label: "1 minute /s", value: 60 },
     { label: "1 hour /s", value: 3600 },
     { label: "1 day /s", value: 86400 },
@@ -112,10 +106,6 @@ const Menu = () => {
   ];
 
   const handleSpeedChange = event => {
-    // const newSpeed = parseInt(event.target.value, 10);
-    // setSimSpeed(newSpeed);
-    // setPrevSpeed(newSpeed);
-
     const newSpeed = parseInt(event, 10);
     setSimSpeed(newSpeed);
     setPrevSpeed(newSpeed);
@@ -145,7 +135,6 @@ const Menu = () => {
     setSelectedMoon(null);
     toggleDetailsMenu(true);
     switchToCustomCamera("Asteroid Belt");
-    setIsDropdownOpen(false);
   };
 
   useLayoutEffect(() => {
@@ -183,7 +172,6 @@ const Menu = () => {
     return false;
   };
 
-
   return (
     <div className={`menu-wrapper ${showResetAllModal || showResetPlanetModal ? "disabled" : "enabled"}`}>
       <div className={`auto-rotate-text ${textClass}`}>{displayText}</div>
@@ -194,6 +182,7 @@ const Menu = () => {
       <div className={`bottom-menu ${isMenuOpen ? "open" : "closed"}`}>
         <button onClick={toggleMenu} className='menu-toggle-btn btn' />
 
+        {/* Left side - dropdowns */}
         <div className='left-con'>
           <div className='menu-item'>
             <label>Select a Planet</label>
@@ -205,30 +194,37 @@ const Menu = () => {
               onMoonSelect={handleMoonSelect}
               onSolarSystemSelect={handleSolarSystemSelect}
               onAsteroidBeltSelect={handleAsteroidBeltSelect}
+              isDisabled={!isMenuOpen}
+              enableSubmenu={true}
             />
           </div>
 
           <div className='menu-item'>
             <label htmlFor='simSpeedSelect'>Simulation Speed</label>
-            <SpeedSelector simSpeed={simSpeed} speedOptions={speedOptions} onSpeedSelect={handleSpeedChange} disable={disableSpeedToggle} />
+            <SpeedSelector
+              simSpeed={simSpeed}
+              speedOptions={speedOptions}
+              onSpeedSelect={handleSpeedChange}
+              isDisabled={disableSpeedToggle()} />
           </div>
         </div>
 
+        {/* Right side - switches */}
         <div className='divider' />
         <div className='right-con'>
           <div className='menu-item'>
             <label htmlFor='orbitPathToggle'>Orbit Paths</label>
-            <div className='switch' onClick={() => toggleOrbitPaths(!orbitPaths)} disabled={!isMenuOpen}>
-              <input id='orbitPathToggle' type='checkbox' checked={orbitPaths} onChange={() => { }} style={{ display: "none" }} />
-              <div className='slider round'></div>
+            <div className='switch' onClick={() => toggleOrbitPaths(!orbitPaths)}>
+              <input id='orbitPathToggle' type='checkbox' checked={orbitPaths} disabled={!isMenuOpen} />
+              <div className='slider round' />
             </div>
           </div>
 
           <div className='menu-item'>
             <label htmlFor='labelToggle'>Labels</label>
-            <div className='switch' onClick={() => toggleDisplayLabels(!displayLabels)} disabled={!isMenuOpen}>
-              <input id='labelToggle' type='checkbox' checked={displayLabels} onChange={() => { }} style={{ display: "none" }} />
-              <div className='slider round'></div>
+            <div className='switch' onClick={() => toggleDisplayLabels(!displayLabels)}>
+              <input id='labelToggle' type='checkbox' checked={displayLabels} disabled={!isMenuOpen} />
+              <div className='slider round' />
             </div>
           </div>
         </div>

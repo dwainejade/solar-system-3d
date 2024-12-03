@@ -7,15 +7,38 @@ import { sizeScaleFactor } from "@/data/planetsData";
 import { moonSizeScaleFactor } from "@/data/moonsData";
 import Sun from "@/components/Sun";
 import Planet from "@/components/Planet";
-import Stars from "@/components/Stars"
+import Stars from "@/components/Stars";
 import { useFrame } from "@react-three/fiber";
 import AsteroidBelt from "@/components/asteroids/AsteroidBelt";
 import * as THREE from "three";
 
 const Scene = () => {
   const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, setViewOnlyMode, toggleDetailsMenu } = useStore();
-  const { planetPositions, selectedPlanet, setSelectedPlanet, selectedMoon, setSelectedMoon, planetsData, moonsData, moonPositions, resetPlanetsData } = usePlanetStore();
-  const { satelliteCamera, isCameraTransitioning, toggleCameraTransitioning, isZoomingToSun, resetCamera, toggleZoomingToSun, activeCamera, setActiveCamera, setSceneCameras, sceneCameras, satelliteCameraState, setSatelliteCameraState } = useCameraStore();
+  const {
+    planetPositions,
+    selectedPlanet,
+    setSelectedPlanet,
+    selectedMoon,
+    setSelectedMoon,
+    planetsData,
+    moonsData,
+    moonPositions,
+    resetPlanetsData,
+  } = usePlanetStore();
+  const {
+    satelliteCamera,
+    isCameraTransitioning,
+    toggleCameraTransitioning,
+    isZoomingToSun,
+    resetCamera,
+    toggleZoomingToSun,
+    activeCamera,
+    setActiveCamera,
+    setSceneCameras,
+    sceneCameras,
+    satelliteCameraState,
+    setSatelliteCameraState,
+  } = useCameraStore();
   const { experimentMode, toggleExperimentMode } = useExperimentsStore();
 
   const cameraControlsRef = useRef();
@@ -28,7 +51,6 @@ const Scene = () => {
   const defaultCameraPosition = [20000, 20000, 20000];
   const initialTarget = [0, 0, 0];
   const transitioning = useRef(false);
-
 
   useEffect(() => {
     if (cameraControlsRef.current && !hasInitialized) {
@@ -46,7 +68,7 @@ const Scene = () => {
   }, [cameraControlsRef.current]);
 
   // Update the calculateOptimalDistance function to handle moons better
-  const calculateOptimalDistance = (radius) => {
+  const calculateOptimalDistance = radius => {
     const baseDistance = 4.2;
     return radius * baseDistance;
   };
@@ -62,7 +84,6 @@ const Scene = () => {
     if (!cameraControlsRef.current) return;
 
     if (satelliteCameraState?.position && isCameraTransitioning) {
-
       const { position, targetPosition } = satelliteCameraState;
 
       // First set position and target instantly to avoid starting from 0,0,0
@@ -88,7 +109,7 @@ const Scene = () => {
       setSatelliteCameraState(null);
     }
 
-    if (activeCamera.type === 'planet' && activeCamera.name !== 'Sun') {
+    if (activeCamera.type === "planet" && activeCamera.name !== "Sun") {
       const planetPosition = planetPositions[selectedPlanet.name];
 
       // setSelectedMoon(null);
@@ -102,41 +123,20 @@ const Scene = () => {
       }
     }
 
-    if (activeCamera.type === 'moon') {
+    if (activeCamera.type === "moon") {
       const moonPosition = moonPositions[activeCamera.name];
       const moon = findMoonByName(activeCamera.name, activeCamera.parentName);
       if (moonPosition && moon) {
-        // Adjust scaling for better moon visibility
         const scaledRadius = moon.radius * moonSizeScaleFactor;
         const optimalDistance = calculateOptimalDistance(scaledRadius);
-        console.log(scaledRadius, optimalDistance)
-
-        // Set a reasonable minimum distance for viewing moons
         setMinDistance(optimalDistance / 2);
-        // Update camera target and distance
-        cameraControlsRef.current.setTarget(
-          moonPosition.x,
-          moonPosition.y,
-          moonPosition.z,
-          true
-        );
 
-        // Adjust dollyTo distance for better moon viewing
+        cameraControlsRef.current.setTarget(moonPosition.x, moonPosition.y, moonPosition.z, true);
         cameraControlsRef.current.dollyTo(optimalDistance, true);
-
-        // Track transition completion
-        const currentTarget = new THREE.Vector3();
-        cameraControlsRef.current.getTarget(currentTarget);
-        const distanceToTarget = currentTarget.distanceTo(new THREE.Vector3(moonPosition.x, moonPosition.y, moonPosition.z));
-
-        if (distanceToTarget < 0.1) {
-          // toggleZoomingToSun(false);
-          toggleCameraTransitioning(false);
-        }
       }
     }
 
-    if (activeCamera.name === 'Sun' && transitioning.current) {
+    if (activeCamera.name === "Sun" && transitioning.current) {
       const currentTarget = new THREE.Vector3();
       const currentPosition = new THREE.Vector3();
       cameraControlsRef.current.getTarget(currentTarget);
@@ -156,13 +156,11 @@ const Scene = () => {
       }
     }
 
-    if (activeCamera.name === 'Asteroid Belt' && transitioning.current) {
+    if (activeCamera.name === "Asteroid Belt" && transitioning.current) {
       const currentPosition = new THREE.Vector3();
       cameraControlsRef.current.getPosition(currentPosition);
       const targetPosition = activeCamera.position;
-      const distanceToTarget = currentPosition.distanceTo(
-        new THREE.Vector3(targetPosition.x, targetPosition.y, targetPosition.z)
-      );
+      const distanceToTarget = currentPosition.distanceTo(new THREE.Vector3(targetPosition.x, targetPosition.y, targetPosition.z));
 
       if (distanceToTarget < 100) {
         transitioning.current = false;
@@ -170,18 +168,13 @@ const Scene = () => {
         // Enable manual control
         cameraControlsRef.current.enabled = true;
       } else {
-        cameraControlsRef.current.setPosition(
-          targetPosition.x,
-          targetPosition.y,
-          targetPosition.z,
-          true
-        );
+        cameraControlsRef.current.setPosition(targetPosition.x, targetPosition.y, targetPosition.z, true);
         cameraControlsRef.current.setTarget(0, 0, 0, true);
       }
     }
 
     // Handle orbit camera transition
-    if (activeCamera.name === 'default' && isCameraTransitioning) {
+    if (activeCamera.name === "default" && isCameraTransitioning) {
       const targetPosition = activeCamera.position;
       const targetLookAt = activeCamera.lookAt;
 
@@ -210,9 +203,9 @@ const Scene = () => {
     }
 
     // When in orbit mode but not transitioning, allow free movement
-    if (activeCamera.type === 'orbit' && !isCameraTransitioning) {
+    if (activeCamera.type === "orbit" && !isCameraTransitioning) {
       setMinDistance(200);
-      cameraControlsRef.current.maxDistance = maxDistance
+      cameraControlsRef.current.maxDistance = maxDistance;
     }
   });
 
@@ -235,25 +228,25 @@ const Scene = () => {
 
   // Handle camera mode changes
   useEffect(() => {
-    if (activeCamera.name === 'Sun' || activeCamera.name === 'Asteroid Belt') {
+    if (activeCamera.name === "Sun" || activeCamera.name === "Asteroid Belt") {
       transitioning.current = true;
       // Temporarily disable manual control during transition
       cameraControlsRef.current.enabled = false;
       setSelectedMoon(null);
       setSelectedPlanet(null);
 
-      if (activeCamera.name === 'Sun') {
+      if (activeCamera.name === "Sun") {
         setMinDistance(200);
         cameraControlsRef.current.maxDistance = 1000;
-      } else if (activeCamera.name === 'Asteroid Belt') {
+      } else if (activeCamera.name === "Asteroid Belt") {
         const beltDistance = 5000;
         setMinDistance(beltDistance * 0.85);
         cameraControlsRef.current.maxDistance = beltDistance * 1.8;
       }
     }
 
-    if ((activeCamera.type === "planet" || activeCamera.type === "moon")) {
-      if (simSpeed === 0) return
+    if (activeCamera.type === "planet" || activeCamera.type === "moon") {
+      if (simSpeed === 0) return;
       toggleCameraTransitioning(true);
       setPrevSpeed(simSpeed);
       setSimSpeed(0);
@@ -265,8 +258,8 @@ const Scene = () => {
   useEffect(() => {
     setViewOnlyMode(true); // disable details menu
     toggleExperimentMode(false);
-    resetPlanetsData()
-    const handleMouseDown = (event) => {
+    resetPlanetsData();
+    const handleMouseDown = event => {
       if (event.button === 1) {
         event.preventDefault();
       }
@@ -275,13 +268,12 @@ const Scene = () => {
       }
     };
 
-    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener("mousedown", handleMouseDown);
 
     return () => {
-      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener("mousedown", handleMouseDown);
     };
   }, []);
-
 
   const earthTextures = useTexture({
     map: "../assets/earth/earth_daymap.jpg",
@@ -289,7 +281,7 @@ const Scene = () => {
   });
   const sunTextures = useTexture({
     map: "../assets/sun/sun.jpg",
-  })
+  });
   const venusTextures = useTexture({
     map: "../assets/venus/venus_surface.jpg",
   });
@@ -320,38 +312,32 @@ const Scene = () => {
     minDistance: minDistance,
     near: 0.0001,
     far: 20000000,
-    smoothTime: .6,
+    smoothTime: 0.6,
     enableDamping: true,
     draggingSmoothTime: 0.25, // Smooth drag movement
-    azimuthRotateSpeed: 1,     // Horizontal rotation speed
-    polarRotateSpeed: 1,       // Vertical rotation speed
-    dollySpeed: .4,
+    azimuthRotateSpeed: 1, // Horizontal rotation speed
+    polarRotateSpeed: 1, // Vertical rotation speed
+    dollySpeed: 0.4,
   };
 
   return (
     <>
-      <CameraControls
-        ref={cameraControlsRef}
-        makeDefault={!satelliteCamera}
-        enabled={!satelliteCamera}
-        {...cameraConfig}
-      />
+      <CameraControls ref={cameraControlsRef} makeDefault={!satelliteCamera} enabled={!satelliteCamera} {...cameraConfig} />
 
       <Stars />
 
-      <Planet name="Earth" textures={earthTextures} />
-      <Planet name="Mars" textures={marsTextures} />
-      <Planet name="Venus" textures={venusTextures} />
-      <Planet name="Mercury" textures={mercuryTextures} />
-      <Planet name="Jupiter" textures={jupiterTextures} />
-      <Planet name="Saturn" textures={saturnTextures} />
-      <Planet name="Uranus" textures={uranusTextures} />
-      <Planet name="Neptune" textures={neptuneTextures} />
+      <Planet name='Earth' textures={earthTextures} />
+      <Planet name='Mars' textures={marsTextures} />
+      <Planet name='Venus' textures={venusTextures} />
+      <Planet name='Mercury' textures={mercuryTextures} />
+      <Planet name='Jupiter' textures={jupiterTextures} />
+      <Planet name='Saturn' textures={saturnTextures} />
+      <Planet name='Uranus' textures={uranusTextures} />
+      <Planet name='Neptune' textures={neptuneTextures} />
 
       <AsteroidBelt meshCount={2500} />
 
       <Sun key={"Sun-plain"} textures={sunTextures} position={sunSettings.position} resetCamera={resetCamera} />
-
     </>
   );
 };

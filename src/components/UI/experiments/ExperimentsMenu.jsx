@@ -3,6 +3,8 @@ import React, { useState, useEffect, useLayoutEffect } from "react";
 import useStore, { usePlanetStore, useCameraStore } from "../../../store/store";
 import useExperimentsStore from "../../../store/experiments";
 import ExperimentsModal from "./ExperimentsModal";
+import PlanetSelector from "../PlanetSelector";
+import SpeedSelector from "../SpeedSelector";
 
 const SPEED_OPTIONS = {
   "-1 year /s": -31557600,
@@ -11,7 +13,7 @@ const SPEED_OPTIONS = {
   "-1 day /s": -86400,
   "-1 hour /s": -3600,
   "-1 minute /s": -60,
-  "Real-time": 1,
+  "real time": 1,
   "1 minute /s": 60,
   "1 hour /s": 3600,
   "1 day /s": 86400,
@@ -20,7 +22,6 @@ const SPEED_OPTIONS = {
   "1 year /s": 31557600
 };
 
-// max speeds for each experiment type
 const EXPERIMENT_SPEED_LIMITS = {
   'kepler-1': "1 year /s",
   'kepler-2': "1 month /s",
@@ -29,19 +30,16 @@ const EXPERIMENT_SPEED_LIMITS = {
   'default': "1 year /s"
 };
 
-
-const Menu = () => {
-  const { resetExperiments, experimentPlanet, setExperimentPlanet, experimentStatus, experimentType } = useExperimentsStore();
-  const { simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, toggleFullscreen, resetAllData, } = useStore();
-  const { displayLabels, toggleDisplayLabels, planetsData, showResetPlanetModal, showResetAllModal, toggleResetAllModal, orbitPaths, toggleOrbitPaths } = usePlanetStore();
-  const { isCameraTransitioning, autoRotate, activeCamera } = useCameraStore();
+const ExperimentsMenu = () => {
+  const { resetExperiments, setExperimentPlanet, experimentPlanet, experimentStatus, experimentType } = useExperimentsStore();
+  const { simSpeed, setSimSpeed, setPrevSpeed, toggleFullscreen, resetAllData } = useStore();
+  const { displayLabels, toggleDisplayLabels, planetsData, showResetPlanetModal, showResetAllModal, orbitPaths, toggleOrbitPaths } = usePlanetStore();
+  const { autoRotate } = useCameraStore();
 
   const [firstRender, setFirstRender] = useState(true);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [textClass, setTextClass] = useState('');
   const [displayText, setDisplayText] = useState('');
-
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const toggleMenu = () => {
     setMenuOpen(!isMenuOpen);
@@ -56,31 +54,40 @@ const Menu = () => {
     toggleFullscreen();
   };
 
+  const handleSpeedChange = (speedValue) => {
+    setSimSpeed(speedValue);
+  };
+
   const disablePlanetSelect = () => {
     if (experimentType === 'newton-1') return true;
     if (experimentType === 'kepler-3') return true;
+    return false;
   };
 
-  // Get available speed options based on experiment type
   const getSpeedOptions = () => {
     if (!experimentType) {
-      return Object.entries(SPEED_OPTIONS);
+      // Format the options properly
+      return Object.entries(SPEED_OPTIONS).map(([label, value]) => ({
+        label,
+        value
+      }));
     }
 
     const maxSpeed = EXPERIMENT_SPEED_LIMITS[experimentType] || EXPERIMENT_SPEED_LIMITS.default;
     const allOptions = Object.entries(SPEED_OPTIONS);
-
-    // Find the index of "Real-time" and maxSpeed
-    const startIndex = allOptions.findIndex(([key]) => key === "Real-time");
+    const startIndex = allOptions.findIndex(([key]) => key === "real time");
     const maxIndex = allOptions.findIndex(([key]) => key === maxSpeed);
 
-    return allOptions.slice(startIndex, maxIndex + 1);
+    // Format the sliced options properly
+    return allOptions.slice(startIndex, maxIndex + 1)
+      .map(([label, value]) => ({
+        label,
+        value
+      }));
   };
-
 
   const handlePlanetSelect = (planetName) => {
     setExperimentPlanet(planetName);
-    setIsDropdownOpen(false); // Close dropdown after selection
   };
 
   useLayoutEffect(() => {
@@ -89,22 +96,21 @@ const Menu = () => {
   }, []);
 
   useEffect(() => {
-    // do not show on initial render
     if (firstRender) {
       setFirstRender(false);
       toggleMenu(true);
-      return
+      return;
     }
 
     setTextClass('slideIn');
     setDisplayText(`Auto-Rotate ${autoRotate ? "On" : "Off"}`);
     const timer1 = setTimeout(() => {
       setTextClass('slideOut');
-    }, 1500); // display text for 1.5 seconds
+    }, 1500);
 
     const timer2 = setTimeout(() => {
       setDisplayText('');
-    }, 2500); // Total duration
+    }, 2500);
 
     return () => {
       clearTimeout(timer1);
@@ -114,16 +120,23 @@ const Menu = () => {
 
   useEffect(() => {
     return () => {
-      handleResetAll()
-    }
+      handleResetAll();
+    };
   }, []);
 
   const disableSpeedToggle = () => {
     if (experimentStatus !== 'started') return true;
-    else if (!isMenuOpen) return true;
+    if (!isMenuOpen) return true;
     return false;
   };
 
+  const handleOrbitPathsChange = (e) => {
+    toggleOrbitPaths(!orbitPaths);
+  };
+
+  const handleLabelsChange = (e) => {
+    toggleDisplayLabels(!displayLabels);
+  };
 
   return (
     <div className={`menu-wrapper ${showResetAllModal || showResetPlanetModal ? "disabled" : "enabled"}`}>
@@ -137,54 +150,26 @@ const Menu = () => {
         <button onClick={toggleMenu} className="menu-toggle-btn btn" />
 
         <div className="left-con">
-          <div className="menu-item">
+          <div className='menu-item'>
             <label>Select a Planet</label>
-            <div className="dropdown-container">
-              <button
-                className="dropdown-trigger"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                disabled={!isMenuOpen || experimentStatus || disablePlanetSelect()}
-              >
-                {experimentPlanet}
-              </button>
-
-
-              <div className="item-wrapper">
-                {isDropdownOpen && (
-                  <ul className="dropdown-menu">
-                    {/* <li onClick={handleSolarSystemSelect}>Solar System</li> */}
-                    {Object.keys(planetsData)
-                      .filter((planetName) => planetName !== 'Sun')
-                      .map((planetName) => (
-                        <li
-                          key={planetName}
-                          className="dropdown-item"
-                          onClick={() => handlePlanetSelect(planetName)}
-                        >
-                          {planetName}
-                        </li>
-                      ))}
-                    {/* <li onClick={handleAsteroidBeltSelect}>Asteroid Belt</li> */}
-                  </ul>
-                )}
-              </div>
-            </div>
+            <PlanetSelector
+              planetsData={planetsData}
+              activeCamera={experimentPlanet}
+              onPlanetSelect={handlePlanetSelect}
+              isDisabled={!isMenuOpen || experimentStatus || disablePlanetSelect()}
+              enableSubmenu={false}
+              showOnlyPlanets={true}
+            />
           </div>
 
           <div className="menu-item">
             <label htmlFor="simSpeedSelect">Simulation Speed</label>
-            <select
-              id="simSpeedSelect"
-              onChange={(e) => setSimSpeed(SPEED_OPTIONS[e.target.value])}
-              value={Object.entries(SPEED_OPTIONS).find(([_, v]) => v === simSpeed)?.[0] || "Real-time"}
-              disabled={disableSpeedToggle()}
-            >
-              {getSpeedOptions().map(([label, value]) => (
-                <option key={label} value={label}>
-                  {label}
-                </option>
-              ))}
-            </select>
+            <SpeedSelector
+              simSpeed={simSpeed}
+              speedOptions={getSpeedOptions()}
+              onSpeedSelect={handleSpeedChange}
+              isDisabled={disableSpeedToggle()}
+            />
           </div>
         </div>
 
@@ -192,13 +177,13 @@ const Menu = () => {
         <div className="right-con">
           <div className="menu-item">
             <label htmlFor="orbitPathToggle">Orbit Paths</label>
-            <div className="switch" onClick={() => toggleOrbitPaths(!orbitPaths)} disabled={!isMenuOpen}>
+            <div className="switch" onClick={handleOrbitPathsChange} disabled={!isMenuOpen}>
               <input
                 id="orbitPathToggle"
                 type="checkbox"
                 checked={orbitPaths}
-                onChange={() => { }}
-                style={{ display: "none" }}
+                onChange={handleOrbitPathsChange}
+                disabled={!isMenuOpen}
               />
               <div className="slider round"></div>
             </div>
@@ -206,13 +191,13 @@ const Menu = () => {
 
           <div className="menu-item">
             <label htmlFor="labelToggle">Labels</label>
-            <div className="switch" onClick={() => toggleDisplayLabels(!displayLabels)} disabled={!isMenuOpen}>
+            <div className="switch" onClick={handleLabelsChange} disabled={!isMenuOpen}>
               <input
                 id="labelToggle"
                 type="checkbox"
                 checked={displayLabels}
-                onChange={() => { }}
-                style={{ display: "none" }}
+                onChange={handleLabelsChange}
+                disabled={!isMenuOpen}
               />
               <div className="slider round"></div>
             </div>
@@ -221,9 +206,8 @@ const Menu = () => {
       </div>
 
       <ExperimentsModal />
-
     </div>
   );
 };
 
-export default Menu;
+export default ExperimentsMenu;
