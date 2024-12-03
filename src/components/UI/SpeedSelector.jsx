@@ -4,13 +4,9 @@ import "../../styles/Dropdown.css";
 const MenuItem = ({
   label,
   isActive,
-  hasSubmenu,
   onSelect,
-  children,
-  showSubmenu,
   onMouseEnter,
   onMouseLeave,
-  isSubmenuItem = false,
   isHighlighted = false,
   onKeyDown,
   tabIndex,
