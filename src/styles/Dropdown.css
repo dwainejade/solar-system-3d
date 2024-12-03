@@ -6,11 +6,10 @@
 }
 .planet-selector-button,
 .speed-selector-button {
-  background-color: #fdf5e8;
+  background-color: #fff5e6;
   color: #333333;
   border: 0;
   cursor: pointer;
-  font-size: 13px;
   font-weight: bold;
   width: 120px;
   height: 34px;
@@ -18,29 +17,30 @@
   align-items: center;
   justify-content: space-between;
   text-align: left;
-  color: #717171;
+  color: #333;
   padding: 4px 8px;
-  &:disabled {
-    cursor: not-allowed;
-    background-color: #999;
-  }
+}
+.planet-selector-button:disabled,
+.speed-selector-button:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 .planet-selector-menu,
 .speed-selector-menu {
   position: absolute;
   bottom: 100%;
   right: 0;
-  background-color: #fdf5e8;
+  background-color: #fff5e6;
   color: #333333;
   margin-bottom: 4px;
-  min-width: 140px;
+  width: 120px;
   z-index: 1000;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
 }
 .planet-selector-item,
 .speed-selector-item {
-  padding: 4px 8px;
-  font-size: 0.95rem;
+  padding: 2px 4px;
+  font-size: 0.85rem;
   color: #333333;
   cursor: pointer;
   display: flex;
@@ -49,7 +49,7 @@
   position: relative;
   background-color: transparent;
   border: transparent 2px solid;
-  color: #717171;
+  color: #666;
   font-weight: bold;
 }
 .planet-selector-item.active,
@@ -96,9 +96,9 @@
   position: absolute;
   left: 100%;
   bottom: 0;
-  background-color: #fdf5e8;
+  background-color: #fff5e6;
   border: 1px solid #333333;
-  min-width: 120px;
+  width: 120px;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
   visibility: hidden;
   opacity: 0;
