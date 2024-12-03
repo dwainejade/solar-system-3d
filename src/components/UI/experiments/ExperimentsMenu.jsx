@@ -142,6 +142,8 @@ const Menu = () => {
               activeCamera={experimentPlanet}
               onPlanetSelect={handlePlanetSelect}
               disabled={!isMenuOpen || experimentStatus || disablePlanetSelect()}
+              enableSubmenu={false}
+              showOnlyPlanets={true}  // Add this prop
             />
           </div>
 

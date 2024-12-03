@@ -127,7 +127,7 @@ const moonsData = {
       orbitalPeriod: 1.769,
       orbitalInclination: 0.05,
       eccentricity: 0.0041,
-      color: "yellow",
+      color: "#fef46d",
       orbitalSpeed: 17.334,
       axialTilt: 0.0,
       rotationPeriod: 1.769,
@@ -146,7 +146,7 @@ const moonsData = {
       orbitalPeriod: 0.498, // days
       orbitalInclination: 0.374, // degrees
       eccentricity: 0.003,
-      color: "#8B0000", // dark red
+      color: "#a77057", // hazelnut
       orbitalSpeed: 26.57, // km/s
       axialTilt: 0, // degrees
       rotationPeriod: 0.498, // days (synchronous)
@@ -182,7 +182,7 @@ const moonsData = {
       orbitalPeriod: 0.295, // days
       orbitalInclination: 0.06, // degrees
       eccentricity: 0.0012,
-      color: "#8B4513", // reddish-brown
+      color: "#708090", // slate-gray
       orbitalSpeed: 31.5, // km/s
       axialTilt: 0, // degrees
       rotationPeriod: 0.295, // days (synchronous)
