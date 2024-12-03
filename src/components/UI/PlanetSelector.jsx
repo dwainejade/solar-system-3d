@@ -66,7 +66,7 @@ const PlanetSelector = ({
   onMoonSelect,
   onSolarSystemSelect,
   onAsteroidBeltSelect,
-  disabled = false,
+  isDisabled = false,
   enableSubmenu = false,
   showOnlyPlanets = false
 }) => {
@@ -247,7 +247,7 @@ const PlanetSelector = ({
         onClick={() => setIsOpen(!isOpen)}
         aria-haspopup='true'
         aria-expanded={isOpen}
-        disabled={disabled}
+        disabled={isDisabled}
       >
         {getActiveLabel()}
       </button>

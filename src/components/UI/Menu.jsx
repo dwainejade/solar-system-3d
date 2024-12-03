@@ -53,7 +53,6 @@ const Menu = () => {
   const [textClass, setTextClass] = useState("");
   const [displayText, setDisplayText] = useState("");
 
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const toggleMenu = () => {
     setMenuOpen(!isMenuOpen);
@@ -73,7 +72,6 @@ const Menu = () => {
   };
 
   useEffect(() => {
-    setIsDropdownOpen(false);
     if (activeCamera.type === "planet") {
       setSelectedPlanet(planetsData[activeCamera.name]);
       toggleDetailsMenu(true);
@@ -137,7 +135,6 @@ const Menu = () => {
     setSelectedMoon(null);
     toggleDetailsMenu(true);
     switchToCustomCamera("Asteroid Belt");
-    setIsDropdownOpen(false);
   };
 
   useLayoutEffect(() => {
@@ -197,14 +194,18 @@ const Menu = () => {
               onMoonSelect={handleMoonSelect}
               onSolarSystemSelect={handleSolarSystemSelect}
               onAsteroidBeltSelect={handleAsteroidBeltSelect}
-              disabled={!isMenuOpen}
+              isDisabled={!isMenuOpen}
               enableSubmenu={true}
             />
           </div>
 
           <div className='menu-item'>
             <label htmlFor='simSpeedSelect'>Simulation Speed</label>
-            <SpeedSelector simSpeed={simSpeed} speedOptions={speedOptions} onSpeedSelect={handleSpeedChange} disable={disableSpeedToggle} />
+            <SpeedSelector
+              simSpeed={simSpeed}
+              speedOptions={speedOptions}
+              onSpeedSelect={handleSpeedChange}
+              isDisabled={disableSpeedToggle()} />
           </div>
         </div>
 

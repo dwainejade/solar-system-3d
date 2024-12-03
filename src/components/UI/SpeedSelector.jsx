@@ -40,7 +40,7 @@ const MenuItem = ({
   );
 };
 
-const SpeedSelector = ({ simSpeed, speedOptions, onSpeedSelect, disable }) => {
+const SpeedSelector = ({ simSpeed, speedOptions, onSpeedSelect, isDisabled }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(7);
   const [selectedOption, setSelectedOption] = useState("real time");
@@ -137,15 +137,17 @@ const SpeedSelector = ({ simSpeed, speedOptions, onSpeedSelect, disable }) => {
 
   return (
     <div className='speed-selector' ref={speedDropdownRef} onKeyDown={handleKeyDown}>
-      <button onClick={toggleDropdown} className='speed-selector-button' disabled={disable()} aria-haspopup='true' aria-expanded={isOpen}>
+      <button
+        onClick={toggleDropdown}
+        className='speed-selector-button'
+        disabled={isDisabled}
+        aria-haspopup='true'
+        aria-expanded={isOpen}>
         {selectedOption}
       </button>
       {isOpen && (
         <div className='speed-selector-menu' role='menu' aria-label='Planet selection menu'>
           {speedOptions.map((option, index) => (
-            // <div className='speed-selector-item' key={index} value={option.value} onClick={() => handleOptionClick(option)} role='menuitem'>
-            //   {option.label}
-            // </div>
             <MenuItem
               key={option.label}
               label={option.label}

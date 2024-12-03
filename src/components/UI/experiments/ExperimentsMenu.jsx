@@ -4,6 +4,7 @@ import useStore, { usePlanetStore, useCameraStore } from "../../../store/store";
 import useExperimentsStore from "../../../store/experiments";
 import ExperimentsModal from "./ExperimentsModal";
 import PlanetSelector from "../PlanetSelector";
+import SpeedSelector from "../SpeedSelector";
 
 const SPEED_OPTIONS = {
   "-1 year /s": -31557600,
@@ -21,7 +22,6 @@ const SPEED_OPTIONS = {
   "1 year /s": 31557600
 };
 
-// max speeds for each experiment type
 const EXPERIMENT_SPEED_LIMITS = {
   'kepler-1': "1 year /s",
   'kepler-2': "1 month /s",
@@ -30,8 +30,7 @@ const EXPERIMENT_SPEED_LIMITS = {
   'default': "1 year /s"
 };
 
-
-const Menu = () => {
+const ExperimentsMenu = () => {
   const { resetExperiments, setExperimentPlanet, experimentPlanet, experimentStatus, experimentType } = useExperimentsStore();
   const { simSpeed, setSimSpeed, setPrevSpeed, toggleFullscreen, resetAllData } = useStore();
   const { displayLabels, toggleDisplayLabels, planetsData, showResetPlanetModal, showResetAllModal, orbitPaths, toggleOrbitPaths } = usePlanetStore();
@@ -55,12 +54,16 @@ const Menu = () => {
     toggleFullscreen();
   };
 
+  const handleSpeedChange = (speedValue) => {
+    setSimSpeed(speedValue);
+  };
+
   const disablePlanetSelect = () => {
     if (experimentType === 'newton-1') return true;
     if (experimentType === 'kepler-3') return true;
+    return false;
   };
 
-  // Get available speed options based on experiment type
   const getSpeedOptions = () => {
     if (!experimentType) {
       return Object.entries(SPEED_OPTIONS);
@@ -68,14 +71,11 @@ const Menu = () => {
 
     const maxSpeed = EXPERIMENT_SPEED_LIMITS[experimentType] || EXPERIMENT_SPEED_LIMITS.default;
     const allOptions = Object.entries(SPEED_OPTIONS);
-
-    // Find the index of "real time" and maxSpeed
     const startIndex = allOptions.findIndex(([key]) => key === "real time");
     const maxIndex = allOptions.findIndex(([key]) => key === maxSpeed);
 
     return allOptions.slice(startIndex, maxIndex + 1);
   };
-
 
   const handlePlanetSelect = (planetName) => {
     setExperimentPlanet(planetName);
@@ -87,22 +87,21 @@ const Menu = () => {
   }, []);
 
   useEffect(() => {
-    // do not show on initial render
     if (firstRender) {
       setFirstRender(false);
       toggleMenu(true);
-      return
+      return;
     }
 
     setTextClass('slideIn');
     setDisplayText(`Auto-Rotate ${autoRotate ? "On" : "Off"}`);
     const timer1 = setTimeout(() => {
       setTextClass('slideOut');
-    }, 1500); // display text for 1.5 seconds
+    }, 1500);
 
     const timer2 = setTimeout(() => {
       setDisplayText('');
-    }, 2500); // Total duration
+    }, 2500);
 
     return () => {
       clearTimeout(timer1);
@@ -112,16 +111,15 @@ const Menu = () => {
 
   useEffect(() => {
     return () => {
-      handleResetAll()
-    }
+      handleResetAll();
+    };
   }, []);
 
   const disableSpeedToggle = () => {
     if (experimentStatus !== 'started') return true;
-    else if (!isMenuOpen) return true;
+    if (!isMenuOpen) return true;
     return false;
   };
-
 
   return (
     <div className={`menu-wrapper ${showResetAllModal || showResetPlanetModal ? "disabled" : "enabled"}`}>
@@ -134,7 +132,6 @@ const Menu = () => {
       <div className={`bottom-menu ${isMenuOpen ? "open" : "closed"}`}>
         <button onClick={toggleMenu} className="menu-toggle-btn btn" />
 
-        {/* Left side - dropdowns */}
         <div className="left-con">
           <div className='menu-item'>
             <label>Select a Planet</label>
@@ -142,7 +139,7 @@ const Menu = () => {
               planetsData={planetsData}
               activeCamera={experimentPlanet}
               onPlanetSelect={handlePlanetSelect}
-              disabled={!isMenuOpen || experimentStatus || disablePlanetSelect()}
+              isDisabled={!isMenuOpen || experimentStatus || disablePlanetSelect()}
               enableSubmenu={false}
               showOnlyPlanets={true}
             />
@@ -150,22 +147,15 @@ const Menu = () => {
 
           <div className="menu-item">
             <label htmlFor="simSpeedSelect">Simulation Speed</label>
-            <select
-              id="simSpeedSelect"
-              onChange={(e) => setSimSpeed(SPEED_OPTIONS[e.target.value])}
-              value={Object.entries(SPEED_OPTIONS).find(([_, v]) => v === simSpeed)?.[0] || "real time"}
-              disabled={disableSpeedToggle()}
-            >
-              {getSpeedOptions().map(([label, value]) => (
-                <option key={label} value={label}>
-                  {label}
-                </option>
-              ))}
-            </select>
+            <SpeedSelector
+              simSpeed={simSpeed}
+              speedOptions={getSpeedOptions()}
+              onSpeedSelect={handleSpeedChange}
+              isDisabled={disableSpeedToggle()}
+            />
           </div>
         </div>
 
-        {/* Right side - switches */}
         <div className="divider" />
         <div className="right-con">
           <div className="menu-item">
@@ -195,9 +185,8 @@ const Menu = () => {
       </div>
 
       <ExperimentsModal />
-
     </div>
   );
 };
 
-export default Menu;
+export default ExperimentsMenu;

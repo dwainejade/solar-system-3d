@@ -565,40 +565,6 @@ body {
   font-size: 1rem;
   font-weight: 600;
 }
-#planetSelection,
-#simSpeedSelect,
-.speed-selector {
-  background-color: #fff5e6;
-  color: #717171;
-  font-weight: bold;
-  border: none;
-  width: 120px;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  border-radius: 0;
-}
-@media screen and (max-width: 500px) {
-  #planetSelection,
-  #simSpeedSelect,
-  .speed-selector {
-    width: 90px;
-  }
-}
-@media screen and (max-width: 400px) {
-  #planetSelection,
-  #simSpeedSelect,
-  .speed-selector {
-    width: 80px;
-  }
-}
-@media screen and (max-width: 300px) {
-  #planetSelection,
-  #simSpeedSelect,
-  .speed-selector {
-    width: 70px;
-  }
-}
 .auto-rotate-text {
   position: absolute;
   top: 0;
@@ -625,4 +591,3 @@ body {
   transform: translateY(-20px);
   /* Start position for slide-out effect */
 }
-/* Styles for the dropdown container */
