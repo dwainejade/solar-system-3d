@@ -66,7 +66,11 @@ const ExperimentsMenu = () => {
 
   const getSpeedOptions = () => {
     if (!experimentType) {
-      return Object.entries(SPEED_OPTIONS);
+      // Format the options properly
+      return Object.entries(SPEED_OPTIONS).map(([label, value]) => ({
+        label,
+        value
+      }));
     }
 
     const maxSpeed = EXPERIMENT_SPEED_LIMITS[experimentType] || EXPERIMENT_SPEED_LIMITS.default;
@@ -74,7 +78,12 @@ const ExperimentsMenu = () => {
     const startIndex = allOptions.findIndex(([key]) => key === "real time");
     const maxIndex = allOptions.findIndex(([key]) => key === maxSpeed);
 
-    return allOptions.slice(startIndex, maxIndex + 1);
+    // Format the sliced options properly
+    return allOptions.slice(startIndex, maxIndex + 1)
+      .map(([label, value]) => ({
+        label,
+        value
+      }));
   };
 
   const handlePlanetSelect = (planetName) => {
@@ -121,6 +130,14 @@ const ExperimentsMenu = () => {
     return false;
   };
 
+  const handleOrbitPathsChange = (e) => {
+    toggleOrbitPaths(!orbitPaths);
+  };
+
+  const handleLabelsChange = (e) => {
+    toggleDisplayLabels(!displayLabels);
+  };
+
   return (
     <div className={`menu-wrapper ${showResetAllModal || showResetPlanetModal ? "disabled" : "enabled"}`}>
       <div className={`auto-rotate-text ${textClass}`}>
@@ -160,11 +177,13 @@ const ExperimentsMenu = () => {
         <div className="right-con">
           <div className="menu-item">
             <label htmlFor="orbitPathToggle">Orbit Paths</label>
-            <div className="switch" onClick={() => toggleOrbitPaths(!orbitPaths)} disabled={!isMenuOpen}>
+            <div className="switch" onClick={handleOrbitPathsChange} disabled={!isMenuOpen}>
               <input
                 id="orbitPathToggle"
                 type="checkbox"
                 checked={orbitPaths}
+                onChange={handleOrbitPathsChange}
+                disabled={!isMenuOpen}
               />
               <div className="slider round"></div>
             </div>
@@ -172,11 +191,13 @@ const ExperimentsMenu = () => {
 
           <div className="menu-item">
             <label htmlFor="labelToggle">Labels</label>
-            <div className="switch" onClick={() => toggleDisplayLabels(!displayLabels)} disabled={!isMenuOpen}>
+            <div className="switch" onClick={handleLabelsChange} disabled={!isMenuOpen}>
               <input
                 id="labelToggle"
                 type="checkbox"
                 checked={displayLabels}
+                onChange={handleLabelsChange}
+                disabled={!isMenuOpen}
               />
               <div className="slider round"></div>
             </div>
