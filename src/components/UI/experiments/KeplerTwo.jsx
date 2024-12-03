@@ -50,7 +50,6 @@ function KeplerTwo() {
     setSimSpeed(1);
     updatePlanetData(selectedPlanet, { eccentricity: originalEccentricity, initialOrbitalAngle: 0 });
     setExperimentStatus(null);
-    console.log("reset");
   };
   // Update local eccentricity if planet data changes externally
   useEffect(() => {
@@ -74,7 +73,7 @@ function KeplerTwo() {
           min={0}
           max={0.9}
           markers={["0", ".9"]}
-          step={0.01}
+          step={0.001}
           onDecrement={handleDecrement}
           onIncrement={handleIncrement}
           onSliderChange={handleSliderChange}
@@ -87,7 +86,7 @@ function KeplerTwo() {
 
         <div className='details-con'>
           <p>
-            Eccentricity: <span>{eccentricity}</span>
+            Eccentricity: <span>{eccentricity.toFixed(4)}</span>
           </p>
         </div>
 
