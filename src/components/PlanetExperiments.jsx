@@ -513,7 +513,7 @@ const Planet = ({ name = 'Earth', textures }) => {
           planetName={name}
           planetRef={localRef}
           angleRef={localAngleRef}  // Pass the ref directly
-          numTriangles={6}
+          numTriangles={8}
           radius={scaledOrbitalRadius}
           eccentricity={eccentricity}
           orbitalInclination={orbitalInclination}
