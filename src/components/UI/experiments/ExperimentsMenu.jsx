@@ -134,6 +134,7 @@ const Menu = () => {
       <div className={`bottom-menu ${isMenuOpen ? "open" : "closed"}`}>
         <button onClick={toggleMenu} className="menu-toggle-btn btn" />
 
+        {/* Left side - dropdowns */}
         <div className="left-con">
           <div className='menu-item'>
             <label>Select a Planet</label>
@@ -143,7 +144,7 @@ const Menu = () => {
               onPlanetSelect={handlePlanetSelect}
               disabled={!isMenuOpen || experimentStatus || disablePlanetSelect()}
               enableSubmenu={false}
-              showOnlyPlanets={true}  // Add this prop
+              showOnlyPlanets={true}
             />
           </div>
 
@@ -164,6 +165,7 @@ const Menu = () => {
           </div>
         </div>
 
+        {/* Right side - switches */}
         <div className="divider" />
         <div className="right-con">
           <div className="menu-item">
@@ -173,7 +175,6 @@ const Menu = () => {
                 id="orbitPathToggle"
                 type="checkbox"
                 checked={orbitPaths}
-                onChange={() => { }}
               />
               <div className="slider round"></div>
             </div>
@@ -186,7 +187,6 @@ const Menu = () => {
                 id="labelToggle"
                 type="checkbox"
                 checked={displayLabels}
-                onChange={() => { }}
               />
               <div className="slider round"></div>
             </div>

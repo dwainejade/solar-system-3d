@@ -54,7 +54,6 @@ const Menu = () => {
   const [displayText, setDisplayText] = useState("");
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [hoveredPlanetName, setHoveredPlanetName] = useState(null); // Track which planet's moons are displayed
 
   const toggleMenu = () => {
     setMenuOpen(!isMenuOpen);
@@ -77,12 +76,10 @@ const Menu = () => {
     setIsDropdownOpen(false);
     if (activeCamera.type === "planet") {
       setSelectedPlanet(planetsData[activeCamera.name]);
-      // setSelectedMoon(null);
       toggleDetailsMenu(true);
     }
 
     if (activeCamera.type === "moon") {
-      // setSelectedPlanet(null);
       const moon = moonsData[activeCamera.parentName]?.find(m => m.name === activeCamera.name);
       setSelectedMoon(moon);
       toggleDetailsMenu(true);
@@ -90,7 +87,6 @@ const Menu = () => {
 
     if (activeCamera.name === "Asteroid Belt") {
       setSelectedPlanet(null);
-      // setSelectedMoon(null);
       toggleDetailsMenu(true);
     }
   }, [activeCamera]);
@@ -112,10 +108,6 @@ const Menu = () => {
   ];
 
   const handleSpeedChange = event => {
-    // const newSpeed = parseInt(event.target.value, 10);
-    // setSimSpeed(newSpeed);
-    // setPrevSpeed(newSpeed);
-
     const newSpeed = parseInt(event, 10);
     setSimSpeed(newSpeed);
     setPrevSpeed(newSpeed);
@@ -193,6 +185,7 @@ const Menu = () => {
       <div className={`bottom-menu ${isMenuOpen ? "open" : "closed"}`}>
         <button onClick={toggleMenu} className='menu-toggle-btn btn' />
 
+        {/* Left side - dropdowns */}
         <div className='left-con'>
           <div className='menu-item'>
             <label>Select a Planet</label>
@@ -215,21 +208,22 @@ const Menu = () => {
           </div>
         </div>
 
+        {/* Right side - switches */}
         <div className='divider' />
         <div className='right-con'>
           <div className='menu-item'>
             <label htmlFor='orbitPathToggle'>Orbit Paths</label>
             <div className='switch' onClick={() => toggleOrbitPaths(!orbitPaths)}>
-              <input id='orbitPathToggle' type='checkbox' checked={orbitPaths} onChange={() => { }} disabled={!isMenuOpen} />
-              <div className='slider round'></div>
+              <input id='orbitPathToggle' type='checkbox' checked={orbitPaths} disabled={!isMenuOpen} />
+              <div className='slider round' />
             </div>
           </div>
 
           <div className='menu-item'>
             <label htmlFor='labelToggle'>Labels</label>
             <div className='switch' onClick={() => toggleDisplayLabels(!displayLabels)}>
-              <input id='labelToggle' type='checkbox' checked={displayLabels} onChange={() => { }} disabled={!isMenuOpen} />
-              <div className='slider round'></div>
+              <input id='labelToggle' type='checkbox' checked={displayLabels} disabled={!isMenuOpen} />
+              <div className='slider round' />
             </div>
           </div>
         </div>

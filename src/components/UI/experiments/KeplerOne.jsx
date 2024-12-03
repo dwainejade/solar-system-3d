@@ -88,7 +88,11 @@ function KeplerOne() {
         </div>
       </div>
       <footer className='experiment-footer'>
-        <button className={`btn start-btn ${experimentMode ? "active" : ""}`} onClick={handleStartExperiment}>
+        <button
+          className={`btn start-btn ${experimentMode ? "active" : ""}`}
+          onClick={handleStartExperiment}
+          disabled={experimentStatus === "started"}
+        >
           Start Experiment
         </button>
         <button className='btn reset-btn' onClick={handleReset}>

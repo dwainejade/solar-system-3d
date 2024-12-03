@@ -99,7 +99,11 @@ function KeplerTwo() {
         </div>
       </div>
       <footer className='experiment-footer'>
-        <button className={`btn start-btn ${experimentStatus ? "active" : ""}`} onClick={handleStartExperiment} disabled={experimentStatus}>
+        <button
+          className={`btn start-btn ${experimentStatus ? "active" : ""}`}
+          onClick={handleStartExperiment}
+          disabled={experimentStatus}
+        >
           Start Experiment
         </button>
         <button className='btn reset-btn' onClick={handleReset}>
