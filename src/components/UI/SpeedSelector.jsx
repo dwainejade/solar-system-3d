@@ -43,7 +43,7 @@ const MenuItem = ({
 const SpeedSelector = ({ simSpeed, speedOptions, onSpeedSelect, disable }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(7);
-  const [selectedOption, setSelectedOption] = useState("Realtime");
+  const [selectedOption, setSelectedOption] = useState("real time");
   const speedDropdownRef = useRef(null);
 
   const menuItems = [

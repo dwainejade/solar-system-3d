@@ -12,7 +12,7 @@ export const getSpeedValue = (key) => {
             return -3600;
         case "-1 minute /s":
             return -60;
-        case "Real-time":
+        case "real time":
             return 1;
         case "1 minute /s":
             return 60;
