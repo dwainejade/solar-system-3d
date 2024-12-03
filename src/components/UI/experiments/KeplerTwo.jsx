@@ -93,7 +93,7 @@ function KeplerTwo() {
 
         <div className='description-con'>
           <p>
-            Kepler's second law states that a planet sweeps out equal areas in equal times, moving faster when the planet is closer to the
+            A planet sweeps out equal areas in equal times, moving faster when the planet is closer to the
             Sun and slower when it is farther away.
           </p>
         </div>

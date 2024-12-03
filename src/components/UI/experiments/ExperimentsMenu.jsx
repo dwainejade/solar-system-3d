@@ -3,6 +3,7 @@ import React, { useState, useEffect, useLayoutEffect } from "react";
 import useStore, { usePlanetStore, useCameraStore } from "../../../store/store";
 import useExperimentsStore from "../../../store/experiments";
 import ExperimentsModal from "./ExperimentsModal";
+import PlanetSelector from "../PlanetSelector";
 
 const SPEED_OPTIONS = {
   "-1 year /s": -31557600,
@@ -11,7 +12,7 @@ const SPEED_OPTIONS = {
   "-1 day /s": -86400,
   "-1 hour /s": -3600,
   "-1 minute /s": -60,
-  "Real-time": 1,
+  "real time": 1,
   "1 minute /s": 60,
   "1 hour /s": 3600,
   "1 day /s": 86400,
@@ -31,17 +32,15 @@ const EXPERIMENT_SPEED_LIMITS = {
 
 
 const Menu = () => {
-  const { resetExperiments, experimentPlanet, setExperimentPlanet, experimentStatus, experimentType } = useExperimentsStore();
-  const { simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, toggleFullscreen, resetAllData, } = useStore();
-  const { displayLabels, toggleDisplayLabels, planetsData, showResetPlanetModal, showResetAllModal, toggleResetAllModal, orbitPaths, toggleOrbitPaths } = usePlanetStore();
-  const { isCameraTransitioning, autoRotate, activeCamera } = useCameraStore();
+  const { resetExperiments, setExperimentPlanet, experimentPlanet, experimentStatus, experimentType } = useExperimentsStore();
+  const { simSpeed, setSimSpeed, setPrevSpeed, toggleFullscreen, resetAllData } = useStore();
+  const { displayLabels, toggleDisplayLabels, planetsData, showResetPlanetModal, showResetAllModal, orbitPaths, toggleOrbitPaths } = usePlanetStore();
+  const { autoRotate } = useCameraStore();
 
   const [firstRender, setFirstRender] = useState(true);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [textClass, setTextClass] = useState('');
   const [displayText, setDisplayText] = useState('');
-
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const toggleMenu = () => {
     setMenuOpen(!isMenuOpen);
@@ -70,8 +69,8 @@ const Menu = () => {
     const maxSpeed = EXPERIMENT_SPEED_LIMITS[experimentType] || EXPERIMENT_SPEED_LIMITS.default;
     const allOptions = Object.entries(SPEED_OPTIONS);
 
-    // Find the index of "Real-time" and maxSpeed
-    const startIndex = allOptions.findIndex(([key]) => key === "Real-time");
+    // Find the index of "real time" and maxSpeed
+    const startIndex = allOptions.findIndex(([key]) => key === "real time");
     const maxIndex = allOptions.findIndex(([key]) => key === maxSpeed);
 
     return allOptions.slice(startIndex, maxIndex + 1);
@@ -80,7 +79,6 @@ const Menu = () => {
 
   const handlePlanetSelect = (planetName) => {
     setExperimentPlanet(planetName);
-    setIsDropdownOpen(false); // Close dropdown after selection
   };
 
   useLayoutEffect(() => {
@@ -137,38 +135,14 @@ const Menu = () => {
         <button onClick={toggleMenu} className="menu-toggle-btn btn" />
 
         <div className="left-con">
-          <div className="menu-item">
+          <div className='menu-item'>
             <label>Select a Planet</label>
-            <div className="dropdown-container">
-              <button
-                className="dropdown-trigger"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                disabled={!isMenuOpen || experimentStatus || disablePlanetSelect()}
-              >
-                {experimentPlanet}
-              </button>
-
-
-              <div className="item-wrapper">
-                {isDropdownOpen && (
-                  <ul className="dropdown-menu">
-                    {/* <li onClick={handleSolarSystemSelect}>Solar System</li> */}
-                    {Object.keys(planetsData)
-                      .filter((planetName) => planetName !== 'Sun')
-                      .map((planetName) => (
-                        <li
-                          key={planetName}
-                          className="dropdown-item"
-                          onClick={() => handlePlanetSelect(planetName)}
-                        >
-                          {planetName}
-                        </li>
-                      ))}
-                    {/* <li onClick={handleAsteroidBeltSelect}>Asteroid Belt</li> */}
-                  </ul>
-                )}
-              </div>
-            </div>
+            <PlanetSelector
+              planetsData={planetsData}
+              activeCamera={experimentPlanet}
+              onPlanetSelect={handlePlanetSelect}
+              disabled={!isMenuOpen || experimentStatus || disablePlanetSelect()}
+            />
           </div>
 
           <div className="menu-item">
@@ -176,7 +150,7 @@ const Menu = () => {
             <select
               id="simSpeedSelect"
               onChange={(e) => setSimSpeed(SPEED_OPTIONS[e.target.value])}
-              value={Object.entries(SPEED_OPTIONS).find(([_, v]) => v === simSpeed)?.[0] || "Real-time"}
+              value={Object.entries(SPEED_OPTIONS).find(([_, v]) => v === simSpeed)?.[0] || "real time"}
               disabled={disableSpeedToggle()}
             >
               {getSpeedOptions().map(([label, value]) => (
@@ -198,7 +172,6 @@ const Menu = () => {
                 type="checkbox"
                 checked={orbitPaths}
                 onChange={() => { }}
-                style={{ display: "none" }}
               />
               <div className="slider round"></div>
             </div>
@@ -212,7 +185,6 @@ const Menu = () => {
                 type="checkbox"
                 checked={displayLabels}
                 onChange={() => { }}
-                style={{ display: "none" }}
               />
               <div className="slider round"></div>
             </div>
