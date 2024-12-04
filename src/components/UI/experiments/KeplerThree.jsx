@@ -6,9 +6,14 @@ import { getSpeedValue } from "../../../helpers/utils";
 import Slider from "../../../components/UI/Slider";
 
 function KeplerThree() {
-  const { updatePlanetData, resetSinglePlanetData } = usePlanetStore();
-  const { setExperimentStatus, experimentStatus, setExperimentPlanet } = useExperimentsStore();
-  const { setSimSpeed } = useStore();
+  const updatePlanetData = usePlanetStore((state) => state.updatePlanetData);
+  const resetSinglePlanetData = usePlanetStore((state) => state.resetSinglePlanetData);
+
+  const setExperimentStatus = useExperimentsStore((state) => state.setExperimentStatus);
+  const experimentStatus = useExperimentsStore((state) => state.experimentStatus);
+  const setExperimentPlanet = useExperimentsStore((state) => state.setExperimentPlanet);
+
+  const setSimSpeed = useStore((state) => state.setSimSpeed);
 
   const selectedPlanet = "Earth";
 

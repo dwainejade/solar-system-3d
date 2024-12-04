@@ -6,9 +6,15 @@ import { getSpeedValue } from "../../../helpers/utils";
 import Slider from "../../../components/UI/Slider";
 
 function KeplerOne() {
-  const { planetsData: newPlanetsData, updatePlanetData, resetSinglePlanetData } = usePlanetStore();
-  const { setSimSpeed, simSpeed, prevSpeed } = useStore();
-  const { experimentMode, experimentPlanet, setExperimentStatus, experimentStatus } = useExperimentsStore();
+  const newPlanetsData = usePlanetStore((state) => state.planetsData);
+  const updatePlanetData = usePlanetStore((state) => state.updatePlanetData);
+
+  const setSimSpeed = useStore((state) => state.setSimSpeed);
+
+  const experimentMode = useExperimentsStore((state) => state.experimentMode);
+  const experimentPlanet = useExperimentsStore((state) => state.experimentPlanet);
+  const setExperimentStatus = useExperimentsStore((state) => state.setExperimentStatus);
+  const experimentStatus = useExperimentsStore((state) => state.experimentStatus);
 
   const selectedPlanet = experimentPlanet || "Earth";
 

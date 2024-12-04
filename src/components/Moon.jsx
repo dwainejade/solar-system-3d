@@ -36,8 +36,6 @@ const Moon = forwardRef(({ moonData, planetPosition, parentName, parentMeshRef }
   }), [radius, orbitalRadius, orbitalPeriod, orbitalInclination]);
 
   const {
-    isSurfaceCameraActive,
-    satelliteCamera,
     activeCamera,
     setAutoRotate,
     autoRotate,

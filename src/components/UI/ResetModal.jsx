@@ -2,7 +2,10 @@ import React from 'react'
 import { usePlanetStore } from '../../store/store';
 
 function ResetModal({ type, handleResetAll }) {
-    const { showResetPlanetModal, toggleResetPlanetModal, ShowResetAllModal, toggleResetAllModal, resetSinglePlanetData, selectedPlanet } = usePlanetStore();
+    const toggleResetPlanetModal = usePlanetStore((state) => state.toggleResetPlanetModal);
+    const toggleResetAllModal = usePlanetStore((state) => state.toggleResetAllModal);
+    const resetSinglePlanetData = usePlanetStore((state) => state.resetSinglePlanetData);
+    const selectedPlanet = usePlanetStore((state) => state.selectedPlanet);
 
     const description = type === 'all'
         ? 'Are you sure you want to reset all objects to their default values?'

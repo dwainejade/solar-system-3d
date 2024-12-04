@@ -6,9 +6,17 @@ import { getSpeedValue } from "../../../helpers/utils";
 import Slider from "../../../components/UI/Slider";
 
 function NewtonGravity() {
-  const { updatePlanetData, resetSinglePlanetData, updatePlanetPosition } = usePlanetStore();
-  const { setSimSpeed, simSpeed, prevSpeed } = useStore();
-  const { experimentPlanet, setExperimentPlanet, experimentStatus, setExperimentStatus, newtonOneStatus, setNewtonOneStatus } = useExperimentsStore();
+  const updatePlanetData = usePlanetStore((state) => state.updatePlanetData);
+  const resetSinglePlanetData = usePlanetStore((state) => state.resetSinglePlanetData);
+  const updatePlanetPosition = usePlanetStore((state) => state.updatePlanetPosition);
+
+  const setSimSpeed = useStore((state) => state.setSimSpeed);
+
+  const setExperimentPlanet = useExperimentsStore((state) => state.setExperimentPlanet);
+  const experimentStatus = useExperimentsStore((state) => state.experimentStatus);
+  const setExperimentStatus = useExperimentsStore((state) => state.setExperimentStatus);
+  const newtonOneStatus = useExperimentsStore((state) => state.newtonOneStatus);
+  const setNewtonOneStatus = useExperimentsStore((state) => state.setNewtonOneStatus);
 
   const selectedPlanet = "Earth";
   const [massScale, setMassScale] = useState(1);

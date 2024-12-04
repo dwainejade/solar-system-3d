@@ -10,7 +10,10 @@ import ExperimentsMenu from "../UI/experiments/ExperimentsMenu";
 import "../../styles.css";
 
 const SharedCanvas = ({ children, mode = 'main' }) => {
-  const { fullscreen, isLoading, toggleLoading } = useStore();
+  const fullscreen = useStore((state) => state.fullscreen);
+  const isLoading = useStore((state) => state.isLoading);
+  const toggleLoading = useStore((state) => state.toggleLoading);
+
   const { errors, loaded } = useProgress();
   const total = 17;
   const [dpr, setDpr] = useState([1, 2]);

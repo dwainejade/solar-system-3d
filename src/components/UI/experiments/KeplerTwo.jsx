@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from "react";
 import useStore, { usePlanetStore } from "../../../store/store";
 import useExperimentsStore from "../../../store/experiments";
-import initialPlanetsData, { G } from "../../../data/planetsData";
+import initialPlanetsData from "../../../data/planetsData";
 import { getSpeedValue } from "../../../helpers/utils";
 import Slider from "../../../components/UI/Slider";
 
 function KeplerTwo() {
-  const { planetsData, updatePlanetData } = usePlanetStore();
-  const { setSimSpeed, simSpeed, prevSpeed } = useStore();
-  const { experimentMode, experimentStatus, setExperimentStatus, experimentPlanet } = useExperimentsStore();
+  const planetsData = usePlanetStore((state) => state.planetsData);
+  const updatePlanetData = usePlanetStore((state) => state.updatePlanetData);
+
+  const setSimSpeed = useStore((state) => state.setSimSpeed);
+
+  const experimentMode = useExperimentsStore((state) => state.experimentMode);
+  const experimentStatus = useExperimentsStore((state) => state.experimentStatus);
+  const setExperimentStatus = useExperimentsStore((state) => state.setExperimentStatus);
+  const experimentPlanet = useExperimentsStore((state) => state.experimentPlanet);
   const selectedPlanet = experimentPlanet;
 
   // Initialize eccentricity from planet data

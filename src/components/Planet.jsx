@@ -81,7 +81,6 @@ const Planet = ({ name = 'Earth', textures }) => {
 
   const {
     radius = 1, // default values to prevent null
-    orbitalOrigin,
     orbitalRadius = 1,
     orbitalPeriod = 1,
     orbitalInclination = 0,
@@ -90,39 +89,34 @@ const Planet = ({ name = 'Earth', textures }) => {
     color = '#ffffff',
     initialOrbitalAngle = 0,
     eccentricity = 0,
-    mass
   } = mergedData;
 
-  const { simSpeed, toggleDetailsMenu } = useStore();
-  const {
-    planetAngles,
-    updatePlanetPosition,
-    selectedPlanet,
-    setSelectedPlanet,
-    moonSelected,
-    displayLabels,
-    selectedMoon,
-    setSelectedMoon,
-    orbitPaths
-  } = usePlanetStore();
+  // Optimized subscriptions from useStore
+  const simSpeed = useStore((state) => state.simSpeed);
+  const toggleDetailsMenu = useStore((state) => state.toggleDetailsMenu);
 
-  const {
-    isSurfaceCameraActive,
-    satelliteCamera,
-    toggleSatelliteCamera,
-    setAutoRotate,
-    autoRotate,
-    activeCamera,
-    switchToPlanetCamera,
-    toggleCameraTransitioning
-  } = useCameraStore();
+  // Optimized subscriptions from usePlanetStore
+  const planetAngles = usePlanetStore((state) => state.planetAngles);
+  const updatePlanetPosition = usePlanetStore((state) => state.updatePlanetPosition);
+  const selectedPlanet = usePlanetStore((state) => state.selectedPlanet);
+  const setSelectedPlanet = usePlanetStore((state) => state.setSelectedPlanet);
+  const displayLabels = usePlanetStore((state) => state.displayLabels);
+  const selectedMoon = usePlanetStore((state) => state.selectedMoon);
+  const setSelectedMoon = usePlanetStore((state) => state.setSelectedMoon);
+  const orbitPaths = usePlanetStore((state) => state.orbitPaths);
+
+  // Optimized subscriptions from useCameraStore
+  const isSurfaceCameraActive = useCameraStore((state) => state.isSurfaceCameraActive);
+  const setAutoRotate = useCameraStore((state) => state.setAutoRotate);
+  const autoRotate = useCameraStore((state) => state.autoRotate);
+  const activeCamera = useCameraStore((state) => state.activeCamera);
+  const switchToPlanetCamera = useCameraStore((state) => state.switchToPlanetCamera);
 
   const localRef = useRef();
   const localAngleRef = useRef(planetAngles[name] || 0);
   const cloudsRef = useRef();
   const meshRef = useRef(null);
 
-  const [texturesLoaded, setTexturesLoaded] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const initialClickPosition = useRef({ x: 0, y: 0 });
