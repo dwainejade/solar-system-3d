@@ -21,9 +21,9 @@ const SatelliteCamera = ({ target, size, targetName, bodyType = 'planet' }) => {
     // Use refs instead of state for frequently updating values
     const isDraggingRef = useRef(false);
     const mousePositionRef = useRef({ x: 0, y: 0 });
-    const sphericalRef = useRef(new THREE.Spherical(size * 6, Math.PI / 2, 0));
+    const sphericalRef = useRef(new THREE.Spherical(size * 5, Math.PI / 2, 0));
 
-    const minZoom = size * 2.8;
+    const minZoom = size * 3;
     const maxZoom = 1000;
     const zoomSpeed = 0.1;
 
@@ -60,6 +60,8 @@ const SatelliteCamera = ({ target, size, targetName, bodyType = 'planet' }) => {
     }, [handleUserInteraction]);
 
     const handleWheel = useCallback((event) => {
+        event.preventDefault();
+
         if (!satelliteCamera) return;
 
         const deltaRadius = event.deltaY * zoomSpeed;
@@ -142,7 +144,7 @@ const SatelliteCamera = ({ target, size, targetName, bodyType = 'planet' }) => {
         // Check for camera switch with improved threshold
         if (activeCamera.name === targetName && !satelliteCamera) {
             const distance = orbitCamera.position.distanceTo(targetWorldPos);
-            const sizeThreshold = size * 4.5;
+            const sizeThreshold = Math.max(size * 5, 0.1);
             if (distance <= sizeThreshold) {
                 switchToSatelliteCamera(orbitCamera, targetWorldPos);
             }
@@ -181,7 +183,7 @@ const SatelliteCamera = ({ target, size, targetName, bodyType = 'planet' }) => {
         canvasElement.addEventListener('mousedown', handleMouseDown);
         window.addEventListener('mousemove', handleMouseMove);
         window.addEventListener('mouseup', handleMouseUp);
-        canvasElement.addEventListener('wheel', handleWheel, { passive: true });
+        canvasElement.addEventListener('wheel', handleWheel);
         canvasElement.addEventListener('touchstart', handleStart);
         canvasElement.addEventListener('touchmove', handleMove);
         canvasElement.addEventListener('touchend', handleMouseUp);

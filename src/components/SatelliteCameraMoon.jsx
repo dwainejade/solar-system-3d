@@ -23,11 +23,11 @@ const MoonSatelliteCamera = ({ target, size, targetName, bodyType = 'moon' }) =>
     // Use refs instead of state for frequently updating values
     const isDraggingRef = useRef(false);
     const mousePositionRef = useRef({ x: 0, y: 0 });
-    const sphericalRef = useRef(new THREE.Spherical(size * 6, Math.PI / 2, 0));
+    const sphericalRef = useRef(new THREE.Spherical(size * 10, Math.PI / 2, 0));
 
-    const minZoom = size * 4;
+    const minZoom = size * 5;
     const maxZoom = 10000;
-    const zoomSpeed = 0.02;
+    const zoomSpeed = 0.01;
 
     const handleUserInteraction = useCallback(() => {
         setAutoRotate(false);
@@ -62,6 +62,8 @@ const MoonSatelliteCamera = ({ target, size, targetName, bodyType = 'moon' }) =>
     }, [handleUserInteraction]);
 
     const handleWheel = useCallback((event) => {
+        event.preventDefault();
+
         if (!satelliteCamera) return;
 
         const deltaRadius = event.deltaY * zoomSpeed;
@@ -116,7 +118,7 @@ const MoonSatelliteCamera = ({ target, size, targetName, bodyType = 'moon' }) =>
 
         if (activeCamera.name === targetName && !satelliteCamera) {
             const distance = orbitCamera.position.distanceTo(targetWorldPos);
-            const sizeThreshold = Math.max(size * 5, 0.01);
+            const sizeThreshold = Math.max(size * 10, 0.001);
 
             if (distance <= sizeThreshold) {
                 toggleSatelliteCamera(false);
@@ -127,9 +129,9 @@ const MoonSatelliteCamera = ({ target, size, targetName, bodyType = 'moon' }) =>
 
         if (!satelliteCamera) return;
 
-        if (autoRotate) {
-            sphericalRef.current.theta += 0.05 * delta;
-        }
+        // if (autoRotate) {
+        //     sphericalRef.current.theta += 0.05 * delta;
+        // }
 
         const localPosition = new THREE.Vector3().setFromSpherical(sphericalRef.current);
         const moonPosition = target.position;
@@ -184,7 +186,7 @@ const MoonSatelliteCamera = ({ target, size, targetName, bodyType = 'moon' }) =>
         canvasElement.addEventListener('mousedown', handleMouseDown);
         window.addEventListener('mousemove', handleMouseMove);
         window.addEventListener('mouseup', handleMouseUp);
-        canvasElement.addEventListener('wheel', handleWheel, { passive: true });
+        canvasElement.addEventListener('wheel', handleWheel);
         canvasElement.addEventListener('touchstart', handleStart);
         canvasElement.addEventListener('touchmove', handleMove);
         canvasElement.addEventListener('touchend', handleMouseUp);
