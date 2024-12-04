@@ -11,7 +11,6 @@ const Menu = () => {
   // Split store subscriptions into granular selectors
   const simSpeed = useStore(state => state.simSpeed);
   const setSimSpeed = useStore(state => state.setSimSpeed);
-  const prevSpeed = useStore(state => state.prevSpeed);
   const setPrevSpeed = useStore(state => state.setPrevSpeed);
   const toggleFullscreen = useStore(state => state.toggleFullscreen);
   const showDetailsMenu = useStore(state => state.showDetailsMenu);
@@ -25,7 +24,6 @@ const Menu = () => {
   const displayLabels = usePlanetStore(state => state.displayLabels);
   const toggleDisplayLabels = usePlanetStore(state => state.toggleDisplayLabels);
   const planetsData = usePlanetStore(state => state.planetsData);
-  const resetPlanetsData = usePlanetStore(state => state.resetPlanetsData);
   const showResetPlanetModal = usePlanetStore(state => state.showResetPlanetModal);
   const showResetAllModal = usePlanetStore(state => state.showResetAllModal);
   const toggleResetAllModal = usePlanetStore(state => state.toggleResetAllModal);
@@ -33,12 +31,10 @@ const Menu = () => {
   const toggleOrbitPaths = usePlanetStore(state => state.toggleOrbitPaths);
   const moonsData = usePlanetStore(state => state.moonsData);
   const setSelectedMoon = usePlanetStore(state => state.setSelectedMoon);
-  const selectedMoon = usePlanetStore(state => state.selectedMoon);
 
   // Camera store selectors
   const toggleSatelliteCamera = useCameraStore(state => state.toggleSatelliteCamera);
   const isCameraTransitioning = useCameraStore(state => state.isCameraTransitioning);
-  const satelliteCamera = useCameraStore(state => state.satelliteCamera);
   const autoRotate = useCameraStore(state => state.autoRotate);
   const switchToMoonCamera = useCameraStore(state => state.switchToMoonCamera);
   const switchToCustomCamera = useCameraStore(state => state.switchToCustomCamera);
