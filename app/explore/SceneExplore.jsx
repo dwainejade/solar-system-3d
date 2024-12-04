@@ -13,33 +13,36 @@ import AsteroidBelt from "@/components/asteroids/AsteroidBelt";
 import * as THREE from "three";
 
 const Scene = () => {
-  const { sunSettings, simSpeed, setSimSpeed, prevSpeed, setPrevSpeed, setViewOnlyMode, toggleDetailsMenu } = useStore();
-  const {
-    planetPositions,
-    selectedPlanet,
-    setSelectedPlanet,
-    selectedMoon,
-    setSelectedMoon,
-    planetsData,
-    moonsData,
-    moonPositions,
-    resetPlanetsData,
-  } = usePlanetStore();
-  const {
-    satelliteCamera,
-    isCameraTransitioning,
-    toggleCameraTransitioning,
-    isZoomingToSun,
-    resetCamera,
-    toggleZoomingToSun,
-    activeCamera,
-    setActiveCamera,
-    setSceneCameras,
-    sceneCameras,
-    satelliteCameraState,
-    setSatelliteCameraState,
-  } = useCameraStore();
-  const { experimentMode, toggleExperimentMode } = useExperimentsStore();
+  // Optimized subscriptions from useStore
+  const sunSettings = useStore((state) => state.sunSettings);
+  const simSpeed = useStore((state) => state.simSpeed);
+  const setSimSpeed = useStore((state) => state.setSimSpeed);
+  const setPrevSpeed = useStore((state) => state.setPrevSpeed);
+  const setViewOnlyMode = useStore((state) => state.setViewOnlyMode);
+  const toggleDetailsMenu = useStore((state) => state.toggleDetailsMenu);
+
+  // Optimized subscriptions from usePlanetStore
+  const planetPositions = usePlanetStore((state) => state.planetPositions);
+  const selectedPlanet = usePlanetStore((state) => state.selectedPlanet);
+  const setSelectedPlanet = usePlanetStore((state) => state.setSelectedPlanet);
+  const setSelectedMoon = usePlanetStore((state) => state.setSelectedMoon);
+  const planetsData = usePlanetStore((state) => state.planetsData);
+  const moonsData = usePlanetStore((state) => state.moonsData);
+  const moonPositions = usePlanetStore((state) => state.moonPositions);
+  const resetPlanetsData = usePlanetStore((state) => state.resetPlanetsData);
+
+  // Optimized subscriptions from useCameraStore
+  const satelliteCamera = useCameraStore((state) => state.satelliteCamera);
+  const isCameraTransitioning = useCameraStore((state) => state.isCameraTransitioning);
+  const toggleCameraTransitioning = useCameraStore((state) => state.toggleCameraTransitioning);
+  const resetCamera = useCameraStore((state) => state.resetCamera);
+  const toggleZoomingToSun = useCameraStore((state) => state.toggleZoomingToSun);
+  const activeCamera = useCameraStore((state) => state.activeCamera);
+  const satelliteCameraState = useCameraStore((state) => state.satelliteCameraState);
+  const setSatelliteCameraState = useCameraStore((state) => state.setSatelliteCameraState);
+
+  // Optimized subscriptions from useExperimentsStore
+  const toggleExperimentMode = useExperimentsStore((state) => state.toggleExperimentMode);
 
   const cameraControlsRef = useRef();
   const maxDistance = 160000;
