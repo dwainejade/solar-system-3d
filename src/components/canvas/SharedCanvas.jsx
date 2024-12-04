@@ -45,16 +45,16 @@ const SharedCanvas = ({ children, mode = 'main' }) => {
       <Canvas
         id='Canvas'
         style={{
-          height: '100vh',
-          width: '100vw'
+          height: '100%',
+          width: '100%'
         }}
         dpr={dpr}
         gl={{
           logarithmicDepthBuffer: true,
           antialias: true,
-          alpha: false,
+          // alpha: false,
           // powerPreference: 'high-performance',
-          depth: false
+          // depth: false
         }}
         camera={{
           fov: 50,
@@ -84,7 +84,7 @@ const SharedCanvas = ({ children, mode = 'main' }) => {
             />
           </EffectComposer>
         </Suspense>
-        <Preload all />
+        {/* <Preload all /> */}
       </Canvas>
       {!isLoading && mode === 'main' && <Menu />}
       {!isLoading && mode === 'experiments' && <ExperimentsMenu />}

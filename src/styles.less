@@ -39,8 +39,6 @@ body {
   color: black;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
-  height: 100%;
-  width: 100%;
 }
 
 .Main {
@@ -48,12 +46,19 @@ body {
   width: 100%;
   display: flex;
   min-height: 600px;
-  max-height: 700px;
   max-width: 1300px;
   overflow: hidden;
   margin: 0 auto;
   flex-direction: row;
   position: relative;
+
+  canvas {
+    height: 100%;
+    width: 100%;
+    min-height: 600px;
+    background-color: black;
+    overflow: hidden;
+  }
 
   .mobile-only() {
     height: 100vh;
@@ -129,14 +134,6 @@ body {
         }
       }
     }
-  }
-  // @media (max-width: 600px) {
-  //   flex-direction: column;
-  // }
-
-  #Canvas {
-    background-color: black;
-    position: relative;
   }
 
   .menu-wrapper {
