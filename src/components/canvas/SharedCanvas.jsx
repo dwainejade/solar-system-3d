@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useCallback, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Html, PerformanceMonitor, useProgress, Preload } from "@react-three/drei";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
@@ -13,32 +13,43 @@ const SharedCanvas = ({ children, mode = 'main' }) => {
   const { fullscreen, isLoading, toggleLoading } = useStore();
   const { errors, loaded } = useProgress();
   const total = 17;
-  const progressPercentage = (loaded / total) * 100;
   const [dpr, setDpr] = useState([1, 2]);
 
+  // Memoize progress calculation to prevent unnecessary recalculations
+  const progressPercentage = useMemo(() =>
+    (loaded / total) * 100
+    , [loaded]);
+
+  // Handle DPR changes with useCallback
+  const handleIncline = useCallback(() => setDpr([1, 2]), []);
+  const handleDecline = useCallback(() => setDpr([1, 1]), []);
+
+  // Separate effects for error handling and loading state
   useEffect(() => {
     if (errors.length) {
       console.warn(errors);
     }
-    if (progressPercentage >= 100) {
-      toggleLoading(false);
-    } else {
-      toggleLoading(true);
-    }
-  }, [errors, progressPercentage, toggleLoading]);
+  }, [errors]);
 
-  const Loader = () => {
-    return (
-      <Html as='div' fullscreen className='loading-screen'>
-        <div className='loading-con'>
-          <p>Loading...</p>
-          <div className='loading-bar-container'>
-            <div className='loading-bar' style={{ width: `${progressPercentage}%` }}></div>
-          </div>
+  useEffect(() => {
+    const isLoadingComplete = progressPercentage >= 100;
+    toggleLoading(!isLoadingComplete);
+  }, [progressPercentage, toggleLoading]);
+
+  // Memoize Loader component
+  const Loader = useMemo(() => () => (
+    <Html as='div' fullscreen className='loading-screen'>
+      <div className='loading-con'>
+        <p>Loading...</p>
+        <div className='loading-bar-container'>
+          <div
+            className='loading-bar'
+            style={{ width: `${progressPercentage}%` }}
+          />
         </div>
-      </Html>
-    );
-  };
+      </div>
+    </Html>
+  ), [progressPercentage]);
 
   return (
     <div className={`Main ${fullscreen ? "fullscreen" : "minimized"}`}>
@@ -46,15 +57,15 @@ const SharedCanvas = ({ children, mode = 'main' }) => {
         id='Canvas'
         style={{
           height: '100%',
-          width: '100%'
+          width: '100%',
+          position: 'absolute',
+          top: 0,
+          left: 0
         }}
         dpr={dpr}
         gl={{
           logarithmicDepthBuffer: true,
           antialias: true,
-          // alpha: false,
-          // powerPreference: 'high-performance',
-          // depth: false
         }}
         camera={{
           fov: 50,
@@ -64,8 +75,8 @@ const SharedCanvas = ({ children, mode = 'main' }) => {
         }}
       >
         <PerformanceMonitor
-          onIncline={() => setDpr([1, 2])}
-          onDecline={() => setDpr([1, 1])}
+          onIncline={handleIncline}
+          onDecline={handleDecline}
           flipflops={true}
         />
 
@@ -84,12 +95,18 @@ const SharedCanvas = ({ children, mode = 'main' }) => {
             />
           </EffectComposer>
         </Suspense>
-        {/* <Preload all /> */}
       </Canvas>
-      {/* {!isLoading && mode === 'main' && <Menu />} */}
-      {!isLoading && mode === 'experiments' && <ExperimentsMenu />}
+
+      {/* Memoize menu rendering condition */}
+      {useMemo(() => (
+        <>
+          {!isLoading && mode === 'main' && <Menu />}
+          {!isLoading && mode === 'experiments' && <ExperimentsMenu />}
+        </>
+      ), [isLoading, mode])}
     </div>
   );
 };
+
 
 export default SharedCanvas;
