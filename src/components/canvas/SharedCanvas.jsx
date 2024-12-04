@@ -44,13 +44,16 @@ const SharedCanvas = ({ children, mode = 'main' }) => {
     <div className={`Main ${fullscreen ? "fullscreen" : "minimized"}`}>
       <Canvas
         id='Canvas'
-        shadows
+        style={{
+          height: '100vh',
+          width: '100vw'
+        }}
         dpr={dpr}
         gl={{
           logarithmicDepthBuffer: true,
-          antialias: false,
+          antialias: true,
           alpha: false,
-          powerPreference: 'high-performance',
+          // powerPreference: 'high-performance',
           depth: false
         }}
         camera={{

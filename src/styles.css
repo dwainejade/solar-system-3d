@@ -23,21 +23,21 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  overflow: hidden;
-  height: 100%;
-  width: 100%;
 }
 body {
   font-family: helvetica neue, helvetica, arial, sans-serif;
   color: black;
   -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
 }
 .Main {
   height: 100%;
   width: 100%;
   display: flex;
   min-height: 600px;
-  max-height: 800px;
+  max-height: 700px;
   max-width: 1300px;
   overflow: hidden;
   margin: 0 auto;
