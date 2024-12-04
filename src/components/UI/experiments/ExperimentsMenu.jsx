@@ -31,10 +31,31 @@ const EXPERIMENT_SPEED_LIMITS = {
 };
 
 const ExperimentsMenu = () => {
-  const { resetExperiments, setExperimentPlanet, experimentPlanet, experimentStatus, experimentType } = useExperimentsStore();
-  const { simSpeed, setSimSpeed, setPrevSpeed, toggleFullscreen, resetAllData } = useStore();
-  const { displayLabels, toggleDisplayLabels, planetsData, showResetPlanetModal, showResetAllModal, orbitPaths, toggleOrbitPaths } = usePlanetStore();
-  const { autoRotate } = useCameraStore();
+  // Extract only what's needed from each store using selectors
+  const simSpeed = useStore((state) => state.simSpeed);
+  const setSimSpeed = useStore((state) => state.setSimSpeed);
+  const setPrevSpeed = useStore((state) => state.setPrevSpeed);
+  const toggleFullscreen = useStore((state) => state.toggleFullscreen);
+  const resetAllData = useStore((state) => state.resetAllData);
+
+  // Experiments store selectors
+  const resetExperiments = useExperimentsStore((state) => state.resetExperiments);
+  const setExperimentPlanet = useExperimentsStore((state) => state.setExperimentPlanet);
+  const experimentPlanet = useExperimentsStore((state) => state.experimentPlanet);
+  const experimentStatus = useExperimentsStore((state) => state.experimentStatus);
+  const experimentType = useExperimentsStore((state) => state.experimentType);
+
+  // Planet store selectors
+  const displayLabels = usePlanetStore((state) => state.displayLabels);
+  const toggleDisplayLabels = usePlanetStore((state) => state.toggleDisplayLabels);
+  const planetsData = usePlanetStore((state) => state.planetsData);
+  const showResetPlanetModal = usePlanetStore((state) => state.showResetPlanetModal);
+  const showResetAllModal = usePlanetStore((state) => state.showResetAllModal);
+  const orbitPaths = usePlanetStore((state) => state.orbitPaths);
+  const toggleOrbitPaths = usePlanetStore((state) => state.toggleOrbitPaths);
+
+  // Camera store selectors
+  const autoRotate = useCameraStore((state) => state.autoRotate);
 
   const [firstRender, setFirstRender] = useState(true);
   const [isMenuOpen, setMenuOpen] = useState(false);
