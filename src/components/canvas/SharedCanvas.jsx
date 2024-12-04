@@ -86,7 +86,7 @@ const SharedCanvas = ({ children, mode = 'main' }) => {
         </Suspense>
         {/* <Preload all /> */}
       </Canvas>
-      {!isLoading && mode === 'main' && <Menu />}
+      {/* {!isLoading && mode === 'main' && <Menu />} */}
       {!isLoading && mode === 'experiments' && <ExperimentsMenu />}
     </div>
   );
