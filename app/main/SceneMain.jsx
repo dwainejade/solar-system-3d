@@ -356,6 +356,8 @@ const SceneThree = () => {
 
       <Stars />
 
+      <pointLight position={[0, 0, 0]} intensity={4} distance={0} decay={0} color="#ffffff" />
+
       <Planet name="Earth" textures={earthTextures} />
       <Planet name="Mars" textures={marsTextures} />
       <Planet name="Venus" textures={venusTextures} />

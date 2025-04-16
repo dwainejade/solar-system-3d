@@ -5,18 +5,21 @@ import Scene from "./SceneExperiments";
 import useExperimentsStore from "../../src/store/experiments";
 import "../../src/styles/Experiments.css";
 
-const SceneExperimentsPage = () => {
-  const { experimentMode, toggleExperimentMode } = useExperimentsStore();
+const ExperimentsPage = () => {
+  const { toggleExperimentMode } = useExperimentsStore();
 
   useEffect(() => {
     toggleExperimentMode(true);
+    return () => {
+      toggleExperimentMode(false);
+    };
   }, [toggleExperimentMode]);
 
   return (
-    <SharedCanvas mode={experimentMode ? 'experiments' : 'main'}>
+    <SharedCanvas mode="experiments">
       <Scene />
     </SharedCanvas>
   );
 };
 
-export default SceneExperimentsPage;
+export default ExperimentsPage;

@@ -22,12 +22,12 @@ const Stars = () => {
   useEffect(() => {
     const loader = new CubeTextureLoader();
     const texture = loader.load([
-      '../assets/stars/stars-cube-map/px.png',
-      '../assets/stars/stars-cube-map/nx.png',
-      '../assets/stars/stars-cube-map/py.png',
-      '../assets/stars/stars-cube-map/ny.png',
-      '../assets/stars/stars-cube-map/pz.png',
-      '../assets/stars/stars-cube-map/nz.png',
+      '../assets/stars/stars-cube-map/high-res/px.png',
+      '../assets/stars/stars-cube-map/high-res/nx.png',
+      '../assets/stars/stars-cube-map/high-res/py.png',
+      '../assets/stars/stars-cube-map/high-res/ny.png',
+      '../assets/stars/stars-cube-map/high-res/pz.png',
+      '../assets/stars/stars-cube-map/high-res/nz.png',
     ]);
 
     // const constellationsTexture = loader.load([

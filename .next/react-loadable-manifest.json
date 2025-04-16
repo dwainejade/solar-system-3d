@@ -1,13 +1,12 @@
 {
   "node_modules/@react-three/drei/core/Text.js -> troika-three-text": {
-    "id": 5212,
+    "id": "node_modules/@react-three/drei/core/Text.js -> troika-three-text",
     "files": [
-      "static/chunks/0f8af13e.65e9f70631afb4e4.js",
-      "static/chunks/610.04419856ad100465.js"
+      "static/chunks/_app-pages-browser_node_modules_troika-three-text_dist_troika-three-text_esm_js.js"
     ]
   },
   "node_modules/@react-three/drei/web/FaceLandmarker.js -> @mediapipe/tasks-vision": {
-    "id": null,
+    "id": "node_modules/@react-three/drei/web/FaceLandmarker.js -> @mediapipe/tasks-vision",
     "files": []
   }
 }

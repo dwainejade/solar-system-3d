@@ -2,7 +2,7 @@
 import SharedCanvas from "@/components/canvas/SharedCanvas";
 import Scene from "./SceneMain";
 
-const SceneOnePage = () => {
+const MainPage = () => {
   return (
     <SharedCanvas>
       <Scene />
@@ -10,4 +10,4 @@ const SceneOnePage = () => {
   );
 };
 
-export default SceneOnePage;
+export default MainPage;

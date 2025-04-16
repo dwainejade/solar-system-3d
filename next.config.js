@@ -8,11 +8,7 @@ const withPWA = require('@ducanh2912/next-pwa').default({
 })
 
 const nextConfig = {
-  // Only apply basePath and assetPrefix in production
-  basePath: process.env.NODE_ENV === 'development' ? '' : '/solar-system-interactive',
-  assetPrefix: process.env.NODE_ENV === 'development' ? '' : '/solar-system-interactive',
-  output: process.env.NODE_ENV === "development" ? undefined : "export",
-  distDir: 'dist',
+  // Remove basePath and assetPrefix for Vercel deployment
   reactStrictMode: true,
   trailingSlash: true,
   images: {},
