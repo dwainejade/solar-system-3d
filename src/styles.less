@@ -45,8 +45,8 @@ body {
   height: 100%;
   width: 100%;
   display: flex;
-  min-height: 600px;
-  max-width: 1300px;
+  min-height: 500px;
+  height: 100vh;
   overflow: hidden;
   margin: 0 auto;
   flex-direction: row;
@@ -55,13 +55,12 @@ body {
   canvas {
     height: 100%;
     width: 100%;
-    min-height: 600px;
+    min-height: 500px;
     background-color: black;
     overflow: hidden;
   }
 
   .mobile-only() {
-    height: 100vh;
     min-height: unset;
     max-height: unset;
     flex-direction: column;
